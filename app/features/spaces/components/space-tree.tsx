@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next";
 import { Form, Link } from "react-router";
 import { Button, CsrfField, Dialog, SelectField, TextField, cx } from "~/components/ui";
 import { COMMON_TIMEZONES } from "~/lib/format";
+import { VirtualBadge } from "~/features/sim/components/common";
 import { allowedChildTypes, flattenSpaces, moveTargets, type FlatSpace, type SpaceNode } from "~/lib/spaces";
 
 export interface TreeActionResult {
@@ -15,6 +16,13 @@ export interface TreeActionResult {
   error?: { code: string; message?: string };
   fieldErrors?: Record<string, string>;
   blockers?: { children?: number; devices?: number; markers?: number; workOrders?: number } | null;
+}
+
+/** "실제만"(SIM-01.01): 가상 공간과 그 아래를 뺀다 */
+export function withoutVirtual(flat: FlatSpace[]): FlatSpace[] {
+  const hidden = new Set<string>();
+  for (const s of flat) if (s.node.virtual || (s.parentId && hidden.has(s.parentId))) hidden.add(s.id);
+  return flat.filter((s) => !hidden.has(s.id));
 }
 
 /** 검색어와 맞는 공간과 그 조상만 남긴다 */
@@ -38,12 +46,20 @@ export function filterTree(flat: FlatSpace[], query: string): FlatSpace[] {
 export function SpaceTree({ spaces, selectedId, canEdit, result }: { spaces: SpaceNode[]; selectedId?: string; canEdit: boolean; result?: TreeActionResult }) {
   const { t } = useTranslation();
   const [query, setQuery] = useState("");
+  const [realOnly, setRealOnly] = useState(false);
   const flat = flattenSpaces(spaces);
-  const visible = filterTree(flat, query);
+  const hasVirtual = flat.some((s) => s.node.virtual);
+  const visible = filterTree(realOnly ? withoutVirtual(flat) : flat, query);
   const selected = flat.find((s) => s.id === selectedId);
   return (
     <nav aria-label={t("spaces.tree.label")} className="flex flex-col gap-2">
       <TextField label={t("spaces.tree.search")} value={query} onChange={(e) => setQuery(e.target.value)} type="search" />
+      {hasVirtual && (
+        <label className="flex items-center gap-2 text-[12.5px]">
+          <input type="checkbox" checked={realOnly} onChange={(e) => setRealOnly(e.target.checked)} />
+          {t("spaces.tree.realOnly")}
+        </label>
+      )}
       {canEdit && <TreeTools spaces={spaces} selected={selected} result={result} />}
       <ul className="flex flex-col">
         {visible.map((s) => (
@@ -55,6 +71,7 @@ export function SpaceTree({ spaces, selectedId, canEdit, result }: { spaces: Spa
             >
               <span className="text-[10.5px] uppercase text-muted">{t(`spaceType.${s.type}`, { defaultValue: s.type })}</span>
               <span className="flex-1">{s.name}</span>
+              {s.node.virtual && <VirtualBadge />}
               {s.node.counts?.devices ? <span className="font-mono text-[11px] text-muted">{s.node.counts.devices}</span> : null}
               {s.node.counts?.offline ? <span className="rounded bg-warn-soft px-1 text-[11px] text-warn">{t("spaces.tree.offline", { n: s.node.counts.offline })}</span> : null}
             </Link>

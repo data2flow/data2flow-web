@@ -19,6 +19,8 @@ export interface SpaceNode {
   comfortState?: string | null;
   /** 권한 범위 밖 조상(이름만 보이는 회색 노드, API-DSH-02) */
   accessible?: boolean;
+  /** 가상 공간(SIM-01.01, API-SIM-10). 화면에 보라 [가상] 배지 */
+  virtual?: boolean;
 }
 
 export interface FlatSpace {

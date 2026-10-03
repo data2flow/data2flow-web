@@ -17,7 +17,8 @@
       "deleteBody": "下位空間・デバイス・平面図マーカー・作業指示がない空間のみ削除できます。",
       "typeName": "確認のため空間名「{{name}}」を入力してください",
       "blockers": "下位空間 {{children}} 件、デバイス {{devices}} 台、マーカー {{markers}} 件、作業指示 {{workOrders}} 件があるため削除できません。",
-      "viewDevices": "デバイスを見る"
+      "viewDevices": "デバイスを見る",
+      "realOnly": "実物のみ"
     },
     "field": {
       "name": "名前",

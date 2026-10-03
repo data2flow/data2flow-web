@@ -17,7 +17,8 @@
       "deleteBody": "하위 공간·기기·평면도 마커·작업 지시가 없는 공간만 삭제할 수 있습니다.",
       "typeName": "확인을 위해 공간 이름 \"{{name}}\"을 입력하세요",
       "blockers": "하위 공간 {{children}}개, 기기 {{devices}}대, 마커 {{markers}}개, 작업 지시 {{workOrders}}건이 있어 삭제할 수 없습니다.",
-      "viewDevices": "기기 보기"
+      "viewDevices": "기기 보기",
+      "realOnly": "실제만"
     },
     "field": {
       "name": "이름",

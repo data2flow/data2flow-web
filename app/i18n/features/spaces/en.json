@@ -17,7 +17,8 @@
       "deleteBody": "Only spaces without child spaces, devices, floor plan markers or work orders can be deleted.",
       "typeName": "Type the space name \"{{name}}\" to confirm",
       "blockers": "Cannot delete: {{children}} child spaces, {{devices}} devices, {{markers}} markers, {{workOrders}} work orders.",
-      "viewDevices": "View devices"
+      "viewDevices": "View devices",
+      "realOnly": "Real only"
     },
     "field": {
       "name": "Name",

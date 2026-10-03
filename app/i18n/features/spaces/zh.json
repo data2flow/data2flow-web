@@ -17,7 +17,8 @@
       "deleteBody": "只能删除没有下级空间、设备、平面图标记和工单的空间。",
       "typeName": "请输入空间名称“{{name}}”以确认",
       "blockers": "存在 {{children}} 个下级空间、{{devices}} 台设备、{{markers}} 个标记、{{workOrders}} 个工单，无法删除。",
-      "viewDevices": "查看设备"
+      "viewDevices": "查看设备",
+      "realOnly": "仅真实"
     },
     "field": {
       "name": "名称",
