@@ -215,7 +215,6 @@ export class FakeGateway {
         return new HttpResponse(null, { status: 204, headers: { "Set-Cookie": "data2flow_refresh=; Max-Age=0; Path=/api/v1/auth" } });
       }),
       http.get(`${GATEWAY}/api/v1/core/stream/*`, ({ request }) => gw.openStream(request)),
-      http.get(`${GATEWAY}/api/v1/core/sources/:id/live`, ({ request }) => gw.openStream(request)),
       http.all(`${GATEWAY}/api/v1/core/*`, async ({ request }) => {
         const url = new URL(request.url);
         const path = url.pathname.replace("/api/v1/core", "");

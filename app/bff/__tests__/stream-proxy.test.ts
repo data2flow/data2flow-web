@@ -6,6 +6,7 @@ import { RouterContextProvider } from "react-router";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { login } from "../auth-flow.server";
 import { bff, bffMiddleware } from "../middleware.server";
+import { proxyRequest } from "../proxy.server";
 import { proxyStream, streamTarget } from "../stream-proxy.server";
 import { cookieValue, setup } from "./helpers";
 
@@ -92,7 +93,7 @@ describe("IAM-07.06 TC-IAM-198 실시간 연결은 세션 쿠키로 BFF에, BFF�
       return original(input, init);
     };
     const controller = new AbortController();
-    const response = await open("/bff/stream/ingest?channels=stats", cookie, { signal: controller.signal });
+    const response = await open("/bff/stream/live?topics=ingest", cookie, { signal: controller.signal });
     const reader = response.body!.getReader();
     await reader.read();
     expect(signals).toHaveLength(1);
@@ -105,7 +106,7 @@ describe("IAM-07.06 TC-IAM-198 실시간 연결은 세션 쿠키로 BFF에, BFF�
   it("gateway가 연결을 닫으면 BFF 응답도 끝난다(브라우저가 다시 연결)", async () => {
     const cookie = await cookieFor();
     const response = await open("/bff/stream/sources/7/live?topicFilter=application", cookie);
-    expect(t.state.gateway.received.some((r) => r.path === "/api/v1/core/sources/7/live?topicFilter=application")).toBe(true);
+    expect(t.state.gateway.received.some((r) => r.path === "/api/v1/core/stream/sources/7/live?topicFilter=application")).toBe(true);
     const reader = response.body!.getReader();
     await reader.read();
     t.state.gateway.closeStreams();
@@ -127,12 +128,23 @@ describe("IAM-07.06 TC-IAM-198 실시간 연결은 세션 쿠키로 BFF에, BFF�
   });
 });
 
+describe("API 문서의 BFF 표기 /bff/api/core/stream/**도 SSE 중계", () => {
+  it("일반 중계(제한 시간 있음) 대신 스트림 중계로 보낸다", async () => {
+    const cookie = await cookieFor();
+    const request = new Request(`${ORIGIN}/bff/api/core/stream/sources/7/live?maxRate=10`, { headers: { Cookie: `data2flow_session=${cookie}` } });
+    const context = new RouterContextProvider();
+    const response = (await bffMiddleware({ request, context, params: {}, unstable_pattern: "" } as never, async () => proxyRequest(request, bff(context), "core", "stream/sources/7/live"))) as Response;
+    expect(response.headers.get("Content-Type")).toContain("text/event-stream");
+    expect(t.state.gateway.received.some((r) => r.path === "/api/v1/core/stream/sources/7/live?maxRate=10")).toBe(true);
+    await response.body!.cancel();
+  });
+});
+
 describe("streamTarget 허용 목록", () => {
-  it("live·ingest·ops/components·sources/{id}/live만, 경로 조작은 거부", () => {
+  it("live·sources/{id}/live만(API-DSH-20, API-DSC-10), 경로 조작은 거부", () => {
     expect(streamTarget("live", "?topics=a")).toBe("/api/v1/core/stream/live?topics=a");
-    expect(streamTarget("ingest", "")).toBe("/api/v1/core/stream/ingest");
-    expect(streamTarget("ops/components", "")).toBe("/api/v1/core/stream/ops/components");
-    expect(streamTarget("sources/7/live", "")).toBe("/api/v1/core/sources/7/live");
+    expect(streamTarget("ingest", "")).toBeUndefined();
+    expect(streamTarget("sources/7/live", "")).toBe("/api/v1/core/stream/sources/7/live");
     expect(streamTarget("sources/abc/live", "")).toBeUndefined();
     expect(streamTarget("../auth/login", "")).toBeUndefined();
     expect(streamTarget("live/../x", "")).toBeUndefined();

@@ -6,6 +6,7 @@
  */
 import { SessionEndedError, UpstreamUnavailableError, publicFetch, sessionFetch } from "./gateway.server";
 import { errorResponse, type BffRequestContext } from "./middleware.server";
+import { proxyStream } from "./stream-proxy.server";
 
 export const PROXY_SERVICES = new Set(["core", "ai"]);
 
@@ -19,6 +20,8 @@ export async function proxyRequest(request: Request, ctx: BffRequestContext, ser
     return errorResponse(404, "RESOURCE_NOT_FOUND", meta.lang, meta.requestId);
   }
   if (session.expired) return errorResponse(401, "AUTH_SESSION_EXPIRED", meta.lang, meta.requestId);
+  // `/bff/api/core/stream/**`(API 문서의 BFF 표기)도 SSE 중계로 보낸다. 일반 중계는 제한 시간이 있어 오래 열 수 없다
+  if (service === "core" && rest.startsWith("stream/") && request.method.toUpperCase() === "GET") return proxyStream(request, ctx, rest.slice("stream/".length));
 
   const url = new URL(request.url);
   const path = `/api/v1/${service}/${rest}${url.search}`;
