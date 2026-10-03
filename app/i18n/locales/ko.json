@@ -1,0 +1,10 @@
+{
+  "app": {
+    "name": "data2flow",
+    "tagline": "지켜보는 운영은 끝났습니다. 이제, 스스로 해결합니다.",
+    "preparing": "서비스를 준비하고 있습니다."
+  },
+  "common": {
+    "language": "언어"
+  }
+}

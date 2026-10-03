@@ -1,0 +1,10 @@
+{
+  "app": {
+    "name": "data2flow",
+    "tagline": "只会盯着看的运维已经结束。现在，它会自己解决问题。",
+    "preparing": "服务正在准备中。"
+  },
+  "common": {
+    "language": "语言"
+  }
+}

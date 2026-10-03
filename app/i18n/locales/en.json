@@ -1,0 +1,10 @@
+{
+  "app": {
+    "name": "data2flow",
+    "tagline": "Stop watching dashboards. Let your building fix itself.",
+    "preparing": "We are getting the service ready."
+  },
+  "common": {
+    "language": "Language"
+  }
+}
