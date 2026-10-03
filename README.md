@@ -79,3 +79,19 @@ KEEP=1 e2e/m1-demo.sh                   # 끝나도 컨테이너·프로세스�
 필요: docker, Java 21, Node 22 + pnpm, curl, python3, openssl, lsof. 포트 25432·26379·25672·21025·28025·28780~28798을 씁니다.
 
 문구를 추가할 때는 `app/i18n/locales/{ko,en,ja,zh}.json`(공통) 또는 기능별 `app/i18n/features/{기능}/{ko,en,ja,zh}.json` 네 파일에 같은 키를 넣습니다. 기능별 파일은 공통 문구에 깊게 합쳐집니다(`errors` 같은 키도 합쳐짐). 키나 보간 변수가 하나라도 다르면 테스트가 실패합니다.
+
+## M2 수집 경로 시연 검증(e2e)
+
+`e2e/m2-demo.sh`는 plan/milestones.md §M2 시연(시나리오 1의 1~3단계)을 실제 서비스로 끝까지 돌립니다: 관리자 로그인(BFF) → 공간 만들기 → ChirpStack MQTT 소스 저장 전 연결 테스트(최근 메시지 미리보기) → 소스 저장·활성화(상태 `CONNECTED`가 실시간 `sources` 토픽으로 반영) → 아카데미 6종(EM300-TH·EM320-TH·EM500-CO2·AM103·AM107·WS302) ChirpStack v4 업링크 → 기기 PENDING 자동 등록 → 모델·공간 지정 승인 → BFF SSE로 `device-update`·`point` 수신 → 시계열 조회와 1분 집계. 이어서 플랫폼 브로커 직결 기기를 확인합니다: 승인 전 서명 없는 값은 quality 2로 격리 → 승인 때 서명 키 1회 → 서명이 맞으면 quality 0 → 서명 없음·틀린 서명은 `DEVICE_SIGNATURE_INVALID`로 거부(측정값 저장 0건).
+
+- 공용 인프라(s3·s4·`iot-data.java21.net`)는 쓰지 않습니다. PostgreSQL 18·Valkey 8·RabbitMQ 4(stream 플러그인)·Mailpit·Mosquitto 2(ChirpStack 브로커 흉내)를 임시 컨테이너로 띄우고, 업링크는 이 임시 Mosquitto에만 발행합니다. 끝나면 컨테이너와 프로세스를 모두 지웁니다.
+- 형제 디렉터리의 `data2flow-auth`·`api-gateway`·`core-api`·`ingress`·`pipeline`을 빌드해 프로필 `e2e`로 실행합니다. `data2flow-contracts`는 로컬 저장소에 설치돼 있어야 합니다(`./mvnw install`). 업링크 본문은 pipeline의 골든 픽스처(`src/test/resources/golden/chirpstack`)에 시각·`deduplicationId`·`fCnt`를 새로 채운 것입니다.
+- 키와 비밀번호는 실행마다 새로 만들어 `WORK_DIR/keys.env`(권한 600)에만 둡니다. 결과는 `WORK_DIR/results.txt`, SSE 기록은 `WORK_DIR/sse-*.txt`에 남습니다.
+
+```bash
+e2e/m2-demo.sh                          # 빌드 + 시연(약 6분, 1분 집계를 기다림)
+SKIP_BUILD=1 WORK_DIR=/tmp/m2 e2e/m2-demo.sh
+KEEP=1 e2e/m2-demo.sh                   # 끝나도 컨테이너·프로세스를 남긴다(디버깅)
+```
+
+포트 31025·31883·35432·35552·35672·36379·38025·38780~38798을 씁니다.
