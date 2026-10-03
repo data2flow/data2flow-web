@@ -22,6 +22,9 @@ import { hasAny } from "~/lib/permissions";
 import type { SpaceNode } from "~/lib/spaces";
 import type { RootData } from "~/root";
 import { DeviceCredentialsPanel } from "~/features/sources/device-credentials";
+import { simApi } from "~/features/sim/api";
+import { VirtualDeviceTab } from "~/features/sim/components/virtual-device-tab";
+import type { VirtualDeviceConfig } from "~/features/sim/model/types";
 import { CommandHistory, HistoryFilters } from "~/features/control/command-history";
 import { DeviceControlPanel } from "~/features/control/control-panel";
 import { historyQuery, type Command, type ControlInfo } from "~/features/control/model/control";
@@ -33,7 +36,7 @@ export function meta() {
 
 // 변경 이력(API-DEV-27)은 DEV-02.07(M4, 규칙·알람·명령 이력과 함께) 범위라 M2에서는 탭을 두지 않는다
 // 제어(UI-ACT-01, ACT-02.04·04.01·04.02)·명령 이력(UI-ACT-02, ACT-04.03)은 M3
-const TABS = ["overview", "data", "control", "commands", "raw", "semantic", "credentials"] as const;
+const TABS = ["overview", "data", "control", "commands", "virtual", "raw", "semantic", "credentials"] as const;
 type Tab = (typeof TABS)[number];
 
 interface RawRow {
@@ -79,6 +82,7 @@ export async function loader({ request, context, params }: Route.LoaderArgs) {
   let modelMetrics: string[] = [];
   let control: ControlInfo | null | undefined;
   let commands: { rows: Command[]; nextCursor?: string | null; failed: boolean } | undefined;
+  let virtualConfig: { config: VirtualDeviceConfig | null; failed: boolean } | undefined;
   if (tab === "raw") {
     const from = new Date(now - 7 * 86_400_000).toISOString();
     const to = new Date(now).toISOString();
@@ -97,6 +101,10 @@ export async function loader({ request, context, params }: Route.LoaderArgs) {
     // API-ACT-02 기기별 명령 이력(커서 목록)
     const result = await callList<Command>(ctx, request, `/api/v1/core/devices/${id}/commands?${historyQuery(url.searchParams)}`);
     commands = { rows: result.ok ? result.list.responses : [], nextCursor: result.ok ? result.list.nextCursor : null, failed: !result.ok };
+  } else if (tab === "virtual") {
+    // UI-SIM-03 가상 기기 설정(API-SIM-09). 가상 기기가 아니면 탭을 보이지 않는다
+    const sim = detail.virtual ? await callApi<VirtualDeviceConfig>(ctx, request, `/api/v1/core/sim/devices/${id}`) : null;
+    virtualConfig = { config: sim?.ok ? sim.data : null, failed: Boolean(sim && !sim.ok) };
   } else if (tab === "semantic") {
     const result = await callApi<SemanticDoc>(ctx, request, `/api/v1/core/devices/${id}/semantic`);
     semantic = result.ok ? result.data : null;
@@ -109,7 +117,7 @@ export async function loader({ request, context, params }: Route.LoaderArgs) {
     const [models, spaces] = await Promise.all([callList<{ id: string; code: string; name: string }>(ctx, request, "/api/v1/core/device-models?size=100"), callApi<SpaceNode[]>(ctx, request, "/api/v1/core/spaces")]);
     editOptions = { models: models.ok ? models.list.responses : [], spaces: spaces.ok ? (spaces.data ?? []) : [] };
   }
-  return { device: detail, tab, now, raw, semantic, control, commands, modelMetrics, editOptions, preferences: prefs.ok ? prefs.data : null };
+  return { device: detail, tab, now, raw, virtualConfig, semantic, control, commands, modelMetrics, editOptions, preferences: prefs.ok ? prefs.data : null };
 }
 
 type ActionResult = { intent: string; done?: boolean; error?: { code: string; message?: string }; references?: { type: string; id: string; name?: string }[]; fieldErrors?: Record<string, string> };
@@ -206,7 +214,7 @@ export default function DeviceDetailRoute({ loaderData, actionData }: Route.Comp
   const [deleteOpen, setDeleteOpen] = useState(false);
   const favorite = isFavorite(preferences?.favorites, "DEVICE", device.id);
   const platformBroker = device.source?.type === "PLATFORM_BROKER";
-  const tabItems = TABS.filter((k) => k !== "credentials" || platformBroker).map((k) => ({ key: k, label: t(`devices.tabs.${k}`), to: `?tab=${k}` }));
+  const tabItems = TABS.filter((k) => (k !== "credentials" || platformBroker) && (k !== "virtual" || device.virtual)).map((k) => ({ key: k, label: k === "virtual" ? t("sim.virtual") : t(`devices.tabs.${k}`), to: `?tab=${k}` }));
   const fmt = (iso?: string | null) => formatDateTime(iso ?? undefined, timezone, i18n.language, true);
   const conflict = result?.error?.code === "VERSION_CONFLICT";
 
@@ -295,6 +303,7 @@ export default function DeviceDetailRoute({ loaderData, actionData }: Route.Comp
       {editOptions && <EditPanel device={device} options={editOptions} canAdmin={canAdmin} fieldErrors={result?.fieldErrors} />}
 
       <Tabs items={tabItems} current={tab} />
+      {tab === "virtual" && loaderData.virtualConfig && <VirtualDeviceTab deviceId={device.id} initial={loaderData.virtualConfig.config} failed={loaderData.virtualConfig.failed} canManage={hasAny(permissions, ["SIM_MANAGE"])} api={simApi} />}
       {tab === "overview" && <DeviceOverview device={device} timezone={timezone} lang={i18n.language} now={now} />}
       {tab === "data" && <DeviceDataPanel deviceId={device.id} metrics={metricChoices(device.latest, modelMetrics)} latest={device.latest} expectedIntervalSec={device.effective?.expectedIntervalSec} timezone={timezone} now={Date.now} />}
       {tab === "raw" && raw && (
