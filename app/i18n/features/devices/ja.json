@@ -8,7 +8,12 @@
     "status": "状態",
     "connectivity": "接続",
     "kind": "種類",
-    "kinds": { "SENSOR": "センサー", "ACTUATOR": "アクチュエーター", "GATEWAY": "ゲートウェイ", "HYBRID": "複合" },
+    "kinds": {
+      "SENSOR": "センサー",
+      "ACTUATOR": "アクチュエーター",
+      "GATEWAY": "ゲートウェイ",
+      "HYBRID": "複合"
+    },
     "model": "モデル",
     "space": "空間",
     "source": "ソース",
@@ -42,7 +47,11 @@
     "noModel": "モデルなし",
     "offlineBaseline": "オフライン基準",
     "offlineBaselineValue": "{{sec}}秒 × {{n}}（{{from}}）",
-    "inheritedFrom": { "DEVICE": "デバイスの値", "MODEL": "モデルの値", "SYSTEM": "システム既定値" },
+    "inheritedFrom": {
+      "DEVICE": "デバイスの値",
+      "MODEL": "モデルの値",
+      "SYSTEM": "システム既定値"
+    },
     "favorite": "お気に入りに追加",
     "unfavorite": "お気に入りから外す",
     "activate": "有効化",
@@ -53,15 +62,78 @@
     "deleteTitle": "デバイス削除",
     "deleteBody": "{{name}}を削除します。元に戻せません。",
     "inUse": "ルール・フローなどで使用中のため削除できません。先に使用箇所から外すか無効化してください。",
-    "credentialsPlaceholder": "プラットフォームブローカーの認証情報",
-    "area": { "all": "全デバイス", "pending": "承認待ち", "models": "デバイスモデル", "metrics": "測定項目", "groups": "グループ" },
-    "tabs": { "overview": "概要", "data": "データ", "raw": "生メッセージ", "history": "変更履歴", "semantic": "セマンティック", "credentials": "認証情報" },
-    "overview": { "title": "現在の状態" },
-    "onboarding": { "title": "オンボーディング", "firstData": "初回受信", "model": "モデル", "space": "空間", "decodeOk": "デコード", "rulesApplied": "ルール", "done": "完了", "todo": "未完了" },
-    "data": { "title": "測定データ", "metrics": "測定項目", "period": "期間", "quality": "品質", "qualityNormal": "正常のみ", "qualityAll": "すべて", "error": "データを読み込めませんでした。", "chooseMetric": "測定項目を1つ以上選んでください" },
-    "raw": { "title": "生メッセージ（最新50件）", "unavailable": "生メッセージを読み込めませんでした。", "empty": "直近7日間の生メッセージはありません", "receivedAt": "受信時刻", "topic": "トピック", "status": "処理結果", "size": "サイズ", "json": "生JSON", "noPayload": "生データを見る権限がありません。" },
-    "history": { "title": "変更履歴", "empty": "変更履歴はありません", "at": "時刻", "actor": "誰が", "action": "何を", "changes": "変更" },
-    "semantic": { "title": "セマンティック", "reapply": "モデルのタグを再適用", "empty": "モデルに既定のタグがありません", "equipClass": "機器種別", "equipName": "機器名", "metric": "測定項目", "pointType": "ポイント種別", "quantity": "物理量", "tags": "タグ", "pointTypeOf": "{{metric}}のポイント種別", "quantityOf": "{{metric}}の物理量", "tagsOf": "{{metric}}のタグ", "readOnly": "閲覧のみ" },
+    "area": {
+      "all": "全デバイス",
+      "pending": "承認待ち",
+      "models": "デバイスモデル",
+      "metrics": "測定項目",
+      "groups": "グループ"
+    },
+    "tabs": {
+      "overview": "概要",
+      "data": "データ",
+      "raw": "生メッセージ",
+      "history": "変更履歴",
+      "semantic": "セマンティック",
+      "credentials": "認証情報"
+    },
+    "overview": {
+      "title": "現在の状態"
+    },
+    "onboarding": {
+      "title": "オンボーディング",
+      "firstData": "初回受信",
+      "model": "モデル",
+      "space": "空間",
+      "decodeOk": "デコード",
+      "rulesApplied": "ルール",
+      "done": "完了",
+      "todo": "未完了"
+    },
+    "data": {
+      "title": "測定データ",
+      "metrics": "測定項目",
+      "period": "期間",
+      "quality": "品質",
+      "qualityNormal": "正常のみ",
+      "qualityAll": "すべて",
+      "error": "データを読み込めませんでした。",
+      "chooseMetric": "測定項目を1つ以上選んでください"
+    },
+    "raw": {
+      "title": "生メッセージ（最新50件）",
+      "unavailable": "生メッセージを読み込めませんでした。",
+      "empty": "直近7日間の生メッセージはありません",
+      "receivedAt": "受信時刻",
+      "topic": "トピック",
+      "status": "処理結果",
+      "size": "サイズ",
+      "json": "生JSON",
+      "noPayload": "生データを見る権限がありません。"
+    },
+    "history": {
+      "title": "変更履歴",
+      "empty": "変更履歴はありません",
+      "at": "時刻",
+      "actor": "誰が",
+      "action": "何を",
+      "changes": "変更"
+    },
+    "semantic": {
+      "title": "セマンティック",
+      "reapply": "モデルのタグを再適用",
+      "empty": "モデルに既定のタグがありません",
+      "equipClass": "機器種別",
+      "equipName": "機器名",
+      "metric": "測定項目",
+      "pointType": "ポイント種別",
+      "quantity": "物理量",
+      "tags": "タグ",
+      "pointTypeOf": "{{metric}}のポイント種別",
+      "quantityOf": "{{metric}}の物理量",
+      "tagsOf": "{{metric}}のタグ",
+      "readOnly": "閲覧のみ"
+    },
     "pending": {
       "title": "承認待ち（{{n}}）",
       "rejected": "{{n}}台を拒否しました。",

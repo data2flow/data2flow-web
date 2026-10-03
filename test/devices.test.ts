@@ -320,7 +320,9 @@ describe("DEV-02.01 UI-DEV-06 기기 상세", () => {
     app.gateway.m2.devices.push({ ...app.gateway.m2.devices[0], id: "2001", name: "ESP32-TH-01", externalId: "esp32-th-01", sourceId: "8" });
     const browser = await viewer();
     const page = await browser.get("/devices/2001?tab=credentials");
-    expect(page.body).toContain('data-slot="device-credentials"');
+    // UI-DSC-06 패널(DSC-03.02): 접속 정보는 서버 렌더링, 목록은 브라우저에서 불러온다. VIEWER에게는 발급 버튼이 없다
+    expect(page.body).toContain("wss://iot-data.java21.net/mqtt");
+    expect(page.body).not.toContain(">발급</button>");
     expect((await browser.get("/devices/9999")).response.status).toBe(404);
   });
 });

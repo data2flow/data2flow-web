@@ -8,7 +8,12 @@
     "status": "상태",
     "connectivity": "연결",
     "kind": "종류",
-    "kinds": { "SENSOR": "센서", "ACTUATOR": "액추에이터", "GATEWAY": "게이트웨이", "HYBRID": "복합" },
+    "kinds": {
+      "SENSOR": "센서",
+      "ACTUATOR": "액추에이터",
+      "GATEWAY": "게이트웨이",
+      "HYBRID": "복합"
+    },
     "model": "모델",
     "space": "공간",
     "source": "소스",
@@ -42,7 +47,11 @@
     "noModel": "모델 없음",
     "offlineBaseline": "오프라인 기준",
     "offlineBaselineValue": "{{sec}}초 × {{n}} ({{from}})",
-    "inheritedFrom": { "DEVICE": "기기 값", "MODEL": "모델 값", "SYSTEM": "시스템 기본값" },
+    "inheritedFrom": {
+      "DEVICE": "기기 값",
+      "MODEL": "모델 값",
+      "SYSTEM": "시스템 기본값"
+    },
     "favorite": "즐겨찾기에 추가",
     "unfavorite": "즐겨찾기에서 빼기",
     "activate": "활성화",
@@ -53,15 +62,78 @@
     "deleteTitle": "기기 삭제",
     "deleteBody": "{{name}} 기기를 삭제합니다. 되돌릴 수 없습니다.",
     "inUse": "규칙·플로우 등에서 쓰고 있어 삭제할 수 없습니다. 먼저 사용처에서 빼거나 비활성화하세요.",
-    "credentialsPlaceholder": "플랫폼 브로커 자격증명",
-    "area": { "all": "전체 기기", "pending": "승인 대기", "models": "기기 모델", "metrics": "측정 항목", "groups": "그룹" },
-    "tabs": { "overview": "개요", "data": "데이터", "raw": "원본 메시지", "history": "변경 이력", "semantic": "시맨틱", "credentials": "자격증명" },
-    "overview": { "title": "현재 상태" },
-    "onboarding": { "title": "온보딩", "firstData": "첫 수신", "model": "모델", "space": "공간", "decodeOk": "디코딩", "rulesApplied": "규칙", "done": "완료", "todo": "미완료" },
-    "data": { "title": "측정 데이터", "metrics": "측정 항목", "period": "기간", "quality": "품질", "qualityNormal": "정상만", "qualityAll": "전체", "error": "데이터를 불러오지 못했습니다.", "chooseMetric": "측정 항목을 하나 이상 고르세요" },
-    "raw": { "title": "원본 메시지(최근 50건)", "unavailable": "원본 메시지를 불러오지 못했습니다.", "empty": "최근 7일 원본 메시지가 없습니다", "receivedAt": "수신 시각", "topic": "토픽", "status": "처리 결과", "size": "크기", "json": "원본 JSON", "noPayload": "원본 내용을 볼 권한이 없습니다." },
-    "history": { "title": "변경 이력", "empty": "변경 이력이 없습니다", "at": "시각", "actor": "누가", "action": "무엇을", "changes": "변경" },
-    "semantic": { "title": "시맨틱", "reapply": "모델 태그 다시 적용", "empty": "모델에 기본 태그가 없습니다", "equipClass": "장비 유형", "equipName": "장비 이름", "metric": "측정 항목", "pointType": "점 유형", "quantity": "물리량", "tags": "태그", "pointTypeOf": "{{metric}} 점 유형", "quantityOf": "{{metric}} 물리량", "tagsOf": "{{metric}} 태그", "readOnly": "조회 전용" },
+    "area": {
+      "all": "전체 기기",
+      "pending": "승인 대기",
+      "models": "기기 모델",
+      "metrics": "측정 항목",
+      "groups": "그룹"
+    },
+    "tabs": {
+      "overview": "개요",
+      "data": "데이터",
+      "raw": "원본 메시지",
+      "history": "변경 이력",
+      "semantic": "시맨틱",
+      "credentials": "자격증명"
+    },
+    "overview": {
+      "title": "현재 상태"
+    },
+    "onboarding": {
+      "title": "온보딩",
+      "firstData": "첫 수신",
+      "model": "모델",
+      "space": "공간",
+      "decodeOk": "디코딩",
+      "rulesApplied": "규칙",
+      "done": "완료",
+      "todo": "미완료"
+    },
+    "data": {
+      "title": "측정 데이터",
+      "metrics": "측정 항목",
+      "period": "기간",
+      "quality": "품질",
+      "qualityNormal": "정상만",
+      "qualityAll": "전체",
+      "error": "데이터를 불러오지 못했습니다.",
+      "chooseMetric": "측정 항목을 하나 이상 고르세요"
+    },
+    "raw": {
+      "title": "원본 메시지(최근 50건)",
+      "unavailable": "원본 메시지를 불러오지 못했습니다.",
+      "empty": "최근 7일 원본 메시지가 없습니다",
+      "receivedAt": "수신 시각",
+      "topic": "토픽",
+      "status": "처리 결과",
+      "size": "크기",
+      "json": "원본 JSON",
+      "noPayload": "원본 내용을 볼 권한이 없습니다."
+    },
+    "history": {
+      "title": "변경 이력",
+      "empty": "변경 이력이 없습니다",
+      "at": "시각",
+      "actor": "누가",
+      "action": "무엇을",
+      "changes": "변경"
+    },
+    "semantic": {
+      "title": "시맨틱",
+      "reapply": "모델 태그 다시 적용",
+      "empty": "모델에 기본 태그가 없습니다",
+      "equipClass": "장비 유형",
+      "equipName": "장비 이름",
+      "metric": "측정 항목",
+      "pointType": "점 유형",
+      "quantity": "물리량",
+      "tags": "태그",
+      "pointTypeOf": "{{metric}} 점 유형",
+      "quantityOf": "{{metric}} 물리량",
+      "tagsOf": "{{metric}} 태그",
+      "readOnly": "조회 전용"
+    },
     "pending": {
       "title": "승인 대기 ({{n}})",
       "rejected": "{{n}}대를 거부했습니다.",

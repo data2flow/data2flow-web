@@ -8,7 +8,12 @@
     "status": "Status",
     "connectivity": "Connectivity",
     "kind": "Kind",
-    "kinds": { "SENSOR": "Sensor", "ACTUATOR": "Actuator", "GATEWAY": "Gateway", "HYBRID": "Hybrid" },
+    "kinds": {
+      "SENSOR": "Sensor",
+      "ACTUATOR": "Actuator",
+      "GATEWAY": "Gateway",
+      "HYBRID": "Hybrid"
+    },
     "model": "Model",
     "space": "Space",
     "source": "Source",
@@ -42,7 +47,11 @@
     "noModel": "No model",
     "offlineBaseline": "Offline threshold",
     "offlineBaselineValue": "{{sec}}s × {{n}} ({{from}})",
-    "inheritedFrom": { "DEVICE": "device value", "MODEL": "model value", "SYSTEM": "system default" },
+    "inheritedFrom": {
+      "DEVICE": "device value",
+      "MODEL": "model value",
+      "SYSTEM": "system default"
+    },
     "favorite": "Add to favorites",
     "unfavorite": "Remove from favorites",
     "activate": "Activate",
@@ -53,15 +62,78 @@
     "deleteTitle": "Delete device",
     "deleteBody": "Delete the device {{name}}. This cannot be undone.",
     "inUse": "It is used by rules, flows or other items and cannot be deleted. Remove it from them or deactivate it first.",
-    "credentialsPlaceholder": "Platform broker credentials",
-    "area": { "all": "All devices", "pending": "Pending approval", "models": "Device models", "metrics": "Metrics", "groups": "Groups" },
-    "tabs": { "overview": "Overview", "data": "Data", "raw": "Raw messages", "history": "History", "semantic": "Semantics", "credentials": "Credentials" },
-    "overview": { "title": "Current state" },
-    "onboarding": { "title": "Onboarding", "firstData": "First data", "model": "Model", "space": "Space", "decodeOk": "Decoding", "rulesApplied": "Rules", "done": "done", "todo": "not done" },
-    "data": { "title": "Measurements", "metrics": "Metrics", "period": "Period", "quality": "Quality", "qualityNormal": "Normal only", "qualityAll": "All", "error": "Could not load the data.", "chooseMetric": "Select at least one metric" },
-    "raw": { "title": "Raw messages (latest 50)", "unavailable": "Could not load raw messages.", "empty": "No raw messages in the last 7 days", "receivedAt": "Received at", "topic": "Topic", "status": "Result", "size": "Size", "json": "Raw JSON", "noPayload": "You do not have permission to see the raw payload." },
-    "history": { "title": "History", "empty": "No changes yet", "at": "Time", "actor": "Who", "action": "What", "changes": "Changes" },
-    "semantic": { "title": "Semantics", "reapply": "Reapply model tags", "empty": "The model has no default tags", "equipClass": "Equipment class", "equipName": "Equipment name", "metric": "Metric", "pointType": "Point type", "quantity": "Quantity", "tags": "Tags", "pointTypeOf": "{{metric}} point type", "quantityOf": "{{metric}} quantity", "tagsOf": "{{metric}} tags", "readOnly": "Read only" },
+    "area": {
+      "all": "All devices",
+      "pending": "Pending approval",
+      "models": "Device models",
+      "metrics": "Metrics",
+      "groups": "Groups"
+    },
+    "tabs": {
+      "overview": "Overview",
+      "data": "Data",
+      "raw": "Raw messages",
+      "history": "History",
+      "semantic": "Semantics",
+      "credentials": "Credentials"
+    },
+    "overview": {
+      "title": "Current state"
+    },
+    "onboarding": {
+      "title": "Onboarding",
+      "firstData": "First data",
+      "model": "Model",
+      "space": "Space",
+      "decodeOk": "Decoding",
+      "rulesApplied": "Rules",
+      "done": "done",
+      "todo": "not done"
+    },
+    "data": {
+      "title": "Measurements",
+      "metrics": "Metrics",
+      "period": "Period",
+      "quality": "Quality",
+      "qualityNormal": "Normal only",
+      "qualityAll": "All",
+      "error": "Could not load the data.",
+      "chooseMetric": "Select at least one metric"
+    },
+    "raw": {
+      "title": "Raw messages (latest 50)",
+      "unavailable": "Could not load raw messages.",
+      "empty": "No raw messages in the last 7 days",
+      "receivedAt": "Received at",
+      "topic": "Topic",
+      "status": "Result",
+      "size": "Size",
+      "json": "Raw JSON",
+      "noPayload": "You do not have permission to see the raw payload."
+    },
+    "history": {
+      "title": "History",
+      "empty": "No changes yet",
+      "at": "Time",
+      "actor": "Who",
+      "action": "What",
+      "changes": "Changes"
+    },
+    "semantic": {
+      "title": "Semantics",
+      "reapply": "Reapply model tags",
+      "empty": "The model has no default tags",
+      "equipClass": "Equipment class",
+      "equipName": "Equipment name",
+      "metric": "Metric",
+      "pointType": "Point type",
+      "quantity": "Quantity",
+      "tags": "Tags",
+      "pointTypeOf": "{{metric}} point type",
+      "quantityOf": "{{metric}} quantity",
+      "tagsOf": "{{metric}} tags",
+      "readOnly": "Read only"
+    },
     "pending": {
       "title": "Pending approval ({{n}})",
       "rejected": "Rejected {{n}} devices.",

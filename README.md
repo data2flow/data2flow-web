@@ -2,7 +2,7 @@
 
 data2flow 화면과 BFF입니다. React Router v8 프레임워크 모드(SSR, Vite) + React 19 + TypeScript로 만들고, 브라우저는 토큰 없이 HttpOnly 세션 쿠키(`data2flow_session`)만 갖습니다. Access·Refresh 토큰은 BFF가 서버 쪽에 보관하고, 브라우저의 API 호출은 `/bff/api/{svc}/**`로 받아 내부 gateway에 Bearer로 중계합니다(ADR-024, design/auth.md §9). 화면 문구는 한국어·영어·일본어·중국어 4개 언어입니다(ADR-037).
 
-- 관련 스펙: IAM(로그인·세션·회원·권한·감사), OPS-07(조직·외부 서비스 설정), DSH, FLW·RUL 화면 (정본은 비공개 저장소 `data2flow-docs`)
+- 관련 스펙: IAM(로그인·세션·회원·권한·감사), OPS-07(조직·외부 서비스 설정), M2 수집 경로 화면(DSC·DEV·DSH·ING·SCR·TSD), FLW·RUL 화면 (정본은 비공개 저장소 `data2flow-docs`)
 - 포트: 8080. 프로브는 `/healthz`
 
 ## 구조
@@ -10,8 +10,10 @@ data2flow 화면과 BFF입니다. React Router v8 프레임워크 모드(SSR, Vi
 | 위치 | 내용 |
 |---|---|
 | `app/bff/` | 세션 쿠키(AES-256-GCM, `kid` 교체), CSRF 토큰 + Origin 검사, Access 캐시(메모리 / 선택 Redis), Refresh 회전·single-flight, gateway 중계, 보안 헤더(CSP nonce·HSTS 등) |
-| `app/routes/` | 로그인(TOTP 2단계), 초대 수락, 비밀번호 재설정, 가입 신청, 개인정보 안내, 내 정보, 회원·역할·보안 설정·감사 로그·시스템 설정 |
-| `app/lib/`, `app/components/` | 화면 공용 도우미와 부품 |
+| `app/bff/stream-proxy.server.ts` | 실시간 연결 중계 `/bff/stream/**` → gateway `/api/v1/core/stream/**`(SSE). 브라우저는 세션 쿠키로만 연결하고 Bearer는 BFF가 붙인다 |
+| `app/routes/` | 로그인(TOTP 2단계), 초대 수락, 비밀번호 재설정, 가입 신청, 개인정보 안내, 내 정보, 회원·역할·보안 설정·감사 로그·시스템 설정, M2 화면(아래 표) |
+| `app/features/{기능}/` | M2 화면별 부품과 화면 모델(검증·요청 본문·변환) |
+| `app/lib/`, `app/components/` | 화면 공용 도우미와 부품(공통 시계열 차트, 코드 편집기, 실시간 연결 훅, 공간 선택) |
 | `test/` | SSR 통합 테스트(실제 라우트 + MSW 가짜 gateway), 테스트 도구 |
 
 ## 환경 변수
@@ -31,6 +33,24 @@ data2flow 화면과 BFF입니다. React Router v8 프레임워크 모드(SSR, Vi
 | `DATA2FLOW_REDIS_URL` | (없음) | 있으면 Access 캐시를 Redis(`data2flow:bff:at:{sid}`)에도 두고 폐기 알림(`data2flow:auth.revocations`)을 구독. data2flow 전용 ACL 사용자일 때만 설정 |
 | `DATA2FLOW_SIGNUP_REQUEST_ENABLED` | `false` | 대체값만. 로그인 화면 [가입 신청] 링크와 `/signup`은 core 공개 API `GET /api/v1/core/public/signup-settings`(API-IAM-74)의 조직 설정을 따르고, 그 호출이 실패할 때만 이 값을 쓴다 (IAM-01.08) |
 
+## M2 수집 경로 화면
+
+| 경로 | 화면 | 스펙 |
+|---|---|---|
+| `/` | 홈: 요약 카드, 공간 쾌적도, 빈 조직 안내 | DSH-01.02, DSH-08.02 |
+| `/spaces`, `/spaces/{id}?tab=…` | 공간 트리·속성·목표 환경·운영 시간·평면도, 공간 보기(실시간) | DEV-01.01~04, DEV-11.01, DSH-01.02 |
+| `/sites` | 사이트 요약 | DEV-10.01 |
+| `/devices`, `/devices/pending`, `/devices/new`, `/devices/{id}?tab=…` | 기기 목록·승인 대기·추가·상세(실시간 차트) | DEV-02.01·02.03·02.04·02.10·13.01 |
+| `/models`, `/metrics`, `/device-groups` | 기기 모델, 측정 항목·미검증·별칭, 그룹 | DEV-03.01, DEV-04.01·04.02, DEV-06.01, DEV-07.05 |
+| `/explore` | 데이터 탐색(품질·가상 필터, 주석) | TSD-01.04·01.05·03.01·03.04·03.05 |
+| `/sources`, `/sources/new`, `/sources/{id}` | 데이터 소스 등록·연결 테스트·상태·실시간 원본 | DSC-01·02·07·09 |
+| `/ingest/monitor`, `/ingest/failures` | 수집 흐름 모니터, 실패 메시지 | DSH-03, ING-07.03, OPS-01.02 |
+| `/scripts`, `/scripts/{id}` | 스크립트 목록, 편집기(Monaco)·정적 검사·테스트 실행 | SCR-03.01·03.02·04.05 |
+
+- 실시간: 브라우저 `EventSource('/bff/stream/live?topics=…')`(API-DSH-20), `/bff/stream/ingest`(API-ING-03), `/bff/stream/sources/{id}/live`(API-DSC-10). 끊기면 1→30초 백오프로 다시 연결하고, 세션이 끝났으면 모든 탭을 로그인 화면으로 보낸다.
+- 차트는 ECharts(Apache-2.0, `echarts/core`에서 필요한 부품만), 편집기는 Monaco(MIT). 둘 다 해당 화면에서만 지연 로딩한다. Monaco의 JS 언어 서비스 워커는 같은 출처 파일이라 CSP(`script-src 'self'`)를 바꾸지 않는다.
+- 테마: 사용자 메뉴에서 시스템·라이트·다크(쿠키 `data2flow_theme` + 화면 설정 API-DSH-12).
+
 ## 개발
 
 ```bash
@@ -38,7 +58,7 @@ pnpm install
 DATA2FLOW_ALLOWED_ORIGINS=http://localhost:5173 DATA2FLOW_COOKIE_SECURE=false pnpm dev   # http://localhost:5173
 pnpm lint
 pnpm typecheck
-pnpm test:coverage     # server(node: BFF·SSR 통합) + client(jsdom: 부품) 두 프로젝트, 커버리지 80%, i18n 키 일치
+pnpm test:coverage     # server(node: BFF·도우미) + ssr(node: 실제 라우트 + 가짜 gateway, 파일 순차) + client(jsdom: 부품), 커버리지 80%, i18n 키 일치
 pnpm build && pnpm start
 ```
 
@@ -58,4 +78,4 @@ KEEP=1 e2e/m1-demo.sh                   # 끝나도 컨테이너·프로세스�
 
 필요: docker, Java 21, Node 22 + pnpm, curl, python3, openssl, lsof. 포트 25432·26379·25672·21025·28025·28780~28798을 씁니다.
 
-문구를 추가할 때는 `app/i18n/locales/{ko,en,ja,zh}.json` 네 파일에 같은 키를 넣습니다. 키나 보간 변수가 하나라도 다르면 테스트가 실패합니다.
+문구를 추가할 때는 `app/i18n/locales/{ko,en,ja,zh}.json`(공통) 또는 기능별 `app/i18n/features/{기능}/{ko,en,ja,zh}.json` 네 파일에 같은 키를 넣습니다. 기능별 파일은 공통 문구에 깊게 합쳐집니다(`errors` 같은 키도 합쳐짐). 키나 보간 변수가 하나라도 다르면 테스트가 실패합니다.

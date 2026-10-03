@@ -21,6 +21,7 @@ import { formatDateTime } from "~/lib/format";
 import { hasAny } from "~/lib/permissions";
 import type { SpaceNode } from "~/lib/spaces";
 import type { RootData } from "~/root";
+import { DeviceCredentialsPanel } from "~/features/sources/device-credentials";
 import type { Route } from "./+types/device-detail";
 
 export function meta() {
@@ -373,9 +374,8 @@ export default function DeviceDetailRoute({ loaderData, actionData }: Route.Comp
       {tab === "semantic" && <SemanticTab semantic={semantic ?? null} canEdit={canAdmin} fieldErrors={result?.intent === "semantic-save" ? result.fieldErrors : undefined} />}
       {tab === "credentials" && platformBroker && (
         <Card title={t("devices.tabs.credentials")}>
-          <div data-slot="device-credentials" data-device-id={device.id}>
-            <p className="text-muted">{t("devices.credentialsPlaceholder")}</p>
-          </div>
+          {/* 플랫폼 브로커 기기 자격증명(UI-DSC-06, DSC-03.02·03.05): 승인 뒤 서명 키를 여기서 한 번 발급한다(ADR-031) */}
+          <DeviceCredentialsPanel deviceId={device.id} externalId={device.externalId} canAdmin={hasAny(permissions, ["SRC_ADMIN"])} timezone={timezone} lang={i18n.language} />
         </Card>
       )}
 

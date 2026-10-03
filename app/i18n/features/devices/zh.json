@@ -8,7 +8,12 @@
     "status": "状态",
     "connectivity": "连接",
     "kind": "类型",
-    "kinds": { "SENSOR": "传感器", "ACTUATOR": "执行器", "GATEWAY": "网关", "HYBRID": "复合" },
+    "kinds": {
+      "SENSOR": "传感器",
+      "ACTUATOR": "执行器",
+      "GATEWAY": "网关",
+      "HYBRID": "复合"
+    },
     "model": "型号",
     "space": "空间",
     "source": "数据源",
@@ -42,7 +47,11 @@
     "noModel": "无型号",
     "offlineBaseline": "离线判定标准",
     "offlineBaselineValue": "{{sec}}秒 × {{n}}（{{from}}）",
-    "inheritedFrom": { "DEVICE": "设备值", "MODEL": "型号值", "SYSTEM": "系统默认值" },
+    "inheritedFrom": {
+      "DEVICE": "设备值",
+      "MODEL": "型号值",
+      "SYSTEM": "系统默认值"
+    },
     "favorite": "加入收藏",
     "unfavorite": "取消收藏",
     "activate": "启用",
@@ -53,15 +62,78 @@
     "deleteTitle": "删除设备",
     "deleteBody": "将删除设备 {{name}}，此操作无法撤销。",
     "inUse": "该设备正被规则、流程等使用，无法删除。请先从使用处移除或停用。",
-    "credentialsPlaceholder": "平台代理凭据",
-    "area": { "all": "全部设备", "pending": "待审批", "models": "设备型号", "metrics": "测量项", "groups": "分组" },
-    "tabs": { "overview": "概览", "data": "数据", "raw": "原始消息", "history": "变更历史", "semantic": "语义", "credentials": "凭据" },
-    "overview": { "title": "当前状态" },
-    "onboarding": { "title": "接入检查", "firstData": "首次接收", "model": "型号", "space": "空间", "decodeOk": "解码", "rulesApplied": "规则", "done": "已完成", "todo": "未完成" },
-    "data": { "title": "测量数据", "metrics": "测量项", "period": "期间", "quality": "质量", "qualityNormal": "仅正常", "qualityAll": "全部", "error": "无法加载数据。", "chooseMetric": "请至少选择一个测量项" },
-    "raw": { "title": "原始消息（最近 50 条）", "unavailable": "无法加载原始消息。", "empty": "最近 7 天没有原始消息", "receivedAt": "接收时间", "topic": "主题", "status": "处理结果", "size": "大小", "json": "原始 JSON", "noPayload": "没有查看原始内容的权限。" },
-    "history": { "title": "变更历史", "empty": "没有变更历史", "at": "时间", "actor": "操作人", "action": "操作", "changes": "变更" },
-    "semantic": { "title": "语义", "reapply": "重新应用型号标签", "empty": "型号没有默认标签", "equipClass": "设备类别", "equipName": "设备名称", "metric": "测量项", "pointType": "点类型", "quantity": "物理量", "tags": "标签", "pointTypeOf": "{{metric}} 点类型", "quantityOf": "{{metric}} 物理量", "tagsOf": "{{metric}} 标签", "readOnly": "只读" },
+    "area": {
+      "all": "全部设备",
+      "pending": "待审批",
+      "models": "设备型号",
+      "metrics": "测量项",
+      "groups": "分组"
+    },
+    "tabs": {
+      "overview": "概览",
+      "data": "数据",
+      "raw": "原始消息",
+      "history": "变更历史",
+      "semantic": "语义",
+      "credentials": "凭据"
+    },
+    "overview": {
+      "title": "当前状态"
+    },
+    "onboarding": {
+      "title": "接入检查",
+      "firstData": "首次接收",
+      "model": "型号",
+      "space": "空间",
+      "decodeOk": "解码",
+      "rulesApplied": "规则",
+      "done": "已完成",
+      "todo": "未完成"
+    },
+    "data": {
+      "title": "测量数据",
+      "metrics": "测量项",
+      "period": "期间",
+      "quality": "质量",
+      "qualityNormal": "仅正常",
+      "qualityAll": "全部",
+      "error": "无法加载数据。",
+      "chooseMetric": "请至少选择一个测量项"
+    },
+    "raw": {
+      "title": "原始消息（最近 50 条）",
+      "unavailable": "无法加载原始消息。",
+      "empty": "最近 7 天没有原始消息",
+      "receivedAt": "接收时间",
+      "topic": "主题",
+      "status": "处理结果",
+      "size": "大小",
+      "json": "原始 JSON",
+      "noPayload": "没有查看原始内容的权限。"
+    },
+    "history": {
+      "title": "变更历史",
+      "empty": "没有变更历史",
+      "at": "时间",
+      "actor": "操作人",
+      "action": "操作",
+      "changes": "变更"
+    },
+    "semantic": {
+      "title": "语义",
+      "reapply": "重新应用型号标签",
+      "empty": "型号没有默认标签",
+      "equipClass": "设备类别",
+      "equipName": "设备名称",
+      "metric": "测量项",
+      "pointType": "点类型",
+      "quantity": "物理量",
+      "tags": "标签",
+      "pointTypeOf": "{{metric}} 点类型",
+      "quantityOf": "{{metric}} 物理量",
+      "tagsOf": "{{metric}} 标签",
+      "readOnly": "只读"
+    },
     "pending": {
       "title": "待审批（{{n}}）",
       "rejected": "已拒绝 {{n}} 台。",
