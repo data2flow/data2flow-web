@@ -3,7 +3,10 @@
     "spaces": "空間",
     "devices": "デバイス",
     "explore": "データ探索",
-    "ingest": "収集"
+    "ingest": "収集",
+    "automation": "自動化",
+    "control": "制御",
+    "sim": "仮想環境"
   },
   "common": {
     "cancel": "キャンセル",

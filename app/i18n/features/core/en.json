@@ -3,7 +3,10 @@
     "spaces": "Spaces",
     "devices": "Devices",
     "explore": "Explore",
-    "ingest": "Ingestion"
+    "ingest": "Ingestion",
+    "automation": "Automation",
+    "control": "Control",
+    "sim": "Virtual environment"
   },
   "common": {
     "cancel": "Cancel",

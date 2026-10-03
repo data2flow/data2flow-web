@@ -3,7 +3,10 @@
     "spaces": "공간",
     "devices": "기기",
     "explore": "데이터 탐색",
-    "ingest": "수집"
+    "ingest": "수집",
+    "automation": "자동화",
+    "control": "제어",
+    "sim": "가상 환경"
   },
   "common": {
     "cancel": "취소",

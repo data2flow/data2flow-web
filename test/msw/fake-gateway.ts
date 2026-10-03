@@ -40,8 +40,8 @@ export interface ReceivedRequest {
   body?: unknown;
 }
 
-import { ADMIN_PERMISSIONS, INTEGRATOR_PERMISSIONS, OPERATOR_PERMISSIONS, VIEWER_PERMISSIONS } from "../roles";
-export { ADMIN_PERMISSIONS, INTEGRATOR_PERMISSIONS, OPERATOR_PERMISSIONS, VIEWER_PERMISSIONS };
+import { ADMIN_PERMISSIONS, ANALYST_PERMISSIONS, INTEGRATOR_PERMISSIONS, OPERATOR_PERMISSIONS, VIEWER_PERMISSIONS } from "../roles";
+export { ADMIN_PERMISSIONS, ANALYST_PERMISSIONS, INTEGRATOR_PERMISSIONS, OPERATOR_PERMISSIONS, VIEWER_PERMISSIONS };
 
 function b64u(value: unknown) {
   return Buffer.from(JSON.stringify(value)).toString("base64url");
@@ -92,6 +92,7 @@ export class FakeGateway {
       { id: "5", loginId: "mfa.admin", password: "MfaAdmin-Pass1", name: "필수", email: "m@school.ac.kr", role: "ADMIN", permissions: ADMIN_PERMISSIONS, mfaSetupRequired: true, version: 1 },
       { id: "8", loginId: "lee.int", password: "Integrator-Pass1", name: "이통합", email: "lee@school.ac.kr", role: "INTEGRATOR", permissions: INTEGRATOR_PERMISSIONS, version: 1, timezone: "Asia/Seoul", locale: "ko" },
       { id: "9", loginId: "view.er", password: "Viewer-Pass-123", name: "조회자", email: "viewer@school.ac.kr", role: "VIEWER", permissions: VIEWER_PERMISSIONS, version: 1, timezone: "Asia/Seoul", locale: "ko" },
+      { id: "10", loginId: "ana.lyst", password: "Analyst-Pass-123", name: "박분석", email: "analyst@school.ac.kr", role: "ANALYST", permissions: ANALYST_PERMISSIONS, version: 1, timezone: "Asia/Seoul", locale: "ko" },
     ];
   }
 

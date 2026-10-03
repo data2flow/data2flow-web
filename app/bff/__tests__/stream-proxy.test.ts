@@ -148,5 +148,8 @@ describe("streamTarget 허용 목록", () => {
     expect(streamTarget("sources/abc/live", "")).toBeUndefined();
     expect(streamTarget("../auth/login", "")).toBeUndefined();
     expect(streamTarget("live/../x", "")).toBeUndefined();
+    // API-SIM-31 가상 환경 실행 스트림
+    expect(streamTarget("sim/runs/r-42", "")).toBe("/api/v1/core/stream/sim/runs/r-42");
+    expect(streamTarget("sim/runs/a/b", "")).toBeUndefined();
   });
 });

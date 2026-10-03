@@ -1,9 +1,13 @@
 /**
  * M2 core 가짜 핸들러 목록. 앞에서부터 처리하고 undefined를 돌려주면 다음 핸들러로 넘긴다.
- * 도메인마다 파일 하나: 소스(DSC)·기기/모델/측정 항목/그룹(DEV)·공간(DEV-01, DSH-02)·시계열(TSD)·수집(ING, DSH-03)·스크립트(SCR)·홈(DSH-01)
+ * 도메인마다 파일 하나: 소스(DSC)·기기/모델/측정 항목/그룹(DEV)·공간(DEV-01, DSH-02)·시계열(TSD)·수집(ING, DSH-03)·스크립트(SCR)·홈(DSH-01),
+ * M3: 플로우(FLW)·가상 환경(SIM)·제어(ACT)
  */
 import type { CoreHandler } from "../core-fixtures";
 import { baseHandler } from "./base";
+import { controlHandler } from "./control";
+import { flowsHandler } from "./flows";
+import { simHandler } from "./sim";
 import { devicesHandler } from "./devices";
 import { groupsHandler } from "./groups";
 import { modelsHandler } from "./models";
@@ -14,4 +18,4 @@ import { sourcesHandler } from "./sources";
 import { spacesHandler } from "./spaces";
 import { telemetryHandler } from "./telemetry";
 
-export const CORE_HANDLERS: CoreHandler[] = [spacesHandler, devicesHandler, modelsHandler, groupsHandler, sourcesHandler, telemetryHandler, ingestHandler, scriptsHandler, homeHandler, baseHandler];
+export const CORE_HANDLERS: CoreHandler[] = [flowsHandler, simHandler, controlHandler, spacesHandler, devicesHandler, modelsHandler, groupsHandler, sourcesHandler, telemetryHandler, ingestHandler, scriptsHandler, homeHandler, baseHandler];

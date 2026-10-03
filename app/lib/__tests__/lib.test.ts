@@ -88,7 +88,15 @@ describe("permissions IAM-04.05 메뉴 숨김", () => {
   it("권한별 메뉴, 비밀번호 변경 필요 시 메뉴 없음, 경로별 필요 권한", () => {
     expect(visibleMenu(["DEV_READ"]).map((m) => m.key)).toEqual(["home", "spaces", "devices"]);
     expect(visibleMenu(["IAM_MANAGE", "AUDIT_READ", "OPS_MANAGE"]).map((m) => m.key)).toEqual(["home", "members", "roles", "security", "audit", "settings"]);
-    expect(visibleMenu(["IAM_MANAGE", "AUDIT_READ", "OPS_MANAGE", "DEV_READ", "TS_READ", "INGEST_READ"])).toHaveLength(MENU.length);
+    expect(visibleMenu(["IAM_MANAGE", "AUDIT_READ", "OPS_MANAGE", "DEV_READ", "TS_READ", "INGEST_READ", "FLOW_READ", "DEVICE_CONTROL", "SIM_READ"])).toHaveLength(MENU.length);
+    // M3: 자동화(FLOW_READ)·제어(DEVICE_CONTROL)·가상 환경(SIM_READ)
+    expect(visibleMenu(["FLOW_READ", "SIM_READ"]).map((m) => m.key)).toEqual(["home", "automation", "sim"]);
+    expect(requiredPermissionsFor("/automation/flows/f-1")).toEqual(["FLOW_READ"]);
+    expect(requiredPermissionsFor("/automation/flows/new")).toEqual(["FLOW_WRITE"]);
+    expect(requiredPermissionsFor("/automation/templates")).toEqual(["FLOW_WRITE"]);
+    expect(requiredPermissionsFor("/sim/runs/r-1")).toEqual(["SIM_READ"]);
+    expect(requiredPermissionsFor("/control/commands")).toEqual(["DEV_READ"]);
+    expect(isMenuActive(MENU.find((m) => m.key === "automation")!, "/automation/templates")).toBe(true);
     expect(visibleMenu(["IAM_MANAGE"], true)).toEqual([]);
     expect(visibleMenu(undefined).map((m) => m.key)).toEqual(["home"]);
     expect(requiredPermissionsFor("/admin/members/7")).toEqual(["IAM_MANAGE"]);

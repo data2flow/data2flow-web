@@ -2,7 +2,7 @@
  * 화면 메뉴와 권한(IAM-04.01, IAM-04.05). 메뉴를 숨기는 것은 보조 수단이고 실제 거부는 서버가 한다.
  * 권한 이름은 spec/IAM-identity.md의 Permission 목록을, 경로는 spec/detail/00-navigation.md §2를 따른다.
  */
-export type MenuKey = "home" | "spaces" | "devices" | "explore" | "ingest" | "members" | "roles" | "security" | "audit" | "settings";
+export type MenuKey = "home" | "spaces" | "devices" | "explore" | "ingest" | "automation" | "control" | "sim" | "members" | "roles" | "security" | "audit" | "settings";
 
 export interface MenuItem {
   key: MenuKey;
@@ -12,6 +12,8 @@ export interface MenuItem {
   group: "main" | "admin";
   /** 이 메뉴가 현재 메뉴로 표시되는 다른 경로 접두사(예: 수집 메뉴는 /sources·/scripts도 포함) */
   sections?: string[];
+  /** 경로 권한이 메뉴 노출 권한과 다를 때(예: 명령 이력은 메뉴는 제어 권한, 화면은 조회 권한) */
+  guard?: string[];
 }
 
 export const MENU: MenuItem[] = [
@@ -20,6 +22,10 @@ export const MENU: MenuItem[] = [
   { key: "devices", path: "/devices", anyOf: ["DEV_READ"], group: "main", sections: ["/models", "/metrics", "/device-groups"] },
   { key: "explore", path: "/explore", anyOf: ["TS_READ"], group: "main" },
   { key: "ingest", path: "/ingest/monitor", anyOf: ["INGEST_READ"], group: "main", sections: ["/ingest", "/sources", "/scripts"] },
+  // M3 폐루프(가상): 자동화(FLW), 제어(ACT 명령 이력), 가상 환경(SIM) — 00-navigation.md §2
+  { key: "automation", path: "/automation/flows", anyOf: ["FLOW_READ"], group: "main", sections: ["/automation"] },
+  { key: "control", path: "/control/commands", anyOf: ["DEVICE_CONTROL"], group: "main", sections: ["/control"], guard: ["DEV_READ"] },
+  { key: "sim", path: "/sim", anyOf: ["SIM_READ"], group: "main" },
   { key: "members", path: "/admin/members", anyOf: ["IAM_MANAGE"], group: "admin" },
   { key: "roles", path: "/admin/roles", anyOf: ["IAM_MANAGE"], group: "admin" },
   { key: "security", path: "/admin/security", anyOf: ["IAM_MANAGE"], group: "admin" },
@@ -29,7 +35,7 @@ export const MENU: MenuItem[] = [
 
 /** 메뉴 밖 경로의 권한(라우트 가드). 가장 긴 접두사가 이긴다 */
 export const ROUTE_GUARDS: { prefix: string; anyOf: string[] }[] = [
-  ...MENU.filter((m) => m.path !== "/").map((m) => ({ prefix: m.path, anyOf: m.anyOf })),
+  ...MENU.filter((m) => m.path !== "/").map((m) => ({ prefix: m.path, anyOf: m.guard ?? m.anyOf })),
   { prefix: "/sites", anyOf: ["DEV_READ"] },
   { prefix: "/models", anyOf: ["DEV_READ"] },
   { prefix: "/metrics", anyOf: ["DEV_READ"] },
@@ -39,6 +45,12 @@ export const ROUTE_GUARDS: { prefix: string; anyOf: string[] }[] = [
   { prefix: "/sources", anyOf: ["SRC_READ"] },
   { prefix: "/sources/new", anyOf: ["SRC_ADMIN"] },
   { prefix: "/scripts", anyOf: ["SCRIPT_READ"] },
+  { prefix: "/automation", anyOf: ["FLOW_READ"] },
+  { prefix: "/automation/flows/new", anyOf: ["FLOW_WRITE"] },
+  { prefix: "/automation/templates", anyOf: ["FLOW_WRITE"] },
+  { prefix: "/automation/approvals", anyOf: ["FLOW_WRITE", "FLOW_APPROVE"] },
+  // 명령 이력(UI-ACT-02)은 조회 권한으로 연다(VIEWER 이상). 메뉴는 제어 권한이 있을 때만 보인다
+  { prefix: "/control", anyOf: ["DEV_READ"] },
 ];
 
 export function hasAny(permissions: readonly string[] | undefined, required: readonly string[]): boolean {

@@ -62,5 +62,23 @@ export default [
     route("sources/:sourceId/edit", "routes/source-edit.tsx"),
     route("scripts", "routes/scripts.tsx"),
     route("scripts/:scriptId", "routes/script-detail.tsx"),
+
+    // M3 폐루프(가상): 자동화(FLW) · 제어(ACT) · 가상 환경(SIM) — spec/detail/00-navigation.md §2
+    route("automation/flows", "routes/flows.tsx"),
+    route("automation/flows/new", "routes/flow-new.tsx"),
+    route("automation/flows/:flowId", "routes/flow-detail.tsx"),
+    route("automation/templates", "routes/flow-templates.tsx"),
+    route("automation/approvals", "routes/flow-approvals.tsx"),
+    route("control/commands", "routes/control-commands.tsx"),
+    route("sim", "routes/sim-home.tsx"),
+    route("sim/catalog", "routes/sim-catalog.tsx"),
+    route("sim/profiles", "routes/sim-profiles.tsx"),
+    route("sim/spaces", "routes/sim-spaces.tsx"),
+    route("sim/spaces/:spaceId", "routes/sim-space-detail.tsx"),
+    route("sim/scenarios", "routes/sim-scenarios.tsx"),
+    route("sim/scenarios/:scenarioId/edit", "routes/sim-scenario-edit.tsx"),
+    route("sim/runs/:runId", "routes/sim-run.tsx"),
+    route("sim/runs/:runId/report", "routes/sim-run-report.tsx"),
+    route("sim/replay", "routes/sim-replay.tsx"),
   ]),
 ] satisfies RouteConfig;

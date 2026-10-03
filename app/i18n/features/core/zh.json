@@ -3,7 +3,10 @@
     "spaces": "空间",
     "devices": "设备",
     "explore": "数据探索",
-    "ingest": "采集"
+    "ingest": "采集",
+    "automation": "自动化",
+    "control": "控制",
+    "sim": "虚拟环境"
   },
   "common": {
     "cancel": "取消",
