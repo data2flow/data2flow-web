@@ -1,0 +1,392 @@
+{
+  "sources": {
+    "section": {
+      "label": "수집 메뉴",
+      "monitor": "수집 모니터",
+      "sources": "데이터 소스",
+      "scripts": "스크립트",
+      "failures": "실패 메시지"
+    },
+    "type": {
+      "MQTT_SUBSCRIBE": "MQTT 구독",
+      "PLATFORM_BROKER": "플랫폼 브로커",
+      "WEBHOOK": "HTTP Webhook",
+      "SIMULATION": "가상 환경",
+      "ONEM2M": "oneM2M",
+      "OPCUA": "OPC UA",
+      "MODBUS_TCP": "Modbus TCP",
+      "CONNECTOR": "커넥터",
+      "EDGE": "엣지 게이트웨이"
+    },
+    "typeIcon": {
+      "MQTT_SUBSCRIBE": "MQ",
+      "PLATFORM_BROKER": "PB",
+      "SIMULATION": "SIM",
+      "WEBHOOK": "HTTP"
+    },
+    "lifecycle": {
+      "DRAFT": "초안",
+      "ACTIVE": "수집 중",
+      "PAUSED": "일시정지",
+      "ARCHIVED": "보관됨"
+    },
+    "state": {
+      "CONNECTED": "연결됨",
+      "CONNECTING": "연결 중",
+      "DISCONNECTED": "끊김",
+      "ERROR": "오류",
+      "DISABLED": "꺼짐"
+    },
+    "auth": {
+      "NONE": "없음",
+      "USERPASS": "사용자·비밀번호",
+      "HEADER": "HTTP 헤더",
+      "MTLS": "클라이언트 인증서",
+      "BASIC": "Basic 인증"
+    },
+    "decoder": {
+      "chirpstack-v4": "ChirpStack v4",
+      "generic-json": "일반 JSON(경로 매핑)",
+      "single-value": "단일 값",
+      "script": "사용자 스크립트"
+    },
+    "policy": {
+      "AUTO_REGISTER": "자동 등록(승인 대기)",
+      "REJECT": "거부"
+    },
+    "action": {
+      "activate": "활성화",
+      "pause": "일시정지",
+      "resume": "재개",
+      "archive": "보관",
+      "delete": "삭제",
+      "clone": "복제"
+    },
+    "confirm": {
+      "pause": {
+        "title": "소스 일시정지",
+        "body": "구독을 멈추지만 세션은 유지합니다. 재개하면 브로커에 쌓인 메시지부터 받습니다."
+      },
+      "archive": {
+        "title": "소스 보관",
+        "body": "연결을 끊고 설정을 읽기 전용으로 바꿉니다. 보관한 소스는 다시 활성화할 수 없습니다(복제로 새로 만듭니다)."
+      },
+      "delete": {
+        "title": "소스 삭제",
+        "body": "연결된 기기가 없을 때만 삭제할 수 있습니다. 되돌릴 수 없습니다."
+      },
+      "clone": {
+        "title": "소스 복제",
+        "body": "설정만 복사해 초안으로 만듭니다. 비밀값과 기기는 복사하지 않습니다."
+      },
+      "usage": "사용처: 기기 {{devices}}대 · 플로우 {{flows}}개",
+      "typeCode": "확인을 위해 소스 코드 {{code}}를 입력하세요",
+      "mismatch": "입력한 코드가 소스 코드와 다릅니다."
+    },
+    "list": {
+      "title": "데이터 소스",
+      "new": "새 소스",
+      "type": "유형",
+      "lifecycle": "상태",
+      "includeArchived": "보관 포함",
+      "state": "연결",
+      "name": "이름·코드",
+      "rate": "분당 수신",
+      "perMin": "/분",
+      "sparkline": "최근 1시간 분당 수신",
+      "decodeErrors": "디코딩 실패율",
+      "lastReceived": "마지막 수신",
+      "devices": "기기 수",
+      "live": "실시간 메시지",
+      "noMatch": "조건에 맞는 소스가 없습니다",
+      "emptyTitle": "아직 소스가 없습니다",
+      "emptyBody": "데이터 소스를 연결해 센서 데이터를 받으세요.",
+      "emptyAskAdmin": "소스 연결은 관리자(INTEGRATOR 이상)에게 요청하세요.",
+      "connect": "소스 연결"
+    },
+    "new": {
+      "title": "새 데이터 소스",
+      "steps": "1 커넥터 선택 · 2 설정 · 3 테스트",
+      "withTemplate": "{{type}} (템플릿: {{template}})",
+      "unsupported": "이 커넥터는 아직 화면에서 만들 수 없습니다. MQTT 구독·플랫폼 브로커·가상 환경을 사용하세요."
+    },
+    "edit": {
+      "title": "{{name}} 설정",
+      "saved": "저장했습니다. 수집 중인 소스는 이 소스 연결만 다시 맺습니다."
+    },
+    "catalog": {
+      "search": "커넥터 검색",
+      "categories": "분류",
+      "templates": "템플릿",
+      "types": "기본 유형",
+      "later": "준비 중",
+      "noMatch": "조건에 맞는 커넥터가 없습니다",
+      "fallback": "커넥터 카탈로그를 불러오지 못했습니다. 기본 유형으로 만들 수 있습니다.",
+      "authCount": "인증 {{n}}종",
+      "unavailable": "사용 불가({{reason}})",
+      "reason": {
+        "LICENSE": "라이선스"
+      },
+      "category": {
+        "ALL": "전체",
+        "MQTT": "MQTT",
+        "LORAWAN": "LoRaWAN",
+        "CLOUD": "클라우드 허브",
+        "QUEUE": "메시지 큐",
+        "HTTP": "HTTP",
+        "LIGHTWEIGHT": "경량",
+        "INDUSTRIAL": "산업",
+        "BUILDING": "빌딩",
+        "FILE": "파일",
+        "PLATFORM": "플랫폼"
+      }
+    },
+    "form": {
+      "tabs": "설정 탭",
+      "tabError": "오류 있음",
+      "tab": {
+        "basic": "기본",
+        "connection": "연결",
+        "auth": "인증",
+        "subscription": "구독",
+        "decoder": "디코더",
+        "policy": "정책"
+      },
+      "readOnly": "읽기 전용입니다. 설정 변경은 INTEGRATOR 이상만 할 수 있습니다.",
+      "conflict": "다른 사용자가 먼저 수정했습니다. 새로 고침해 최신 설정을 확인한 뒤 다시 저장하세요.",
+      "type": "유형",
+      "code": "코드",
+      "codeHint": "영문 소문자로 시작, 소문자·숫자·- 50자 이하. 만든 뒤 바꿀 수 없습니다",
+      "name": "이름",
+      "url": "브로커 주소",
+      "protocolVersion": "프로토콜 버전",
+      "clientIdBase": "client-id 접두사",
+      "clientIdPreview": "실제 접속 ID: {{ids}}",
+      "keepalive": "keepalive(초, 10~600)",
+      "persistentSession": "영속 세션(clean start 끔)",
+      "sessionExpiry": "세션 만료(초)",
+      "receiveMaximum": "receive maximum",
+      "mqtt5Only": "MQTT 5.0 전용",
+      "tlsInsecure": "TLS 인증서 검증 끄기",
+      "tlsInsecureWarn": "인증서를 검증하지 않으면 중간자 공격에 노출됩니다. 개발 소스에서만 쓰세요.",
+      "deviceKeyPattern": "기기 키 패턴",
+      "platformEndpoint": "접속 주소는 플랫폼이 정합니다: wss://iot-data.java21.net/mqtt",
+      "scenarioId": "시나리오 ID(선택)",
+      "scenarioHint": "가상 환경이 이 소스로 데이터를 넣습니다",
+      "auth": "인증 방식",
+      "headerName": "헤더 이름",
+      "username": "사용자 이름",
+      "secret": {
+        "USERPASS": "비밀번호",
+        "HEADER": "헤더 값",
+        "MTLS": "클라이언트 키(PEM)"
+      },
+      "secretKeep": "비우면 기존 값을 유지합니다",
+      "secretWriteOnly": "저장 뒤에는 끝 4자리 지문만 보입니다",
+      "sharedGroup": "공유 구독 그룹(선택)",
+      "sharedGroupHint": "입력하면 실제 토픽이 $share/{그룹}/… 이 됩니다",
+      "topicN": "토픽 {{n}}",
+      "qosN": "토픽 {{n}} QoS",
+      "actualTopic": "실제 토픽: {{topic}}",
+      "addTopic": "+ 토픽",
+      "lossPossible": "유실 가능",
+      "decoder": "디코더",
+      "script": "DECODE 스크립트",
+      "chooseScript": "스크립트 선택",
+      "decoderChangeHint": "디코더를 바꾸면 그 뒤에 처리하는 메시지부터 적용됩니다. 이전 메시지는 재처리하세요.",
+      "unknownDevicePolicy": "미등록 기기",
+      "defaultModel": "기본 기기 모델",
+      "defaultSpace": "기본 공간",
+      "noDefault": "지정 안 함",
+      "autoregLimit": "시간당 자동 등록 한도(0~10,000)",
+      "noDataAlarm": "무수신 알람 기준(초, 60~86,400)",
+      "test": "연결 테스트",
+      "saveDraft": "초안으로 저장",
+      "saveActivate": "저장 후 활성화",
+      "reconnectHint": "수집 중인 소스는 이 소스 연결만 다시 맺습니다."
+    },
+    "validation": {
+      "code": "영문 소문자로 시작하는 50자 이하(소문자·숫자·-)",
+      "name": "이름은 1~100자로 입력하세요",
+      "url": "브로커 주소 형식이 올바르지 않습니다",
+      "clientId": "client-id는 영문·숫자·-_ 1~100자입니다",
+      "keepalive": "10~600초 사이로 입력하세요",
+      "sessionExpiry": "세션 만료는 0 이상의 정수입니다",
+      "topicRequired": "토픽을 하나 이상 입력하세요",
+      "topicLimit": "토픽은 20개까지 넣을 수 있습니다",
+      "topic": "토픽 형식이 올바르지 않습니다",
+      "secret": "인증 정보를 입력하세요",
+      "username": "사용자 이름을 입력하세요",
+      "headerName": "헤더 이름을 입력하세요",
+      "script": "스크립트를 선택하세요",
+      "mapping": "매핑 설정을 확인하세요",
+      "autoreg": "0~10,000 사이로 입력하세요",
+      "noData": "60~86,400초 사이로 입력하세요"
+    },
+    "mapping": {
+      "title": "generic-json 매핑",
+      "deviceIdFrom": "기기 ID 위치",
+      "deviceIdHint": "토픽 단계(topic[1]) 또는 JSON 경로($.dev)",
+      "timePath": "시각 경로(선택)",
+      "timeHint": "epoch ms 또는 ISO-8601. 비우면 수신 시각",
+      "path": "JSON 경로",
+      "key": "측정 항목 키",
+      "pathN": "경로 {{n}}",
+      "keyN": "키 {{n}}",
+      "addMetric": "+ 측정 항목",
+      "sampleTopic": "테스트 토픽",
+      "samplePayload": "테스트 메시지(JSON)",
+      "preview": "미리 보기",
+      "externalId": "외부 ID",
+      "measuredAt": "측정 시각",
+      "problem": {
+        "path": "경로 문법이 올바르지 않습니다: {{position}}",
+        "topicIndex": "토픽 단계 번호가 올바르지 않습니다",
+        "duplicate": "같은 측정 항목 키를 두 번 매핑했습니다: {{value}}",
+        "metricKey": "측정 항목 키 형식이 올바르지 않습니다: {{value}}",
+        "required": "필수 항목입니다",
+        "json": "JSON 형식이 올바르지 않습니다"
+      }
+    },
+    "test": {
+      "title": "연결 테스트",
+      "retry": "다시 테스트",
+      "running": "연결 테스트 중… (최대 30초)",
+      "idle": "[연결 테스트]를 누르면 단계별 결과와 최근 메시지 최대 10건을 보여 줍니다. 결과는 저장하지 않습니다.",
+      "success": "모든 단계 성공, 메시지 {{n}}건 수신",
+      "partial": "부분 성공: 구독은 성공했지만 메시지가 없습니다. 토픽과 QoS를 확인하세요.",
+      "failed": "연결 테스트에 실패했습니다. 실패한 단계의 원인을 확인하세요.",
+      "lossPossible": "이 설정은 장애 때 메시지를 잃을 수 있습니다(QoS 0).",
+      "steps": "테스트 단계",
+      "chain": "인증서: {{subject}} · 발급자 {{issuer}} · 만료 {{notAfter}}",
+      "preview": "미리보기 ({{n}}/10)",
+      "noDecoded": "디코딩 결과 없음",
+      "step": {
+        "DNS": "DNS",
+        "TCP": "TCP",
+        "TLS": "TLS",
+        "AUTH": "인증",
+        "SUBSCRIBE": "구독",
+        "POLL": "첫 폴링"
+      },
+      "status": {
+        "OK": "성공",
+        "FAIL": "실패",
+        "SKIPPED": "건너뜀"
+      }
+    },
+    "live": {
+      "topicFilter": "토픽 필터",
+      "rate": "초당 최대 10건을 보여 줍니다",
+      "pausedWaiting": "일시정지 중 {{n}}건 대기",
+      "skipped": "{{n}}건 생략",
+      "empty": "아직 받은 메시지가 없습니다",
+      "emptyBody": "소스가 수집 중이면 새 메시지가 여기에 바로 보입니다.",
+      "truncated": "잘림",
+      "raw": "원본",
+      "decoded": "디코딩 미리 보기",
+      "noDecoded": "디코딩 미리 보기가 없습니다"
+    },
+    "stats": {
+      "received": "수신",
+      "accepted": "수락",
+      "decodeErrors": "디코딩 실패",
+      "scriptErrors": "스크립트 오류",
+      "rejectedUnknown": "미등록 거부",
+      "invalid": "잘못된 메시지",
+      "unit": "건"
+    },
+    "detail": {
+      "tab": {
+        "status": "상태",
+        "live": "실시간 메시지",
+        "settings": "설정",
+        "usage": "사용처",
+        "ignore": "무시 목록",
+        "credentials": "자격증명"
+      },
+      "noInstances": "연결 인스턴스가 없습니다",
+      "noInstancesBody": "소스를 활성화하면 1분 안에 연결을 시도합니다.",
+      "state": "상태",
+      "connectedSince": "연결 시작",
+      "reconnects24h": "24시간 재연결",
+      "lastError": "마지막 오류",
+      "noError": "오류 없음",
+      "metrics": "수신 지표",
+      "period": "기간",
+      "periodLimit": "최대 7일까지 볼 수 있습니다",
+      "modelMissing": "모델 없음",
+      "spaceMissing": "공간 없음",
+      "viewSettings": "설정 보기",
+      "usageUnavailable": "사용처를 불러오지 못했습니다",
+      "devices": "기기",
+      "deviceCount": "{{n}}대",
+      "flows": "트리거로 쓰는 플로우",
+      "noFlows": "없음",
+      "volume7d": "7일 수신량"
+    },
+    "ignore": {
+      "empty": "무시 목록이 비어 있습니다",
+      "emptyBody": "승인 대기에서 거부한 기기가 여기에 쌓입니다.",
+      "externalId": "외부 ID",
+      "reason": "사유",
+      "createdAt": "날짜",
+      "release": "해제",
+      "reasons": {
+        "REJECTED": "승인 거부",
+        "MANUAL": "직접 추가"
+      }
+    },
+    "credentials": {
+      "title": "플랫폼 브로커 자격증명",
+      "connectInfo": "접속 정보",
+      "issue": "발급",
+      "issueTitle": "자격증명 발급",
+      "issueBody": "비밀번호와 서명 키를 만듭니다. 결과는 한 번만 보여 줍니다.",
+      "expiresAtOptional": "만료 시각(선택)",
+      "endpoint": "접속 주소",
+      "topic": "토픽",
+      "authMethod": "인증",
+      "signing": "메시지 서명",
+      "topicRules": "토픽 규칙",
+      "perDevice": "기기별 자격증명은 기기 상세의 자격증명 탭에서 발급·폐기합니다.",
+      "onceTitle": "지금만 볼 수 있습니다. 기기에 입력한 뒤 닫으세요.",
+      "username": "사용자 이름",
+      "password": "비밀번호",
+      "signingKey": "서명 키(HMAC-SHA256)",
+      "closeOnce": "확인했습니다(닫기)",
+      "empty": "발급한 자격증명이 없습니다",
+      "emptyBody": "[발급]으로 이 기기의 접속 정보를 만드세요.",
+      "askAdmin": "발급은 관리자(INTEGRATOR 이상)에게 요청하세요.",
+      "type": "유형",
+      "status": "상태",
+      "expiresAt": "만료",
+      "lastUsedAt": "마지막 사용",
+      "noExpiry": "만료 없음",
+      "revoke": "폐기",
+      "revokeTitle": "자격증명 폐기",
+      "revokeBody": "{{username}}을(를) 폐기합니다. 되돌릴 수 없습니다. 서명 키 거부는 1분 안에 반영됩니다.",
+      "state": {
+        "ACTIVE": "사용 중",
+        "REVOKED": "폐기됨"
+      }
+    }
+  },
+  "errors": {
+    "SOURCE_NOT_FOUND": "소스를 찾을 수 없습니다.",
+    "SOURCE_CODE_DUPLICATE": "같은 코드의 소스가 이미 있습니다.",
+    "SOURCE_CLIENT_ID_DUPLICATE": "다른 소스가 같은 client-id를 쓰고 있습니다.",
+    "SOURCE_CONFIG_INVALID": "소스 설정이 올바르지 않습니다.",
+    "SOURCE_SECRET_REQUIRED": "인증 정보를 입력하세요.",
+    "SOURCE_LIMIT_EXCEEDED": "조직의 소스 한도(50개)를 넘었습니다.",
+    "SOURCE_STATE_CONFLICT": "지금 상태에서는 할 수 없는 작업입니다.",
+    "SOURCE_IN_USE": "연결된 기기가 있어 삭제할 수 없습니다.",
+    "SOURCE_AUTH_UNSUPPORTED": "이 커넥터가 지원하지 않는 인증 방식입니다.",
+    "SOURCE_TLS_VERIFY_REQUIRED": "운영 소스는 TLS 인증서 검증을 끌 수 없습니다.",
+    "SOURCE_ROTATION_FAILED": "자격증명 교체에 실패했습니다. 이전 값을 유지합니다.",
+    "SITE_LOCATION_REQUIRED": "사이트 위치(위·경도)가 필요합니다.",
+    "SCRIPT_NOT_FOUND": "스크립트를 찾을 수 없습니다.",
+    "CONNECTOR_NOT_FOUND": "커넥터를 찾을 수 없습니다.",
+    "CREDENTIAL_REVOKED": "이미 폐기한 자격증명입니다."
+  }
+}

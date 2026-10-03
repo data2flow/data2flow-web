@@ -1,0 +1,392 @@
+{
+  "sources": {
+    "section": {
+      "label": "采集菜单",
+      "monitor": "采集监控",
+      "sources": "数据源",
+      "scripts": "脚本",
+      "failures": "失败消息"
+    },
+    "type": {
+      "MQTT_SUBSCRIBE": "MQTT 订阅",
+      "PLATFORM_BROKER": "平台代理",
+      "WEBHOOK": "HTTP Webhook",
+      "SIMULATION": "虚拟环境",
+      "ONEM2M": "oneM2M",
+      "OPCUA": "OPC UA",
+      "MODBUS_TCP": "Modbus TCP",
+      "CONNECTOR": "连接器",
+      "EDGE": "边缘网关"
+    },
+    "typeIcon": {
+      "MQTT_SUBSCRIBE": "MQ",
+      "PLATFORM_BROKER": "PB",
+      "SIMULATION": "SIM",
+      "WEBHOOK": "HTTP"
+    },
+    "lifecycle": {
+      "DRAFT": "草稿",
+      "ACTIVE": "采集中",
+      "PAUSED": "已暂停",
+      "ARCHIVED": "已归档"
+    },
+    "state": {
+      "CONNECTED": "已连接",
+      "CONNECTING": "连接中",
+      "DISCONNECTED": "已断开",
+      "ERROR": "错误",
+      "DISABLED": "已关闭"
+    },
+    "auth": {
+      "NONE": "无",
+      "USERPASS": "用户名和密码",
+      "HEADER": "HTTP 头",
+      "MTLS": "客户端证书",
+      "BASIC": "Basic 认证"
+    },
+    "decoder": {
+      "chirpstack-v4": "ChirpStack v4",
+      "generic-json": "通用 JSON（路径映射）",
+      "single-value": "单一值",
+      "script": "用户脚本"
+    },
+    "policy": {
+      "AUTO_REGISTER": "自动注册（待审批）",
+      "REJECT": "拒绝"
+    },
+    "action": {
+      "activate": "启用",
+      "pause": "暂停",
+      "resume": "恢复",
+      "archive": "归档",
+      "delete": "删除",
+      "clone": "复制"
+    },
+    "confirm": {
+      "pause": {
+        "title": "暂停数据源",
+        "body": "停止订阅但保留会话。恢复后先接收代理中积压的消息。"
+      },
+      "archive": {
+        "title": "归档数据源",
+        "body": "断开连接并将设置设为只读。已归档的数据源不能重新启用（请复制新建）。"
+      },
+      "delete": {
+        "title": "删除数据源",
+        "body": "仅当没有关联设备时才能删除，且无法撤销。"
+      },
+      "clone": {
+        "title": "复制数据源",
+        "body": "仅复制设置并创建草稿，不复制密钥和设备。"
+      },
+      "usage": "使用情况：设备 {{devices}} 台 · 流程 {{flows}} 个",
+      "typeCode": "请输入数据源代码 {{code}} 以确认",
+      "mismatch": "输入的代码与数据源代码不一致。"
+    },
+    "list": {
+      "title": "数据源",
+      "new": "新建数据源",
+      "type": "类型",
+      "lifecycle": "状态",
+      "includeArchived": "包含已归档",
+      "state": "连接",
+      "name": "名称·代码",
+      "rate": "每分钟接收",
+      "perMin": "/分",
+      "sparkline": "最近1小时每分钟接收",
+      "decodeErrors": "解码失败率",
+      "lastReceived": "最后接收",
+      "devices": "设备数",
+      "live": "实时消息",
+      "noMatch": "没有符合条件的数据源",
+      "emptyTitle": "还没有数据源",
+      "emptyBody": "连接数据源以接收传感器数据。",
+      "emptyAskAdmin": "请联系管理员（INTEGRATOR 及以上）连接数据源。",
+      "connect": "连接数据源"
+    },
+    "new": {
+      "title": "新建数据源",
+      "steps": "1 选择连接器 · 2 设置 · 3 测试",
+      "withTemplate": "{{type}}（模板：{{template}}）",
+      "unsupported": "该连接器暂不能在界面上创建。请使用 MQTT 订阅、平台代理或虚拟环境。"
+    },
+    "edit": {
+      "title": "{{name}} 设置",
+      "saved": "已保存。采集中的数据源仅重新建立此数据源的连接。"
+    },
+    "catalog": {
+      "search": "搜索连接器",
+      "categories": "分类",
+      "templates": "模板",
+      "types": "基本类型",
+      "later": "即将推出",
+      "noMatch": "没有符合条件的连接器",
+      "fallback": "无法加载连接器目录。仍可使用基本类型创建。",
+      "authCount": "{{n}} 种认证",
+      "unavailable": "不可用（{{reason}}）",
+      "reason": {
+        "LICENSE": "许可证"
+      },
+      "category": {
+        "ALL": "全部",
+        "MQTT": "MQTT",
+        "LORAWAN": "LoRaWAN",
+        "CLOUD": "云平台",
+        "QUEUE": "消息队列",
+        "HTTP": "HTTP",
+        "LIGHTWEIGHT": "轻量",
+        "INDUSTRIAL": "工业",
+        "BUILDING": "楼宇",
+        "FILE": "文件",
+        "PLATFORM": "平台"
+      }
+    },
+    "form": {
+      "tabs": "设置选项卡",
+      "tabError": "有错误",
+      "tab": {
+        "basic": "基本",
+        "connection": "连接",
+        "auth": "认证",
+        "subscription": "订阅",
+        "decoder": "解码器",
+        "policy": "策略"
+      },
+      "readOnly": "只读。只有 INTEGRATOR 及以上可以修改设置。",
+      "conflict": "其他用户已先修改。请刷新查看最新设置后再保存。",
+      "type": "类型",
+      "code": "代码",
+      "codeHint": "以小写字母开头，小写字母、数字和 -，最多50字符。创建后不可更改",
+      "name": "名称",
+      "url": "代理地址",
+      "protocolVersion": "协议版本",
+      "clientIdBase": "client-id 前缀",
+      "clientIdPreview": "实际连接 ID：{{ids}}",
+      "keepalive": "keepalive（秒，10~600）",
+      "persistentSession": "持久会话（关闭 clean start）",
+      "sessionExpiry": "会话过期（秒）",
+      "receiveMaximum": "receive maximum",
+      "mqtt5Only": "仅限 MQTT 5.0",
+      "tlsInsecure": "关闭 TLS 证书验证",
+      "tlsInsecureWarn": "不验证证书将面临中间人攻击，仅用于开发数据源。",
+      "deviceKeyPattern": "设备键模式",
+      "platformEndpoint": "接入地址由平台固定：wss://iot-data.java21.net/mqtt",
+      "scenarioId": "场景 ID（可选）",
+      "scenarioHint": "虚拟环境通过此数据源注入数据",
+      "auth": "认证方式",
+      "headerName": "头名称",
+      "username": "用户名",
+      "secret": {
+        "USERPASS": "密码",
+        "HEADER": "头值",
+        "MTLS": "客户端密钥（PEM）"
+      },
+      "secretKeep": "留空则保留原值",
+      "secretWriteOnly": "保存后仅显示末尾4位指纹",
+      "sharedGroup": "共享订阅组（可选）",
+      "sharedGroupHint": "设置后实际主题为 $share/{组}/…",
+      "topicN": "主题 {{n}}",
+      "qosN": "主题 {{n}} QoS",
+      "actualTopic": "实际主题：{{topic}}",
+      "addTopic": "+ 主题",
+      "lossPossible": "可能丢失",
+      "decoder": "解码器",
+      "script": "DECODE 脚本",
+      "chooseScript": "选择脚本",
+      "decoderChangeHint": "更换解码器后从之后处理的消息开始生效。之前的消息请重新处理。",
+      "unknownDevicePolicy": "未注册设备",
+      "defaultModel": "默认设备型号",
+      "defaultSpace": "默认空间",
+      "noDefault": "不指定",
+      "autoregLimit": "每小时自动注册上限（0~10,000）",
+      "noDataAlarm": "无数据告警阈值（秒，60~86,400）",
+      "test": "测试连接",
+      "saveDraft": "保存为草稿",
+      "saveActivate": "保存并启用",
+      "reconnectHint": "采集中的数据源仅重新建立此数据源的连接。"
+    },
+    "validation": {
+      "code": "以小写字母开头，最多50字符（小写字母、数字、-）",
+      "name": "名称为1~100个字符",
+      "url": "代理地址格式不正确",
+      "clientId": "client-id 为1~100个字母、数字、- 或 _",
+      "keepalive": "请输入10~600秒",
+      "sessionExpiry": "会话过期须为非负整数",
+      "topicRequired": "请至少输入一个主题",
+      "topicLimit": "最多20个主题",
+      "topic": "主题格式不正确",
+      "secret": "请输入认证信息",
+      "username": "请输入用户名",
+      "headerName": "请输入头名称",
+      "script": "请选择脚本",
+      "mapping": "请检查映射设置",
+      "autoreg": "请输入0~10,000",
+      "noData": "请输入60~86,400秒"
+    },
+    "mapping": {
+      "title": "generic-json 映射",
+      "deviceIdFrom": "设备 ID 位置",
+      "deviceIdHint": "主题层级（topic[1]）或 JSON 路径（$.dev）",
+      "timePath": "时间路径（可选）",
+      "timeHint": "epoch ms 或 ISO-8601。留空则用接收时间",
+      "path": "JSON 路径",
+      "key": "测量项键",
+      "pathN": "路径 {{n}}",
+      "keyN": "键 {{n}}",
+      "addMetric": "+ 测量项",
+      "sampleTopic": "测试主题",
+      "samplePayload": "测试消息（JSON）",
+      "preview": "预览",
+      "externalId": "外部 ID",
+      "measuredAt": "测量时间",
+      "problem": {
+        "path": "路径语法不正确：{{position}}",
+        "topicIndex": "主题层级编号不正确",
+        "duplicate": "同一测量项键重复映射：{{value}}",
+        "metricKey": "测量项键格式不正确：{{value}}",
+        "required": "必填项",
+        "json": "JSON 格式不正确"
+      }
+    },
+    "test": {
+      "title": "连接测试",
+      "retry": "重新测试",
+      "running": "正在测试连接…（最长30秒）",
+      "idle": "点击[测试连接]显示各步骤结果和最多10条最新消息。结果不会保存。",
+      "success": "全部步骤成功，收到 {{n}} 条消息",
+      "partial": "部分成功：订阅成功但没有消息。请检查主题和 QoS。",
+      "failed": "连接测试失败。请查看失败步骤的原因。",
+      "lossPossible": "此设置在故障时可能丢失消息（QoS 0）。",
+      "steps": "测试步骤",
+      "chain": "证书：{{subject}} · 颁发者 {{issuer}} · 到期 {{notAfter}}",
+      "preview": "预览（{{n}}/10）",
+      "noDecoded": "无解码结果",
+      "step": {
+        "DNS": "DNS",
+        "TCP": "TCP",
+        "TLS": "TLS",
+        "AUTH": "认证",
+        "SUBSCRIBE": "订阅",
+        "POLL": "首次轮询"
+      },
+      "status": {
+        "OK": "成功",
+        "FAIL": "失败",
+        "SKIPPED": "已跳过"
+      }
+    },
+    "live": {
+      "topicFilter": "主题筛选",
+      "rate": "每秒最多显示10条",
+      "pausedWaiting": "已暂停，{{n}} 条等待",
+      "skipped": "省略 {{n}} 条",
+      "empty": "尚未收到消息",
+      "emptyBody": "数据源采集中时，新消息会立即显示在此处。",
+      "truncated": "已截断",
+      "raw": "原始",
+      "decoded": "解码预览",
+      "noDecoded": "无解码预览"
+    },
+    "stats": {
+      "received": "接收",
+      "accepted": "接受",
+      "decodeErrors": "解码失败",
+      "scriptErrors": "脚本错误",
+      "rejectedUnknown": "拒绝未注册",
+      "invalid": "无效消息",
+      "unit": "条"
+    },
+    "detail": {
+      "tab": {
+        "status": "状态",
+        "live": "实时消息",
+        "settings": "设置",
+        "usage": "使用情况",
+        "ignore": "忽略列表",
+        "credentials": "凭据"
+      },
+      "noInstances": "没有连接实例",
+      "noInstancesBody": "启用后将在1分钟内尝试连接。",
+      "state": "状态",
+      "connectedSince": "连接开始",
+      "reconnects24h": "24小时重连",
+      "lastError": "最后错误",
+      "noError": "无错误",
+      "metrics": "接收指标",
+      "period": "期间",
+      "periodLimit": "最多可查看7天",
+      "modelMissing": "型号不存在",
+      "spaceMissing": "空间不存在",
+      "viewSettings": "查看设置",
+      "usageUnavailable": "无法加载使用情况",
+      "devices": "设备",
+      "deviceCount": "{{n}} 台",
+      "flows": "用作触发器的流程",
+      "noFlows": "无",
+      "volume7d": "7天接收量"
+    },
+    "ignore": {
+      "empty": "忽略列表为空",
+      "emptyBody": "在待审批中被拒绝的设备会显示在这里。",
+      "externalId": "外部 ID",
+      "reason": "原因",
+      "createdAt": "日期",
+      "release": "解除",
+      "reasons": {
+        "REJECTED": "审批拒绝",
+        "MANUAL": "手动添加"
+      }
+    },
+    "credentials": {
+      "title": "平台代理凭据",
+      "connectInfo": "连接信息",
+      "issue": "签发",
+      "issueTitle": "签发凭据",
+      "issueBody": "生成密码和签名密钥，仅显示一次。",
+      "expiresAtOptional": "过期时间（可选）",
+      "endpoint": "接入地址",
+      "topic": "主题",
+      "authMethod": "认证",
+      "signing": "消息签名",
+      "topicRules": "主题规则",
+      "perDevice": "设备凭据在设备详情的凭据选项卡中签发和吊销。",
+      "onceTitle": "仅此一次显示。输入设备后请关闭。",
+      "username": "用户名",
+      "password": "密码",
+      "signingKey": "签名密钥（HMAC-SHA256）",
+      "closeOnce": "已记录（关闭）",
+      "empty": "尚未签发凭据",
+      "emptyBody": "使用[签发]为此设备创建凭据。",
+      "askAdmin": "请联系管理员（INTEGRATOR 及以上）签发。",
+      "type": "类型",
+      "status": "状态",
+      "expiresAt": "过期",
+      "lastUsedAt": "最后使用",
+      "noExpiry": "不过期",
+      "revoke": "吊销",
+      "revokeTitle": "吊销凭据",
+      "revokeBody": "将吊销 {{username}}，无法撤销。签名密钥拒绝在1分钟内生效。",
+      "state": {
+        "ACTIVE": "使用中",
+        "REVOKED": "已吊销"
+      }
+    }
+  },
+  "errors": {
+    "SOURCE_NOT_FOUND": "找不到数据源。",
+    "SOURCE_CODE_DUPLICATE": "已存在相同代码的数据源。",
+    "SOURCE_CLIENT_ID_DUPLICATE": "其他数据源正在使用相同的 client-id。",
+    "SOURCE_CONFIG_INVALID": "数据源设置不正确。",
+    "SOURCE_SECRET_REQUIRED": "请输入认证信息。",
+    "SOURCE_LIMIT_EXCEEDED": "超过组织的数据源上限（50个）。",
+    "SOURCE_STATE_CONFLICT": "当前状态下无法执行此操作。",
+    "SOURCE_IN_USE": "有关联设备，无法删除。",
+    "SOURCE_AUTH_UNSUPPORTED": "该连接器不支持此认证方式。",
+    "SOURCE_TLS_VERIFY_REQUIRED": "生产数据源不能关闭 TLS 证书验证。",
+    "SOURCE_ROTATION_FAILED": "凭据轮换失败，保留原值。",
+    "SITE_LOCATION_REQUIRED": "需要站点位置（经纬度）。",
+    "SCRIPT_NOT_FOUND": "找不到脚本。",
+    "CONNECTOR_NOT_FOUND": "找不到连接器。",
+    "CREDENTIAL_REVOKED": "凭据已被吊销。"
+  }
+}

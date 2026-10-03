@@ -1,0 +1,392 @@
+{
+  "sources": {
+    "section": {
+      "label": "Ingestion menu",
+      "monitor": "Monitor",
+      "sources": "Data sources",
+      "scripts": "Scripts",
+      "failures": "Failed messages"
+    },
+    "type": {
+      "MQTT_SUBSCRIBE": "MQTT subscription",
+      "PLATFORM_BROKER": "Platform broker",
+      "WEBHOOK": "HTTP Webhook",
+      "SIMULATION": "Simulation",
+      "ONEM2M": "oneM2M",
+      "OPCUA": "OPC UA",
+      "MODBUS_TCP": "Modbus TCP",
+      "CONNECTOR": "Connector",
+      "EDGE": "Edge gateway"
+    },
+    "typeIcon": {
+      "MQTT_SUBSCRIBE": "MQ",
+      "PLATFORM_BROKER": "PB",
+      "SIMULATION": "SIM",
+      "WEBHOOK": "HTTP"
+    },
+    "lifecycle": {
+      "DRAFT": "Draft",
+      "ACTIVE": "Active",
+      "PAUSED": "Paused",
+      "ARCHIVED": "Archived"
+    },
+    "state": {
+      "CONNECTED": "Connected",
+      "CONNECTING": "Connecting",
+      "DISCONNECTED": "Disconnected",
+      "ERROR": "Error",
+      "DISABLED": "Disabled"
+    },
+    "auth": {
+      "NONE": "None",
+      "USERPASS": "Username and password",
+      "HEADER": "HTTP header",
+      "MTLS": "Client certificate",
+      "BASIC": "Basic auth"
+    },
+    "decoder": {
+      "chirpstack-v4": "ChirpStack v4",
+      "generic-json": "Generic JSON (path mapping)",
+      "single-value": "Single value",
+      "script": "User script"
+    },
+    "policy": {
+      "AUTO_REGISTER": "Auto-register (pending approval)",
+      "REJECT": "Reject"
+    },
+    "action": {
+      "activate": "Activate",
+      "pause": "Pause",
+      "resume": "Resume",
+      "archive": "Archive",
+      "delete": "Delete",
+      "clone": "Clone"
+    },
+    "confirm": {
+      "pause": {
+        "title": "Pause source",
+        "body": "Subscriptions stop but the session is kept. When resumed, messages queued at the broker are received first."
+      },
+      "archive": {
+        "title": "Archive source",
+        "body": "Disconnects and makes the settings read-only. An archived source cannot be reactivated (clone it instead)."
+      },
+      "delete": {
+        "title": "Delete source",
+        "body": "A source can be deleted only when no devices are linked. This cannot be undone."
+      },
+      "clone": {
+        "title": "Clone source",
+        "body": "Copies the settings into a new draft. Secrets and devices are not copied."
+      },
+      "usage": "In use by: {{devices}} devices · {{flows}} flows",
+      "typeCode": "Type the source code {{code}} to confirm",
+      "mismatch": "The code you typed does not match the source code."
+    },
+    "list": {
+      "title": "Data sources",
+      "new": "New source",
+      "type": "Type",
+      "lifecycle": "Lifecycle",
+      "includeArchived": "Include archived",
+      "state": "Connection",
+      "name": "Name / code",
+      "rate": "Per minute",
+      "perMin": "/min",
+      "sparkline": "Messages per minute, last hour",
+      "decodeErrors": "Decode error rate",
+      "lastReceived": "Last received",
+      "devices": "Devices",
+      "live": "Live messages",
+      "noMatch": "No sources match the filters",
+      "emptyTitle": "There are no sources yet",
+      "emptyBody": "Connect a data source to receive sensor data.",
+      "emptyAskAdmin": "Ask an administrator (INTEGRATOR or above) to connect a source.",
+      "connect": "Connect a source"
+    },
+    "new": {
+      "title": "New data source",
+      "steps": "1 Choose connector · 2 Configure · 3 Test",
+      "withTemplate": "{{type}} (template: {{template}})",
+      "unsupported": "This connector cannot be created from the screen yet. Use MQTT subscription, platform broker or simulation."
+    },
+    "edit": {
+      "title": "{{name}} settings",
+      "saved": "Saved. If the source is active, only this source reconnects."
+    },
+    "catalog": {
+      "search": "Search connectors",
+      "categories": "Categories",
+      "templates": "Templates",
+      "types": "Basic types",
+      "later": "Coming later",
+      "noMatch": "No connectors match",
+      "fallback": "Could not load the connector catalog. You can still use the basic types.",
+      "authCount": "{{n}} auth methods",
+      "unavailable": "Unavailable ({{reason}})",
+      "reason": {
+        "LICENSE": "license"
+      },
+      "category": {
+        "ALL": "All",
+        "MQTT": "MQTT",
+        "LORAWAN": "LoRaWAN",
+        "CLOUD": "Cloud hubs",
+        "QUEUE": "Message queues",
+        "HTTP": "HTTP",
+        "LIGHTWEIGHT": "Lightweight",
+        "INDUSTRIAL": "Industrial",
+        "BUILDING": "Building",
+        "FILE": "Files",
+        "PLATFORM": "Platform"
+      }
+    },
+    "form": {
+      "tabs": "Settings tabs",
+      "tabError": "Has errors",
+      "tab": {
+        "basic": "Basic",
+        "connection": "Connection",
+        "auth": "Auth",
+        "subscription": "Subscription",
+        "decoder": "Decoder",
+        "policy": "Policy"
+      },
+      "readOnly": "Read-only. Only INTEGRATOR or above can change settings.",
+      "conflict": "Someone else changed this source first. Refresh to see the latest settings, then save again.",
+      "type": "Type",
+      "code": "Code",
+      "codeHint": "Starts with a lowercase letter; lowercase, digits and - up to 50. Cannot be changed later",
+      "name": "Name",
+      "url": "Broker URL",
+      "protocolVersion": "Protocol version",
+      "clientIdBase": "client-id prefix",
+      "clientIdPreview": "Actual client IDs: {{ids}}",
+      "keepalive": "Keepalive (s, 10–600)",
+      "persistentSession": "Persistent session (clean start off)",
+      "sessionExpiry": "Session expiry (s)",
+      "receiveMaximum": "Receive maximum",
+      "mqtt5Only": "MQTT 5.0 only",
+      "tlsInsecure": "Skip TLS certificate verification",
+      "tlsInsecureWarn": "Without verification the connection is exposed to man-in-the-middle attacks. Use only for development sources.",
+      "deviceKeyPattern": "Device key pattern",
+      "platformEndpoint": "The endpoint is fixed by the platform: wss://iot-data.java21.net/mqtt",
+      "scenarioId": "Scenario ID (optional)",
+      "scenarioHint": "The simulator feeds data through this source",
+      "auth": "Authentication",
+      "headerName": "Header name",
+      "username": "Username",
+      "secret": {
+        "USERPASS": "Password",
+        "HEADER": "Header value",
+        "MTLS": "Client key (PEM)"
+      },
+      "secretKeep": "Leave empty to keep the current value",
+      "secretWriteOnly": "After saving, only a 4-character fingerprint is shown",
+      "sharedGroup": "Shared subscription group (optional)",
+      "sharedGroupHint": "If set, the actual topic becomes $share/{group}/…",
+      "topicN": "Topic {{n}}",
+      "qosN": "Topic {{n}} QoS",
+      "actualTopic": "Actual topic: {{topic}}",
+      "addTopic": "+ Topic",
+      "lossPossible": "Loss possible",
+      "decoder": "Decoder",
+      "script": "DECODE script",
+      "chooseScript": "Choose a script",
+      "decoderChangeHint": "A decoder change applies to messages processed afterwards. Reprocess earlier messages if needed.",
+      "unknownDevicePolicy": "Unknown devices",
+      "defaultModel": "Default device model",
+      "defaultSpace": "Default space",
+      "noDefault": "None",
+      "autoregLimit": "Auto-registrations per hour (0–10,000)",
+      "noDataAlarm": "No-data alarm after (s, 60–86,400)",
+      "test": "Test connection",
+      "saveDraft": "Save as draft",
+      "saveActivate": "Save and activate",
+      "reconnectHint": "For an active source, only this source reconnects."
+    },
+    "validation": {
+      "code": "Up to 50 characters starting with a lowercase letter (lowercase, digits, -)",
+      "name": "Enter a name of 1–100 characters",
+      "url": "The broker URL is invalid",
+      "clientId": "client-id must be 1–100 letters, digits, - or _",
+      "keepalive": "Enter 10–600 seconds",
+      "sessionExpiry": "Session expiry must be a non-negative integer",
+      "topicRequired": "Enter at least one topic",
+      "topicLimit": "Up to 20 topics",
+      "topic": "The topic is invalid",
+      "secret": "Enter the credentials",
+      "username": "Enter a username",
+      "headerName": "Enter a header name",
+      "script": "Choose a script",
+      "mapping": "Check the mapping",
+      "autoreg": "Enter 0–10,000",
+      "noData": "Enter 60–86,400 seconds"
+    },
+    "mapping": {
+      "title": "generic-json mapping",
+      "deviceIdFrom": "Device ID from",
+      "deviceIdHint": "Topic level (topic[1]) or JSON path ($.dev)",
+      "timePath": "Time path (optional)",
+      "timeHint": "epoch ms or ISO-8601. Empty means received time",
+      "path": "JSON path",
+      "key": "Metric key",
+      "pathN": "Path {{n}}",
+      "keyN": "Key {{n}}",
+      "addMetric": "+ Metric",
+      "sampleTopic": "Test topic",
+      "samplePayload": "Test message (JSON)",
+      "preview": "Preview",
+      "externalId": "External ID",
+      "measuredAt": "Measured at",
+      "problem": {
+        "path": "Invalid path syntax: {{position}}",
+        "topicIndex": "Invalid topic level index",
+        "duplicate": "Metric key mapped twice: {{value}}",
+        "metricKey": "Invalid metric key: {{value}}",
+        "required": "Required",
+        "json": "Invalid JSON"
+      }
+    },
+    "test": {
+      "title": "Connection test",
+      "retry": "Test again",
+      "running": "Testing the connection… (up to 30 s)",
+      "idle": "Press [Test connection] to see each step and up to 10 recent messages. Results are not saved.",
+      "success": "All steps passed, {{n}} messages received",
+      "partial": "Partial success: subscribed but no messages arrived. Check the topics and QoS.",
+      "failed": "The connection test failed. Check the cause at the failed step.",
+      "lossPossible": "With these settings messages may be lost on failure (QoS 0).",
+      "steps": "Test steps",
+      "chain": "Certificate: {{subject}} · issuer {{issuer}} · expires {{notAfter}}",
+      "preview": "Preview ({{n}}/10)",
+      "noDecoded": "No decoded result",
+      "step": {
+        "DNS": "DNS",
+        "TCP": "TCP",
+        "TLS": "TLS",
+        "AUTH": "Auth",
+        "SUBSCRIBE": "Subscribe",
+        "POLL": "First poll"
+      },
+      "status": {
+        "OK": "passed",
+        "FAIL": "failed",
+        "SKIPPED": "skipped"
+      }
+    },
+    "live": {
+      "topicFilter": "Topic filter",
+      "rate": "Shows up to 10 messages per second",
+      "pausedWaiting": "Paused, {{n}} waiting",
+      "skipped": "{{n}} skipped",
+      "empty": "No messages received yet",
+      "emptyBody": "While the source is active, new messages appear here immediately.",
+      "truncated": "truncated",
+      "raw": "Raw",
+      "decoded": "Decoded preview",
+      "noDecoded": "No decoded preview"
+    },
+    "stats": {
+      "received": "Received",
+      "accepted": "Accepted",
+      "decodeErrors": "Decode errors",
+      "scriptErrors": "Script errors",
+      "rejectedUnknown": "Unknown rejected",
+      "invalid": "Invalid",
+      "unit": "msgs"
+    },
+    "detail": {
+      "tab": {
+        "status": "Status",
+        "live": "Live messages",
+        "settings": "Settings",
+        "usage": "Usage",
+        "ignore": "Ignore list",
+        "credentials": "Credentials"
+      },
+      "noInstances": "No connection instances",
+      "noInstancesBody": "After activation the platform connects within 1 minute.",
+      "state": "State",
+      "connectedSince": "Connected since",
+      "reconnects24h": "Reconnects (24 h)",
+      "lastError": "Last error",
+      "noError": "No errors",
+      "metrics": "Ingestion metrics",
+      "period": "Period",
+      "periodLimit": "Up to 7 days",
+      "modelMissing": "Model missing",
+      "spaceMissing": "Space missing",
+      "viewSettings": "View settings",
+      "usageUnavailable": "Could not load usage",
+      "devices": "Devices",
+      "deviceCount": "{{n}} devices",
+      "flows": "Flows using this source",
+      "noFlows": "None",
+      "volume7d": "Volume, last 7 days"
+    },
+    "ignore": {
+      "empty": "The ignore list is empty",
+      "emptyBody": "Devices rejected in pending approval appear here.",
+      "externalId": "External ID",
+      "reason": "Reason",
+      "createdAt": "Date",
+      "release": "Release",
+      "reasons": {
+        "REJECTED": "Rejected",
+        "MANUAL": "Added manually"
+      }
+    },
+    "credentials": {
+      "title": "Platform broker credentials",
+      "connectInfo": "Connection info",
+      "issue": "Issue",
+      "issueTitle": "Issue credential",
+      "issueBody": "Creates a password and a signing key. They are shown only once.",
+      "expiresAtOptional": "Expires at (optional)",
+      "endpoint": "Endpoint",
+      "topic": "Topic",
+      "authMethod": "Authentication",
+      "signing": "Message signing",
+      "topicRules": "Topic rules",
+      "perDevice": "Per-device credentials are issued and revoked in the device's Credentials tab.",
+      "onceTitle": "Shown only now. Enter it into the device, then close.",
+      "username": "Username",
+      "password": "Password",
+      "signingKey": "Signing key (HMAC-SHA256)",
+      "closeOnce": "I have it (close)",
+      "empty": "No credentials issued",
+      "emptyBody": "Use [Issue] to create this device's credentials.",
+      "askAdmin": "Ask an administrator (INTEGRATOR or above) to issue one.",
+      "type": "Type",
+      "status": "Status",
+      "expiresAt": "Expires",
+      "lastUsedAt": "Last used",
+      "noExpiry": "No expiry",
+      "revoke": "Revoke",
+      "revokeTitle": "Revoke credential",
+      "revokeBody": "Revokes {{username}}. This cannot be undone. Signature rejection takes effect within 1 minute.",
+      "state": {
+        "ACTIVE": "Active",
+        "REVOKED": "Revoked"
+      }
+    }
+  },
+  "errors": {
+    "SOURCE_NOT_FOUND": "Source not found.",
+    "SOURCE_CODE_DUPLICATE": "A source with the same code already exists.",
+    "SOURCE_CLIENT_ID_DUPLICATE": "Another source uses the same client-id.",
+    "SOURCE_CONFIG_INVALID": "The source settings are invalid.",
+    "SOURCE_SECRET_REQUIRED": "Enter the credentials.",
+    "SOURCE_LIMIT_EXCEEDED": "The organization source limit (50) was exceeded.",
+    "SOURCE_STATE_CONFLICT": "This action is not allowed in the current state.",
+    "SOURCE_IN_USE": "Devices are linked, so the source cannot be deleted.",
+    "SOURCE_AUTH_UNSUPPORTED": "This connector does not support the authentication method.",
+    "SOURCE_TLS_VERIFY_REQUIRED": "Production sources cannot skip TLS verification.",
+    "SOURCE_ROTATION_FAILED": "Credential rotation failed; the previous value is kept.",
+    "SITE_LOCATION_REQUIRED": "The site location (latitude/longitude) is required.",
+    "SCRIPT_NOT_FOUND": "Script not found.",
+    "CONNECTOR_NOT_FOUND": "Connector not found.",
+    "CREDENTIAL_REVOKED": "The credential is already revoked."
+  }
+}

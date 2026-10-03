@@ -1,4 +1,179 @@
-/** 준비 중인 화면(M2) */
-export default function Pending() {
-  return null;
+/**
+ * UI-DSC-01 데이터 소스 목록(DSC-01.01, DSC-01.02, DSC-02.01, DSC-02.03, DSC-02.06, DSC-07.01, DSH-08.02).
+ * API: 목록 API-DSC-01, 상태 변경 API-DSC-06(activate·pause·resume, baseVersion).
+ * 조회 SRC_READ(OPERATOR 이상), [새 소스]·행의 [실시간 메시지]·상태 변경은 SRC_ADMIN(INTEGRATOR 이상).
+ * 연결 상태는 실시간(API-DSH-20 `ingest` 토픽)으로 갱신하고, 수신량은 1분마다 다시 불러온다.
+ */
+import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { Form, Link, data, useRevalidator, useSearchParams } from "react-router";
+import { callApi, callList, field, listOrThrow } from "~/bff/api.server";
+import { bff } from "~/bff/middleware.server";
+import { getMe } from "~/bff/user.server";
+import { Alert, ButtonLink, Card, Checkbox, CsrfField, EmptyState, PageHeader, Pager, SelectField, Table, TextField } from "~/components/ui";
+import { errorText } from "~/lib/error-text";
+import { formatRelative } from "~/lib/format";
+import { hasAny } from "~/lib/permissions";
+import { IngestTabs, LifecycleBadge, Sparkline, StateBadge } from "~/features/sources/components/common";
+import { LIFECYCLES, TYPE_CARDS, percent, type SourceSummary } from "~/features/sources/model/source";
+import type { Route } from "./+types/sources";
+
+export function meta() {
+  return [{ title: "data2flow" }];
+}
+
+export async function loader({ request, context }: Route.LoaderArgs) {
+  const ctx = bff(context);
+  const url = new URL(request.url);
+  const page = Math.max(1, Number(url.searchParams.get("page")) || 1);
+  const query = new URLSearchParams({ page: String(page), size: "50" });
+  const q = url.searchParams.get("q");
+  if (q) query.set("q", q);
+  for (const type of url.searchParams.getAll("type").filter(Boolean)) query.append("type", type);
+  const lifecycle = url.searchParams.get("lifecycle");
+  const archived = url.searchParams.get("archived") === "1";
+  if (lifecycle) query.set("lifecycle", lifecycle);
+  else if (archived) query.set("lifecycle", LIFECYCLES.join(","));
+  const [list, me] = await Promise.all([callList<SourceSummary>(ctx, request, `/api/v1/core/sources?${query}`), getMe(ctx, request)]);
+  const permissions = me.ok ? me.data.permissions : [];
+  return { sources: listOrThrow(list), page, canAdmin: hasAny(permissions, ["SRC_ADMIN"]), filtered: Boolean(q || lifecycle || url.searchParams.get("type")), now: ctx.runtime.now() };
+}
+
+export async function action({ request, context }: Route.ActionArgs) {
+  const ctx = bff(context);
+  const form = await request.formData();
+  const intent = field(form, "intent");
+  if (!["activate", "pause", "resume"].includes(intent)) return data({ intent, error: { code: "INVALID_REQUEST" } }, { status: 400 });
+  const id = encodeURIComponent(field(form, "id"));
+  const result = await callApi(ctx, request, `/api/v1/core/sources/${id}/${intent}`, { method: "POST", body: { baseVersion: Number(field(form, "baseVersion")) } });
+  if (!result.ok) return data({ intent, error: { code: result.code, message: result.message } }, { status: result.status });
+  return { intent, done: true };
+}
+
+export default function Sources({ loaderData, actionData }: Route.ComponentProps) {
+  const { t, i18n } = useTranslation();
+  const { sources, page, canAdmin, filtered, now } = loaderData;
+  const [params] = useSearchParams();
+  const revalidator = useRevalidator();
+  const [clock, setClock] = useState(now);
+  // 수신량·마지막 수신은 1분마다 다시 불러온다(TC-DSC-075)
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setClock(Date.now());
+      if (revalidator.state === "idle") void revalidator.revalidate();
+    }, 60_000);
+    return () => clearInterval(timer);
+  }, [revalidator]);
+  const error = actionData && "error" in actionData ? actionData.error : undefined;
+
+  return (
+    <>
+      <IngestTabs current="sources" />
+      <PageHeader title={t("sources.list.title")} actions={canAdmin && <ButtonLink to="/sources/new" variant="primary">{t("sources.list.new")}</ButtonLink>} />
+      {error && <Alert tone="danger">{errorText(t, error)}</Alert>}
+      <Card>
+        <Form method="get" className="mb-3 flex flex-wrap items-end gap-3">
+          <TextField label={t("common.search")} name="q" defaultValue={params.get("q") ?? ""} />
+          <SelectField label={t("sources.list.type")} name="type" defaultValue={params.get("type") ?? ""}>
+            <option value="">{t("common.all")}</option>
+            {TYPE_CARDS.map((type) => (
+              <option key={type} value={type}>
+                {t(`sources.type.${type}`)}
+              </option>
+            ))}
+          </SelectField>
+          <SelectField label={t("sources.list.lifecycle")} name="lifecycle" defaultValue={params.get("lifecycle") ?? ""}>
+            <option value="">{t("common.all")}</option>
+            {LIFECYCLES.map((l) => (
+              <option key={l} value={l}>
+                {t(`sources.lifecycle.${l}`)}
+              </option>
+            ))}
+          </SelectField>
+          <Checkbox label={t("sources.list.includeArchived")} name="archived" value="1" defaultChecked={params.get("archived") === "1"} />
+          <button type="submit" className="rounded-md border border-line px-3 py-1.5 text-[13px]">
+            {t("common.search")}
+          </button>
+        </Form>
+        {sources.responses.length === 0 ? (
+          filtered ? (
+            <EmptyState title={t("sources.list.noMatch")} action={<ButtonLink to="/sources">{t("common.reset")}</ButtonLink>} />
+          ) : (
+            <EmptyState
+              title={t("sources.list.emptyTitle")}
+              body={canAdmin ? t("sources.list.emptyBody") : t("sources.list.emptyAskAdmin")}
+              action={canAdmin && <ButtonLink to="/sources/new" variant="primary">{t("sources.list.connect")}</ButtonLink>}
+            />
+          )
+        ) : (
+          <Table>
+            <thead>
+              <tr>
+                <th scope="col">{t("sources.list.state")}</th>
+                <th scope="col">{t("sources.list.name")}</th>
+                <th scope="col">{t("sources.list.type")}</th>
+                <th scope="col">{t("sources.list.lifecycle")}</th>
+                <th scope="col">{t("sources.list.rate")}</th>
+                <th scope="col">{t("sources.list.decodeErrors")}</th>
+                <th scope="col">{t("sources.list.lastReceived")}</th>
+                <th scope="col">{t("sources.list.devices")}</th>
+                <th scope="col" />
+              </tr>
+            </thead>
+            <tbody>
+              {sources.responses.map((s) => (
+                <tr key={s.id}>
+                  <td>
+                    <StateBadge state={s.lifecycle === "ACTIVE" ? s.state : s.lifecycle === "PAUSED" || s.lifecycle === "DRAFT" ? "DISABLED" : (s.state ?? "DISABLED")} />
+                  </td>
+                  <td>
+                    <Link to={`/sources/${s.id}`} className="font-medium text-accent hover:underline">
+                      {s.name}
+                    </Link>
+                    <div className="font-mono text-[12px] text-muted">{s.code}</div>
+                  </td>
+                  <td>
+                    <span aria-hidden className="mr-1 font-mono text-[11px] text-muted">
+                      {t(`sources.typeIcon.${s.type}`, { defaultValue: "•" })}
+                    </span>
+                    {t(`sources.type.${s.type}`, { defaultValue: s.type })}
+                  </td>
+                  <td>
+                    <LifecycleBadge lifecycle={s.lifecycle} />
+                  </td>
+                  <td className="whitespace-nowrap font-mono">
+                    <Sparkline values={s.rateSeries} label={t("sources.list.sparkline")} /> {s.ratePerMin ?? "–"}
+                    {t("sources.list.perMin")}
+                  </td>
+                  <td className="font-mono">{percent(s.decodeErrorRate1h)}</td>
+                  <td>{formatRelative(s.lastReceivedAt, clock, i18n.language)}</td>
+                  <td className="font-mono">{s.deviceCount ?? 0}</td>
+                  <td>
+                    {canAdmin && (
+                      <div className="flex flex-wrap gap-2">
+                        <Link to={`/sources/${s.id}?tab=live`} className="text-[12.5px] text-accent hover:underline">
+                          {t("sources.list.live")}
+                        </Link>
+                        {(s.lifecycle === "DRAFT" || s.lifecycle === "ACTIVE" || s.lifecycle === "PAUSED") && (
+                          <Form method="post">
+                            <CsrfField />
+                            <input type="hidden" name="id" value={s.id} />
+                            <input type="hidden" name="baseVersion" value={s.version ?? 0} />
+                            <button type="submit" name="intent" value={s.lifecycle === "DRAFT" ? "activate" : s.lifecycle === "ACTIVE" ? "pause" : "resume"} className="text-[12.5px] text-accent hover:underline">
+                              {t(`sources.action.${s.lifecycle === "DRAFT" ? "activate" : s.lifecycle === "ACTIVE" ? "pause" : "resume"}`)}
+                            </button>
+                          </Form>
+                        )}
+                      </div>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        )}
+        <Pager page={page} totalPages={sources.totalPages} />
+      </Card>
+    </>
+  );
 }
