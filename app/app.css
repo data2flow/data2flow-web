@@ -35,8 +35,9 @@
   --d2f-bad-soft: #fbe9e9;
 }
 
+/* 테마(DSH-07.02): 기본은 시스템 설정을 따르고, 사용자가 고르면 html[data-theme]로 고정한다 */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --d2f-bg: #151f2c;
     --d2f-panel: #1c2836;
     --d2f-line: #2c3a4b;
@@ -52,6 +53,23 @@
     --d2f-bad-soft: #432426;
     color-scheme: dark;
   }
+}
+
+:root[data-theme="dark"] {
+  --d2f-bg: #151f2c;
+  --d2f-panel: #1c2836;
+  --d2f-line: #2c3a4b;
+  --d2f-text: #e3e9f0;
+  --d2f-muted: #94a3b5;
+  --d2f-accent: #4c8dde;
+  --d2f-accent-soft: #1f3550;
+  --d2f-good: #51b96a;
+  --d2f-good-soft: #1d3a27;
+  --d2f-warn: #e0a743;
+  --d2f-warn-soft: #3d3020;
+  --d2f-bad: #ec6b6b;
+  --d2f-bad-soft: #432426;
+  color-scheme: dark;
 }
 
 html,

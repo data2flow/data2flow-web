@@ -1,13 +1,48 @@
 {
-  "nav": { "spaces": "Spaces", "devices": "Devices", "explore": "Explore", "ingest": "Ingestion" },
-  "common": { "cancel": "Cancel", "confirm": "Confirm", "refresh": "Refresh", "retry": "Retry", "add": "Add", "remove": "Remove", "copy": "Copy", "copied": "Copied.", "detail": "Details", "none": "None", "loading": "Loading…", "apply": "Apply", "reset": "Reset", "more": "More", "pause": "Pause", "resume": "Resume", "filter": "Filter", "selectedCount": "{{n}} selected", "unknown": "Unknown", "create": "Create", "back": "Back" },
+  "nav": {
+    "spaces": "Spaces",
+    "devices": "Devices",
+    "explore": "Explore",
+    "ingest": "Ingestion"
+  },
+  "common": {
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "refresh": "Refresh",
+    "retry": "Retry",
+    "add": "Add",
+    "remove": "Remove",
+    "copy": "Copy",
+    "copied": "Copied.",
+    "detail": "Details",
+    "none": "None",
+    "loading": "Loading…",
+    "apply": "Apply",
+    "reset": "Reset",
+    "more": "More",
+    "pause": "Pause",
+    "resume": "Resume",
+    "filter": "Filter",
+    "selectedCount": "{{n}} selected",
+    "unknown": "Unknown",
+    "create": "Create",
+    "back": "Back"
+  },
   "live": {
     "disconnected": "Real-time connection lost. Reconnecting…",
-    "status": { "connecting": "Connecting", "open": "Live", "retrying": "Reconnecting", "closed": "Off" }
+    "status": {
+      "connecting": "Connecting",
+      "open": "Live",
+      "retrying": "Reconnecting",
+      "closed": "Off"
+    }
   },
   "chart": {
     "label": "Time-series chart",
-    "quality": { "1": "Out of range", "3": "Suspect" },
+    "quality": {
+      "1": "Out of range",
+      "3": "Suspect"
+    },
     "virtual": "Virtual",
     "noData": "No data in this period",
     "gap": "No data received",
@@ -18,9 +53,22 @@
     "tableCaption": "Chart values",
     "time": "Time"
   },
-  "editor": { "loaded": "{{label}} editor" },
-  "spacePicker": { "choose": "Select a space", "noSpaces": "There are no spaces yet.", "allScope": "If none is selected, all spaces are included.", "selected": "{{n}} spaces (including children)" },
-  "spaceType": { "SITE": "Site", "BUILDING": "Building", "FLOOR": "Floor", "ROOM": "Room", "ZONE": "Zone" },
+  "editor": {
+    "loaded": "{{label}} editor"
+  },
+  "spacePicker": {
+    "choose": "Select a space",
+    "noSpaces": "There are no spaces yet.",
+    "allScope": "If none is selected, all spaces are included.",
+    "selected": "{{n}} spaces (including children)"
+  },
+  "spaceType": {
+    "SITE": "Site",
+    "BUILDING": "Building",
+    "FLOOR": "Floor",
+    "ROOM": "Room",
+    "ZONE": "Zone"
+  },
   "glossary": {
     "metric": "Metric: a kind of value a device sends (e.g. temperature, co2). It has a key, unit and valid range.",
     "quality": "Quality code: 0 normal, 1 out of range, 2 unverified metric, 3 suspect (stuck or jumping value), 4 time corrected, 5 forecast",
@@ -31,9 +79,36 @@
     "comfort": "Comfort: current values against the space's target environment. Normal, caution (within 10% outside the target), warning"
   },
   "status": {
-    "device": { "PENDING": "Pending", "ACTIVE": "Active", "INACTIVE": "Inactive" },
-    "connectivity": { "ONLINE": "Online", "OFFLINE": "Offline", "UNKNOWN": "Unknown" },
-    "comfort": { "NORMAL": "Normal", "CAUTION": "Caution", "WARNING": "Warning", "UNKNOWN": "Unknown" }
+    "device": {
+      "PENDING": "Pending",
+      "ACTIVE": "Active",
+      "INACTIVE": "Inactive"
+    },
+    "connectivity": {
+      "ONLINE": "Online",
+      "OFFLINE": "Offline",
+      "UNKNOWN": "Unknown"
+    },
+    "comfort": {
+      "NORMAL": "Normal",
+      "CAUTION": "Caution",
+      "WARNING": "Warning",
+      "UNKNOWN": "Unknown"
+    }
   },
-  "range": { "1h": "1 hour", "6h": "6 hours", "24h": "24 hours", "7d": "7 days", "30d": "30 days", "90d": "90 days", "custom": "Custom" }
+  "range": {
+    "1h": "1 hour",
+    "6h": "6 hours",
+    "24h": "24 hours",
+    "7d": "7 days",
+    "30d": "30 days",
+    "90d": "90 days",
+    "custom": "Custom"
+  },
+  "theme": {
+    "SYSTEM": "Theme: system",
+    "LIGHT": "Theme: light",
+    "DARK": "Theme: dark",
+    "switchTo": "Switch to {{theme}}"
+  }
 }

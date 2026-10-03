@@ -11,6 +11,7 @@ export default [
   // 실시간 연결 중계(SSE, design/auth.md §8·§9.2)
   route("bff/stream/*", "routes/bff-stream.ts"),
   route("logout", "routes/logout.ts"),
+  route("theme", "routes/theme.ts"),
 
   // 공개 페이지(UI-IAM-01·02·03·05, NFR-12.01)
   route(":lang?/login", "routes/login.tsx"),

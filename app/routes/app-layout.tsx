@@ -29,7 +29,7 @@ export default function AppLayout() {
     [navigate],
   );
   return (
-    <AppShell me={root?.me ?? null}>
+    <AppShell me={root?.me ?? null} theme={root?.theme}>
       <Outlet />
     </AppShell>
   );

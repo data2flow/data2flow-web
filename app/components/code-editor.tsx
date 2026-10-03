@@ -26,7 +26,8 @@ export type EditorFactory = (element: HTMLDivElement, options: { value: string; 
 const monacoFactory: EditorFactory = async (element, options) => {
   const { monaco, setContractTypes } = await import("~/lib/monaco.client");
   if (options.contractTypes) setContractTypes(options.contractTypes);
-  const dark = typeof window.matchMedia === "function" && window.matchMedia("(prefers-color-scheme: dark)").matches;
+  const { isDarkNow } = await import("~/lib/theme");
+  const dark = isDarkNow();
   const editor = monaco.editor.create(element, {
     value: options.value,
     language: "javascript",

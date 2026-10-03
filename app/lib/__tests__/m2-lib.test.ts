@@ -8,6 +8,7 @@ import { appendPoint, axisIndexByUnit, axisLabel, buildChartOption, hasData, qua
 import { LiveConnection, MessageBuffer, RateLimiter, backoffDelay, liveUrl, type EventSourceLike } from "../event-stream";
 import { formatDate, formatNumber, formatRelative, rangeOf } from "../format";
 import { scopeFromForm } from "../roles";
+import { isDarkNow, nextTheme, normalizeTheme, themeAttribute, themeFromCookie } from "../theme";
 import { allowedChildTypes, checkSpaceInput, descendantIds, findSpace, flattenSpaces, moveTargets, spacePathLabel, type SpaceNode } from "../spaces";
 
 class FakeSource implements EventSourceLike {
@@ -315,5 +316,19 @@ describe("IAM-01.07 공간 범위 폼 값", () => {
     form.append("spaceScope", "");
     expect(scopeFromForm(form)).toEqual(["3", "31"]);
     expect(scopeFromForm(new FormData())).toEqual([]);
+  });
+});
+
+describe("DSH-07.02 테마 값", () => {
+  it("쿠키·속성·다음 테마·현재 어두운지", () => {
+    expect(themeFromCookie("a=1; data2flow_theme=DARK; b=2")).toBe("DARK");
+    expect(themeFromCookie(undefined)).toBe("SYSTEM");
+    expect(normalizeTheme("light")).toBe("LIGHT");
+    expect(normalizeTheme("purple")).toBe("SYSTEM");
+    expect([themeAttribute("SYSTEM"), themeAttribute("DARK"), themeAttribute("LIGHT")]).toEqual([undefined, "dark", "light"]);
+    expect([nextTheme("SYSTEM"), nextTheme("LIGHT"), nextTheme("DARK")]).toEqual(["LIGHT", "DARK", "SYSTEM"]);
+    expect(isDarkNow(undefined)).toBe(false);
+    expect(isDarkNow({ documentElement: { dataset: { theme: "dark" } } } as unknown as Document)).toBe(true);
+    expect(isDarkNow({ documentElement: { dataset: { theme: "light" } } } as unknown as Document)).toBe(false);
   });
 });

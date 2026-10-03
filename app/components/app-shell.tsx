@@ -7,14 +7,15 @@ import { useTranslation } from "react-i18next";
 import { Form, Link, NavLink, useLocation } from "react-router";
 import type { Me } from "~/lib/api-types";
 import { isMenuActive, visibleMenu } from "~/lib/permissions";
+import { nextTheme, type Theme } from "~/lib/theme";
 import { Logo } from "./logo";
 import { CsrfField, cx } from "./ui";
 
-export function AppShell({ me, children }: { me: Me | null; children: ReactNode }) {
+export function AppShell({ me, children, theme = "SYSTEM" }: { me: Me | null; children: ReactNode; theme?: Theme }) {
   const { t } = useTranslation();
   const locked = !me || Boolean(me.mustChangePassword);
   const menu = visibleMenu(me?.permissions, locked);
-  const { pathname } = useLocation();
+  const { pathname, search } = useLocation();
   return (
     <div className="min-h-screen">
       <header className="border-b border-line bg-panel">
@@ -41,6 +42,14 @@ export function AppShell({ me, children }: { me: Me | null; children: ReactNode 
                 {me.name || me.loginId}
               </NavLink>
             )}
+            <Form method="post" action="/theme">
+              <CsrfField />
+              <input type="hidden" name="theme" value={nextTheme(theme)} />
+              <input type="hidden" name="next" value={`${pathname}${search}`} />
+              <button type="submit" className="text-muted hover:text-text" title={t("theme.switchTo", { theme: t(`theme.${nextTheme(theme)}`) })}>
+                {t(`theme.${theme}`)}
+              </button>
+            </Form>
             <Form method="post" action="/logout">
               <CsrfField />
               <button type="submit" className="text-muted hover:text-text">

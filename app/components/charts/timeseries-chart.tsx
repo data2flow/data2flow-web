@@ -6,6 +6,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { buildChartOption, hasData, roundTo, toTable, tooltipTime, type ChartAnnotation, type ChartSeries } from "~/lib/chart-model";
 import { formatDateTime } from "~/lib/format";
+import { isDarkNow } from "~/lib/theme";
 import { Button, Table, cx } from "../ui";
 
 export interface ChartHandle {
@@ -21,9 +22,6 @@ const defaultFactory: ChartFactory = async (element, dark) => {
   return echarts.init(element, dark ? "dark" : undefined, { renderer: "canvas" }) as unknown as ChartHandle;
 };
 
-function prefersDark() {
-  return typeof window !== "undefined" && typeof window.matchMedia === "function" && window.matchMedia("(prefers-color-scheme: dark)").matches;
-}
 
 export interface TimeseriesChartProps {
   series: ChartSeries[];
@@ -43,7 +41,7 @@ export function TimeseriesChart({ series, timezone, annotations, target, loading
   const chart = useRef<ChartHandle | null>(null);
   const [ready, setReady] = useState(false);
   const [showTable, setShowTable] = useState(false);
-  const dark = prefersDark();
+  const dark = isDarkNow();
   const option = useMemo(
     () =>
       buildChartOption(series, {

@@ -9,6 +9,7 @@ import { ErrorView } from "./components/error-view";
 import { SUPPORTED_LANGUAGES, createI18n, languageFromPath, localizedPath, normalizeLanguage, stripLanguagePrefix, type Language } from "./i18n";
 import type { Me } from "./lib/api-types";
 import { resolveTimezone } from "./lib/format";
+import { themeAttribute, themeFromCookie, type Theme } from "./lib/theme";
 import { useNonce } from "./lib/nonce";
 import { isPublicPath } from "./lib/public-paths";
 
@@ -24,6 +25,8 @@ export interface RootData {
   meError?: string;
   timezone: string;
   publicOrigin: string;
+  /** 화면 테마(DSH-07.02). 쿠키 값, 없으면 시스템 설정 */
+  theme: Theme;
 }
 
 /** 언어: 공개 페이지 주소 접두사 → 계정 설정 → 브라우저 언어 → 한국어(ADR-037) */
@@ -52,6 +55,7 @@ export async function loader({ request, context }: Route.LoaderArgs): Promise<Ro
     meError,
     timezone: resolveTimezone(me?.timezone),
     publicOrigin: ctx.runtime.config.publicOrigin,
+    theme: themeFromCookie(request.headers.get("Cookie")),
   };
 }
 
@@ -79,7 +83,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const nonce = useNonce();
   const i18n = useMemo(() => createI18n(lang), [lang]);
   return (
-    <html lang={lang === "zh" ? "zh-Hans" : lang}>
+    <html lang={lang === "zh" ? "zh-Hans" : lang} data-theme={themeAttribute(data?.theme ?? "SYSTEM")}>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
