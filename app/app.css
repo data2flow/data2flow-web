@@ -1,15 +1,62 @@
 @import "tailwindcss";
 
+/* 디자인 규칙: storyboards/README.md §3 (관리 콘솔, 파랑 강조 하나, 카드 1px 테두리·모서리 8px) */
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif,
-    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-sans: "Inter", "Noto Sans KR", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --color-bg: var(--d2f-bg);
+  --color-panel: var(--d2f-panel);
+  --color-line: var(--d2f-line);
+  --color-text: var(--d2f-text);
+  --color-muted: var(--d2f-muted);
+  --color-accent: var(--d2f-accent);
+  --color-accent-soft: var(--d2f-accent-soft);
+  --color-good: var(--d2f-good);
+  --color-good-soft: var(--d2f-good-soft);
+  --color-warn: var(--d2f-warn);
+  --color-warn-soft: var(--d2f-warn-soft);
+  --color-bad: var(--d2f-bad);
+  --color-bad-soft: var(--d2f-bad-soft);
+}
+
+:root {
+  --d2f-bg: #f6f8fb;
+  --d2f-panel: #ffffff;
+  --d2f-line: #e1e6ee;
+  --d2f-text: #1d2733;
+  --d2f-muted: #66768a;
+  --d2f-accent: #206bc4;
+  --d2f-accent-soft: #e8f0fa;
+  --d2f-good: #2f9e44;
+  --d2f-good-soft: #e6f4ea;
+  --d2f-warn: #b7791f;
+  --d2f-warn-soft: #fdf3e1;
+  --d2f-bad: #d63939;
+  --d2f-bad-soft: #fbe9e9;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --d2f-bg: #151f2c;
+    --d2f-panel: #1c2836;
+    --d2f-line: #2c3a4b;
+    --d2f-text: #e3e9f0;
+    --d2f-muted: #94a3b5;
+    --d2f-accent: #4c8dde;
+    --d2f-accent-soft: #1f3550;
+    --d2f-good: #51b96a;
+    --d2f-good-soft: #1d3a27;
+    --d2f-warn: #e0a743;
+    --d2f-warn-soft: #3d3020;
+    --d2f-bad: #ec6b6b;
+    --d2f-bad-soft: #432426;
+    color-scheme: dark;
+  }
 }
 
 html,
 body {
-  @apply bg-white dark:bg-gray-950;
-
-  @media (prefers-color-scheme: dark) {
-    color-scheme: dark;
-  }
+  background: var(--d2f-bg);
+  color: var(--d2f-text);
+  font-size: 13.5px;
 }
