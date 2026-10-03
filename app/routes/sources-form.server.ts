@@ -6,34 +6,38 @@ import { callApi, callList, field } from "~/bff/api.server";
 import type { BffRequestContext } from "~/bff/middleware.server";
 import type { SpaceNode } from "~/lib/spaces";
 import { mappingFromConfig, validateMapping } from "~/features/sources/model/mapping";
-import { DEFAULT_MAPPING, validateForm, type SourceFormValues } from "~/features/sources/model/source";
+import { DEFAULT_MAPPING, MAX_TOPICS, validateForm, type SourceFormValues, type SourceLimits } from "~/features/sources/model/source";
 
 export interface Choices {
   models: { id: string; code?: string; name: string }[];
   spaces: SpaceNode[];
   scripts: { id: string; name: string }[];
+  /** 조직 소스 한도(API-DSC-71). 못 불러오면 null(기본 한도로 검사) */
+  limits: SourceLimits | null;
 }
 
 export async function loadChoices(ctx: BffRequestContext, request: Request): Promise<Choices> {
-  const [models, spaces, scripts] = await Promise.all([
+  const [models, spaces, scripts, limits] = await Promise.all([
     callList<{ id: string; code: string; name: string; status?: string }>(ctx, request, "/api/v1/core/device-models?size=100"),
     callApi<SpaceNode[]>(ctx, request, "/api/v1/core/spaces"),
     callList<{ id: string; name: string }>(ctx, request, "/api/v1/core/scripts?kind=DECODE&size=100"),
+    callApi<SourceLimits>(ctx, request, "/api/v1/core/source-limits"),
   ]);
   return {
     models: models.ok ? models.list.responses.filter((m) => m.status !== "DEPRECATED").map((m) => ({ id: String(m.id), code: m.code, name: m.name })) : [],
     spaces: spaces.ok && Array.isArray(spaces.data) ? spaces.data : [],
     scripts: scripts.ok ? scripts.list.responses.map((s) => ({ id: String(s.id), name: s.name })) : [],
+    limits: limits.ok && limits.data ? limits.data : null,
   };
 }
 
 /** 폼의 payload(JSON)를 읽고 화면과 같은 규칙으로 다시 검사한다. 틀리면 null */
-export function readPayload(form: FormData, options: { editing: boolean; secretConfigured?: boolean }): SourceFormValues | null {
+export function readPayload(form: FormData, options: { editing: boolean; secretConfigured?: boolean; maxTopics?: number }): SourceFormValues | null {
   try {
     const values = JSON.parse(field(form, "payload")) as SourceFormValues;
     if (!values || typeof values !== "object" || !Array.isArray(values.topics)) return null;
     const mappingError = values.decoderKey === "generic-json" && validateMapping(mappingFromConfig(values.decoderConfig || DEFAULT_MAPPING)).length > 0 ? "mapping" : null;
-    const errors = validateForm(values, { ...options, mappingError });
+    const errors = validateForm(values, { ...options, maxTopics: options.maxTopics ?? MAX_TOPICS, mappingError });
     return Object.keys(errors).length === 0 ? values : null;
   } catch {
     return null;

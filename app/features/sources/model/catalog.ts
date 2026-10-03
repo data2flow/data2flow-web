@@ -12,7 +12,11 @@ export interface Connector {
   transports: string[];
   authMethods: string[];
   payloadFormats?: string[];
+  /** AFTER_WRITE·CURSOR는 무손실, AUTO·NONE은 "유실 가능"(contracts AckMode) */
   ackMode?: string;
+  /** core가 계산해 준다(API-DSC-55). 있으면 이 값을 쓴다 */
+  lossPossible?: boolean;
+  sourceType?: string;
   scaling?: string;
   supportsSend?: boolean;
   enabled: boolean;
@@ -30,14 +34,15 @@ export const CATEGORIES = ["MQTT", "LORAWAN", "CLOUD", "QUEUE", "HTTP", "LIGHTWE
 
 /** M2 기본 유형(카탈로그 API가 없어도 보인다) */
 export const BASIC_CONNECTORS: Connector[] = [
-  { connectorKey: "mqtt", version: "5.0", name: "MQTT 3.1.1/5.0", category: "MQTT", standard: "MQTT 5.0", transports: ["tcp", "ssl", "ws", "wss"], authMethods: ["NONE", "USERPASS", "HEADER", "MTLS"], ackMode: "AFTER_STORE", scaling: "DUAL_ACTIVE", enabled: true },
-  { connectorKey: "platform-broker", version: "1", name: "Platform broker", category: "PLATFORM", standard: "MQTT (iot-data WSS)", transports: ["wss"], authMethods: ["USERPASS"], ackMode: "AFTER_STORE", scaling: "DUAL_ACTIVE", enabled: true },
-  { connectorKey: "simulation", version: "1", name: "Simulation", category: "PLATFORM", standard: "data2flow SIM", transports: ["internal"], authMethods: ["NONE"], ackMode: "AFTER_STORE", scaling: "SCALABLE", enabled: true },
+  { connectorKey: "mqtt", version: "5.0", name: "MQTT 3.1.1/5.0", category: "MQTT", standard: "MQTT 5.0", transports: ["tcp", "ssl", "ws", "wss"], authMethods: ["NONE", "USER_PASSWORD", "WS_HEADER", "MTLS"], ackMode: "AFTER_WRITE", scaling: "DUAL_ACTIVE", enabled: true },
+  { connectorKey: "platform-broker", version: "1", name: "Platform broker", category: "PLATFORM", standard: "MQTT (iot-data WSS)", transports: ["wss"], authMethods: ["USER_PASSWORD"], ackMode: "AFTER_WRITE", scaling: "DUAL_ACTIVE", enabled: true },
+  { connectorKey: "simulation", version: "1", name: "Simulation", category: "PLATFORM", standard: "data2flow SIM", transports: ["internal"], authMethods: ["NONE"], ackMode: "AFTER_WRITE", scaling: "SCALABLE", enabled: true },
 ];
 
-/** 기록 전에 확인(ACK)하는 커넥터는 장애 때 메시지를 잃을 수 있다(DSC-09.03 "유실 가능") */
-export function isLossy(connector: Pick<Connector, "ackMode">): boolean {
-  return Boolean(connector.ackMode) && connector.ackMode !== "AFTER_STORE" && connector.ackMode !== "AFTER_COMMIT";
+/** 기록 전에 확인(ACK)하거나 확인할 수 없는 커넥터는 장애 때 메시지를 잃을 수 있다(DSC-09.03 "유실 가능") */
+export function isLossy(connector: Pick<Connector, "ackMode" | "lossPossible">): boolean {
+  if (typeof connector.lossPossible === "boolean") return connector.lossPossible;
+  return connector.ackMode === "AUTO" || connector.ackMode === "NONE";
 }
 
 /** API 응답(배열 또는 `{connectors, templates}`)을 정리하고 기본 유형을 앞에 둔다 */

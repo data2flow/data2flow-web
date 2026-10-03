@@ -21,7 +21,7 @@ import { IngestTabs, LifecycleBadge, StateBadge, useTimezone } from "~/features/
 import { LifecycleActions, type UsageSummary } from "~/features/sources/components/lifecycle-actions";
 import { LiveMessages } from "~/features/sources/components/live-messages";
 import type { BrokerInfo } from "~/features/sources/device-credentials";
-import { STAT_RANGES, STAT_SERIES, statBucket, worstState, type RuntimeInstance, type SourceDetail } from "~/features/sources/model/source";
+import { STAT_RANGES, STAT_SERIES, representativeState, statBucket, type RuntimeInstance, type SourceDetail } from "~/features/sources/model/source";
 import type { Route } from "./+types/source-detail";
 
 const TABS = ["status", "live", "settings", "usage", "ignore", "credentials"] as const;
@@ -149,7 +149,7 @@ export default function SourceDetailPage({ loaderData, actionData }: Route.Compo
   const timezone = useTimezone();
   const { source, canAdmin, tabs, tab, usage, runtime } = loaderData;
   const error = actionData && "error" in actionData ? actionData.error : undefined;
-  const representative = source.lifecycle === "ACTIVE" ? worstState(runtime.map((r) => r.state)) : "DISABLED";
+  const representative = representativeState(source, runtime);
   return (
     <>
       <IngestTabs current="sources" />

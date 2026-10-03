@@ -2,12 +2,16 @@
  * 데이터 소스(DSC) 가짜 core API — design/api/DSC-api.md 계약 모양.
  * 소스 목록·상세·생성·수정·상태 변경·삭제·복제(API-DSC-01~07·12), 지표·런타임·사용처·무시 목록(API-DSC-09·11·13·14),
  * 연결 테스트(API-DSC-57), 커넥터 카탈로그(API-DSC-55·56), 플랫폼 브로커 정보·기기 자격증명(API-DSC-20~23).
- * 연결 테스트: URL에 `badauth`가 있으면 인증 단계 실패, `quiet`이면 구독 성공·메시지 없음(부분 성공).
+ * 연결 테스트: URL에 `badauth`가 있으면 인증 단계 실패(ingress 표기 FAILED), `quiet`이면 구독 성공·메시지 없음(부분 성공).
+ * core-api M2 실제 계약(SourceDtos): 비율은 0~1 소수, 런타임은 `{sourceId, state, stateDetail, instances[]}`, 카탈로그 ackMode는
+ * contracts AckMode(AFTER_WRITE·AUTO·CURSOR·NONE) + lossPossible, 소스 한도 API-DSC-71, 연결 테스트 timeoutSec 쿼리(기본 15, 5~30).
  */
 import { fail, list, noContent, ok, type CoreHandler, type CoreState, type FakeSource } from "../core-fixtures";
 
 interface SourcesExtra {
-  ignore: Record<string, { externalId: string; reason: string; createdAt: string }[]>;
+  limits: { maxSources: number; maxTopicsPerSource: number; maxMessageBytes: number; maxMessagesPerSec: number; version: number };
+  lastTestTimeoutSec?: number;
+  ignore: Record<string, { externalId: string; reason: string; createdBy?: string; createdAt: string }[]>;
   credentials: Record<string, { id: string; type: string; username: string; status: string; expiresAt: string | null; lastUsedAt: string | null }[]>;
   rateSeries: Record<string, number[]>;
 }
@@ -15,7 +19,8 @@ interface SourcesExtra {
 function extra(core: CoreState): SourcesExtra {
   if (!core.extra.sources) {
     core.extra.sources = {
-      ignore: { "7": [{ externalId: "24e1240000000001", reason: "REJECTED", createdAt: "2026-10-02T00:00:00Z" }] },
+      limits: { maxSources: 50, maxTopicsPerSource: 20, maxMessageBytes: 262144, maxMessagesPerSec: 500, version: 1 },
+      ignore: { "7": [{ externalId: "24e1240000000001", reason: "REJECTED", createdBy: "1", createdAt: "2026-10-02T00:00:00Z" }] },
       credentials: {},
       rateSeries: { "7": [9, 10, 11, 10, 9, 12, 10] },
     } satisfies SourcesExtra;
@@ -29,6 +34,7 @@ function summary(core: CoreState, s: FakeSource) {
     code: s.code,
     name: s.name,
     type: s.type,
+    connectorKey: s.connectorKey ?? null,
     lifecycle: s.lifecycle,
     state: s.lifecycle === "ACTIVE" ? s.state : "DISABLED",
     stateDetail: { connectedInstances: s.runtime.filter((r) => r.state === "CONNECTED").length, totalInstances: s.runtime.length },
@@ -60,18 +66,29 @@ function detail(s: FakeSource) {
     defaultSpaceId: s.defaultSpaceId ?? null,
     autoregLimitPerHour: s.autoregLimitPerHour,
     noDataAlarmAfterSec: s.noDataAlarmAfterSec,
+    isDev: Boolean((s as FakeSource & { isDev?: boolean }).isDev),
+    clientIdBase: String(s.connection.clientIdBase ?? `data2flow-${s.code}`),
     clientIds: s.runtime.map((r) => r.clientId).filter(Boolean),
-    runtime: s.runtime.map((r) => ({ instanceId: r.instanceId, state: r.state, errorKind: r.errorKind ?? null, errorMessage: r.errorMessage ?? null, connectedSince: r.connectedSince ?? null, reportedAt: r.reportedAt ?? null })),
+    runtime: s.runtime.map(runtimeOf),
+    state: s.lifecycle === "ACTIVE" ? s.state : "DISABLED",
+    stateDetail: { connectedInstances: s.runtime.filter((r) => r.state === "CONNECTED").length, totalInstances: s.runtime.length },
+    lastReceivedAt: s.lastReceivedAt,
+    ratePerMin: s.ratePerMin,
+    decodeErrorRate1h: s.decodeErrorRate1h,
     version: s.version,
     updatedAt: "2026-10-03T00:00:00Z",
   };
 }
 
+function runtimeOf(r: FakeSource["runtime"][number]) {
+  return { instanceId: r.instanceId, state: r.state, errorKind: r.errorKind ?? null, errorMessage: r.errorMessage ?? null, clientId: r.clientId ?? null, connectedSince: r.connectedSince ?? null, reconnects24h: r.reconnects24h ?? 0, reportedAt: r.reportedAt ?? null, stale: false };
+}
+
 const CONNECTORS = [
-  { connectorKey: "mqtt", version: "5.0", name: "MQTT 3.1.1/5.0", category: "MQTT", standard: "MQTT 5.0", transports: ["tcp", "ssl", "ws", "wss"], authMethods: ["NONE", "USERPASS", "HEADER", "MTLS", "OAUTH2", "SAS", "AWS_SIGV4"], payloadFormats: ["JSON"], ackMode: "AFTER_STORE", scaling: "DUAL_ACTIVE", supportsSend: false, enabled: true },
-  { connectorKey: "sparkplug-b", version: "3.0", name: "Sparkplug B", category: "MQTT", standard: "Eclipse Tahu", transports: ["tcp", "ssl"], authMethods: ["NONE", "USERPASS", "MTLS", "HEADER", "OAUTH2"], payloadFormats: ["PROTOBUF"], ackMode: "AFTER_STORE", scaling: "SCALABLE", enabled: true },
-  { connectorKey: "kafka", version: "3.7", name: "Apache Kafka", category: "QUEUE", standard: "Kafka 3", transports: ["tcp"], authMethods: ["NONE", "SASL"], ackMode: "BEFORE_STORE", scaling: "SCALABLE", enabled: true },
-  { connectorKey: "bacnet-ip", version: "1", name: "BACnet/IP", category: "BUILDING", standard: "ASHRAE 135", transports: ["udp"], authMethods: [], ackMode: "AFTER_STORE", scaling: "SINGLETON", enabled: false, disabledReason: "LICENSE" },
+  { connectorKey: "mqtt", version: "5.0", name: "MQTT 3.1.1/5.0", category: "MQTT", standard: "MQTT 5.0", transports: ["tcp", "ssl", "ws", "wss"], authMethods: ["NONE", "USER_PASSWORD", "WS_HEADER", "MTLS"], payloadFormats: ["JSON", "TEXT", "BINARY"], ackMode: "AFTER_WRITE", scaling: "DUAL_ACTIVE", supportsSend: false, lossPossible: false, enabled: true, sourceType: "MQTT_SUBSCRIBE" },
+  { connectorKey: "sparkplug-b", version: "3.0", name: "Sparkplug B", category: "MQTT", standard: "Eclipse Tahu", transports: ["tcp", "ssl"], authMethods: ["NONE", "USER_PASSWORD", "MTLS", "WS_HEADER", "OAUTH2"], payloadFormats: ["PROTOBUF"], ackMode: "AFTER_WRITE", scaling: "SCALABLE", lossPossible: false, enabled: true },
+  { connectorKey: "kafka", version: "3.7", name: "Apache Kafka", category: "QUEUE", standard: "Kafka 3", transports: ["tcp"], authMethods: ["NONE", "SASL"], ackMode: "AUTO", scaling: "SCALABLE", lossPossible: true, enabled: true },
+  { connectorKey: "bacnet-ip", version: "1", name: "BACnet/IP", category: "BUILDING", standard: "ASHRAE 135", transports: ["udp"], authMethods: [], ackMode: "NONE", scaling: "SINGLETON", lossPossible: true, enabled: false, disabledReason: "LICENSE" },
 ];
 const TEMPLATES = [
   { key: "academy-iot-data", name: "아카데미 iot-data(WSS)", connectorKey: "mqtt", description: "wss://iot-data.java21.net/mqtt" },
@@ -85,11 +102,12 @@ function testResult(body: Record<string, unknown>) {
     { name: "TCP", status: "OK", ms: 18 },
     { name: "TLS", status: "OK", ms: 41, tlsChain: [{ subject: "CN=iot-data.java21.net", issuer: "Let's Encrypt R11", notAfter: "2027-01-01" }] },
   ];
-  if (url.includes("badauth")) return { steps: [...ok, { name: "AUTH", status: "FAIL", ms: 22, code: "AUTH_FAILED", detail: "HTTP 401" }, { name: "SUBSCRIBE", status: "SKIPPED" }], preview: [], lossPossible: false };
+  if (url.includes("badauth")) return { ok: false, stage: "AUTH", steps: [...ok, { name: "AUTH", status: "FAILED", ms: 22, code: "AUTH_FAILED", detail: "HTTP 401" }, { name: "SUBSCRIBE", status: "SKIPPED" }], preview: [], lossPossible: false };
   const steps = [...ok, { name: "AUTH", status: "OK", ms: 22, detail: "HTTP 101 Switching Protocols" }, { name: "SUBSCRIBE", status: "OK", ms: 9 }];
-  if (url.includes("quiet")) return { steps, preview: [], lossPossible: false };
+  if (url.includes("quiet")) return { ok: true, steps, preview: [], lossPossible: false };
   const topics = (body.topics as { qos: number }[] | undefined) ?? [];
   return {
+    ok: true,
     steps,
     preview: [
       { at: "2026-10-04T00:00:01Z", topic: "application/1/device/24e124136d151606/event/up", size: 412, rawExcerpt: '{"deviceInfo":{"deviceName":"EM300-TH-151606"},"object":{"temperature":22.3,"humidity":43}}', decoded: { externalId: "24e124136d151606", metrics: [{ key: "temperature", value: 22.3, unit: "℃" }, { key: "humidity", value: 43, unit: "%" }] } },
@@ -98,7 +116,7 @@ function testResult(body: Record<string, unknown>) {
   };
 }
 
-export const sourcesHandler: CoreHandler = (core, { method, path, url, body, can }) => {
+export const sourcesHandler: CoreHandler = (core, { method, path, url, body, can, user }) => {
   const x = extra(core);
   const read = () => (can("SRC_READ") ? undefined : fail(403, "PERMISSION_DENIED"));
   const admin = () => (can("SRC_ADMIN") ? undefined : fail(403, "PERMISSION_DENIED"));
@@ -109,6 +127,16 @@ export const sourcesHandler: CoreHandler = (core, { method, path, url, body, can
   if (model && method === "GET") {
     const found = core.model(model[1]);
     return found ? ok({ ...found, deviceCount: 0 }) : fail(404, "MODEL_NOT_FOUND");
+  }
+  if (path === "/source-limits" && method === "GET") {
+    return read() ?? ok({ ...x.limits, activeSources: core.sources.filter((s) => s.lifecycle !== "ARCHIVED").length, updatedAt: "2026-10-01T00:00:00Z" });
+  }
+  if (path === "/source-limits" && method === "PATCH") {
+    if (!user.permissions.includes("OPS_MANAGE")) return fail(403, "PERMISSION_DENIED");
+    if (Number(b.baseVersion) !== x.limits.version) return fail(409, "VERSION_CONFLICT");
+    for (const key of ["maxSources", "maxTopicsPerSource", "maxMessageBytes", "maxMessagesPerSec"] as const) if (b[key] !== undefined) x.limits[key] = Number(b[key]);
+    x.limits.version += 1;
+    return ok({ ...x.limits, activeSources: core.sources.filter((s) => s.lifecycle !== "ARCHIVED").length, updatedAt: "2026-10-04T00:00:00Z" });
   }
   if (path === "/connectors" && method === "GET") return read() ?? ok({ connectors: CONNECTORS, templates: TEMPLATES });
   const template = /^\/connector-templates\/([^/]+)$/.exec(path);
@@ -128,12 +156,21 @@ export const sourcesHandler: CoreHandler = (core, { method, path, url, body, can
     const items = core.sources.filter((s) => (!q || s.name.toLowerCase().includes(q) || s.code.includes(q)) && (types.length === 0 || types.includes(s.type)) && lifecycles.includes(s.lifecycle));
     return list(items.map((s) => summary(core, s)), url);
   }
-  if ((path === "/sources/test" || /^\/sources\/[^/]+\/test$/.test(path)) && method === "POST") return admin() ?? ok(testResult(b));
+  if ((path === "/sources/test" || /^\/sources\/[^/]+\/test$/.test(path)) && method === "POST") {
+    const denied = admin();
+    if (denied) return denied;
+    const raw = Number(url.searchParams.get("timeoutSec") ?? 15);
+    x.lastTestTimeoutSec = Math.max(5, Math.min(30, Number.isFinite(raw) ? raw : 15));
+    return ok(testResult(b));
+  }
   if (path === "/sources" && method === "POST") {
     const denied = admin();
     if (denied) return denied;
     if (core.sources.some((s) => s.code === b.code)) return fail(409, "SOURCE_CODE_DUPLICATE");
+    if (core.sources.filter((s) => s.lifecycle !== "ARCHIVED").length >= x.limits.maxSources) return fail(429, "SOURCE_LIMIT_EXCEEDED");
+    if (((b.topics as unknown[] | undefined) ?? []).length > x.limits.maxTopicsPerSource) return fail(429, "SOURCE_LIMIT_EXCEEDED", { errors: [{ field: "topics", code: "MAX_TOPICS", message: "" }] });
     const connection = (b.connection ?? {}) as Record<string, unknown>;
+    if (connection.tlsInsecure === true && b.isDev !== true) return fail(400, "SOURCE_TLS_VERIFY_REQUIRED", { errors: [{ field: "connection.tlsInsecure", code: "TLS_VERIFY_REQUIRED", message: "" }] });
     if (connection.clientIdBase && core.sources.some((s) => s.connection.clientIdBase === connection.clientIdBase)) return fail(409, "SOURCE_CLIENT_ID_DUPLICATE");
     const secret = b.secret as { kind: string; value: string } | undefined;
     const created: FakeSource = {
@@ -161,6 +198,7 @@ export const sourcesHandler: CoreHandler = (core, { method, path, url, body, can
       lastReceivedAt: null,
       version: 1,
     };
+    (created as FakeSource & { isDev?: boolean }).isDev = b.isDev === true;
     core.sources.push(created);
     return ok(detail(created), 201, { Location: `/api/v1/core/sources/${created.id}` });
   }
@@ -175,10 +213,12 @@ export const sourcesHandler: CoreHandler = (core, { method, path, url, body, can
     const denied = sub === "/live" ? admin() : read();
     if (denied) return denied;
     if (sub === "") return ok(detail(source));
-    if (sub === "/runtime") return ok({ sourceId: source.id, instances: source.runtime });
+    if (sub === "/runtime") {
+      return ok({ sourceId: source.id, state: source.lifecycle === "ACTIVE" ? source.state : "DISABLED", stateDetail: { connectedInstances: source.runtime.filter((r) => r.state === "CONNECTED").length, totalInstances: source.runtime.length }, instances: source.runtime.map(runtimeOf) });
+    }
     if (sub === "/stats") {
       const base = Date.parse(url.searchParams.get("to") ?? "2026-10-04T00:00:00Z");
-      return ok(Array.from({ length: 6 }, (_, i) => ({ t: new Date(base - (5 - i) * 3600_000).toISOString(), received: 600, accepted: 590, decodeErrors: i === 3 ? 4 : 0, scriptErrors: 0, rejectedUnknown: 0, invalid: 1, dup: 9, reconnects: 0 })));
+      return ok(Array.from({ length: 6 }, (_, i) => ({ t: new Date(base - (5 - i) * 3600_000).toISOString(), received: 600, accepted: 590, decodeErrors: i === 3 ? 4 : 0, scriptErrors: 0, rejectedUnknown: 0, invalid: 1, dup: 9, bytes: 240000, reconnects: 0 })));
     }
     if (sub === "/usage") return ok({ deviceCount: core.devices.filter((d) => d.sourceId === source.id).length, flows: [{ id: "201", name: "실습실 환기" }], volume7d: [{ day: "2026-10-03", count: 14400 }, { day: "2026-10-02", count: 14100 }] });
     if (sub === "/ignore-list") return list(x.ignore[source.id] ?? [], url);
@@ -211,9 +251,11 @@ export const sourcesHandler: CoreHandler = (core, { method, path, url, body, can
     if (!versionOk()) return fail(409, "VERSION_CONFLICT");
     const from: Record<string, string[]> = { "/activate": ["DRAFT"], "/pause": ["ACTIVE"], "/resume": ["PAUSED"], "/archive": ["ACTIVE", "PAUSED"] };
     if (!from[sub].includes(source.lifecycle)) return fail(409, "SOURCE_STATE_CONFLICT");
+    // 보관은 confirm(true 또는 소스 코드)이 있어야 한다(core DataSourceService)
+    if (sub === "/archive" && !(b.confirm === true || b.confirm === source.code)) return fail(400, "INVALID_REQUEST", { errors: [{ field: "confirm", code: "REQUIRED", message: "" }] });
     source.lifecycle = ({ "/activate": "ACTIVE", "/pause": "PAUSED", "/resume": "ACTIVE", "/archive": "ARCHIVED" } as const)[sub as "/activate"];
     source.version += 1;
-    return ok({ id: source.id, lifecycle: source.lifecycle, version: source.version });
+    return ok({ id: source.id, lifecycle: source.lifecycle, ...(sub === "/archive" ? { archivedAt: "2026-10-04T00:00:00Z" } : {}), version: source.version });
   }
   if (method === "DELETE" && sub === "") {
     if (source.lifecycle === "ACTIVE" || source.lifecycle === "PAUSED") return fail(409, "SOURCE_STATE_CONFLICT");
@@ -250,14 +292,14 @@ function deviceCredentials(core: CoreState, x: SourcesExtra, method: string, pat
     const id = core.nextId();
     const expiresAt = ((body ?? {}) as { expiresAt?: string }).expiresAt ?? null;
     items.push({ id, type: "PASSWORD", username: `dev-${device.externalId}`, status: "ACTIVE", expiresAt, lastUsedAt: null });
-    return ok({ credentialId: id, username: `dev-${device.externalId}`, password: "Pw-Once-7f3a91", signingKey: "sk-once-9b2c" }, 201);
+    return ok({ credentialId: id, username: `dev-${device.externalId}`, password: "Pw-Once-7f3a91", signingKey: "sk-once-9b2c", expiresAt }, 201);
   }
   if (method === "POST" && credentialId) {
     const item = items.find((c) => c.id === credentialId);
     if (!item) return fail(404, "RESOURCE_NOT_FOUND");
     if (item.status === "REVOKED") return fail(409, "CREDENTIAL_REVOKED");
     item.status = "REVOKED";
-    return ok({ id: item.id, deviceId, type: item.type, username: item.username, status: "REVOKED", revokedAt: "2026-10-04T00:00:00Z" });
+    return ok({ id: item.id, deviceId, type: item.type, username: item.username, status: "REVOKED", expiresAt: item.expiresAt, lastUsedAt: item.lastUsedAt, createdAt: "2026-10-03T00:00:00Z", revokedAt: "2026-10-04T00:00:00Z" });
   }
   return undefined;
 }

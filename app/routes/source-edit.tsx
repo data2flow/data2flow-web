@@ -32,7 +32,7 @@ export async function loader({ request, context, params }: Route.LoaderArgs) {
 export async function action({ request, context, params }: Route.ActionArgs) {
   const ctx = bff(context);
   const form = await request.formData();
-  const values = readPayload(form, { editing: true, secretConfigured: true });
+  const values = readPayload(form, { editing: true, secretConfigured: true, maxTopics: 200 });
   if (!values) return data({ error: { code: "INVALID_REQUEST" } }, { status: 400 });
   const id = encodeURIComponent(params.sourceId);
   const result = await callApi(ctx, request, `/api/v1/core/sources/${id}`, { method: "PATCH", body: { ...updateBody(values), baseVersion: Number(field(form, "baseVersion")) } });
@@ -42,7 +42,7 @@ export async function action({ request, context, params }: Route.ActionArgs) {
 
 export default function SourceEdit({ loaderData, actionData }: Route.ComponentProps) {
   const { t } = useTranslation();
-  const { source, initial, models, spaces, scripts, readOnly } = loaderData;
+  const { source, initial, models, spaces, scripts, readOnly, limits } = loaderData;
   return (
     <>
       <IngestTabs current="sources" />
@@ -57,6 +57,7 @@ export default function SourceEdit({ loaderData, actionData }: Route.ComponentPr
         models={models}
         spaces={spaces}
         scripts={scripts}
+        maxTopics={limits?.maxTopicsPerSource}
         testPath={`/bff/api/core/sources/${encodeURIComponent(source.id)}/test`}
         serverError={actionData?.error ?? null}
         serverFieldErrors={(actionData as { errors?: { field: string; code: string; message: string }[] } | undefined)?.errors}

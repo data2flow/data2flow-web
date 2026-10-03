@@ -10,7 +10,32 @@ export const LIFECYCLES = ["DRAFT", "ACTIVE", "PAUSED", "ARCHIVED"] as const;
 export const RUNTIME_STATES = ["CONNECTED", "CONNECTING", "DISCONNECTED", "ERROR", "DISABLED"] as const;
 export const DECODERS = ["chirpstack-v4", "generic-json", "single-value", "script"] as const;
 export const AUTH_METHODS = ["NONE", "USERPASS", "HEADER", "MTLS"] as const;
+/** 소스당 토픽 기본 한도(BR-DSC-06). 조직 한도는 API-DSC-71 `maxTopicsPerSource`가 정한다 */
 export const MAX_TOPICS = 20;
+
+/** 연결 테스트 제한 시간(BR-DSC-07, API-DSC-57): 기본 15초, 요청 `timeoutSec`로 5~30초 */
+export const TEST_TIMEOUT_SEC = 15;
+export const TEST_TIMEOUT_RANGE = { min: 5, max: 30 } as const;
+
+export function clampTestTimeout(value: number | null | undefined): number {
+  if (value === null || value === undefined || !Number.isFinite(value)) return TEST_TIMEOUT_SEC;
+  return Math.max(TEST_TIMEOUT_RANGE.min, Math.min(TEST_TIMEOUT_RANGE.max, Math.round(value)));
+}
+
+/** 연결 테스트 단계 실패 표기: 문서·ingress는 FAILED, core 정규화는 FAIL. 둘 다 실패로 본다 */
+export function isFailedStep(status: string | null | undefined): boolean {
+  return status === "FAILED" || status === "FAIL";
+}
+
+/** 조직 소스 한도(API-DSC-71) */
+export interface SourceLimits {
+  maxSources: number;
+  maxTopicsPerSource: number;
+  maxMessageBytes: number;
+  maxMessagesPerSec: number;
+  activeSources: number;
+  version?: number;
+}
 
 /** 커넥터 키 → 소스 유형(M2 기본 유형) */
 export const CONNECTOR_TYPES: Record<string, string> = { mqtt: "MQTT_SUBSCRIBE", "platform-broker": "PLATFORM_BROKER", simulation: "SIMULATION" };
@@ -68,7 +93,8 @@ export function lifecycleActions(lifecycle: string): LifecycleAction[] {
 }
 
 export const CODE_PATTERN = /^[a-z][a-z0-9-]{1,49}$/;
-export const CLIENT_ID_PATTERN = /^[A-Za-z0-9_-]{1,100}$/;
+/** client-id base(core SourceConfigValidator, contracts ClientIds): 소문자·숫자·하이픈, 뒤에 `-{env}-{n}`이 붙는다 */
+export const CLIENT_ID_PATTERN = /^[a-z0-9][a-z0-9-]{0,80}$/;
 
 export function checkCode(code: string): boolean {
   return CODE_PATTERN.test(code);
@@ -88,7 +114,8 @@ export function checkBrokerUrl(raw: string): boolean {
 
 /** MQTT 토픽 필터: 1~256자, `#`은 마지막 단계에만 홀로, `+`는 단계 전체로만 */
 export function checkTopic(topic: string): boolean {
-  if (topic.length < 1 || topic.length > 256) return false;
+  // 공유 구독 접두사는 토픽이 아니라 sharedGroup으로 쓴다(core 검증과 같음)
+  if (topic.length < 1 || topic.length > 256 || topic.startsWith("$share/")) return false;
   const levels = topic.split("/");
   return levels.every((level, i) => {
     if (level.includes("#")) return level === "#" && i === levels.length - 1;
@@ -129,9 +156,13 @@ export interface SourceFormValues {
   receiveMaximum: string;
   auth: string;
   headerName: string;
+  /** 헤더 인증 스킴(Basic 등, 템플릿 `academy-iot-data`). 화면에서 바꾸지 않고 그대로 보존한다 */
+  headerScheme: string;
   username: string;
   secretValue: string;
   tlsInsecure: boolean;
+  /** 개발 소스(BR-DSC-29: 이 표시가 있을 때만 TLS 검증 끄기 허용) */
+  isDev: boolean;
   sharedGroup: string;
   topics: TopicRow[];
   deviceKeyPattern: string;
@@ -165,9 +196,11 @@ export function emptyForm(type: string, connectorKey: string): SourceFormValues 
     receiveMaximum: "",
     auth: "NONE",
     headerName: "Authorization",
+    headerScheme: "",
     username: "",
     secretValue: "",
     tlsInsecure: false,
+    isDev: false,
     sharedGroup: "",
     topics: type === "MQTT_SUBSCRIBE" ? [{ topic: "", qos: 1 }] : [],
     deviceKeyPattern: "{externalId}",
@@ -202,8 +235,10 @@ export function formFromSource(source: SourceDetail): SourceFormValues {
     receiveMaximum: str(c.receiveMaximum),
     auth: str(c.auth, "NONE"),
     headerName: str(c.headerName, "Authorization"),
+    headerScheme: str(c.headerScheme),
     username: str(c.username),
     tlsInsecure: Boolean(c.tlsInsecure),
+    isDev: Boolean(source.isDev),
     sharedGroup: str(c.sharedGroup),
     topics: (source.topics ?? []).map((t) => ({ topic: t.topic, qos: Number(t.qos ?? 1) })),
     deviceKeyPattern: str(c.deviceKeyPattern, "{externalId}"),
@@ -224,7 +259,7 @@ export type FieldErrors = Partial<Record<keyof SourceFormValues | `topic${number
 const inRange = (raw: string, min: number, max: number) => raw.trim() !== "" && Number.isInteger(Number(raw)) && Number(raw) >= min && Number(raw) <= max;
 
 /** 입력 검증(UI-DSC-02 표). 값은 오류 문구 키(`sources.validation.*`) */
-export function validateForm(values: SourceFormValues, options: { editing?: boolean; secretConfigured?: boolean; mappingError?: string | null } = {}): FieldErrors {
+export function validateForm(values: SourceFormValues, options: { editing?: boolean; secretConfigured?: boolean; mappingError?: string | null; maxTopics?: number } = {}): FieldErrors {
   const errors: FieldErrors = {};
   if (!options.editing && !checkCode(values.code)) errors.code = "code";
   if (values.name.trim().length < 1 || values.name.trim().length > 100) errors.name = "name";
@@ -234,13 +269,14 @@ export function validateForm(values: SourceFormValues, options: { editing?: bool
     if (!inRange(values.keepaliveSec, 10, 600)) errors.keepaliveSec = "keepalive";
     if (values.protocolVersion === "5.0" && !inRange(values.sessionExpirySec, 0, 4294967295)) errors.sessionExpirySec = "sessionExpiry";
     if (values.topics.length === 0) errors.topics = "topicRequired";
-    if (values.topics.length > MAX_TOPICS) errors.topics = "topicLimit";
+    if (values.topics.length > (options.maxTopics ?? MAX_TOPICS)) errors.topics = "topicLimit";
     values.topics.forEach((row, i) => {
       if (!checkTopic(row.topic)) errors[`topic${i}`] = "topic";
     });
-    if (values.auth !== "NONE" && !values.secretValue && !(options.editing && options.secretConfigured)) errors.secretValue = "secret";
+    if ((values.auth === "USERPASS" || values.auth === "HEADER") && !values.secretValue && !(options.editing && options.secretConfigured)) errors.secretValue = "secret";
     if (values.auth === "USERPASS" && !values.username.trim()) errors.username = "username";
     if (values.auth === "HEADER" && !values.headerName.trim()) errors.headerName = "headerName";
+    if (values.tlsInsecure && !values.isDev) errors.tlsInsecure = "tlsDevOnly";
   }
   if (values.decoderKey === "script" && !values.decodeScriptId) errors.decodeScriptId = "script";
   if (values.decoderKey === "generic-json" && options.mappingError) errors.decoderConfig = "mapping";
@@ -267,6 +303,7 @@ function connectionOf(values: SourceFormValues): Record<string, unknown> {
   if (mqtt5 && values.receiveMaximum) connection.receiveMaximum = Number(values.receiveMaximum);
   if (values.sharedGroup.trim()) connection.sharedGroup = values.sharedGroup.trim();
   if (values.auth === "HEADER") connection.headerName = values.headerName.trim();
+  if (values.auth === "HEADER" && values.headerScheme.trim()) connection.headerScheme = values.headerScheme.trim();
   if (values.auth === "USERPASS") connection.username = values.username.trim();
   return connection;
 }
@@ -295,6 +332,7 @@ export function updateBody(values: SourceFormValues): Record<string, unknown> {
   const body: Record<string, unknown> = {
     name: values.name.trim(),
     connectorKey: values.connectorKey,
+    isDev: values.isDev,
     connection: connectionOf(values),
     topics: values.type === "MQTT_SUBSCRIBE" ? values.topics.map((t) => ({ topic: t.topic.trim(), qos: Number(t.qos) })) : undefined,
     decoderKey: values.decoderKey,
@@ -306,7 +344,8 @@ export function updateBody(values: SourceFormValues): Record<string, unknown> {
     autoregLimitPerHour: Number(values.autoregLimitPerHour),
     noDataAlarmAfterSec: Number(values.noDataAlarmAfterSec),
   };
-  if (values.secretValue) body.secret = { kind: values.auth, value: values.secretValue };
+  // 비밀값 종류: core는 인증 방식 이름(USERPASS→PASSWORD, HEADER→HEADER_VALUE)을 받는다. MTLS 인증서·키 올리기는 M5(DSC-09.06)
+  if (values.secretValue && (values.auth === "USERPASS" || values.auth === "HEADER")) body.secret = { kind: values.auth, value: values.secretValue };
   return body;
 }
 
@@ -341,6 +380,15 @@ export interface RuntimeInstance {
   connectedSince?: string | null;
   reportedAt?: string | null;
   reconnects24h?: number | null;
+  /** 90초 넘게 보고 없음(대표 상태에서 빠진다) */
+  stale?: boolean;
+}
+
+/** 대표 상태: core가 계산한 `state`를 쓰고, 없으면 보고가 끊기지 않은 인스턴스 중 가장 나쁜 상태 */
+export function representativeState(source: Pick<SourceDetail, "lifecycle" | "state">, runtime: RuntimeInstance[]): string {
+  if (source.lifecycle !== "ACTIVE") return "DISABLED";
+  if (source.state) return source.state;
+  return worstState(runtime.filter((r) => !r.stale).map((r) => r.state));
 }
 
 export interface SourceDetail {
@@ -362,16 +410,25 @@ export interface SourceDetail {
   autoregLimitPerHour?: number;
   noDataAlarmAfterSec?: number;
   webhookUrl?: string | null;
+  clientIdBase?: string | null;
   clientIds?: string[];
   runtime?: RuntimeInstance[];
+  /** 대표 연결 상태(core 계산) */
+  state?: string | null;
+  stateDetail?: { connectedInstances?: number; totalInstances?: number; errorKind?: string | null; errorMessage?: string | null } | null;
+  lastReceivedAt?: string | null;
+  ratePerMin?: number | null;
+  decodeErrorRate1h?: number | null;
+  isDev?: boolean;
   version: number;
   updatedAt?: string;
 }
 
-/** 소수 비율(0.12) 또는 퍼센트(12)를 퍼센트 문자열로 */
+/** 비율(0~1 소수, `*Rate`)을 퍼센트 문자열로 */
 export function percent(rate: number | null | undefined): string {
   if (rate === null || rate === undefined || Number.isNaN(rate)) return "–";
-  const value = rate <= 1 ? rate * 100 : rate;
+  // `*Rate`는 0~1 소수(API-DSC-01·ING 문서). 100을 곱해 퍼센트로
+  const value = rate * 100;
   return `${Math.round(value * 10) / 10}%`;
 }
 
@@ -394,7 +451,7 @@ export const STAT_SERIES = ["received", "accepted", "decodeErrors", "scriptError
 
 export interface TestStep {
   name: string;
-  status: "OK" | "FAIL" | "SKIPPED" | string;
+  status: "OK" | "FAILED" | "FAIL" | "SKIPPED" | string;
   ms?: number | null;
   code?: string | null;
   detail?: string | null;
@@ -410,6 +467,9 @@ export interface TestPreview {
 }
 
 export interface TestResult {
+  ok?: boolean;
+  /** 처음 실패한 단계 이름 */
+  stage?: string | null;
   steps: TestStep[];
   preview: TestPreview[];
   lossPossible?: boolean;
@@ -417,7 +477,8 @@ export interface TestResult {
 
 /** 연결 테스트 결과 판정(UI-DSC-09): 실패 / 부분 성공(구독 성공·메시지 없음, TC-DSC-268) / 성공 */
 export function testOutcome(result: TestResult): "failed" | "partial" | "success" {
-  if (result.steps.some((s) => s.status === "FAIL")) return "failed";
+  if (result.ok === false && result.steps.length === 0) return "failed";
+  if (result.steps.some((s) => isFailedStep(s.status))) return "failed";
   if (result.preview.length === 0) return "partial";
   return "success";
 }

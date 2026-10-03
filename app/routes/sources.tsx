@@ -15,7 +15,7 @@ import { errorText } from "~/lib/error-text";
 import { formatRelative } from "~/lib/format";
 import { hasAny } from "~/lib/permissions";
 import { IngestTabs, LifecycleBadge, Sparkline, StateBadge } from "~/features/sources/components/common";
-import { LIFECYCLES, TYPE_CARDS, percent, type SourceSummary } from "~/features/sources/model/source";
+import { LIFECYCLES, TYPE_CARDS, percent, type SourceLimits, type SourceSummary } from "~/features/sources/model/source";
 import type { Route } from "./+types/sources";
 
 export function meta() {
@@ -34,9 +34,14 @@ export async function loader({ request, context }: Route.LoaderArgs) {
   const archived = url.searchParams.get("archived") === "1";
   if (lifecycle) query.set("lifecycle", lifecycle);
   else if (archived) query.set("lifecycle", LIFECYCLES.join(","));
-  const [list, me] = await Promise.all([callList<SourceSummary>(ctx, request, `/api/v1/core/sources?${query}`), getMe(ctx, request)]);
+  const [list, me, limits] = await Promise.all([
+    callList<SourceSummary>(ctx, request, `/api/v1/core/sources?${query}`),
+    getMe(ctx, request),
+    // 조직 소스 한도(API-DSC-71, DSC-07.03). 실패해도 목록은 보인다
+    callApi<SourceLimits>(ctx, request, "/api/v1/core/source-limits"),
+  ]);
   const permissions = me.ok ? me.data.permissions : [];
-  return { sources: listOrThrow(list), page, canAdmin: hasAny(permissions, ["SRC_ADMIN"]), filtered: Boolean(q || lifecycle || url.searchParams.get("type")), now: ctx.runtime.now() };
+  return { sources: listOrThrow(list), page, limits: limits.ok && limits.data ? limits.data : null, canAdmin: hasAny(permissions, ["SRC_ADMIN"]), filtered: Boolean(q || lifecycle || url.searchParams.get("type")), now: ctx.runtime.now() };
 }
 
 export async function action({ request, context }: Route.ActionArgs) {
@@ -69,7 +74,19 @@ export default function Sources({ loaderData, actionData }: Route.ComponentProps
   return (
     <>
       <IngestTabs current="sources" />
-      <PageHeader title={t("sources.list.title")} actions={canAdmin && <ButtonLink to="/sources/new" variant="primary">{t("sources.list.new")}</ButtonLink>} />
+      <PageHeader
+        title={t("sources.list.title")}
+        actions={
+          <>
+            {loaderData.limits && <span className="self-center text-[12.5px] text-muted">{t("sources.limits.sources", { n: loaderData.limits.activeSources, max: loaderData.limits.maxSources })}</span>}
+            {canAdmin && (
+              <ButtonLink to="/sources/new" variant="primary">
+                {t("sources.list.new")}
+              </ButtonLink>
+            )}
+          </>
+        }
+      />
       {error && <Alert tone="danger">{errorText(t, error)}</Alert>}
       <Card>
         <Form method="get" className="mb-3 flex flex-wrap items-end gap-3">

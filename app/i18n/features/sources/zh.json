@@ -203,7 +203,8 @@
       "test": "测试连接",
       "saveDraft": "保存为草稿",
       "saveActivate": "保存并启用",
-      "reconnectHint": "采集中的数据源仅重新建立此数据源的连接。"
+      "reconnectHint": "采集中的数据源仅重新建立此数据源的连接。",
+      "isDev": "开发数据源（允许关闭 TLS 验证）"
     },
     "validation": {
       "code": "以小写字母开头，最多50字符（小写字母、数字、-）",
@@ -213,7 +214,7 @@
       "keepalive": "请输入10~600秒",
       "sessionExpiry": "会话过期须为非负整数",
       "topicRequired": "请至少输入一个主题",
-      "topicLimit": "最多20个主题",
+      "topicLimit": "最多可添加{{max}}个主题",
       "topic": "主题格式不正确",
       "secret": "请输入认证信息",
       "username": "请输入用户名",
@@ -221,7 +222,8 @@
       "script": "请选择脚本",
       "mapping": "请检查映射设置",
       "autoreg": "请输入0~10,000",
-      "noData": "请输入60~86,400秒"
+      "noData": "请输入60~86,400秒",
+      "tlsDevOnly": "仅开发数据源允许关闭 TLS 验证"
     },
     "mapping": {
       "title": "generic-json 映射",
@@ -245,13 +247,24 @@
         "duplicate": "同一测量项键重复映射：{{value}}",
         "metricKey": "测量项键格式不正确：{{value}}",
         "required": "必填项",
-        "json": "JSON 格式不正确"
-      }
+        "json": "JSON 格式不正确",
+        "tooMany": "最多可映射200个测量项",
+        "unit": "单位不能超过16个字符：{{value}}"
+      },
+      "timeFormat": "时间格式",
+      "timeFormats": {
+        "AUTO": "自动",
+        "EPOCH_S": "epoch 秒",
+        "EPOCH_MS": "epoch 毫秒",
+        "ISO8601": "ISO-8601"
+      },
+      "unit": "单位（可选）",
+      "unitN": "单位 {{n}}"
     },
     "test": {
       "title": "连接测试",
       "retry": "重新测试",
-      "running": "正在测试连接…（最长30秒）",
+      "running": "正在测试连接…（最长{{seconds}}秒）",
       "idle": "点击[测试连接]显示各步骤结果和最多10条最新消息。结果不会保存。",
       "success": "全部步骤成功，收到 {{n}} 条消息",
       "partial": "部分成功：订阅成功但没有消息。请检查主题和 QoS。",
@@ -272,8 +285,10 @@
       "status": {
         "OK": "成功",
         "FAIL": "失败",
-        "SKIPPED": "已跳过"
-      }
+        "SKIPPED": "已跳过",
+        "FAILED": "失败"
+      },
+      "timeout": "时限（秒）"
     },
     "live": {
       "topicFilter": "主题筛选",
@@ -370,6 +385,10 @@
         "ACTIVE": "使用中",
         "REVOKED": "已吊销"
       }
+    },
+    "limits": {
+      "topics": "主题 {{n}}/{{max}}",
+      "sources": "数据源 {{n}}/{{max}}"
     }
   },
   "errors": {

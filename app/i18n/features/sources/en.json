@@ -203,7 +203,8 @@
       "test": "Test connection",
       "saveDraft": "Save as draft",
       "saveActivate": "Save and activate",
-      "reconnectHint": "For an active source, only this source reconnects."
+      "reconnectHint": "For an active source, only this source reconnects.",
+      "isDev": "Development source (allows disabling TLS verification)"
     },
     "validation": {
       "code": "Up to 50 characters starting with a lowercase letter (lowercase, digits, -)",
@@ -213,7 +214,7 @@
       "keepalive": "Enter 10–600 seconds",
       "sessionExpiry": "Session expiry must be a non-negative integer",
       "topicRequired": "Enter at least one topic",
-      "topicLimit": "Up to 20 topics",
+      "topicLimit": "You can add up to {{max}} topics",
       "topic": "The topic is invalid",
       "secret": "Enter the credentials",
       "username": "Enter a username",
@@ -221,7 +222,8 @@
       "script": "Choose a script",
       "mapping": "Check the mapping",
       "autoreg": "Enter 0–10,000",
-      "noData": "Enter 60–86,400 seconds"
+      "noData": "Enter 60–86,400 seconds",
+      "tlsDevOnly": "Disabling TLS verification is allowed only for development sources"
     },
     "mapping": {
       "title": "generic-json mapping",
@@ -245,13 +247,24 @@
         "duplicate": "Metric key mapped twice: {{value}}",
         "metricKey": "Invalid metric key: {{value}}",
         "required": "Required",
-        "json": "Invalid JSON"
-      }
+        "json": "Invalid JSON",
+        "tooMany": "You can map up to 200 metrics",
+        "unit": "Units must be 16 characters or fewer: {{value}}"
+      },
+      "timeFormat": "Time format",
+      "timeFormats": {
+        "AUTO": "Auto",
+        "EPOCH_S": "Epoch seconds",
+        "EPOCH_MS": "Epoch milliseconds",
+        "ISO8601": "ISO-8601"
+      },
+      "unit": "Unit (optional)",
+      "unitN": "Unit {{n}}"
     },
     "test": {
       "title": "Connection test",
       "retry": "Test again",
-      "running": "Testing the connection… (up to 30 s)",
+      "running": "Testing connection… (up to {{seconds}} s)",
       "idle": "Press [Test connection] to see each step and up to 10 recent messages. Results are not saved.",
       "success": "All steps passed, {{n}} messages received",
       "partial": "Partial success: subscribed but no messages arrived. Check the topics and QoS.",
@@ -272,8 +285,10 @@
       "status": {
         "OK": "passed",
         "FAIL": "failed",
-        "SKIPPED": "skipped"
-      }
+        "SKIPPED": "skipped",
+        "FAILED": "failed"
+      },
+      "timeout": "Time limit (s)"
     },
     "live": {
       "topicFilter": "Topic filter",
@@ -370,6 +385,10 @@
         "ACTIVE": "Active",
         "REVOKED": "Revoked"
       }
+    },
+    "limits": {
+      "topics": "Topics {{n}}/{{max}}",
+      "sources": "Sources {{n}}/{{max}}"
     }
   },
   "errors": {

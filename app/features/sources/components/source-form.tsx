@@ -12,7 +12,7 @@ import { bffJson } from "~/lib/bff-client";
 import { errorText } from "~/lib/error-text";
 import type { SpaceNode } from "~/lib/spaces";
 import { validateMapping, mappingFromConfig } from "../model/mapping";
-import { AUTH_METHODS, DECODERS, DEFAULT_MAPPING, MAX_TOPICS, clientIdPreview, sharedTopic, testBody, validateForm, type FieldErrors, type SourceFormValues, type TestResult } from "../model/source";
+import { AUTH_METHODS, DECODERS, DEFAULT_MAPPING, MAX_TOPICS, TEST_TIMEOUT_RANGE, TEST_TIMEOUT_SEC, clampTestTimeout, clientIdPreview, sharedTopic, testBody, validateForm, type FieldErrors, type SourceFormValues, type TestResult } from "../model/source";
 import { ConnectionTestPanel } from "./connection-test-panel";
 import { MappingEditor } from "./mapping-editor";
 
@@ -38,13 +38,15 @@ export interface SourceFormProps {
   serverError?: { code: string; message?: string } | null;
   serverFieldErrors?: { field: string; code: string; message: string }[];
   env?: string;
+  /** 소스당 토픽 한도(API-DSC-71 maxTopicsPerSource) */
+  maxTopics?: number;
 }
 
 type TabKey = "basic" | "connection" | "auth" | "subscription" | "decoder" | "policy";
 
 const TAB_FIELDS: Record<TabKey, string[]> = {
   basic: ["code", "name"],
-  connection: ["url", "clientIdBase", "keepaliveSec", "sessionExpirySec"],
+  connection: ["url", "clientIdBase", "keepaliveSec", "sessionExpirySec", "tlsInsecure"],
   auth: ["secretValue", "username", "headerName"],
   subscription: ["topics"],
   decoder: ["decodeScriptId", "decoderConfig"],
@@ -56,7 +58,7 @@ function tabsFor(type: string): TabKey[] {
   return ["basic", "connection", "decoder", "policy"];
 }
 
-export function SourceForm({ initial, mode, readOnly = false, secretConfigured, secretFingerprint, models, spaces, scripts, idempotencyKey, baseVersion, testPath, serverError, serverFieldErrors, env = "prod" }: SourceFormProps) {
+export function SourceForm({ initial, mode, readOnly = false, secretConfigured, secretFingerprint, models, spaces, scripts, idempotencyKey, baseVersion, testPath, serverError, serverFieldErrors, env = "prod", maxTopics = MAX_TOPICS }: SourceFormProps) {
   const { t } = useTranslation();
   const navigation = useNavigation();
   const [values, setValues] = useState<SourceFormValues>(initial);
@@ -65,8 +67,9 @@ export function SourceForm({ initial, mode, readOnly = false, secretConfigured, 
   const [result, setResult] = useState<TestResult | null>(null);
   const [testError, setTestError] = useState<string | null>(null);
   const [touched, setTouched] = useState(false);
+  const [timeoutSec, setTimeoutSec] = useState(TEST_TIMEOUT_SEC);
   const mappingError = useMemo(() => (values.decoderKey === "generic-json" && validateMapping(mappingFromConfig(values.decoderConfig || DEFAULT_MAPPING)).length > 0 ? "mapping" : null), [values.decoderKey, values.decoderConfig]);
-  const errors: FieldErrors = validateForm(values, { editing: mode === "edit", secretConfigured, mappingError });
+  const errors: FieldErrors = validateForm(values, { editing: mode === "edit", secretConfigured, mappingError, maxTopics });
   for (const fe of serverFieldErrors ?? []) if (!(fe.field in errors)) (errors as Record<string, string>)[fe.field] = "server";
   const hasErrors = Object.keys(errors).length > 0;
   const tabs = tabsFor(values.type);
@@ -89,9 +92,10 @@ export function SourceForm({ initial, mode, readOnly = false, secretConfigured, 
     setTesting(true);
     setTestError(null);
     setResult(null);
-    const response = await bffJson<TestResult>(testPath, { method: "POST", body: testBody(values) });
+    // 제한 시간은 쿼리 timeoutSec(기본 15초, 5~30초, API-DSC-57)
+    const response = await bffJson<TestResult>(`${testPath}?timeoutSec=${clampTestTimeout(timeoutSec)}`, { method: "POST", body: testBody(values) });
     setTesting(false);
-    if (response.ok) setResult({ steps: response.data?.steps ?? [], preview: response.data?.preview ?? [], lossPossible: response.data?.lossPossible });
+    if (response.ok) setResult({ ok: response.data?.ok, stage: response.data?.stage, steps: response.data?.steps ?? [], preview: response.data?.preview ?? [], lossPossible: response.data?.lossPossible });
     else setTestError(errorText(t, response) ?? null);
   }
 
@@ -146,7 +150,8 @@ export function SourceForm({ initial, mode, readOnly = false, secretConfigured, 
                 <Checkbox label={t("sources.form.persistentSession")} checked={!values.cleanStart} onChange={(e) => set("cleanStart", !e.target.checked)} />
                 <TextField label={t("sources.form.sessionExpiry")} type="number" value={values.sessionExpirySec} disabled={!mqtt5} hint={!mqtt5 ? t("sources.form.mqtt5Only") : undefined} error={mqtt5 ? show("sessionExpirySec") : undefined} onChange={(e) => set("sessionExpirySec", e.target.value)} />
                 <TextField label={t("sources.form.receiveMaximum")} type="number" value={values.receiveMaximum} disabled={!mqtt5} hint={!mqtt5 ? t("sources.form.mqtt5Only") : undefined} onChange={(e) => set("receiveMaximum", e.target.value)} />
-                <Checkbox label={t("sources.form.tlsInsecure")} checked={values.tlsInsecure} onChange={(e) => set("tlsInsecure", e.target.checked)} />
+                <Checkbox label={t("sources.form.isDev")} checked={values.isDev} onChange={(e) => set("isDev", e.target.checked)} />
+                <Checkbox label={t("sources.form.tlsInsecure")} checked={values.tlsInsecure} error={show("tlsInsecure")} onChange={(e) => set("tlsInsecure", e.target.checked)} />
                 {values.tlsInsecure && <Alert tone="warning">{t("sources.form.tlsInsecureWarn")}</Alert>}
               </>
             )}
@@ -214,10 +219,11 @@ export function SourceForm({ initial, mode, readOnly = false, secretConfigured, 
               ))}
               {show("topics") && <p className="text-[12px] text-bad">{show("topics")}</p>}
               <div>
-                <Button onClick={() => set("topics", [...values.topics, { topic: "", qos: 1 }])} disabled={values.topics.length >= MAX_TOPICS}>
+                <Button onClick={() => set("topics", [...values.topics, { topic: "", qos: 1 }])} disabled={values.topics.length >= maxTopics}>
                   {t("sources.form.addTopic")}
                 </Button>
-                {values.topics.length >= MAX_TOPICS && <span className="ml-2 text-[12px] text-muted">{t("sources.validation.topicLimit")}</span>}
+                <span className="ml-2 text-[12px] text-muted">{t("sources.limits.topics", { n: values.topics.length, max: maxTopics })}</span>
+                {values.topics.length >= maxTopics && <span className="ml-2 text-[12px] text-muted">{t("sources.validation.topicLimit", { max: maxTopics })}</span>}
               </div>
             </section>
           )}
@@ -288,7 +294,19 @@ export function SourceForm({ initial, mode, readOnly = false, secretConfigured, 
         )}
       </Form>
       <aside>
-        <ConnectionTestPanel result={result} testing={testing} error={testError} onRetry={readOnly ? undefined : runTest} />
+        <div className="flex flex-col gap-2">
+          {!readOnly && (
+            <TextField
+              label={t("sources.test.timeout")}
+              type="number"
+              min={TEST_TIMEOUT_RANGE.min}
+              max={TEST_TIMEOUT_RANGE.max}
+              value={String(timeoutSec)}
+              onChange={(e) => setTimeoutSec(clampTestTimeout(Number(e.target.value)))}
+            />
+          )}
+          <ConnectionTestPanel result={result} testing={testing} error={testError} onRetry={readOnly ? undefined : runTest} timeoutSec={timeoutSec} />
+        </div>
       </aside>
     </div>
   );

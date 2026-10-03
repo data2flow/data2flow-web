@@ -50,7 +50,7 @@ export async function action({ request, context }: Route.ActionArgs) {
   const ctx = bff(context);
   const form = await request.formData();
   const intent = field(form, "intent");
-  const values = readPayload(form, { editing: false });
+  const values = readPayload(form, { editing: false, maxTopics: 200 });
   if (!values) return data({ error: { code: "INVALID_REQUEST" } }, { status: 400 });
   const result = await callApi<{ id: string }>(ctx, request, "/api/v1/core/sources", { method: "POST", idempotencyKey: field(form, "idempotencyKey") || newIdempotencyKey(), body: createBody(values, intent === "activate") });
   if (!result.ok) return data({ error: { code: result.code, message: result.message }, errors: result.errors ?? [] }, { status: result.status });
@@ -59,7 +59,7 @@ export async function action({ request, context }: Route.ActionArgs) {
 
 export default function SourceNewForm({ loaderData, actionData }: Route.ComponentProps) {
   const { t } = useTranslation();
-  const { initial, models, spaces, scripts, idempotencyKey, templateName, supported } = loaderData;
+  const { initial, models, spaces, scripts, idempotencyKey, templateName, supported, limits } = loaderData;
   return (
     <>
       <IngestTabs current="sources" />
@@ -73,6 +73,7 @@ export default function SourceNewForm({ loaderData, actionData }: Route.Componen
           models={models}
           spaces={spaces}
           scripts={scripts}
+          maxTopics={limits?.maxTopicsPerSource}
           idempotencyKey={idempotencyKey}
           testPath="/bff/api/core/sources/test"
           serverError={actionData?.error ?? null}

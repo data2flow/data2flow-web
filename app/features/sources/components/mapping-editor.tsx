@@ -4,8 +4,8 @@
  */
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Button, Table, TextArea, TextField } from "~/components/ui";
-import { mappingFromConfig, mappingToConfig, previewMapping, validateMapping, type GenericJsonMapping, type MappingProblem } from "../model/mapping";
+import { Button, SelectField, Table, TextArea, TextField } from "~/components/ui";
+import { TIME_FORMATS, mappingFromConfig, mappingToConfig, previewMapping, validateMapping, type GenericJsonMapping, type MappingProblem, type TimeFormat } from "../model/mapping";
 
 export function problemText(t: (k: string, o?: Record<string, unknown>) => string, problem: MappingProblem | undefined): string | undefined {
   if (!problem) return undefined;
@@ -25,7 +25,7 @@ export function MappingEditor({ value, onChange, readOnly = false }: { value: st
     setMapping(next);
     onChange(mappingToConfig(next), validateMapping(next).length === 0);
   };
-  const setMetric = (index: number, patch: Partial<{ path: string; key: string }>) => update({ ...mapping, metrics: mapping.metrics.map((m, i) => (i === index ? { ...m, ...patch } : m)) });
+  const setMetric = (index: number, patch: Partial<{ path: string; key: string; unit: string }>) => update({ ...mapping, metrics: mapping.metrics.map((m, i) => (i === index ? { ...m, ...patch } : m)) });
 
   return (
     <div className="flex flex-col gap-3 rounded-md border border-line p-3">
@@ -33,12 +33,20 @@ export function MappingEditor({ value, onChange, readOnly = false }: { value: st
       <div className="grid gap-3 md:grid-cols-2">
         <TextField label={t("sources.mapping.deviceIdFrom")} value={mapping.deviceIdFrom} readOnly={readOnly} hint={t("sources.mapping.deviceIdHint")} error={problemText(t, problemOf("deviceIdFrom"))} onChange={(e) => update({ ...mapping, deviceIdFrom: e.target.value })} />
         <TextField label={t("sources.mapping.timePath")} value={mapping.timePath ?? ""} readOnly={readOnly} hint={t("sources.mapping.timeHint")} error={problemText(t, problemOf("timePath"))} onChange={(e) => update({ ...mapping, timePath: e.target.value })} />
+        <SelectField label={t("sources.mapping.timeFormat")} value={mapping.timeFormat ?? "AUTO"} disabled={readOnly} onChange={(e) => update({ ...mapping, timeFormat: e.target.value as TimeFormat })}>
+          {TIME_FORMATS.map((f) => (
+            <option key={f} value={f}>
+              {t(`sources.mapping.timeFormats.${f}`)}
+            </option>
+          ))}
+        </SelectField>
       </div>
       <Table>
         <thead>
           <tr>
             <th scope="col">{t("sources.mapping.path")}</th>
             <th scope="col">{t("sources.mapping.key")}</th>
+            <th scope="col">{t("sources.mapping.unit")}</th>
             <th scope="col" />
           </tr>
         </thead>
@@ -50,6 +58,9 @@ export function MappingEditor({ value, onChange, readOnly = false }: { value: st
               </td>
               <td>
                 <TextField label={t("sources.mapping.keyN", { n: i + 1 })} value={m.key} readOnly={readOnly} error={problemText(t, problemOf(`metrics.${i}.key`))} onChange={(e) => setMetric(i, { key: e.target.value })} />
+              </td>
+              <td>
+                <TextField label={t("sources.mapping.unitN", { n: i + 1 })} value={m.unit ?? ""} readOnly={readOnly} error={problemText(t, problemOf(`metrics.${i}.unit`))} onChange={(e) => setMetric(i, { unit: e.target.value })} />
               </td>
               <td>
                 {!readOnly && (

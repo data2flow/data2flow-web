@@ -1,17 +1,25 @@
 /**
  * generic-json 디코더 매핑(ING-02.03, DSC-01.06, UI-DSC-02 4단계 매핑 편집기).
- * 매핑: `{deviceIdFrom: "topic[1]" | "$.dev", timePath?: "$.ts", metrics: [{path: "$.temp", key: "temperature"}]}`
+ * 매핑(spec/detail/DSC/domain-model §2.1, core SourceConfigValidator):
+ * `{deviceIdFrom: "topic[1]" | "$.dev", timePath?: "$.ts", timeFormat?: AUTO|EPOCH_S|EPOCH_MS|ISO8601, metrics: [{path: "$.temp", key: "temperature", unit?: "°C"}]}`
+ * 측정 항목은 1~200개, key 중복 금지, unit은 16자 이하
  * 화면은 붙여 넣은 테스트 메시지로 결과를 바로 미리 보여 준다(TC-DSC-045). 서버(pipeline)가 같은 규칙으로 다시 검사한다(TC-ING-040).
  */
 
 export interface MetricMapping {
   path: string;
   key: string;
+  unit?: string;
 }
+
+export const TIME_FORMATS = ["AUTO", "EPOCH_S", "EPOCH_MS", "ISO8601"] as const;
+export type TimeFormat = (typeof TIME_FORMATS)[number];
+export const MAX_MAPPED_METRICS = 200;
 
 export interface GenericJsonMapping {
   deviceIdFrom: string;
   timePath?: string;
+  timeFormat?: TimeFormat;
   metrics: MetricMapping[];
 }
 
@@ -70,7 +78,7 @@ export const METRIC_KEY = /^[a-z][a-z0-9_]{0,63}$/i;
 export interface MappingProblem {
   field: string;
   /** 문구 키(sources.mapping.*) */
-  code: "path" | "topicIndex" | "duplicate" | "metricKey" | "required" | "json";
+  code: "path" | "topicIndex" | "duplicate" | "metricKey" | "required" | "json" | "tooMany" | "unit";
   position?: number;
   value?: string;
 }
@@ -86,11 +94,13 @@ export function validateMapping(mapping: GenericJsonMapping): MappingProblem[] {
   else if (!TOPIC_REF.test(mapping.deviceIdFrom)) pathProblem("deviceIdFrom", mapping.deviceIdFrom);
   if (mapping.timePath) pathProblem("timePath", mapping.timePath);
   if (mapping.metrics.length === 0) problems.push({ field: "metrics", code: "required" });
+  if (mapping.metrics.length > MAX_MAPPED_METRICS) problems.push({ field: "metrics", code: "tooMany" });
   const seen = new Set<string>();
   mapping.metrics.forEach((m, i) => {
     pathProblem(`metrics.${i}.path`, m.path);
     if (!METRIC_KEY.test(m.key)) problems.push({ field: `metrics.${i}.key`, code: "metricKey", value: m.key });
     else if (seen.has(m.key)) problems.push({ field: `metrics.${i}.key`, code: "duplicate", value: m.key });
+    if (m.unit && m.unit.length > 16) problems.push({ field: `metrics.${i}.unit`, code: "unit", value: m.unit });
     seen.add(m.key);
   });
   return problems;
@@ -100,15 +110,27 @@ export function validateMapping(mapping: GenericJsonMapping): MappingProblem[] {
 export function mappingFromConfig(raw: string): GenericJsonMapping {
   try {
     const parsed = JSON.parse(raw) as Partial<GenericJsonMapping>;
-    return { deviceIdFrom: parsed.deviceIdFrom ?? "", timePath: parsed.timePath ?? "", metrics: Array.isArray(parsed.metrics) ? parsed.metrics.map((m) => ({ path: String(m.path ?? ""), key: String(m.key ?? "") })) : [] };
+    const timeFormat = (TIME_FORMATS as readonly string[]).includes(String(parsed.timeFormat)) ? (parsed.timeFormat as TimeFormat) : "AUTO";
+    return {
+      deviceIdFrom: parsed.deviceIdFrom ?? "",
+      timePath: parsed.timePath ?? "",
+      timeFormat,
+      metrics: Array.isArray(parsed.metrics) ? parsed.metrics.map((m) => ({ path: String(m.path ?? ""), key: String(m.key ?? ""), unit: m.unit ? String(m.unit) : "" })) : [],
+    };
   } catch {
     return { deviceIdFrom: "topic[1]", timePath: "$.ts", metrics: [{ path: "$.temp", key: "temperature" }] };
   }
 }
 
 export function mappingToConfig(mapping: GenericJsonMapping): string {
-  const out: GenericJsonMapping = { deviceIdFrom: mapping.deviceIdFrom.trim(), metrics: mapping.metrics.map((m) => ({ path: m.path.trim(), key: m.key.trim() })) };
-  if (mapping.timePath?.trim()) out.timePath = mapping.timePath.trim();
+  const out: GenericJsonMapping = {
+    deviceIdFrom: mapping.deviceIdFrom.trim(),
+    metrics: mapping.metrics.map((m) => (m.unit?.trim() ? { path: m.path.trim(), key: m.key.trim(), unit: m.unit.trim() } : { path: m.path.trim(), key: m.key.trim() })),
+  };
+  if (mapping.timePath?.trim()) {
+    out.timePath = mapping.timePath.trim();
+    if (mapping.timeFormat && mapping.timeFormat !== "AUTO") out.timeFormat = mapping.timeFormat;
+  }
   return JSON.stringify(out, null, 2);
 }
 
@@ -119,7 +141,12 @@ export interface MappingPreview {
   error?: "json";
 }
 
-function toIso(value: unknown): string | null {
+/** 시각 해석(timeFormat). AUTO는 숫자면 크기로 초·밀리초를 가르고, 문자열이면 ISO-8601 */
+export function toIso(value: unknown, format: TimeFormat = "AUTO"): string | null {
+  const numeric = typeof value === "number" ? value : typeof value === "string" && /^\d+(\.\d+)?$/.test(value) ? Number(value) : undefined;
+  if (format === "EPOCH_S") return numeric === undefined ? null : new Date(numeric * 1000).toISOString();
+  if (format === "EPOCH_MS") return numeric === undefined ? null : new Date(numeric).toISOString();
+  if (format === "ISO8601") return typeof value === "string" && !Number.isNaN(Date.parse(value)) ? new Date(value).toISOString() : null;
   if (typeof value === "number") return new Date(value > 1e12 ? value : value * 1000).toISOString();
   if (typeof value === "string" && !Number.isNaN(Date.parse(value))) return new Date(value).toISOString();
   return null;
@@ -146,7 +173,7 @@ export function previewMapping(mapping: GenericJsonMapping, topic: string, paylo
   let measuredAt: string | null = null;
   if (mapping.timePath) {
     const parsed = parseJsonPath(mapping.timePath);
-    if (parsed.ok) measuredAt = toIso(evaluate(payload, parsed.segments)[0]);
+    if (parsed.ok) measuredAt = toIso(evaluate(payload, parsed.segments)[0], mapping.timeFormat ?? "AUTO");
   }
   const metrics: { key: string; value: unknown }[] = [];
   for (const m of mapping.metrics) {

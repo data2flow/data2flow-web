@@ -5,11 +5,11 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Alert, Button, Card, cx } from "~/components/ui";
-import { testOutcome, type TestPreview, type TestResult } from "../model/source";
+import { TEST_TIMEOUT_SEC, isFailedStep, testOutcome, type TestPreview, type TestResult } from "../model/source";
 
-const ICON: Record<string, string> = { OK: "✓", FAIL: "✗", SKIPPED: "–" };
+const ICON: Record<string, string> = { OK: "✓", FAILED: "✗", FAIL: "✗", SKIPPED: "–" };
 
-export function ConnectionTestPanel({ result, testing, error, onRetry }: { result: TestResult | null; testing: boolean; error?: string | null; onRetry?: () => void }) {
+export function ConnectionTestPanel({ result, testing, error, onRetry, timeoutSec = TEST_TIMEOUT_SEC }: { result: TestResult | null; testing: boolean; error?: string | null; onRetry?: () => void; timeoutSec?: number }) {
   const { t } = useTranslation();
   const outcome = result ? testOutcome(result) : null;
   return (
@@ -25,7 +25,7 @@ export function ConnectionTestPanel({ result, testing, error, onRetry }: { resul
     >
       {testing && (
         <p role="status" className="text-[13px] text-muted">
-          {t("sources.test.running")}
+          {t("sources.test.running", { seconds: timeoutSec })}
         </p>
       )}
       {!testing && error && <Alert tone="danger">{error}</Alert>}
@@ -38,7 +38,7 @@ export function ConnectionTestPanel({ result, testing, error, onRetry }: { resul
           {result.lossPossible && <Alert tone="warning">{t("sources.test.lossPossible")}</Alert>}
           <ol className="flex flex-col gap-1 text-[13px]" aria-label={t("sources.test.steps")}>
             {result.steps.map((step) => (
-              <li key={step.name} className={cx("flex flex-wrap items-baseline gap-2", step.status === "FAIL" && "text-bad")}>
+              <li key={step.name} className={cx("flex flex-wrap items-baseline gap-2", isFailedStep(step.status) && "text-bad")}>
                 <span aria-hidden className="w-4 font-mono">
                   {ICON[step.status] ?? "·"}
                 </span>

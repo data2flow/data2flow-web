@@ -205,7 +205,9 @@ describe("DSC-01.01·01.04·01.07 UI-DSC-02/08 소스 만들기", () => {
     expect(okResult.steps.map((s: { name: string }) => s.name)).toEqual(["DNS", "TCP", "TLS", "AUTH", "SUBSCRIBE"]);
     expect(okResult.preview).toHaveLength(1);
     const failed = JSON.parse((await call("wss://badauth.example/mqtt")).body).response;
-    expect(failed.steps.find((s: { status: string }) => s.status === "FAIL").name).toBe("AUTH");
+    // ingress·문서 표기 FAILED(core는 FAIL로 정규화할 수 있다), ok=false·stage
+    expect(failed.steps.find((s: { status: string }) => s.status === "FAILED").name).toBe("AUTH");
+    expect([failed.ok, failed.stage]).toEqual([false, "AUTH"]);
     expect(app.gateway.m2.sources).toHaveLength(1);
   });
 });
@@ -359,5 +361,32 @@ describe("DSC-03.02 기기 자격증명 API(UI-DSC-06이 부르는 API-DSC-20~22
     await kim.get("/sources");
     const denied = await kim.request("/bff/api/core/devices/1042/credentials", { method: "POST", headers: { "Content-Type": "application/json", "X-CSRF-TOKEN": kim.csrf }, body: "{}" });
     expect(denied.response.status).toBe(403);
+  });
+});
+
+describe("core-api M2 계약 맞춤(SourceDtos·API-DSC-71·API-DSC-57)", () => {
+  it("목록: 비율(0~1)은 %로, 조직 소스 한도 사용량 표시", async () => {
+    app.gateway.m2.sources[0].decodeErrorRate1h = 0.121;
+    const page = await (await integrator()).get("/sources");
+    expect(page.body).toContain("12.1%");
+    expect(page.body).toContain("소스 1/50");
+  });
+
+  it("새 소스 폼은 조직 토픽 한도를 쓰고, 연결 테스트는 timeoutSec 쿼리를 core로 넘긴다", async () => {
+    const browser = await integrator();
+    const page = await browser.get("/sources/new/mqtt");
+    expect(page.body).toContain("토픽 1/20");
+    await browser.request("/bff/api/core/sources/test?timeoutSec=22", { method: "POST", headers: { "Content-Type": "application/json", "X-CSRF-TOKEN": browser.csrf }, body: JSON.stringify({ type: "MQTT_SUBSCRIBE", connection: { url: "wss://h/mqtt" }, topics: [{ topic: "a", qos: 1 }] }) });
+    expect(app.gateway.received.some((r) => r.path === "/api/v1/core/sources/test?timeoutSec=22")).toBe(true);
+  });
+
+  it("상세 대표 상태는 core state를 따르고 보관에는 confirm을 보낸다", async () => {
+    const browser = await integrator();
+    app.gateway.m2.sources[0].state = "CONNECTING";
+    const page = await browser.get("/sources/7?tab=status");
+    expect(page.body).toContain("CONNECTING");
+    await browser.post("/sources/7", { intent: "archive", baseVersion: "3", confirm: "chirpstack-s3" });
+    const archive = app.gateway.received.find((r) => r.path === "/api/v1/core/sources/7/archive");
+    expect(archive?.body).toMatchObject({ baseVersion: 3, confirm: true });
   });
 });

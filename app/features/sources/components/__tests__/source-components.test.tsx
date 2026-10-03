@@ -138,14 +138,30 @@ describe("UI-DSC-02/08 소스 설정 폼", () => {
     const before = (document.querySelector('input[name="payload"]') as HTMLInputElement).value;
     await userEvent.click(screen.getByRole("button", { name: "연결 테스트" }));
     expect(screen.getByRole("button", { name: "저장 후 활성화" })).toBeDisabled();
-    expect(screen.getByText("연결 테스트 중… (최대 30초)")).toBeInTheDocument();
+    // BR-DSC-07·API-DSC-57: 기본 15초, 쿼리 timeoutSec(5~30)
+    expect(screen.getByText("연결 테스트 중… (최대 15초)")).toBeInTheDocument();
     const [path, init] = fetchMock.mock.calls[0] as unknown as [string, RequestInit];
-    expect(path).toBe("/bff/api/core/sources/test");
+    expect(path).toBe("/bff/api/core/sources/test?timeoutSec=15");
     expect(JSON.parse(String(init.body))).toMatchObject({ code: "academy", connection: { url: "wss://iot-data.java21.net:443/mqtt" } });
     await act(async () => release(json({ header: { resultCode: "SUCCESS" }, response: { steps: [{ name: "DNS", status: "OK", ms: 12 }, { name: "SUBSCRIBE", status: "OK", ms: 9 }], preview: [{ at: "x", topic: "t/1", size: 412, rawExcerpt: "{}" }] } })));
     expect(await screen.findByText("모든 단계 성공, 메시지 1건 수신")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "저장 후 활성화" })).toBeEnabled();
     expect((document.querySelector('input[name="payload"]') as HTMLInputElement).value).toBe(before);
+  });
+
+  it("연결 테스트 제한 시간 입력은 5~30초로 묶어 쿼리로 보낸다, 토픽 한도는 조직 값(API-DSC-71)", async () => {
+    const fetchMock = vi.fn(async () => json({ header: { resultCode: "SUCCESS" }, response: { ok: false, stage: "AUTH", steps: [{ name: "AUTH", status: "FAILED" }], preview: [] } }));
+    vi.stubGlobal("fetch", fetchMock);
+    await renderForm(mqtt(), { maxTopics: 1 });
+    const timeout = screen.getByLabelText("제한 시간(초)");
+    await userEvent.clear(timeout);
+    await userEvent.type(timeout, "99");
+    await userEvent.click(screen.getByRole("button", { name: "연결 테스트" }));
+    expect((fetchMock.mock.calls[0] as unknown as [string])[0]).toBe("/bff/api/core/sources/test?timeoutSec=30");
+    expect(await screen.findByText(/연결 테스트에 실패했습니다/)).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "구독" }));
+    expect(screen.getByText("토픽 1/1")).toBeInTheDocument();
+    expect(screen.getByText("토픽은 1개까지 넣을 수 있습니다")).toBeInTheDocument();
   });
 
   it("연결 테스트 오류 응답은 문구로, 읽기 전용이면 입력 비활성·저장 버튼 없음·서버 오류 표시", async () => {
@@ -178,7 +194,7 @@ describe("UI-DSC-09 연결 테스트 패널", () => {
   it("TC-DSC-091 TLS 실패 단계에 원인 코드와 인증서 체인, TC-DSC-268 부분 성공 안내, 미리보기 펼침", async () => {
     const retry = vi.fn();
     const { rerender } = await renderRoute(
-      <ConnectionTestPanel testing={false} onRetry={retry} result={{ steps: [{ name: "DNS", status: "OK", ms: 12 }, { name: "TLS", status: "FAIL", ms: 40, code: "TLS_UNTRUSTED_CA", detail: "self-signed", tlsChain: [{ subject: "CN=x", issuer: "CN=x", notAfter: "2027-01-01" }] }], preview: [] }} />,
+      <ConnectionTestPanel testing={false} onRetry={retry} result={{ steps: [{ name: "DNS", status: "OK", ms: 12 }, { name: "TLS", status: "FAILED", ms: 40, code: "TLS_UNTRUSTED_CA", detail: "self-signed", tlsChain: [{ subject: "CN=x", issuer: "CN=x", notAfter: "2027-01-01" }] }], preview: [] }} />,
     );
     expect(await screen.findByText("TLS_UNTRUSTED_CA")).toBeInTheDocument();
     expect(screen.getByText(/연결 테스트에 실패했습니다/)).toBeInTheDocument();
@@ -205,6 +221,8 @@ describe("UI-DSC-09 연결 테스트 패널", () => {
     const { rerender } = await renderRoute(<ConnectionTestPanel testing={false} result={null} />);
     expect(await screen.findByText(/결과는 저장하지 않습니다/)).toBeInTheDocument();
     rerender(<ConnectionTestPanel testing result={null} />);
+    expect(screen.getByText("연결 테스트 중… (최대 15초)")).toBeInTheDocument();
+    rerender(<ConnectionTestPanel testing result={null} timeoutSec={30} />);
     expect(screen.getByText("연결 테스트 중… (최대 30초)")).toBeInTheDocument();
     rerender(<ConnectionTestPanel testing={false} result={null} error="오류" />);
     expect(screen.getByText("오류")).toBeInTheDocument();

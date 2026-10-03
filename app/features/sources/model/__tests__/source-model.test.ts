@@ -4,20 +4,23 @@
  */
 import { describe, expect, it } from "vitest";
 import { BASIC_CONNECTORS, filterConnectors, isLossy, normalizeCatalog } from "../catalog";
-import { evaluate, mappingFromConfig, mappingToConfig, parseJsonPath, previewMapping, validateMapping } from "../mapping";
+import { evaluate, mappingFromConfig, mappingToConfig, parseJsonPath, previewMapping, toIso, validateMapping } from "../mapping";
 import {
   DEFAULT_MAPPING,
   checkBrokerUrl,
   checkCode,
   checkTopic,
+  clampTestTimeout,
   clientIdPreview,
   connectorOfType,
   createBody,
   emptyForm,
   formFromSource,
+  isFailedStep,
   lifecycleActions,
   lifecycleTone,
   percent,
+  representativeState,
   sharedTopic,
   sparklinePath,
   statBucket,
@@ -140,8 +143,10 @@ describe("저장 본문(API-DSC-02·04)", () => {
   });
 
   it("표시 도우미: 실패율, 스파크라인, 기간별 묶음, 연결 테스트 판정(TC-DSC-268 부분 성공)", () => {
+    // `*Rate`는 0~1 소수(core SourceDtos)
     expect(percent(0.123)).toBe("12.3%");
-    expect(percent(12)).toBe("12%");
+    expect(percent(1)).toBe("100%");
+    expect(percent(0)).toBe("0%");
     expect(percent(null)).toBe("–");
     expect(sparklinePath([1])).toBe("");
     expect(sparklinePath([0, 10])).toBe("M0.0,16.0 L60.0,0.0");
@@ -149,7 +154,48 @@ describe("저장 본문(API-DSC-02·04)", () => {
     const steps = [{ name: "SUBSCRIBE", status: "OK" }];
     expect(testOutcome({ steps, preview: [] })).toBe("partial");
     expect(testOutcome({ steps, preview: [{ at: "", topic: "t", size: 1, rawExcerpt: "" }] })).toBe("success");
+    // 단계 실패: 문서·ingress 표기 FAILED, core 정규화 표기 FAIL 둘 다
+    expect(testOutcome({ steps: [{ name: "AUTH", status: "FAILED" }], preview: [] })).toBe("failed");
     expect(testOutcome({ steps: [{ name: "AUTH", status: "FAIL" }], preview: [] })).toBe("failed");
+    expect(testOutcome({ ok: false, steps: [], preview: [] })).toBe("failed");
+    expect([isFailedStep("FAILED"), isFailedStep("FAIL"), isFailedStep("OK"), isFailedStep(null)]).toEqual([true, true, false, false]);
+    expect([clampTestTimeout(undefined), clampTestTimeout(1), clampTestTimeout(99), clampTestTimeout(20.4), clampTestTimeout(Number.NaN)]).toEqual([15, 5, 30, 20, 15]);
+  });
+});
+
+describe("core-api M2 계약 맞춤(SourceConfigValidator, SourceDtos)", () => {
+  it("client-id base는 소문자·숫자·하이픈, 공유 구독 접두사 토픽은 거부, 토픽 한도는 조직 값(API-DSC-71)", () => {
+    const base = { ...emptyForm("MQTT_SUBSCRIBE", "mqtt"), code: "lab", name: "실습실", url: "wss://h/mqtt", topics: [{ topic: "a/#", qos: 1 }] };
+    expect(validateForm({ ...base, clientIdBase: "Data2flow_X" }).clientIdBase).toBe("clientId");
+    expect(validateForm({ ...base, clientIdBase: "data2flow-lab" }).clientIdBase).toBeUndefined();
+    expect(checkTopic("$share/g/a/b")).toBe(false);
+    const three = { ...base, topics: [{ topic: "a", qos: 1 }, { topic: "b", qos: 1 }, { topic: "c", qos: 1 }] };
+    expect(validateForm(three, { maxTopics: 2 }).topics).toBe("topicLimit");
+    expect(validateForm(three, { maxTopics: 3 }).topics).toBeUndefined();
+  });
+
+  it("TLS 검증 끄기는 개발 소스만(BR-DSC-29), isDev·headerScheme을 본문에, MTLS는 단일 비밀값을 보내지 않는다", () => {
+    const base = { ...emptyForm("MQTT_SUBSCRIBE", "mqtt"), code: "lab", name: "실습실", url: "wss://h/mqtt", topics: [{ topic: "a", qos: 1 }] };
+    expect(validateForm({ ...base, tlsInsecure: true }).tlsInsecure).toBe("tlsDevOnly");
+    expect(validateForm({ ...base, tlsInsecure: true, isDev: true }).tlsInsecure).toBeUndefined();
+    const header = updateBody({ ...base, auth: "HEADER", headerScheme: "Basic", secretValue: "abc", isDev: true });
+    expect(header.isDev).toBe(true);
+    expect((header.connection as Record<string, unknown>).headerScheme).toBe("Basic");
+    expect(header.secret).toEqual({ kind: "HEADER", value: "abc" });
+    expect(updateBody({ ...base, auth: "MTLS", secretValue: "pem" }).secret).toBeUndefined();
+    expect(validateForm({ ...base, auth: "MTLS" }).secretValue).toBeUndefined();
+    const restored = formFromSource({ id: "1", code: "x", name: "x", type: "MQTT_SUBSCRIBE", lifecycle: "DRAFT", version: 1, isDev: true, connection: { url: "wss://h", auth: "HEADER", headerScheme: "Basic" } });
+    expect([restored.isDev, restored.headerScheme]).toEqual([true, "Basic"]);
+  });
+
+  it("대표 상태: core state 우선, 없으면 보고가 끊긴(stale) 인스턴스를 빼고 가장 나쁜 상태, ACTIVE가 아니면 DISABLED", () => {
+    const runtime = [
+      { instanceId: "a", state: "CONNECTED" },
+      { instanceId: "b", state: "ERROR", stale: true },
+    ];
+    expect(representativeState({ lifecycle: "ACTIVE", state: "CONNECTING" }, runtime)).toBe("CONNECTING");
+    expect(representativeState({ lifecycle: "ACTIVE" }, runtime)).toBe("CONNECTED");
+    expect(representativeState({ lifecycle: "PAUSED", state: "CONNECTED" }, runtime)).toBe("DISABLED");
   });
 });
 
@@ -188,15 +234,35 @@ describe("ING-02.03 generic-json 매핑(TC-ING-039·040, TC-DSC-045)", () => {
 
   it("설정 문자열 ↔ 매핑", () => {
     expect(mappingFromConfig("{bad").deviceIdFrom).toBe("topic[1]");
-    expect(mappingFromConfig('{"metrics":[{"path":"$.a"}]}')).toEqual({ deviceIdFrom: "", timePath: "", metrics: [{ path: "$.a", key: "" }] });
+    expect(mappingFromConfig('{"metrics":[{"path":"$.a"}]}')).toEqual({ deviceIdFrom: "", timePath: "", timeFormat: "AUTO", metrics: [{ path: "$.a", key: "", unit: "" }] });
     expect(JSON.parse(mappingToConfig({ deviceIdFrom: " topic[1] ", timePath: " ", metrics: [{ path: "$.a ", key: " k" }] }))).toEqual({ deviceIdFrom: "topic[1]", metrics: [{ path: "$.a", key: "k" }] });
+    // 문서 형식(spec/detail/DSC/domain-model §2.1): timeFormat·unit 포함
+    const full = { deviceIdFrom: "$.dev", timePath: "$.ts", timeFormat: "EPOCH_S", metrics: [{ path: "$.temp", key: "temperature", unit: "°C" }] };
+    expect(mappingFromConfig(JSON.stringify(full))).toEqual(full);
+    expect(JSON.parse(mappingToConfig(full as never))).toEqual(full);
+    expect(JSON.parse(mappingToConfig({ ...full, timeFormat: "AUTO" } as never)).timeFormat).toBeUndefined();
+    expect(mappingFromConfig('{"timeFormat":"WEIRD","metrics":[]}').timeFormat).toBe("AUTO");
+  });
+
+  it("시각 형식 해석과 단위·개수 검증", () => {
+    expect(toIso(1759449600, "EPOCH_S")).toBe("2025-10-03T00:00:00.000Z");
+    expect(toIso("1759449600000", "EPOCH_MS")).toBe("2025-10-03T00:00:00.000Z");
+    expect(toIso("2026-10-03T00:00:00Z", "ISO8601")).toBe("2026-10-03T00:00:00.000Z");
+    expect(toIso(123, "ISO8601")).toBeNull();
+    expect(toIso("abc", "EPOCH_S")).toBeNull();
+    expect(toIso("abc", "EPOCH_MS")).toBeNull();
+    expect(toIso({}, "AUTO")).toBeNull();
+    expect(previewMapping({ deviceIdFrom: "topic[1]", timePath: "$.ts", timeFormat: "EPOCH_S", metrics: [] }, "d/e", '{"ts":1759449600}').measuredAt).toBe("2025-10-03T00:00:00.000Z");
+    const many = Array.from({ length: 201 }, (_, i) => ({ path: `$.m${i}`, key: `m${i}` }));
+    expect(validateMapping({ deviceIdFrom: "topic[1]", metrics: many }).some((p) => p.code === "tooMany")).toBe(true);
+    expect(validateMapping({ deviceIdFrom: "topic[1]", metrics: [{ path: "$.a", key: "a", unit: "x".repeat(17) }] })).toEqual([{ field: "metrics.0.unit", code: "unit", value: "x".repeat(17) }]);
   });
 });
 
 describe("DSC-09.01 커넥터 카탈로그", () => {
   it("응답 모양 정리, 기본 유형 보장, 분류·검색, 유실 가능", () => {
     expect(normalizeCatalog(null).connectors.map((c) => c.connectorKey)).toEqual(["mqtt", "platform-broker", "simulation"]);
-    const fromArray = normalizeCatalog([{ connectorKey: "kafka", name: "Kafka", category: "QUEUE", transports: ["tcp"], authMethods: [], enabled: true, ackMode: "BEFORE_STORE" }]);
+    const fromArray = normalizeCatalog([{ connectorKey: "kafka", name: "Kafka", category: "QUEUE", transports: ["tcp"], authMethods: [], enabled: true, ackMode: "AUTO" }]);
     expect(fromArray.connectors).toHaveLength(4);
     const fromObject = normalizeCatalog({ connectors: [{ ...BASIC_CONNECTORS[0], name: "MQTT (서버)" }], templates: [{ key: "t", name: "T", connectorKey: "mqtt" }] });
     expect(fromObject.connectors.find((c) => c.connectorKey === "mqtt")?.name).toBe("MQTT (서버)");
@@ -206,8 +272,12 @@ describe("DSC-09.01 커넥터 카탈로그", () => {
     expect(filterConnectors(all, "QUEUE", "").map((c) => c.connectorKey)).toEqual(["kafka"]);
     expect(filterConnectors(all, "ALL", "mqtt").map((c) => c.connectorKey)).toEqual(["mqtt", "platform-broker"]);
     expect(filterConnectors(all, "ALL", "nothing")).toEqual([]);
-    expect(isLossy({ ackMode: "BEFORE_STORE" })).toBe(true);
-    expect(isLossy({ ackMode: "AFTER_STORE" })).toBe(false);
+    // contracts AckMode: AUTO·NONE은 유실 가능, AFTER_WRITE·CURSOR는 무손실. core가 준 lossPossible이 우선
+    expect(isLossy({ ackMode: "AUTO" })).toBe(true);
+    expect(isLossy({ ackMode: "NONE" })).toBe(true);
+    expect(isLossy({ ackMode: "AFTER_WRITE" })).toBe(false);
+    expect(isLossy({ ackMode: "CURSOR" })).toBe(false);
+    expect(isLossy({ ackMode: "AFTER_WRITE", lossPossible: true })).toBe(true);
     expect(isLossy({})).toBe(false);
   });
 });
