@@ -42,7 +42,7 @@ function ResultLine({ result, intent }: { result?: FormResult; intent: string })
   return null;
 }
 
-const USAGES = ["CLASSROOM", "OFFICE", "MEETING", "LAB", "HALLWAY", "OTHER"];
+const USAGES = ["CLASSROOM", "OFFICE", "MEETING", "LAB", "CORRIDOR", "OTHER"];
 
 export function PropsForm({ space, canEdit, result }: { space: SpaceDetail; canEdit: boolean; result?: FormResult }) {
   const { t } = useTranslation();
@@ -94,7 +94,7 @@ export interface TargetsData {
   inheritedFromSpaceId?: string | null;
   inheritedFromSpaceName?: string | null;
   items?: { metricKey: string; min?: number | null; max?: number | null }[];
-  effective?: { metricKey: string; min?: number | null; max?: number | null; inheritedFromSpaceId?: string | null; inheritedFromSpaceName?: string | null }[];
+  effective?: { metricKey: string; min?: number | null; max?: number | null; inherited?: boolean; inheritedFromSpaceId?: string | null; inheritedFromSpaceName?: string | null }[];
 }
 
 const asText = (v: number | null | undefined) => (v === null || v === undefined ? "" : String(v));
@@ -106,7 +106,8 @@ export function TargetsEditor({ data, metrics, canEdit, result }: { data: Target
   const { items, errors } = checkTargets(rows);
   const hasErrors = !inherit && Object.keys(errors).length > 0;
   const update = (index: number, patch: Partial<TargetRow>) => setRows((current) => current.map((r, i) => (i === index ? { ...r, ...patch } : r)));
-  const inherited = (data.effective ?? []).filter((e) => e.inheritedFromSpaceId);
+  // API-DEV-140: inherited=true면 상위에서 물려받은 값(예전 응답은 inheritedFromSpaceId만 있었다)
+  const inherited = (data.effective ?? []).filter((e) => e.inherited ?? Boolean(e.inheritedFromSpaceId));
   return (
     <Card title={t("spaces.tab.targets")}>
       <Form method="post" className="flex flex-col gap-3">

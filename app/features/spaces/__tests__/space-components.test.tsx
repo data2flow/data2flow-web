@@ -91,7 +91,7 @@ describe("UI-DEV-02 관리 탭", () => {
   });
 
   it("TC-DEV-025 목표 환경: 최소>최대 문구와 저장 막힘, 상속 행 회색과 출처, 상속 켜면 직접 행 숨김", async () => {
-    const data = { inherit: false, items: [{ metricKey: "co2", max: 1000 }], effective: [{ metricKey: "temperature", min: 20, max: 26, inheritedFromSpaceId: "1", inheritedFromSpaceName: "광주캠퍼스" }] };
+    const data = { inherit: false, items: [{ metricKey: "co2", max: 1000 }], effective: [{ metricKey: "temperature", min: 20, max: 26, inherited: true, inheritedFromSpaceId: "1", inheritedFromSpaceName: "광주캠퍼스" }, { metricKey: "co2", min: null, max: 1000, inherited: false, inheritedFromSpaceId: null, inheritedFromSpaceName: null }] };
     await renderRoute(<TargetsEditor data={data} metrics={[{ key: "co2", displayName: "CO2" }, { key: "temperature" }]} canEdit />);
     expect(await screen.findByText("상속: 광주캠퍼스")).toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: "항목 추가" }));

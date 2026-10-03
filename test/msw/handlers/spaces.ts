@@ -8,7 +8,7 @@ import { fail, list, noContent, ok, type CoreHandler, type CoreState, type FakeS
 interface SpaceExtra {
   targets: Record<string, { inherit: boolean; items: { metricKey: string; min?: number; max?: number }[] }>;
   schedules: Record<string, { inherit: boolean; slots: { dayOfWeek: number; start: string; end: string }[] }>;
-  floorplans: Record<string, { imageUrl: string; width: number; height: number; markers: { deviceId: string; x: number; y: number }[] }>;
+  floorplans: Record<string, { width: number; height: number; version: number; markers: { deviceId: string; x: number; y: number }[] }>;
   modes: Record<string, { mode: string | null; until: string | null }>;
 }
 
@@ -26,8 +26,34 @@ export function spaceExtra(core: CoreState): SpaceExtra {
 
 const depthOf = (core: CoreState, id: string | null): number => (id ? 1 + depthOf(core, core.spaces.find((s) => s.id === id)?.parentId ?? null) : 0);
 
+/** API-DEV-02·03 SpaceResponse: path는 조상 ID를 /로 이은 문자열(`/1/2/3`) */
 function spaceBody(core: CoreState, s: FakeSpace) {
-  return { ...s, path: core.spacePath(s.id).map((p) => p.name), depth: depthOf(core, s.id), kmaNx: s.type === "SITE" ? 59 : null, kmaNy: s.type === "SITE" ? 74 : null, status: "ACTIVE", updatedAt: "2026-10-03T00:00:00Z" };
+  return { ...s, path: `/${core.spacePath(s.id).map((p) => p.id).join("/")}`, depth: depthOf(core, s.id), kmaNx: s.type === "SITE" ? 59 : null, kmaNy: s.type === "SITE" ? 74 : null, status: "ACTIVE", updatedAt: "2026-10-03T00:00:00Z" };
+}
+
+/** API-DEV-139 SpaceDetailResponse: SpaceResponse + ancestors·effectiveTimezone·개수·평면도 여부 */
+function spaceDetail(core: CoreState, s: FakeSpace, hasFloorplan: boolean) {
+  const ancestors = core.spacePath(s.parentId).map((p) => ({ id: p.id, name: p.name, type: core.spaces.find((x) => x.id === p.id)?.type ?? "" }));
+  const site = core.spaces.find((x) => x.id === core.spacePath(s.id)[0]?.id);
+  return { ...spaceBody(core, s), ancestors, effectiveTimezone: s.timezone ?? site?.timezone ?? "Asia/Seoul", childCount: core.spaces.filter((x) => x.parentId === s.id).length, deviceCount: core.devices.filter((d) => d.spaceId === s.id && d.status !== "PENDING").length, hasFloorplan, targets: null, schedule: null, mode: null };
+}
+
+/** API-DEV-09·DSH-03 FloorplanResponse. imageUrl은 세션으로 읽는 API 경로(API-DEV-142) */
+function floorplanBody(core: CoreState, spaceId: string, plan: { width: number; height: number; version: number; markers: { deviceId: string; x: number; y: number }[] }) {
+  return {
+    spaceId,
+    imageUrl: `/api/v1/core/spaces/${spaceId}/floorplan/image?v=${plan.version}`,
+    widthPx: plan.width,
+    heightPx: plan.height,
+    width: plan.width,
+    height: plan.height,
+    scaleMPerPx: null,
+    contentType: "image/png",
+    version: plan.version,
+    updatedAt: "2026-10-03T00:00:00Z",
+    markersNeedReview: false,
+    markers: plan.markers.map((m) => ({ ...m, deviceName: core.devices.find((d) => d.id === m.deviceId)?.name ?? null, rotation: 0 })),
+  };
 }
 
 /** 가장 가까운 직접 지정 값을 찾는다(BR-DEV-04) */
@@ -87,7 +113,7 @@ export const spacesHandler: CoreHandler = (core, { method, path, url, body, can 
   const space = core.spaces.find((s) => s.id === match[1]);
   if (!space) return fail(404, "SPACE_NOT_FOUND");
   const sub = match[2] ?? "";
-  if (sub === "" && method === "GET") return ok(spaceBody(core, space));
+  if (sub === "" && method === "GET") return ok(spaceDetail(core, space, Boolean(extra.floorplans[space.id])));
   if (sub === "" && method === "PATCH") {
     if (!can("DEV_ADMIN")) return writeDenied();
     const patch = body as Partial<FakeSpace> & { baseVersion?: number };
@@ -122,9 +148,10 @@ export const spacesHandler: CoreHandler = (core, { method, path, url, body, can 
     return ok({
       space: { id: space.id, name: space.name, type: space.type, path: core.spacePath(space.id), targetEnv: effectiveTargets(core, space.id).items },
       comfort: comfortOf(core, space.id),
-      devices: devices.map((d) => ({ id: d.id, name: d.name, modelId: d.modelId, modelName: core.model(d.modelId)?.name ?? null, status: d.status, connection: d.connectivity, lastSeenAt: d.lastSeenAt, battery: d.battery ?? null, rssi: d.rssi ?? null, metrics: d.latest.map((l) => ({ key: l.metricKey, value: l.value, unit: l.unit, quality: l.quality, at: l.measuredAt })) })),
+      devices: devices.map((d) => ({ id: d.id, name: d.name, modelId: d.modelId, modelName: core.model(d.modelId)?.name ?? null, status: d.status, connection: d.connectivity, lastSeenAt: d.lastSeenAt, battery: d.battery ?? null, rssi: d.rssi ?? null, virtual: d.virtual, metrics: d.latest.map((l) => ({ key: l.metricKey, value: l.value, unit: l.unit, quality: l.quality, at: l.measuredAt })) })),
       openAlarms: [],
       hasFloorplan: Boolean(extra.floorplans[space.id]),
+      children: core.spaces.filter((c) => c.parentId === space.id).map((c) => ({ id: c.id, name: c.name, type: c.type, comfortState: comfortOf(core, c.id).state })),
     });
   }
   if (sub === "/devices" && method === "GET") {
@@ -137,7 +164,7 @@ export const spacesHandler: CoreHandler = (core, { method, path, url, body, can 
       const effective = effectiveTargets(core, space.id);
       const inherit = !own || own.inherit;
       const from = effective.from && effective.from.id !== space.id ? effective.from : undefined;
-      return ok({ inherit, items: own?.items ?? [], inheritedFromSpaceId: from?.id ?? null, effective: effective.items.map((i) => ({ ...i, inheritedFromSpaceId: from?.id ?? null, inheritedFromSpaceName: from?.name ?? null })) });
+      return ok(targetsBody(inherit, own?.items ?? [], effective.items, from));
     }
     if (method === "PUT") {
       if (!can("DEV_ADMIN")) return writeDenied();
@@ -145,13 +172,15 @@ export const spacesHandler: CoreHandler = (core, { method, path, url, body, can 
       if (input.items.some((i) => !core.metrics.some((m) => m.key === i.metricKey))) return fail(400, "METRIC_NOT_FOUND");
       if (input.items.some((i) => i.min !== undefined && i.max !== undefined && i.min > i.max)) return fail(400, "INVALID_REQUEST");
       extra.targets[space.id] = { inherit: input.inherit, items: input.items };
-      return ok({ effective: effectiveTargets(core, space.id).items });
+      const effective = effectiveTargets(core, space.id);
+      const from = effective.from && effective.from.id !== space.id ? effective.from : undefined;
+      return ok(targetsBody(input.inherit, input.items, effective.items, from));
     }
   }
   if (sub === "/schedule") {
     if (method === "GET") {
       const own = extra.schedules[space.id];
-      if (own && !own.inherit) return ok({ inherit: false, inheritedFromSpaceId: null, slots: own.slots });
+      if (own && !own.inherit) return ok({ inherit: false, inheritedFromSpaceId: null, inheritedFromSpaceName: null, slots: own.slots });
       let parent = core.spaces.find((s) => s.id === space.parentId);
       while (parent && (!extra.schedules[parent.id] || extra.schedules[parent.id].inherit)) {
         const pid: string | null = parent.parentId;
@@ -165,39 +194,30 @@ export const spacesHandler: CoreHandler = (core, { method, path, url, body, can 
       const overlap = input.slots.some((a, i) => input.slots.some((b, j) => i !== j && a.dayOfWeek === b.dayOfWeek && a.start < b.end && b.start < a.end));
       if (overlap) return fail(400, "SCHEDULE_OVERLAP");
       extra.schedules[space.id] = input;
-      return ok({ inherit: input.inherit, inheritedFromSpaceId: null, slots: input.slots });
+      return ok({ inherit: input.inherit, inheritedFromSpaceId: null, inheritedFromSpaceName: null, slots: input.slots });
     }
   }
   if (sub === "/mode" && method === "GET") {
     const override = extra.modes[space.id];
     return ok(override?.mode ? { mode: override.mode, source: "OVERRIDE", until: override.until, nextChangeAt: override.until } : { mode: "OCCUPIED", source: "SCHEDULE", until: null, nextChangeAt: "2026-10-04T09:00:00Z" });
   }
-  if (sub === "/override-mode" && method === "POST") {
-    if (!can("DEV_PLACE")) return writeDenied();
-    const input = body as { mode: string | null; until: string | null };
-    extra.modes[space.id] = input;
-    return ok({ mode: input.mode ?? "OCCUPIED", source: input.mode ? "OVERRIDE" : "SCHEDULE", until: input.until, nextChangeAt: input.until });
-  }
   if (sub === "/floorplan") {
     if (method === "GET") {
       const plan = extra.floorplans[space.id];
       if (!plan) return fail(404, "RESOURCE_NOT_FOUND");
-      return ok({
-        imageUrl: plan.imageUrl,
-        width: plan.width,
-        height: plan.height,
-        markers: plan.markers.map((m) => {
-          const d = core.devices.find((x) => x.id === m.deviceId);
-          return { ...m, deviceName: d?.name, metrics: (d?.latest ?? []).slice(0, 1).map((l) => ({ key: l.metricKey, value: l.value, unit: l.unit })), state: d?.connectivity };
-        }),
-      });
+      return ok(floorplanBody(core, space.id, plan));
     }
     if (method === "PUT") {
       if (!can("DEV_ADMIN")) return writeDenied();
-      extra.floorplans[space.id] = { imageUrl: `https://objects.test/floorplans/${space.id}.png?sig=x`, width: 1200, height: 800, markers: extra.floorplans[space.id]?.markers ?? [] };
+      extra.floorplans[space.id] = { width: 1200, height: 800, version: (extra.floorplans[space.id]?.version ?? 0) + 1, markers: extra.floorplans[space.id]?.markers ?? [] };
       core.extra.lastFloorplanUpload = true;
-      return ok({ imageUrl: extra.floorplans[space.id].imageUrl, widthPx: 1200, heightPx: 800 });
+      return ok(floorplanBody(core, space.id, extra.floorplans[space.id]));
     }
+  }
+  if (sub === "/floorplan/image" && method === "GET") {
+    if (!extra.floorplans[space.id]) return fail(404, "RESOURCE_NOT_FOUND");
+    // 1×1 PNG(API-DEV-142 이미지 바이트)
+    return new Response(Uint8Array.from(atob("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="), (c) => c.charCodeAt(0)), { headers: { "Content-Type": "image/png", "Cache-Control": "private, max-age=600" } });
   }
   if (sub === "/floorplan/markers" && method === "PUT") {
     if (!can("DEV_ADMIN")) return writeDenied();
@@ -210,6 +230,21 @@ export const spacesHandler: CoreHandler = (core, { method, path, url, body, can 
   }
   return undefined;
 };
+
+/** API-DEV-140 TargetsResponse: 직접 정한 items + 상속을 반영한 effective(inherited 표시) */
+function targetsBody(inherit: boolean, items: { metricKey: string; min?: number; max?: number }[], effective: { metricKey: string; min?: number | null; max?: number | null }[], from?: { id: string; name: string }) {
+  const own = new Set(inherit ? [] : items.map((i) => i.metricKey));
+  return {
+    inherit,
+    inheritedFromSpaceId: from?.id ?? null,
+    inheritedFromSpaceName: from?.name ?? null,
+    items,
+    effective: effective.map((e) => {
+      const inherited = !own.has(e.metricKey) && Boolean(from);
+      return { metricKey: e.metricKey, min: e.min ?? null, max: e.max ?? null, inherited, inheritedFromSpaceId: inherited ? (from?.id ?? null) : null, inheritedFromSpaceName: inherited ? (from?.name ?? null) : null };
+    }),
+  };
+}
 
 function HttpJson(status: number, code: string, response: unknown) {
   return new Response(JSON.stringify({ header: { isSuccessful: false, resultCode: code, resultMessage: `msg:${code}` }, response }), { status, headers: { "Content-Type": "application/json" } });

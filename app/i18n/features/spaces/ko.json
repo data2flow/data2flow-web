@@ -57,7 +57,7 @@
       "OFFICE": "사무실",
       "MEETING": "회의실",
       "LAB": "실습실",
-      "HALLWAY": "복도",
+      "CORRIDOR": "복도",
       "OTHER": "기타"
     },
     "tab": {

@@ -118,3 +118,12 @@ export function parseJsonArray<T>(raw: string): T[] {
     return [];
   }
 }
+
+/**
+ * 평면도 이미지 주소(API-DEV-142). core는 서명 URL 대신 세션으로 읽는 API 경로(`/api/v1/core/spaces/{id}/floorplan/image?v=`)를 준다.
+ * 브라우저는 토큰이 없으므로 같은 경로를 BFF 중계(`/bff/api/core/…`)로 바꿔 읽는다. 이미 다른 주소면 그대로 둔다
+ */
+export function browserImageUrl(url: string | null | undefined): string | null {
+  if (!url) return null;
+  return url.replace(/^(https?:\/\/[^/]+)?\/api\/v1\/core\//, "/bff/api/core/");
+}

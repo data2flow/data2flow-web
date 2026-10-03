@@ -57,7 +57,7 @@
       "OFFICE": "Office",
       "MEETING": "Meeting room",
       "LAB": "Lab",
-      "HALLWAY": "Hallway",
+      "CORRIDOR": "Corridor",
       "OTHER": "Other"
     },
     "tab": {

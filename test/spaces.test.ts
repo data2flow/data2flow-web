@@ -187,14 +187,14 @@ describe("DEV-01.02·01.04·11.01 관리 탭(UI-DEV-02)", () => {
     const overlap = await browser.post("/spaces/31?tab=schedule", { intent: "schedule", slots: JSON.stringify([...slots, { dayOfWeek: 1, start: "11:00", end: "13:00" }]) });
     expect(overlap.response.status).toBe(400);
     expect(overlap.body).toContain("같은 요일의 시간 구간이 겹칩니다");
+    // 운영 모드 수동 지정(override-mode)은 core M2에 없어 조회만(OPERATOR에게도 폼 없음, 서버로 보내지 않음)
     const op = await operator();
-    await op.get("/spaces/31?tab=schedule");
-    const until = new Date(Date.now() + 3600_000).toISOString();
-    const override = await op.post("/spaces/31?tab=schedule", { intent: "override", mode: "MAINTENANCE", until });
-    expect(override.response.status).toBe(200);
-    expect(sent("POST", "/api/v1/core/spaces/31/override-mode")[0].body).toEqual({ mode: "MAINTENANCE", until });
-    const tooLate = await op.post("/spaces/31?tab=schedule", { intent: "override", mode: "HOLIDAY", until: new Date(Date.now() + 8 * 86400_000).toISOString() });
-    expect(tooLate.response.status).toBe(400);
+    const opPage = await op.get("/spaces/31?tab=schedule");
+    expect(opPage.body).toContain("운영 중");
+    expect(opPage.body).not.toContain("수동 지정 해제");
+    const override = await op.post("/spaces/31?tab=schedule", { intent: "override", mode: "MAINTENANCE", until: new Date(Date.now() + 3600_000).toISOString() });
+    expect(override.response.status).toBe(400);
+    expect(sent("POST", "/api/v1/core/spaces/31/override-mode")).toHaveLength(0);
     const v = await (await viewer()).get("/spaces/31?tab=schedule");
     expect(v.body).not.toContain("수동 지정 해제");
   });
@@ -224,7 +224,11 @@ describe("DEV-01.03 평면도(UI-DEV-03)", () => {
     expect(markers.response.status).toBe(200);
     expect(sent("PUT", "/api/v1/core/spaces/31/floorplan/markers")[0].body).toEqual({ markers: [{ deviceId: "1042", x: 0.25, y: 0.5 }] });
     const view = await (await viewer()).get("/spaces/31?tab=floorplan");
-    expect(view.body).toContain("objects.test/floorplans/31.png");
+    // API-DEV-142: imageUrl(API 경로)은 브라우저가 BFF 중계로 읽는다
+    expect(view.body).toContain('src="/bff/api/core/spaces/31/floorplan/image?v=1"');
+    const image = await (await viewer()).get("/bff/api/core/spaces/31/floorplan/image?v=1");
+    expect(image.response.status).toBe(200);
+    expect(image.response.headers.get("Content-Type")).toBe("image/png");
     expect(view.body).toContain("AM107-067999");
     expect(view.body).not.toContain("편집 모드");
   });

@@ -14,7 +14,7 @@ import { ModeCard, PropsForm, ScheduleEditor, TargetsEditor, type FormResult, ty
 import { ChildSpaces, ComfortBadge, ComfortCauses, DeviceCards } from "~/features/spaces/components/space-overview";
 import { SpaceTree, type TreeActionResult } from "~/features/spaces/components/space-tree";
 import type { OverviewDevice } from "~/features/spaces/model/live-devices";
-import { checkFloorplanFile, checkOverrideUntil, checkSlots, checkTargets, parseJsonArray, type Slot, type TargetRow } from "~/features/spaces/model/space-forms";
+import { checkFloorplanFile, checkSlots, checkTargets, parseJsonArray, type Slot, type TargetRow } from "~/features/spaces/model/space-forms";
 import { formatRelative } from "~/lib/format";
 import { hasAny } from "~/lib/permissions";
 import { checkSpaceInput, findSpace } from "~/lib/spaces";
@@ -156,13 +156,6 @@ export async function action({ request, context, params }: Route.ActionArgs) {
       const result = await callApi(ctx, request, `${base}/schedule`, { method: "PUT", body: { inherit, slots } });
       return result.ok ? ({ intent, ok: true } as FormResult) : fail(intent, result);
     }
-    case "override": {
-      const mode = field(form, "mode") || null;
-      const until = field(form, "until") || null;
-      if (checkOverrideUntil(until, Date.now())) return data({ intent, error: { code: "INVALID_REQUEST" } } as FormResult, { status: 400 });
-      const result = await callApi(ctx, request, `${base}/override-mode`, { method: "POST", body: { mode, until } });
-      return result.ok ? ({ intent, ok: true } as FormResult) : fail(intent, result);
-    }
     case "floorplan": {
       const file = form.get("file");
       if (!(file instanceof File) || !checkFloorplanFile({ type: file.type, size: file.size })) return data({ intent, error: { code: "FLOORPLAN_IMAGE_INVALID" } } as FormResult, { status: 400 });
@@ -197,7 +190,6 @@ export default function SpaceDetailPage() {
   const timezone = root?.timezone ?? "Asia/Seoul";
   const lang = i18n.language;
   const canEdit = hasAny(me?.permissions, ["DEV_ADMIN"]);
-  const canPlace = hasAny(me?.permissions, ["DEV_PLACE"]);
   const { space, tree, tab, overview } = loaded;
   const flat = findSpace(tree, space.id);
   const children = (flat?.node.children ?? []).map((c) => ({ id: String(c.id), name: c.name, type: c.type }));
@@ -245,7 +237,8 @@ export default function SpaceDetailPage() {
         {tab === "schedule" && loaded.schedule && (
           <div className="grid gap-4 lg:grid-cols-[1fr_280px]">
             <ScheduleEditor data={loaded.schedule} canEdit={canEdit} result={result} />
-            <ModeCard data={loaded.mode} canOverride={canPlace} timezone={timezone} lang={lang} now={loaded.now} result={result} />
+            {/* 운영 모드 수동 지정(API-DEV-08 POST …/override-mode)은 core M2에 아직 없어 조회만 보인다(DEV-11.02는 M3) */}
+            <ModeCard data={loaded.mode} canOverride={false} timezone={timezone} lang={lang} now={loaded.now} result={result} />
           </div>
         )}
         {tab === "floorplan" && <FloorplanPanel view={loaded.floorplan} devices={loaded.spaceDevices} canEdit={canEdit} result={result} />}

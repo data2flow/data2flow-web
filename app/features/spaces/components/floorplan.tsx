@@ -7,7 +7,7 @@ import { useRef, useState, type MouseEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { Form } from "react-router";
 import { Button, Card, CsrfField, EmptyState, cx } from "~/components/ui";
-import { checkFloorplanFile, ratioFromClick } from "../model/space-forms";
+import { checkFloorplanFile, ratioFromClick, browserImageUrl } from "../model/space-forms";
 import type { FormResult } from "./space-manage";
 
 export interface FloorplanMarker {
@@ -109,7 +109,7 @@ export function FloorplanPanel({ view, devices, canEdit, result }: { view: Floor
           </aside>
         )}
         <div ref={image} role="presentation" onClick={place} data-testid="floorplan-image" className={cx("relative flex-1 overflow-hidden rounded border border-line", editing && picked && "cursor-crosshair")}>
-          <img src={view.imageUrl} alt={t("spaces.floorplan.alt")} className="block w-full" />
+          <img src={browserImageUrl(view.imageUrl) ?? undefined} alt={t("spaces.floorplan.alt")} className="block w-full" />
           {markers.map((m) => (
             <span key={m.deviceId} className="absolute -translate-x-1/2 -translate-y-1/2 rounded bg-panel/90 px-1.5 py-0.5 text-[11.5px] shadow" style={{ left: `${m.x * 100}%`, top: `${m.y * 100}%` }}>
               {m.deviceName ?? m.deviceId}

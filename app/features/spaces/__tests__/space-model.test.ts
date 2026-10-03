@@ -3,7 +3,7 @@
  */
 import { describe, expect, it } from "vitest";
 import { applyDeviceUpdate } from "../model/live-devices";
-import { checkFloorplanFile, checkOverrideUntil, checkSlots, checkTargets, parseJsonArray, ratioFromClick, sortSlots } from "../model/space-forms";
+import { checkFloorplanFile, checkOverrideUntil, checkSlots, checkTargets, parseJsonArray, ratioFromClick, sortSlots, browserImageUrl } from "../model/space-forms";
 
 describe("DEV-01.04 TC-DEV-025 목표 환경 검증", () => {
   it("최소 ≤ 최대, 하나 이상, 숫자, 항목 필수·중복 금지", () => {
@@ -72,5 +72,14 @@ describe("UI-DSH-02 실시간 기기 카드 갱신(device-update)", () => {
     expect(next[0].lastSeenAt).toBe("2026-10-04T00:00:05Z");
     expect(applyDeviceUpdate(devices, { deviceId: "9" })).toBe(devices);
     expect(applyDeviceUpdate([{ id: "1", name: "x" }], { deviceId: "1", state: "INACTIVE" })[0]).toMatchObject({ status: "INACTIVE", metrics: [], lastSeenAt: null });
+  });
+});
+
+describe("DEV-01.03 평면도 이미지 주소(API-DEV-142)", () => {
+  it("core API 경로는 BFF 중계 경로로, 다른 주소·빈 값은 그대로", () => {
+    expect(browserImageUrl("/api/v1/core/spaces/31/floorplan/image?v=3")).toBe("/bff/api/core/spaces/31/floorplan/image?v=3");
+    expect(browserImageUrl("http://data2flow-api-gateway/api/v1/core/spaces/31/floorplan/image")).toBe("/bff/api/core/spaces/31/floorplan/image");
+    expect(browserImageUrl("data:image/png;base64,AAA")).toBe("data:image/png;base64,AAA");
+    expect(browserImageUrl(null)).toBeNull();
   });
 });
