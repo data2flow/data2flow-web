@@ -5,7 +5,7 @@ import { errorText, policyErrorText } from "../error-text";
 import { buildServiceBody } from "../external-services";
 import { COMMON_TIMEZONES, formatDateTime, isValidTimezone, resolveTimezone, zonedDate, zonedDayStartUtc } from "../format";
 import { safeNextPath } from "../next-path";
-import { MENU, hasAny, requiredPermissionsFor, visibleMenu } from "../permissions";
+import { MENU, isMenuActive, hasAny, requiredPermissionsFor, visibleMenu } from "../permissions";
 import { isPublicPath } from "../public-paths";
 import { parseRole, parseScope, roleValue } from "../roles";
 import { announceLogout, onLogout } from "../session-broadcast";
@@ -86,13 +86,25 @@ describe("format AT-IAM-08.1 시간대 표시", () => {
 
 describe("permissions IAM-04.05 메뉴 숨김", () => {
   it("권한별 메뉴, 비밀번호 변경 필요 시 메뉴 없음, 경로별 필요 권한", () => {
-    expect(visibleMenu(["DEV_READ"]).map((m) => m.key)).toEqual(["home"]);
-    expect(visibleMenu(["IAM_MANAGE", "AUDIT_READ", "OPS_MANAGE"])).toHaveLength(MENU.length);
+    expect(visibleMenu(["DEV_READ"]).map((m) => m.key)).toEqual(["home", "spaces", "devices"]);
+    expect(visibleMenu(["IAM_MANAGE", "AUDIT_READ", "OPS_MANAGE"]).map((m) => m.key)).toEqual(["home", "members", "roles", "security", "audit", "settings"]);
+    expect(visibleMenu(["IAM_MANAGE", "AUDIT_READ", "OPS_MANAGE", "DEV_READ", "TS_READ", "INGEST_READ"])).toHaveLength(MENU.length);
     expect(visibleMenu(["IAM_MANAGE"], true)).toEqual([]);
     expect(visibleMenu(undefined).map((m) => m.key)).toEqual(["home"]);
     expect(requiredPermissionsFor("/admin/members/7")).toEqual(["IAM_MANAGE"]);
     expect(requiredPermissionsFor("/admin/audit")).toEqual(["AUDIT_READ"]);
     expect(requiredPermissionsFor("/me")).toEqual([]);
+    // M2 경로: 가장 긴 접두사(TC-DSC-008 새 소스는 INTEGRATOR 이상, UI-DEV-07 기기 추가는 DEV_ADMIN)
+    expect(requiredPermissionsFor("/sources/new/mqtt")).toEqual(["SRC_ADMIN"]);
+    expect(requiredPermissionsFor("/sources/7")).toEqual(["SRC_READ"]);
+    expect(requiredPermissionsFor("/devices/new")).toEqual(["DEV_ADMIN"]);
+    expect(requiredPermissionsFor("/devices/1042")).toEqual(["DEV_READ"]);
+    expect(requiredPermissionsFor("/ingest/failures")).toEqual(["INGEST_READ"]);
+    expect(requiredPermissionsFor("/scripts/3")).toEqual(["SCRIPT_READ"]);
+    expect(isMenuActive(MENU.find((m) => m.key === "ingest")!, "/sources/7")).toBe(true);
+    expect(isMenuActive(MENU.find((m) => m.key === "devices")!, "/models")).toBe(true);
+    expect(isMenuActive(MENU[0], "/devices")).toBe(false);
+    expect(isMenuActive(MENU[0], "/")).toBe(true);
     expect(hasAny(undefined, ["X"])).toBe(false);
   });
 });

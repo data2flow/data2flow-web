@@ -14,9 +14,11 @@
   "dependencies": {
     "@react-router/node": "^8.4.0",
     "@react-router/serve": "^8.4.0",
+    "echarts": "^6.1.0",
     "i18next": "^26.4.2",
     "ioredis": "^5.11.1",
     "isbot": "^5.1.36",
+    "monaco-editor": "^0.57.0",
     "qrcode": "^1.5.4",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",

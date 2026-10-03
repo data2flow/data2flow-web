@@ -4,9 +4,9 @@
  */
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { Form, NavLink } from "react-router";
+import { Form, Link, NavLink, useLocation } from "react-router";
 import type { Me } from "~/lib/api-types";
-import { visibleMenu } from "~/lib/permissions";
+import { isMenuActive, visibleMenu } from "~/lib/permissions";
 import { Logo } from "./logo";
 import { CsrfField, cx } from "./ui";
 
@@ -14,23 +14,25 @@ export function AppShell({ me, children }: { me: Me | null; children: ReactNode 
   const { t } = useTranslation();
   const locked = !me || Boolean(me.mustChangePassword);
   const menu = visibleMenu(me?.permissions, locked);
+  const { pathname } = useLocation();
   return (
     <div className="min-h-screen">
       <header className="border-b border-line bg-panel">
-        <div className="mx-auto flex max-w-6xl items-center gap-6 px-4">
+        <div className="mx-auto flex max-w-7xl items-center gap-6 px-4">
           <Logo />
-          <nav aria-label={t("nav.label")} className="flex flex-1 gap-1">
+          <nav aria-label={t("nav.label")} className="flex flex-1 gap-1 overflow-x-auto">
             {menu.map((item) => (
-              <NavLink
+              <Link
                 key={item.key}
                 to={item.path}
-                end={item.path === "/"}
-                className={({ isActive }) =>
-                  cx("border-b-2 px-2.5 py-3.5 text-[13px]", isActive ? "border-accent font-semibold text-accent" : "border-transparent text-muted hover:text-text")
-                }
+                aria-current={isMenuActive(item, pathname) ? "page" : undefined}
+                className={cx(
+                  "border-b-2 px-2.5 py-3.5 text-[13px]",
+                  isMenuActive(item, pathname) ? "border-accent font-semibold text-accent" : "border-transparent text-muted hover:text-text",
+                )}
               >
                 {t(`nav.${item.key}`)}
-              </NavLink>
+              </Link>
             ))}
           </nav>
           <div className="flex items-center gap-3 text-[13px]">
@@ -48,7 +50,7 @@ export function AppShell({ me, children }: { me: Me | null; children: ReactNode 
           </div>
         </div>
       </header>
-      <main className="mx-auto max-w-6xl px-4 py-6">{children}</main>
+      <main className="mx-auto max-w-7xl px-4 py-6">{children}</main>
     </div>
   );
 }

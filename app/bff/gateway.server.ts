@@ -38,6 +38,8 @@ export interface GatewayInit {
   body?: BodyInit | null;
   /** 허용 목록을 거친 헤더만 넣는다 */
   headers?: Record<string, string>;
+  /** 실시간 스트림처럼 오래 열어 두는 연결은 제한 시간 대신 이 신호로 끊는다 */
+  signal?: AbortSignal;
 }
 
 /** gateway로 보내는 기본 헤더. 사용자 IP는 BFF가 정한 값으로 X-Forwarded-For를 다시 쓴다(auth.md §5) */
@@ -57,7 +59,7 @@ export async function rawFetch(runtime: BffRuntime, path: string, init: RequestI
     return await runtime.fetch(`${runtime.config.gatewayUrl}${path}`, {
       ...init,
       redirect: "manual",
-      signal: AbortSignal.timeout(runtime.config.gatewayTimeoutMs),
+      signal: init.signal ?? AbortSignal.timeout(runtime.config.gatewayTimeoutMs),
     });
   } catch {
     throw new UpstreamUnavailableError();
@@ -211,7 +213,7 @@ export async function sessionFetch(session: BffSession, path: string, init: Gate
   const send = async (token: string) => {
     const headers = baseHeaders(session.meta, init.headers);
     headers.set("Authorization", `Bearer ${token}`);
-    return rawFetch(session.runtime, path, { method: init.method ?? "GET", headers, body: init.body ?? undefined });
+    return rawFetch(session.runtime, path, { method: init.method ?? "GET", headers, body: init.body ?? undefined, signal: init.signal });
   };
   let response = await send(await ensureAccessToken(session));
   if (response.status === 401) {

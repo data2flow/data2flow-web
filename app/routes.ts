@@ -8,6 +8,8 @@ export default [
   route("healthz", "routes/healthz.ts"),
   // 브라우저 API 중계(design/auth.md §9.2)
   route("bff/api/:svc/*", "routes/bff-api.ts"),
+  // 실시간 연결 중계(SSE, design/auth.md §8·§9.2)
+  route("bff/stream/*", "routes/bff-stream.ts"),
   route("logout", "routes/logout.ts"),
 
   // 공개 페이지(UI-IAM-01·02·03·05, NFR-12.01)
@@ -35,5 +37,29 @@ export default [
     route("admin/audit", "routes/admin-audit.tsx"),
     route("admin/security", "routes/admin-security.tsx"),
     route("admin/settings", "routes/admin-settings.tsx"),
+
+    // M2 수집 경로(spec/detail/00-navigation.md §2)
+    route("spaces", "routes/spaces.tsx"),
+    route("spaces/:spaceId", "routes/space-detail.tsx"),
+    route("sites", "routes/sites.tsx"),
+    route("devices", "routes/devices.tsx"),
+    route("devices/pending", "routes/devices-pending.tsx"),
+    route("devices/new", "routes/devices-new.tsx"),
+    route("devices/:deviceId", "routes/device-detail.tsx"),
+    route("models", "routes/models.tsx"),
+    route("models/:modelCode", "routes/model-detail.tsx"),
+    route("metrics", "routes/metrics.tsx"),
+    route("device-groups", "routes/device-groups.tsx"),
+    route("device-groups/:groupId", "routes/device-group-detail.tsx"),
+    route("explore", "routes/explore.tsx"),
+    route("ingest/monitor", "routes/ingest-monitor.tsx"),
+    route("ingest/failures", "routes/ingest-failures.tsx"),
+    route("sources", "routes/sources.tsx"),
+    route("sources/new", "routes/sources-new.tsx"),
+    route("sources/new/:connectorKey", "routes/source-new-form.tsx"),
+    route("sources/:sourceId", "routes/source-detail.tsx"),
+    route("sources/:sourceId/edit", "routes/source-edit.tsx"),
+    route("scripts", "routes/scripts.tsx"),
+    route("scripts/:scriptId", "routes/script-detail.tsx"),
   ]),
 ] satisfies RouteConfig;

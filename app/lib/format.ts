@@ -86,3 +86,43 @@ export function zonedDate(nowMs: number, timeZone: string, days = 0): string {
   const date = new Date(Date.UTC(n("year"), n("month") - 1, n("day") + days));
   return date.toISOString().slice(0, 10);
 }
+
+/** 상대 시각("12초 전", "2시간 전"). 기준 시각은 호출하는 쪽이 준다(테스트에서 고정) */
+export function formatRelative(iso: string | null | undefined, nowMs: number, lang = "ko"): string {
+  if (!iso) return "–";
+  const t = Date.parse(iso);
+  if (Number.isNaN(t)) return "–";
+  const diff = Math.round((t - nowMs) / 1000);
+  const abs = Math.abs(diff);
+  const rtf = new Intl.RelativeTimeFormat(LOCALE_TAGS[lang] ?? "en-US", { numeric: "auto" });
+  if (abs < 60) return rtf.format(diff, "second");
+  if (abs < 3600) return rtf.format(Math.round(diff / 60), "minute");
+  if (abs < 86400) return rtf.format(Math.round(diff / 3600), "hour");
+  return rtf.format(Math.round(diff / 86400), "day");
+}
+
+/** 숫자 표시(언어별 자릿수 구분, TC-DSH-076). 단위는 영어만 띄어 쓴다(`1,240.5 ppm`, 한국어 `1,240.5ppm`) */
+export function formatNumber(value: number | null | undefined, lang = "ko", options: { precision?: number | null; unit?: string | null } = {}): string {
+  if (value === null || value === undefined || Number.isNaN(value)) return "–";
+  const digits = options.precision ?? undefined;
+  const text = new Intl.NumberFormat(LOCALE_TAGS[lang] ?? "en-US", digits === undefined ? { maximumFractionDigits: 3 } : { minimumFractionDigits: digits, maximumFractionDigits: digits }).format(value);
+  if (!options.unit) return text;
+  return lang === "en" ? `${text} ${options.unit}` : `${text}${options.unit}`;
+}
+
+/** 시간대 기준 날짜만(`2026. 10. 3.`·`Oct 3, 2026`·`2026/10/3`, TC-DSH-076) */
+export function formatDate(iso: string | null | undefined, timezone: string, lang = "ko"): string {
+  if (!iso) return "–";
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return "–";
+  const style: Intl.DateTimeFormatOptions = lang === "en" ? { year: "numeric", month: "short", day: "numeric" } : { year: "numeric", month: "numeric", day: "numeric" };
+  return new Intl.DateTimeFormat(LOCALE_TAGS[lang] ?? "en-US", { timeZone: resolveTimezone(timezone), ...style }).format(date);
+}
+
+/** 기간 키(1h·24h·7d·30d)를 [from, to] UTC ISO로 */
+export function rangeOf(key: string, nowMs: number): { from: string; to: string } {
+  const hours: Record<string, number> = { "1h": 1, "6h": 6, "24h": 24, "7d": 168, "30d": 720, "90d": 2160 };
+  const h = hours[key] ?? 24;
+  const iso = (ms: number) => new Date(ms).toISOString().replace(/\.\d{3}Z$/, "Z");
+  return { from: iso(nowMs - h * 3600_000), to: iso(nowMs) };
+}

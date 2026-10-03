@@ -17,16 +17,16 @@ describe("TC-IAM-008 AT-IAM-01.1 상단 메뉴(IAM-04.05 보조 숨김)", () => 
     expect(screen.getByRole("button", { name: "로그아웃" })).toBeInTheDocument();
   });
 
-  it("TC-IAM-012 AT-IAM-01.3 비밀번호를 바꾼 ADMIN은 관리 메뉴가 모두 보인다, OPERATOR는 홈만", async () => {
+  it("TC-IAM-012 AT-IAM-01.3 비밀번호를 바꾼 ADMIN은 관리 메뉴가 모두 보인다, OPERATOR는 관리 메뉴 없이 업무 메뉴만", async () => {
     const { unmount } = await renderRoute(<AppShell me={meOf("ADMIN")}>본문</AppShell>, { session: meOf("ADMIN") });
     await screen.findByText("본문");
     const links = screen.getByRole("navigation", { name: "주 메뉴" }).querySelectorAll("a");
-    expect([...links].map((a) => a.getAttribute("href"))).toEqual(["/", "/admin/members", "/admin/roles", "/admin/security", "/admin/audit", "/admin/settings"]);
+    expect([...links].map((a) => a.getAttribute("href"))).toEqual(["/", "/spaces", "/devices", "/explore", "/ingest/monitor", "/admin/members", "/admin/roles", "/admin/security", "/admin/audit", "/admin/settings"]);
     expect(screen.getByRole("link", { name: "김운영" })).toHaveAttribute("href", "/me");
     unmount();
     await renderRoute(<AppShell me={meOf("OPERATOR")}>본문</AppShell>, { session: meOf("OPERATOR") });
     await screen.findByText("본문");
-    expect(screen.getByRole("navigation", { name: "주 메뉴" }).querySelectorAll("a")).toHaveLength(1);
+    expect(screen.getByRole("navigation", { name: "주 메뉴" }).querySelectorAll("a")).toHaveLength(5);
     expect(document.querySelector('input[name="_csrf"]')).toHaveValue("csrf-test-token");
   });
 });

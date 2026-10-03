@@ -7,11 +7,14 @@ import { I18nextProvider } from "react-i18next";
 import { Outlet, createRoutesStub } from "react-router";
 import { createI18n, type Language } from "~/i18n";
 import type { Me } from "~/lib/api-types";
+import { ADMIN_PERMISSIONS, ANALYST_PERMISSIONS, INTEGRATOR_PERMISSIONS, OPERATOR_PERMISSIONS, VIEWER_PERMISSIONS } from "./roles";
 
 export const ROLE_PERMISSIONS: Record<string, string[]> = {
-  ADMIN: ["IAM_MANAGE", "AUDIT_READ", "OPS_MANAGE", "DEV_READ"],
-  OPERATOR: ["DEV_READ", "DEVICE_CONTROL"],
-  VIEWER: ["DEV_READ"],
+  ADMIN: ADMIN_PERMISSIONS,
+  INTEGRATOR: INTEGRATOR_PERMISSIONS,
+  OPERATOR: OPERATOR_PERMISSIONS,
+  ANALYST: ANALYST_PERMISSIONS,
+  VIEWER: VIEWER_PERMISSIONS,
 };
 
 export function meOf(role: string, extra: Partial<Me> = {}): Me {

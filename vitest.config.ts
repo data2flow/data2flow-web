@@ -14,8 +14,22 @@ export default defineConfig({
         test: {
           name: "server",
           environment: "node",
-          include: ["app/**/*.test.ts", "test/**/*.test.ts"],
+          include: ["app/**/*.test.ts"],
           setupFiles: ["test/setup.server.ts"],
+          testTimeout: 30_000,
+          hookTimeout: 60_000,
+        },
+      },
+      {
+        resolve: { alias },
+        test: {
+          // SSR 통합(실제 라우트 + 가짜 gateway). 파일마다 Vite 개발 서버를 띄우고 React Router 타입 생성기가
+          // 같은 .react-router 폴더에 쓰므로, 파일끼리 겹치지 않게 차례로 돌린다
+          name: "ssr",
+          environment: "node",
+          include: ["test/**/*.test.ts"],
+          setupFiles: ["test/setup.server.ts"],
+          fileParallelism: false,
           testTimeout: 30_000,
           hookTimeout: 60_000,
         },

@@ -4,6 +4,8 @@
  * 토큰은 진짜 JWT 모양(`eyJ…`)으로 만들어, 응답·HTML 어디에도 새지 않는지 검사할 수 있게 한다.
  */
 import { http, HttpResponse, type HttpHandler } from "msw";
+import { CoreState, type CoreRequest } from "./core-fixtures";
+import { CORE_HANDLERS } from "./handlers";
 
 export const GATEWAY = "http://gateway.test";
 
@@ -38,8 +40,8 @@ export interface ReceivedRequest {
   body?: unknown;
 }
 
-const ADMIN_PERMISSIONS = ["IAM_MANAGE", "AUDIT_READ", "OPS_MANAGE", "DEV_READ", "ALARM_READ"];
-const OPERATOR_PERMISSIONS = ["DEV_READ", "DEV_PLACE", "DEVICE_CONTROL", "ALARM_READ", "ALARM_HANDLE"];
+import { ADMIN_PERMISSIONS, INTEGRATOR_PERMISSIONS, OPERATOR_PERMISSIONS, VIEWER_PERMISSIONS } from "../roles";
+export { ADMIN_PERMISSIONS, INTEGRATOR_PERMISSIONS, OPERATOR_PERMISSIONS, VIEWER_PERMISSIONS };
 
 function b64u(value: unknown) {
   return Buffer.from(JSON.stringify(value)).toString("base64url");
@@ -71,6 +73,11 @@ export class FakeGateway {
   /** 조직 설정 가입 신청 허용(API-IAM-74 공개 조회, IAM-01.08) */
   signupRequestEnabled = false;
   refreshCalls = 0;
+  /** M2 수집 경로 core 상태(공간·기기·소스 …, core-fixtures.ts) */
+  m2 = new CoreState();
+  /** 열린 SSE 연결(가짜 gateway가 흘려 보낼 수 있다) */
+  readonly streams = new Set<{ path: string; headers: Record<string, string>; push: (text: string) => void; close: () => void }>();
+  streamCancelled = 0;
   private seq = 0;
   private readonly mfaTickets = new Map<string, string>();
 
@@ -83,6 +90,8 @@ export class FakeGateway {
       { id: "3", loginId: "totp.user", password: "Totp-Pass-123", name: "TOTP", email: "totp@school.ac.kr", role: "VIEWER", permissions: ["DEV_READ"], mfa: true, version: 1 },
       { id: "4", loginId: "pending.user", password: "Pending-Pass-1", name: "대기", email: "p@school.ac.kr", role: "VIEWER", permissions: [], pending: true, version: 1 },
       { id: "5", loginId: "mfa.admin", password: "MfaAdmin-Pass1", name: "필수", email: "m@school.ac.kr", role: "ADMIN", permissions: ADMIN_PERMISSIONS, mfaSetupRequired: true, version: 1 },
+      { id: "8", loginId: "lee.int", password: "Integrator-Pass1", name: "이통합", email: "lee@school.ac.kr", role: "INTEGRATOR", permissions: INTEGRATOR_PERMISSIONS, version: 1, timezone: "Asia/Seoul", locale: "ko" },
+      { id: "9", loginId: "view.er", password: "Viewer-Pass-123", name: "조회자", email: "viewer@school.ac.kr", role: "VIEWER", permissions: VIEWER_PERMISSIONS, version: 1, timezone: "Asia/Seoul", locale: "ko" },
     ];
   }
 
@@ -205,6 +214,8 @@ export class FakeGateway {
         if (record) gw.revokedSids.add(record.sid);
         return new HttpResponse(null, { status: 204, headers: { "Set-Cookie": "data2flow_refresh=; Max-Age=0; Path=/api/v1/auth" } });
       }),
+      http.get(`${GATEWAY}/api/v1/core/stream/*`, ({ request }) => gw.openStream(request)),
+      http.get(`${GATEWAY}/api/v1/core/sources/:id/live`, ({ request }) => gw.openStream(request)),
       http.all(`${GATEWAY}/api/v1/core/*`, async ({ request }) => {
         const url = new URL(request.url);
         const path = url.pathname.replace("/api/v1/core", "");
@@ -251,8 +262,65 @@ export class FakeGateway {
     return fail(404, "RESOURCE_NOT_FOUND");
   }
 
+  /** SSE: 인증을 확인하고 열린 연결로 등록한다. 테스트는 `emit`으로 이벤트를 흘린다 */
+  openStream(request: Request): Response {
+    const auth = this.authenticate(request);
+    this.record(request);
+    if (auth instanceof Response) return auth;
+    const headers: Record<string, string> = {};
+    request.headers.forEach((value, key) => {
+      headers[key] = value;
+    });
+    const url = new URL(request.url);
+    const encoder = new TextEncoder();
+    let entry: { path: string; headers: Record<string, string>; push: (text: string) => void; close: () => void } | undefined;
+    const body = new ReadableStream<Uint8Array>({
+      start: (controller) => {
+        entry = {
+          path: url.pathname + url.search,
+          headers,
+          push: (text) => controller.enqueue(encoder.encode(text)),
+          close: () => {
+            try {
+              controller.close();
+            } catch {
+              // 이미 닫힘
+            }
+            if (entry) this.streams.delete(entry);
+          },
+        };
+        this.streams.add(entry);
+        controller.enqueue(encoder.encode(": connected\n\n"));
+      },
+      cancel: () => {
+        this.streamCancelled += 1;
+        if (entry) this.streams.delete(entry);
+      },
+    });
+    return new HttpResponse(body, { headers: { "Content-Type": "text/event-stream" } });
+  }
+
+  /** 열린 모든 SSE 연결에 이벤트 하나를 보낸다 */
+  emit(event: string, data: unknown, id?: string) {
+    const text = `${id ? `id: ${id}\n` : ""}event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
+    for (const stream of this.streams) stream.push(text);
+  }
+
+  closeStreams() {
+    for (const stream of [...this.streams]) stream.close();
+  }
+
   /** 테스트가 덮어쓸 수 있는 core 응답(기본은 성공 시나리오만) */
-  core(request: Request, path: string, body: unknown, user: FakeUser, sid: string): Response {
+  async core(request: Request, path: string, body: unknown, user: FakeUser, sid: string): Promise<Response> {
+    const m2Request: CoreRequest = { request, method: request.method, path, url: new URL(request.url), body, user, can: (p) => user.permissions.includes(p) };
+    for (const handler of CORE_HANDLERS) {
+      const handled = await handler(this.m2, m2Request);
+      if (handled) return handled;
+    }
+    return this.coreM1(request, path, body, user, sid);
+  }
+
+  private coreM1(request: Request, path: string, body: unknown, user: FakeUser, sid: string): Response {
     const method = request.method;
     const admin = user.permissions.includes("IAM_MANAGE");
     if (path === "/accounts/me" && method === "GET") {
@@ -308,9 +376,6 @@ export class FakeGateway {
     }
     if (!admin && (path.startsWith("/users") || path.startsWith("/invitations") || path.startsWith("/custom-roles") || path.startsWith("/security-policy") || path.startsWith("/permissions"))) {
       return fail(403, "PERMISSION_DENIED");
-    }
-    if (path === "/devices" && method === "GET") {
-      return HttpResponse.json({ ...envelope(), page: 1, size: 20, totalPages: 1, responses: [{ deviceId: "1042", name: "AM107-067999" }], totalCount: 1 });
     }
     if (path === "/security-policy" && method === "GET") {
       return HttpResponse.json(envelope({ sessionIdleMinutes: 30, sessionAbsoluteHours: 12, accessTtlMinutes: 60, refreshTtlHours: 6, loginMaxFailures: 5, lockoutMinutes: 15, mfaRequiredRoles: [], signupRequestEnabled: false, signupAllowedDomains: [], auditRetentionDays: 365, version: 2 }));

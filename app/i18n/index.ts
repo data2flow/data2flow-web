@@ -10,11 +10,33 @@ export const SUPPORTED_LANGUAGES = ["ko", "en", "ja", "zh"] as const;
 export type Language = (typeof SUPPORTED_LANGUAGES)[number];
 export const DEFAULT_LANGUAGE: Language = "ko";
 
+type Tree = Record<string, unknown>;
+
+/** 기능별 문구 파일(`features/{기능}/{언어}.json`)을 공통 파일에 깊게 합친다. `errors`처럼 같은 키는 안쪽까지 합친다 */
+export function deepMerge(base: Tree, extra: Tree): Tree {
+  const out: Tree = { ...base };
+  for (const [key, value] of Object.entries(extra)) {
+    const current = out[key];
+    out[key] =
+      value && typeof value === "object" && current && typeof current === "object" ? deepMerge(current as Tree, value as Tree) : value;
+  }
+  return out;
+}
+
+const featureFiles = import.meta.glob<{ default: Tree }>("./features/*/*.json", { eager: true });
+
+function withFeatures(language: string, base: Tree): Tree {
+  return Object.entries(featureFiles)
+    .filter(([path]) => path.endsWith(`/${language}.json`))
+    .sort(([a], [b]) => a.localeCompare(b))
+    .reduce((acc, [, mod]) => deepMerge(acc, mod.default), base);
+}
+
 export const resources = {
-  ko: { translation: ko },
-  en: { translation: en },
-  ja: { translation: ja },
-  zh: { translation: zh },
+  ko: { translation: withFeatures("ko", ko) },
+  en: { translation: withFeatures("en", en) },
+  ja: { translation: withFeatures("ja", ja) },
+  zh: { translation: withFeatures("zh", zh) },
 } as const;
 
 /** 번역이 없으면 ja·zh는 영어, en은 한국어로 보여 준다 */

@@ -1,0 +1,39 @@
+{
+  "nav": { "spaces": "공간", "devices": "기기", "explore": "데이터 탐색", "ingest": "수집" },
+  "common": { "cancel": "취소", "confirm": "확인", "refresh": "새로 고침", "retry": "다시 시도", "add": "추가", "remove": "제거", "copy": "복사", "copied": "복사했습니다.", "detail": "상세", "none": "없음", "loading": "불러오는 중…", "apply": "적용", "reset": "초기화", "more": "더 보기", "pause": "일시정지", "resume": "계속", "filter": "필터", "selectedCount": "{{n}}개 선택", "unknown": "알 수 없음", "create": "만들기", "back": "뒤로" },
+  "live": {
+    "disconnected": "실시간 연결이 끊겼습니다. 다시 연결 중…",
+    "status": { "connecting": "연결 중", "open": "실시간", "retrying": "재연결 중", "closed": "꺼짐" }
+  },
+  "chart": {
+    "label": "시계열 차트",
+    "quality": { "1": "범위 초과", "3": "의심" },
+    "virtual": "가상",
+    "noData": "이 기간에 데이터가 없습니다",
+    "gap": "수신 없음",
+    "loading": "불러오는 중…",
+    "partialError": "일부 계열을 불러오지 못했습니다: {{names}}",
+    "showTable": "표로 보기",
+    "hideTable": "표 닫기",
+    "tableCaption": "차트 값 표",
+    "time": "시각"
+  },
+  "editor": { "loaded": "{{label}} 편집기" },
+  "spacePicker": { "choose": "공간 선택", "noSpaces": "아직 공간이 없습니다.", "allScope": "선택하지 않으면 전체 공간입니다.", "selected": "{{n}}개 공간(하위 포함)" },
+  "spaceType": { "SITE": "사이트", "BUILDING": "건물", "FLOOR": "층", "ROOM": "실", "ZONE": "구역" },
+  "glossary": {
+    "metric": "측정 항목: 기기가 보내는 값의 종류(예: temperature, co2). 키·단위·유효 범위를 가진다.",
+    "quality": "품질 코드: 0 정상, 1 범위 초과, 2 미검증 항목, 3 의심(값 멈춤·급변), 4 시각 보정, 5 예보값",
+    "deviceStatus": "기기 상태: PENDING 승인 대기, ACTIVE 사용 중, INACTIVE 사용 중지(데이터는 저장하지만 규칙·분석에서 제외)",
+    "connectivity": "연결 상태: ONLINE 예상 주기 안에 수신, OFFLINE 예상 주기 × 배수 동안 수신 없음, UNKNOWN 아직 판단 전",
+    "lifecycle": "소스 상태: DRAFT 초안, ACTIVE 수집 중, PAUSED 일시정지(세션 유지), ARCHIVED 보관",
+    "runtimeState": "연결 상태: CONNECTED 연결됨, CONNECTING 연결 중, DISCONNECTED 끊김, ERROR 오류(재시도해도 실패), DISABLED 꺼짐",
+    "comfort": "쾌적도: 공간 목표 환경 대비 현재값. 정상, 주의(목표를 10% 이내로 벗어남), 경고"
+  },
+  "status": {
+    "device": { "PENDING": "승인 대기", "ACTIVE": "사용 중", "INACTIVE": "사용 중지" },
+    "connectivity": { "ONLINE": "온라인", "OFFLINE": "오프라인", "UNKNOWN": "알 수 없음" },
+    "comfort": { "NORMAL": "정상", "CAUTION": "주의", "WARNING": "경고", "UNKNOWN": "알 수 없음" }
+  },
+  "range": { "1h": "1시간", "6h": "6시간", "24h": "24시간", "7d": "7일", "30d": "30일", "90d": "90일", "custom": "직접 지정" }
+}

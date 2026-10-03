@@ -1,0 +1,39 @@
+{
+  "nav": { "spaces": "空間", "devices": "デバイス", "explore": "データ探索", "ingest": "収集" },
+  "common": { "cancel": "キャンセル", "confirm": "確認", "refresh": "再読み込み", "retry": "再試行", "add": "追加", "remove": "削除", "copy": "コピー", "copied": "コピーしました。", "detail": "詳細", "none": "なし", "loading": "読み込み中…", "apply": "適用", "reset": "リセット", "more": "もっと見る", "pause": "一時停止", "resume": "再開", "filter": "フィルター", "selectedCount": "{{n}}件選択", "unknown": "不明", "create": "作成", "back": "戻る" },
+  "live": {
+    "disconnected": "リアルタイム接続が切れました。再接続しています…",
+    "status": { "connecting": "接続中", "open": "リアルタイム", "retrying": "再接続中", "closed": "オフ" }
+  },
+  "chart": {
+    "label": "時系列チャート",
+    "quality": { "1": "範囲外", "3": "疑わしい値" },
+    "virtual": "仮想",
+    "noData": "この期間のデータはありません",
+    "gap": "受信なし",
+    "loading": "読み込み中…",
+    "partialError": "一部の系列を読み込めませんでした: {{names}}",
+    "showTable": "表で表示",
+    "hideTable": "表を閉じる",
+    "tableCaption": "チャートの値",
+    "time": "時刻"
+  },
+  "editor": { "loaded": "{{label}} エディター" },
+  "spacePicker": { "choose": "空間を選択", "noSpaces": "空間がまだありません。", "allScope": "選択しない場合はすべての空間です。", "selected": "{{n}}件の空間（下位を含む）" },
+  "spaceType": { "SITE": "サイト", "BUILDING": "建物", "FLOOR": "フロア", "ROOM": "部屋", "ZONE": "ゾーン" },
+  "glossary": {
+    "metric": "測定項目: デバイスが送る値の種類（例: temperature, co2）。キー・単位・有効範囲を持つ。",
+    "quality": "品質コード: 0 正常、1 範囲外、2 未検証項目、3 疑わしい値（固着・急変）、4 時刻補正、5 予報値",
+    "deviceStatus": "デバイス状態: PENDING 承認待ち、ACTIVE 使用中、INACTIVE 使用停止（データは保存するがルール・分析から除外）",
+    "connectivity": "接続状態: ONLINE 予想周期内に受信、OFFLINE 周期×倍数の間受信なし、UNKNOWN 未判定",
+    "lifecycle": "ソース状態: DRAFT 下書き、ACTIVE 収集中、PAUSED 一時停止（セッション維持）、ARCHIVED アーカイブ",
+    "runtimeState": "接続: CONNECTED 接続済み、CONNECTING 接続中、DISCONNECTED 切断、ERROR エラー（再試行でも失敗）、DISABLED オフ",
+    "comfort": "快適度: 空間の目標環境に対する現在値。正常、注意（目標から10%以内の逸脱）、警告"
+  },
+  "status": {
+    "device": { "PENDING": "承認待ち", "ACTIVE": "使用中", "INACTIVE": "使用停止" },
+    "connectivity": { "ONLINE": "オンライン", "OFFLINE": "オフライン", "UNKNOWN": "不明" },
+    "comfort": { "NORMAL": "正常", "CAUTION": "注意", "WARNING": "警告", "UNKNOWN": "不明" }
+  },
+  "range": { "1h": "1時間", "6h": "6時間", "24h": "24時間", "7d": "7日", "30d": "30日", "90d": "90日", "custom": "期間指定" }
+}

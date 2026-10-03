@@ -3,7 +3,8 @@
  */
 import type { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode, SelectHTMLAttributes, TextareaHTMLAttributes } from "react";
 import { useId } from "react";
-import { Link, useRouteLoaderData } from "react-router";
+import { useTranslation } from "react-i18next";
+import { Link, useRouteLoaderData, useSearchParams } from "react-router";
 
 export function cx(...names: (string | false | null | undefined)[]) {
   return names.filter(Boolean).join(" ");
@@ -199,4 +200,89 @@ interface RootData {
 export function CsrfField() {
   const root = useRouteLoaderData("root") as RootData | undefined;
   return <input type="hidden" name="_csrf" value={root?.csrfToken ?? ""} />;
+}
+
+/**
+ * 빈 화면 안내(DSH-08.02, BR-DSH-14): 이유 문장 + 다음 행동 버튼. 권한이 없으면 버튼 대신 안내 문장을 보여 준다.
+ */
+export function EmptyState({ title, body, action, children }: { title: ReactNode; body?: ReactNode; action?: ReactNode; children?: ReactNode }) {
+  return (
+    <div data-empty-state className="flex flex-col items-center gap-2 rounded-lg border border-dashed border-line px-6 py-10 text-center">
+      <p className="text-[14px] font-semibold">{title}</p>
+      {body && <p className="max-w-lg text-[13px] text-muted">{body}</p>}
+      {action && <div className="mt-2 flex flex-wrap justify-center gap-2">{action}</div>}
+      {children}
+    </div>
+  );
+}
+
+/** 쪽 이동(오프셋 목록, api-rules §3). 현재 주소의 다른 쿼리는 유지한다 */
+export function Pager({ page, totalPages }: { page: number; totalPages?: number }) {
+  const { t } = useTranslation();
+  const [params] = useSearchParams();
+  const link = (target: number) => {
+    const next = new URLSearchParams(params);
+    next.set("page", String(target));
+    return `?${next}`;
+  };
+  if (page <= 1 && (totalPages === undefined || page >= totalPages)) return null;
+  return (
+    <div className="mt-3 flex items-center justify-end gap-2 text-[12.5px] text-muted">
+      {page > 1 && <ButtonLink to={link(page - 1)}>{t("common.prev")}</ButtonLink>}
+      {totalPages !== undefined && <span>{`${page} / ${Math.max(1, totalPages)}`}</span>}
+      {totalPages !== undefined && page < totalPages && <ButtonLink to={link(page + 1)}>{t("common.next")}</ButtonLink>}
+    </div>
+  );
+}
+
+/** 대화상자(모달 대신 화면 위 카드). 열려 있을 때만 그린다 */
+export function Dialog({ title, open, onClose, children, footer }: { title: ReactNode; open: boolean; onClose: () => void; children: ReactNode; footer?: ReactNode }) {
+  const { t } = useTranslation();
+  if (!open) return null;
+  return (
+    <div className="fixed inset-0 z-40 flex items-start justify-center bg-black/30 p-4 pt-[10vh]" role="presentation" onKeyDown={(e) => e.key === "Escape" && onClose()}>
+      <section role="dialog" aria-modal="true" aria-label={typeof title === "string" ? title : undefined} className="w-full max-w-lg rounded-lg border border-line bg-panel shadow-lg">
+        <header className="flex items-center justify-between border-b border-line px-4 py-3">
+          <h2 className="text-[14px] font-semibold">{title}</h2>
+          <button type="button" onClick={onClose} className="text-[13px] text-muted hover:text-text" aria-label={t("common.close")}>
+            {t("common.close")}
+          </button>
+        </header>
+        <div className="flex flex-col gap-3 p-4">{children}</div>
+        {footer && <footer className="flex justify-end gap-2 border-t border-line px-4 py-3">{footer}</footer>}
+      </section>
+    </div>
+  );
+}
+
+const DOT: Record<string, string> = { good: "bg-good", warn: "bg-warn", bad: "bg-bad", muted: "bg-muted", accent: "bg-accent" };
+
+/** 상태 점 + 글자(색만으로 구분하지 않는다, DSH-07) */
+export function StatusDot({ tone, label }: { tone: "good" | "warn" | "bad" | "muted" | "accent"; label: ReactNode }) {
+  return (
+    <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
+      <span aria-hidden className={cx("inline-block h-2 w-2 rounded-full", DOT[tone])} />
+      <span>{label}</span>
+    </span>
+  );
+}
+
+/**
+ * 용어 툴팁(DSH-08.03): 측정 항목·품질 코드·상태 값 같은 용어에 점선 밑줄과 설명. 설명은 `glossary.{key}` 문구(4개 언어)
+ */
+export function Term({ term, children }: { term: string; children: ReactNode }) {
+  const { t } = useTranslation();
+  const text = t(`glossary.${term}`, { defaultValue: "" });
+  if (!text) return <>{children}</>;
+  return (
+    <abbr title={text} className="cursor-help no-underline decoration-dotted underline-offset-2 [text-decoration-line:underline]">
+      {children}
+    </abbr>
+  );
+}
+
+/** 탭 안 보조 숫자 배지 */
+export function CountBadge({ n }: { n?: number | null }) {
+  if (n === undefined || n === null) return null;
+  return <span className="ml-1 rounded bg-bg px-1 text-[11px] text-muted">{n}</span>;
 }
