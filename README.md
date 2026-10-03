@@ -2,7 +2,7 @@
 
 data2flow 화면과 BFF입니다. React Router v8 프레임워크 모드(SSR, Vite) + React 19 + TypeScript로 만들고, 브라우저는 토큰 없이 HttpOnly 세션 쿠키(`data2flow_session`)만 갖습니다. Access·Refresh 토큰은 BFF가 서버 쪽에 보관하고, 브라우저의 API 호출은 `/bff/api/{svc}/**`로 받아 내부 gateway에 Bearer로 중계합니다(ADR-024, design/auth.md §9). 화면 문구는 한국어·영어·일본어·중국어 4개 언어입니다(ADR-037).
 
-- 관련 스펙: IAM(로그인·세션·회원·권한·감사), OPS-07(조직·외부 서비스 설정), M2 수집 경로 화면(DSC·DEV·DSH·ING·SCR·TSD), FLW·RUL 화면 (정본은 비공개 저장소 `data2flow-docs`)
+- 관련 스펙: IAM(로그인·세션·회원·권한·감사), OPS-07(조직·외부 서비스 설정), M2 수집 경로 화면(DSC·DEV·DSH·ING·SCR·TSD), M3 폐루프(가상) 화면(FLW·ACT·SIM·DEV-03.03), RUL 화면 (정본은 비공개 저장소 `data2flow-docs`)
 - 포트: 8080. 프로브는 `/healthz`
 
 ## 구조
@@ -50,6 +50,19 @@ data2flow 화면과 BFF입니다. React Router v8 프레임워크 모드(SSR, Vi
 - 실시간: 브라우저 `EventSource('/bff/stream/live?topics=…')`(API-DSH-20), `/bff/stream/ingest`(API-ING-03), `/bff/stream/sources/{id}/live`(API-DSC-10). 끊기면 1→30초 백오프로 다시 연결하고, 세션이 끝났으면 모든 탭을 로그인 화면으로 보낸다.
 - 차트는 ECharts(Apache-2.0, `echarts/core`에서 필요한 부품만), 편집기는 Monaco(MIT). 둘 다 해당 화면에서만 지연 로딩한다. Monaco의 JS 언어 서비스 워커는 같은 출처 파일이라 CSP(`script-src 'self'`)를 바꾸지 않는다.
 - 테마: 사용자 메뉴에서 시스템·라이트·다크(쿠키 `data2flow_theme` + 화면 설정 API-DSH-12).
+
+## M3 폐루프(가상) 화면
+
+| 경로 | 화면 | 스펙 |
+|---|---|---|
+| `/automation/flows`, `/automation/flows/new`, `/automation/flows/{id}` | 플로우 목록, 편집기(React Flow 캔버스·팔레트·설정 패널·JS 노드 Monaco·적용 확인·버전 비교·롤백·오류 탭) | FLW-01.01·01.02·01.05·01.06·03.07·05.03·05.06 |
+| `/automation/templates`, `/automation/approvals` | 템플릿 갤러리("고온이면 냉방" 등, `?template=&spaceId=` 미리 채움), 제어 노드 적용 승인 | FLW-01.05, FLW-05.06 |
+| `/devices/{id}?tab=control`, `?tab=commands`, `/control/commands` | 기기 제어 패널(desired/reported/delta, 명령 진행 실시간), 명령 이력 | ACT-02.04·04.02·04.03 |
+| `/devices/{id}?tab=virtual`, `/models/{code}?tab=package` | 가상 기기 설정, 모델 제어 드라이버 연결 | SIM-09.02, DEV-03.03 |
+| `/sim`, `/sim/catalog`, `/sim/profiles`, `/sim/spaces`, `/sim/scenarios`, `/sim/runs/{id}`, `/sim/replay` | 가상 환경 홈·카탈로그·키트·프로필·가상 공간 물리·시나리오 타임라인·실행 제어(x1~x60)·장애 주입·결과·파일 재생 | SIM-01.01·01.02·04.01·04.02·05.03·06.03·09.01~03 |
+
+- 실시간: 명령 상태 `/bff/stream/live?topics=commands:{deviceId},space:{spaceId}`(`command-status`·`device-update`), 시뮬레이션 실행 `/bff/stream/sim/runs/{id}`(API-SIM-31: `sim.tick`·`sim.event`·`sim.status`·`sim.throttle`).
+- 플로우 캔버스는 `@xyflow/react`(MIT, 하위 의존성 MIT·ISC). 라이브 뷰(WebSocket)·시험 실행·서브플로우는 M4에서 만든다.
 
 ## 개발
 
