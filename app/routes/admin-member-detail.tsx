@@ -14,7 +14,9 @@ import { Alert, Badge, Button, Card, CsrfField, PageHeader, SelectField, Table, 
 import { errorText } from "~/lib/error-text";
 import { formatDateTime } from "~/lib/format";
 import { hasAny } from "~/lib/permissions";
-import { parseRole, parseScope, roleValue } from "~/lib/roles";
+import { parseRole, roleValue, scopeFromForm } from "~/lib/roles";
+import { ScopeField } from "~/components/space-picker";
+import { findSpace, type SpaceNode } from "~/lib/spaces";
 import type { RootData } from "~/root";
 import type { Route } from "./+types/admin-member-detail";
 
@@ -27,7 +29,7 @@ interface UserDetail {
   status?: string;
   role?: string;
   customRoleId?: string | null;
-  spaceScope?: { id: string; name?: string }[];
+  spaceScope?: ({ id: string; name?: string } | string)[];
   mfaEnabled?: boolean;
   lockedUntil?: string | null;
   lastLoginAt?: string;
@@ -49,9 +51,11 @@ interface AuditRow {
 export async function loader({ request, context, params }: Route.LoaderArgs) {
   const ctx = bff(context);
   const id = encodeURIComponent(params.userId);
-  const [user, roles] = await Promise.all([
+  const [user, roles, spaceTree] = await Promise.all([
     callApi<UserDetail>(ctx, request, `/api/v1/core/users/${id}`),
     callList<CustomRoleRow>(ctx, request, "/api/v1/core/custom-roles"),
+    // 공간 범위는 트리에서 고른다(IAM-01.07, IAM-04.02). 못 불러오면 ID 입력
+    callApi<SpaceNode[]>(ctx, request, "/api/v1/core/spaces"),
   ]);
   const detail = orThrow(user);
   const root = await getMe(ctx, request);
@@ -60,7 +64,7 @@ export async function loader({ request, context, params }: Route.LoaderArgs) {
     const audit = await callList<AuditRow>(ctx, request, `/api/v1/core/audit-logs?actor=${id}&size=20`);
     if (audit.ok) activity = audit.list.responses;
   }
-  return { user: detail, customRoles: roles.ok ? roles.list.responses : [], activity };
+  return { user: detail, customRoles: roles.ok ? roles.list.responses : [], activity, spaces: spaceTree.ok && Array.isArray(spaceTree.data) ? spaceTree.data : null };
 }
 
 const ACTIONS: Record<string, { method: string; suffix: string }> = {
@@ -80,7 +84,7 @@ export async function action({ request, context, params }: Route.ActionArgs) {
     const role = parseRole(field(form, "role"));
     const result = await callApi(ctx, request, `${base}/role`, {
       method: "PUT",
-      body: { role: role.role, customRoleId: role.customRoleId ?? null, spaceScope: parseScope(field(form, "spaceScope")), baseVersion: Number(field(form, "baseVersion")) },
+      body: { role: role.role, customRoleId: role.customRoleId ?? null, spaceScope: scopeFromForm(form), baseVersion: Number(field(form, "baseVersion")) },
     });
     return result.ok ? { intent, done: true } : data({ intent, error: { code: result.code, message: result.message } }, { status: result.status });
   }
@@ -118,8 +122,9 @@ function ActionButton({ intent, label, confirm, variant = "secondary", disabled 
 export default function AdminMemberDetail({ loaderData, actionData }: Route.ComponentProps) {
   const { t, i18n } = useTranslation();
   const root = useRouteLoaderData("root") as RootData;
-  const { user, customRoles, activity } = loaderData;
+  const { user, customRoles, activity, spaces } = loaderData;
   const self = root.me?.id === user.id;
+  const scopeIds = (user.spaceScope ?? []).map((s) => (typeof s === "string" ? s : String(s.id)));
   const result = actionData as { intent?: string; done?: boolean; error?: { code: string; message?: string } } | undefined;
   const [confirmId, setConfirmId] = useState("");
   const fmt = (iso?: string | null) => formatDateTime(iso ?? undefined, root.timezone, i18n.language);
@@ -174,13 +179,15 @@ export default function AdminMemberDetail({ loaderData, actionData }: Route.Comp
             <SelectField label={t("members.role")} name="role" defaultValue={roleValue(user.role, user.customRoleId)} disabled={self}>
               <RoleOptions customRoles={customRoles} />
             </SelectField>
-            <TextField
-              label={t("members.spaceScope")}
-              name="spaceScope"
-              defaultValue={(user.spaceScope ?? []).map((s) => s.id).join(", ")}
-              hint={t("members.spaceScopeHint")}
-              disabled={self}
-            />
+            {self ? (
+              <p className="text-[13px]">
+                {t("members.spaceScope")}: {scopeIds.length === 0 ? t("members.allSpaces") : scopeIds.map((sid) => findSpace(spaces ?? [], sid)?.path.join(" › ") ?? sid).join(", ")}
+              </p>
+            ) : (
+              <div className="min-w-72">
+                <ScopeField spaces={spaces} label={t("members.spaceScope")} hint={t("members.spaceScopeHint")} defaultValue={scopeIds} />
+              </div>
+            )}
             <Button type="submit" variant="primary" disabled={self}>
               {t("common.save")}
             </Button>

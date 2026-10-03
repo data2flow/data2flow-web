@@ -10,7 +10,9 @@ import { bff } from "~/bff/middleware.server";
 import { Alert, Badge, Button, ButtonLink, Card, CsrfField, PageHeader, SelectField, Table, Tabs, TextArea, TextField } from "~/components/ui";
 import { RoleOptions, type CustomRoleRow } from "~/components/role-options";
 import { BUILTIN_ROLES, type ListEnvelope } from "~/lib/api-types";
-import { parseRole, parseScope } from "~/lib/roles";
+import { parseRole, scopeFromForm } from "~/lib/roles";
+import { ScopeField, SpaceSelect } from "~/components/space-picker";
+import type { SpaceNode } from "~/lib/spaces";
 import { errorText, policyErrorText } from "~/lib/error-text";
 import { formatDateTime } from "~/lib/format";
 import { checkLoginId, checkName, parseEmails } from "~/lib/validation";
@@ -65,9 +67,11 @@ export async function loader({ request, context }: Route.LoaderArgs) {
   const tabParam = url.searchParams.get("tab");
   const tab: Tab = (TABS as readonly string[]).includes(tabParam ?? "") ? (tabParam as Tab) : "members";
   const page = Math.max(1, Number(url.searchParams.get("page")) || 1);
-  const [policy, roles] = await Promise.all([
+  const [policy, roles, spaceTree] = await Promise.all([
     callApi<{ signupRequestEnabled?: boolean }>(ctx, request, "/api/v1/core/security-policy"),
     callList<CustomRoleRow>(ctx, request, "/api/v1/core/custom-roles"),
+    // 공간 범위 트리 선택(IAM-01.07). 못 불러오면 ID 입력으로 대신한다
+    callApi<SpaceNode[]>(ctx, request, "/api/v1/core/spaces"),
   ]);
   const signupEnabled = policy.ok && Boolean(policy.data?.signupRequestEnabled);
   let members: ListEnvelope<UserSummary> | undefined;
@@ -75,7 +79,7 @@ export async function loader({ request, context }: Route.LoaderArgs) {
   let signups: ListEnvelope<SignupRow> | undefined;
   if (tab === "members") {
     const query = new URLSearchParams({ page: String(page), size: String(PAGE_SIZE) });
-    for (const key of ["keyword", "role", "status"]) {
+    for (const key of ["keyword", "role", "status", "spaceId"]) {
       const value = url.searchParams.get(key);
       if (value) query.set(key, value);
     }
@@ -90,6 +94,7 @@ export async function loader({ request, context }: Route.LoaderArgs) {
     page,
     signupEnabled,
     customRoles: roles.ok ? roles.list.responses : [],
+    spaces: spaceTree.ok && Array.isArray(spaceTree.data) ? spaceTree.data : null,
     members,
     invitations,
     signups,
@@ -121,7 +126,7 @@ export async function action({ request, context }: Route.ActionArgs) {
       const result = await callApi<{ results: { email: string; status: string; resultCode?: string }[] }>(ctx, request, "/api/v1/core/invitations", {
         method: "POST",
         idempotencyKey,
-        body: { emails, name: emails.length === 1 && name ? name : undefined, role: role.role, customRoleId: role.customRoleId, spaceScope: parseScope(field(form, "spaceScope")) },
+        body: { emails, name: emails.length === 1 && name ? name : undefined, role: role.role, customRoleId: role.customRoleId, spaceScope: scopeFromForm(form) },
       });
       if (!result.ok) return fail(result);
       return { intent, results: result.data?.results ?? [] } as ActionResult;
@@ -138,7 +143,7 @@ export async function action({ request, context }: Route.ActionArgs) {
       const result = await callApi<{ id: string; temporaryPassword?: string }>(ctx, request, "/api/v1/core/users", {
         method: "POST",
         idempotencyKey,
-        body: { loginId, email, name, role: role.role, customRoleId: role.customRoleId, spaceScope: parseScope(field(form, "spaceScope")), temporaryPassword },
+        body: { loginId, email, name, role: role.role, customRoleId: role.customRoleId, spaceScope: scopeFromForm(form), temporaryPassword },
       });
       if (!result.ok) return fail(result);
       return { intent, loginId, temporaryPassword: result.data?.temporaryPassword ?? temporaryPassword } as ActionResult;
@@ -150,7 +155,7 @@ export async function action({ request, context }: Route.ActionArgs) {
       return result.ok ? ({ intent, done: true } as ActionResult) : fail(result);
     }
     case "approve": {
-      const spaceScope = parseScope(field(form, "spaceScope"));
+      const spaceScope = scopeFromForm(form);
       const roleValue = field(form, "role");
       if (!roleValue || spaceScope.length === 0) return data({ intent, fieldError: "approve" } as ActionResult, { status: 400 });
       const role = parseRole(roleValue);
@@ -211,7 +216,7 @@ function Pager({ page, totalPages }: { page: number; totalPages?: number }) {
   );
 }
 
-function InviteDialog({ customRoles, idempotencyKey, result }: { customRoles: CustomRoleRow[]; idempotencyKey: string; result?: ActionResult }) {
+function InviteDialog({ customRoles, idempotencyKey, result, spaces }: { customRoles: CustomRoleRow[]; idempotencyKey: string; result?: ActionResult; spaces: SpaceNode[] | null }) {
   const { t } = useTranslation();
   const invite = result?.intent === "invite" ? (result as Extract<ActionResult, { intent: "invite" }>) : undefined;
   return (
@@ -244,7 +249,7 @@ function InviteDialog({ customRoles, idempotencyKey, result }: { customRoles: Cu
           <SelectField label={t("members.role")} name="role" defaultValue="VIEWER">
             <RoleOptions customRoles={customRoles} />
           </SelectField>
-          <TextField label={t("members.spaceScope")} name="spaceScope" hint={t("members.spaceScopeHint")} />
+          <ScopeField spaces={spaces} label={t("members.spaceScope")} hint={t("members.spaceScopeHint")} />
           <p className="text-[12px] text-muted">{t("members.invite.notice")}</p>
           <div>
             <Button type="submit" variant="primary">
@@ -257,7 +262,7 @@ function InviteDialog({ customRoles, idempotencyKey, result }: { customRoles: Cu
   );
 }
 
-function CreateDialog({ customRoles, idempotencyKey, result }: { customRoles: CustomRoleRow[]; idempotencyKey: string; result?: ActionResult }) {
+function CreateDialog({ customRoles, idempotencyKey, result, spaces }: { customRoles: CustomRoleRow[]; idempotencyKey: string; result?: ActionResult; spaces: SpaceNode[] | null }) {
   const { t } = useTranslation();
   const create = result?.intent === "create" ? (result as Extract<ActionResult, { intent: "create" }>) : undefined;
   return (
@@ -286,7 +291,7 @@ function CreateDialog({ customRoles, idempotencyKey, result }: { customRoles: Cu
           <SelectField label={t("members.role")} name="role" defaultValue="VIEWER">
             <RoleOptions customRoles={customRoles} />
           </SelectField>
-          <TextField label={t("members.spaceScope")} name="spaceScope" hint={t("members.spaceScopeHint")} />
+          <ScopeField spaces={spaces} label={t("members.spaceScope")} hint={t("members.spaceScopeHint")} />
           <TextField label={t("members.create.temporaryPassword")} name="temporaryPassword" type="text" autoComplete="off" hint={t("members.create.autoHint")} />
           <div>
             <Button type="submit" variant="primary">
@@ -330,8 +335,8 @@ export default function AdminMembers({ loaderData, actionData }: Route.Component
           </>
         }
       />
-      {dialog === "invite" && <InviteDialog customRoles={customRoles} idempotencyKey={loaderData.idempotencyKey} result={result} />}
-      {dialog === "create" && <CreateDialog customRoles={customRoles} idempotencyKey={loaderData.idempotencyKey} result={result} />}
+      {dialog === "invite" && <InviteDialog customRoles={customRoles} idempotencyKey={loaderData.idempotencyKey} result={result} spaces={loaderData.spaces} />}
+      {dialog === "create" && <CreateDialog customRoles={customRoles} idempotencyKey={loaderData.idempotencyKey} result={result} spaces={loaderData.spaces} />}
       <div className="mt-4">
         <Tabs items={tabs} current={tab} />
       </div>
@@ -361,6 +366,7 @@ export default function AdminMembers({ loaderData, actionData }: Route.Component
                 </option>
               ))}
             </SelectField>
+            {loaderData.spaces && <SpaceSelect spaces={loaderData.spaces} label={t("members.spaceFilter")} name="spaceId" emptyLabel={t("common.all")} defaultValue={params.get("spaceId") ?? ""} />}
             <Button type="submit">{t("common.search")}</Button>
           </Form>
           {bulk && (
@@ -509,7 +515,7 @@ export default function AdminMembers({ loaderData, actionData }: Route.Component
                         <option value="">–</option>
                         <RoleOptions customRoles={customRoles} />
                       </SelectField>
-                      <TextField label={t("members.spaceScope")} name="spaceScope" hint={t("members.signups.spaceRequired")} />
+                      <ScopeField spaces={loaderData.spaces} label={t("members.spaceScope")} hint={t("members.signups.spaceRequired")} />
                       <Button type="submit" variant="primary">
                         {t("members.signups.approve")}
                       </Button>

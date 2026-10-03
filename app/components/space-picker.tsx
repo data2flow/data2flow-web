@@ -5,7 +5,7 @@
 import { useState, type SelectHTMLAttributes } from "react";
 import { useTranslation } from "react-i18next";
 import { flattenSpaces, type SpaceNode } from "~/lib/spaces";
-import { SelectField } from "./ui";
+import { SelectField, TextField } from "./ui";
 
 export function SpaceSelect({
   spaces,
@@ -53,4 +53,13 @@ export function SpaceScopePicker({ spaces, name, defaultValue = [], label, hint 
       <p className="text-[12px] text-muted">{selected.length === 0 ? t("spacePicker.allScope") : (hint ?? t("spacePicker.selected", { n: selected.length }))}</p>
     </fieldset>
   );
+}
+
+/**
+ * 회원 공간 범위 입력(IAM-01.07, IAM-04.02): 공간 트리를 불러왔으면 트리 선택, 못 불러왔으면 공간 ID 쉼표 입력으로 대신한다.
+ */
+export function ScopeField({ spaces, name = "spaceScope", label, hint, defaultValue = [] }: { spaces: SpaceNode[] | null | undefined; name?: string; label: string; hint?: string; defaultValue?: string[] }) {
+  // 트리 선택은 고른 개수를 안내하고, 공간 ID 입력 안내(hint)는 대체 입력에만 쓴다
+  if (spaces) return <SpaceScopePicker spaces={spaces} name={name} label={label} defaultValue={defaultValue} />;
+  return <TextField label={label} name={name} hint={hint} defaultValue={defaultValue.join(", ")} />;
 }

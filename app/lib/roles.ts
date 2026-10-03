@@ -19,3 +19,9 @@ export function parseScope(raw: string): string[] {
     .map((s) => s.trim())
     .filter(Boolean);
 }
+
+/** 폼의 공간 범위(트리 선택은 `spaceScope` 여러 개, 예전 입력은 쉼표 구분 하나). 중복은 하나로 */
+export function scopeFromForm(form: FormData, name = "spaceScope"): string[] {
+  const values = form.getAll(name).filter((v): v is string => typeof v === "string");
+  return [...new Set(values.flatMap(parseScope))];
+}

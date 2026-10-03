@@ -7,6 +7,7 @@ import { bffJson, clientIdempotencyKey } from "../bff-client";
 import { appendPoint, axisIndexByUnit, axisLabel, buildChartOption, hasData, qualityPoints, roundTo, toTable, tooltipTime, withGaps, type ChartSeries } from "../chart-model";
 import { LiveConnection, MessageBuffer, RateLimiter, backoffDelay, liveUrl, type EventSourceLike } from "../event-stream";
 import { formatDate, formatNumber, formatRelative, rangeOf } from "../format";
+import { scopeFromForm } from "../roles";
 import { allowedChildTypes, checkSpaceInput, descendantIds, findSpace, flattenSpaces, moveTargets, spacePathLabel, type SpaceNode } from "../spaces";
 
 class FakeSource implements EventSourceLike {
@@ -303,5 +304,16 @@ describe("브라우저 JSON 호출(bffJson)", () => {
     expect(failed).toMatchObject({ ok: false, status: 409, code: "VERSION_CONFLICT", message: "m" });
     expect(await bffJson("/x", {}, { fetchImpl: async () => Promise.reject(new Error("net")) })).toMatchObject({ ok: false, code: "SERVICE_UNAVAILABLE" });
     expect(clientIdempotencyKey()).toMatch(/[0-9a-f-]{8,}/);
+  });
+});
+
+describe("IAM-01.07 공간 범위 폼 값", () => {
+  it("트리 선택(여러 값)과 쉼표 입력을 모두 받고 중복은 하나로", () => {
+    const form = new FormData();
+    form.append("spaceScope", "3");
+    form.append("spaceScope", "31, 3");
+    form.append("spaceScope", "");
+    expect(scopeFromForm(form)).toEqual(["3", "31"]);
+    expect(scopeFromForm(new FormData())).toEqual([]);
   });
 });

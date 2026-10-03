@@ -10,7 +10,7 @@ import { meOf, renderRoute } from "../../../test/render";
 import { TimeseriesChart, type ChartHandle } from "../charts/timeseries-chart";
 import { CodeEditor, type EditorApi } from "../code-editor";
 import { LiveBanner, LiveDot, useLiveStream } from "../live";
-import { SpaceScopePicker, SpaceSelect } from "../space-picker";
+import { ScopeField, SpaceScopePicker, SpaceSelect } from "../space-picker";
 import { CountBadge, Dialog, EmptyState, Pager, StatusDot, Term } from "../ui";
 import type { EventSourceLike } from "~/lib/event-stream";
 
@@ -153,6 +153,16 @@ describe("공간 선택(UI-DEV-05 승인, UI-IAM-08 공간 범위)", () => {
     expect(screen.getByText("선택하지 않으면 전체 공간입니다.")).toBeInTheDocument();
     await userEvent.click(screen.getByLabelText("광주캠퍼스 › 본관 › 실습실"));
     expect(document.querySelector('input[name="spaceScope"]')).toHaveValue("31");
+  });
+
+  it("ScopeField: 트리를 못 불러오면 공간 ID 입력(쉼표)으로 대신한다", async () => {
+    const { unmount } = await renderRoute(<ScopeField spaces={null} label="공간 범위" hint="쉼표로 구분" defaultValue={["3", "31"]} />);
+    expect(await screen.findByLabelText("공간 범위")).toHaveValue("3, 31");
+    expect(screen.getByText("쉼표로 구분")).toBeInTheDocument();
+    unmount();
+    await renderRoute(<ScopeField spaces={tree} label="공간 범위" hint="쉼표로 구분" />);
+    expect(await screen.findByLabelText("광주캠퍼스 › 본관")).toBeInTheDocument();
+    expect(screen.queryByText("쉼표로 구분")).toBeNull();
   });
 
   it("공간이 없으면 안내", async () => {
