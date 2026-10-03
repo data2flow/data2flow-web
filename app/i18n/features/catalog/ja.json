@@ -3,8 +3,19 @@
     "askAdmin": "作成するには管理者（INTEGRATOR以上）に依頼してください。",
     "required": "必須",
     "listHint": "カンマ区切り",
-    "protocol": { "LORAWAN": "LoRaWAN", "MQTT": "MQTT", "HTTP": "HTTP", "VIRTUAL": "仮想", "OTHER": "その他" },
-    "kind": { "SENSOR": "センサー", "ACTUATOR": "アクチュエーター", "GATEWAY": "ゲートウェイ", "HYBRID": "複合" },
+    "protocol": {
+      "LORAWAN": "LoRaWAN",
+      "MQTT": "MQTT",
+      "HTTP": "HTTP",
+      "VIRTUAL": "仮想",
+      "OTHER": "その他"
+    },
+    "kind": {
+      "SENSOR": "センサー",
+      "ACTUATOR": "アクチュエーター",
+      "GATEWAY": "ゲートウェイ",
+      "HYBRID": "複合"
+    },
     "validation": {
       "modelCode": "コードは英大文字・数字で始まる50文字以内",
       "nameRequired": "名前を入力してください（100文字以内）",
@@ -51,7 +62,13 @@
       "confirmDeprecate": "このモデルを使用停止にしますか？新しいデバイスでは選べなくなります。",
       "confirmDelete": "このモデルを削除しますか？",
       "inUseHint": "使用中のデバイスがあるモデルは[使用停止]のみ可能です。",
-      "tab": { "info": "情報", "metrics": "測定項目", "capabilities": "機能", "package": "パッケージ", "devices": "デバイス" },
+      "tab": {
+        "info": "情報",
+        "metrics": "測定項目",
+        "capabilities": "機能",
+        "package": "パッケージ",
+        "devices": "デバイス"
+      },
       "include": "含める",
       "includeOf": "{{key}} を含める",
       "requiredOf": "{{key}} 必須",
@@ -74,7 +91,11 @@
       },
       "preview": "入力フォームのプレビュー・デバイス入力値の検証",
       "noFields": "属性はありません。",
-      "attrError": { "required": "必須の値です", "type": "{{type}} 形式である必要があります", "unknown": "スキーマにない属性です" },
+      "attrError": {
+        "required": "必須の値です",
+        "type": "{{type}} 形式である必要があります",
+        "unknown": "スキーマにない属性です"
+      },
       "validateHint": "値を入力してデバイス入力値を検証してください",
       "valid": "入力値はスキーマに合っています",
       "invalid": "{{n}}件の値がスキーマに合っていません"
@@ -82,7 +103,12 @@
     "metrics": {
       "title": "測定項目",
       "new": "新しい測定項目",
-      "tab": { "verified": "検証済み", "unverified": "未検証", "ignored": "無視", "aliases": "エイリアス" },
+      "tab": {
+        "verified": "検証済み",
+        "unverified": "未検証",
+        "ignored": "無視",
+        "aliases": "エイリアス"
+      },
       "key": "キー",
       "keyHint": "例: co2, pm2_5。作成後は変更できません",
       "displayName": "表示名",
@@ -160,7 +186,11 @@
       "removeSelected": "選択した{{n}}台を削除",
       "addMembers": "デバイスを追加",
       "confirmDelete": "このグループを削除しますか？",
-      "refType": { "RULE": "ルール", "FLOW": "フロー", "DASHBOARD": "ダッシュボード" }
+      "refType": {
+        "RULE": "ルール",
+        "FLOW": "フロー",
+        "DASHBOARD": "ダッシュボード"
+      }
     }
   },
   "errors": {
@@ -174,6 +204,9 @@
     "METRIC_NOT_FOUND": "測定項目が見つかりません。",
     "GROUP_NAME_DUPLICATE": "同じ名前のグループがすでにあります。",
     "GROUP_SIZE_EXCEEDED": "グループには1,000台まで入れられます。",
-    "GROUP_IN_USE": "このグループは使用中のため削除できません。"
+    "GROUP_IN_USE": "このグループは使用中のため削除できません。",
+    "MODEL_NOT_FOUND": "デバイスモデルが見つかりません。",
+    "GROUP_NOT_FOUND": "グループが見つかりません。",
+    "ATTRIBUTE_SCHEMA_VIOLATION": "属性値がモデルの属性スキーマに合いません。"
   }
 }

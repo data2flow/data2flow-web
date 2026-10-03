@@ -6,7 +6,6 @@ import { HttpResponse } from "msw";
 import { envelope, fail, list, noContent, ok, type CoreHandler, type CoreState, type FakeDevice } from "../core-fixtures";
 
 interface DeviceExtra {
-  history: Record<string, { at: string; actor: string; action: string; changes: Record<string, [unknown, unknown]> }[]>;
   semantic: Record<string, { equipment: unknown[] }>;
   references: Record<string, { type: string; id: string; name: string }[]>;
   preferences: Record<string, { favorites: { type: string; id: string; name?: string }[]; recent: { type: string; id: string }[]; version: number }>;
@@ -15,7 +14,6 @@ interface DeviceExtra {
 /** 테스트가 상황을 바꿀 수 있는 기기 부가 상태(사용처, 시맨틱 …) */
 export function deviceExtra(core: CoreState): DeviceExtra {
   core.extra.devices ??= {
-    history: { "1042": [{ at: "2026-10-02T00:00:00Z", actor: "홍길동", action: "UPDATED", changes: { spaceId: ["3", "31"] } }] },
     semantic: {
       "1042": {
         equipment: [
@@ -104,7 +102,8 @@ export const devicesHandler: CoreHandler = (core, { method, path, url, body, can
       if (items.length === 1 && typeof b.name === "string") d.name = b.name;
       if (Array.isArray(b.tags)) d.tags = b.tags as string[];
       touch(d);
-      return { deviceId: d.id, ok: true };
+      // 플랫폼 브로커 기기는 승인 때 서명 키를 한 번 준다(API-DEV-15 results[].signingKey, DSC-03.05)
+      return core.source(d.sourceId)?.type === "PLATFORM_BROKER" ? { deviceId: d.id, ok: true, signingKey: `sk-${d.id}-hmac` } : { deviceId: d.id, ok: true };
     });
     return ok({ results });
   }
@@ -156,7 +155,7 @@ export const devicesHandler: CoreHandler = (core, { method, path, url, body, can
   if (!one) return undefined;
   const d = core.devices.find((x) => x.id === one[1]);
   const sub = one[2] ?? "";
-  if (!d) return ["", "/history", "/semantic", "/model-suggestions", "/activate", "/deactivate"].includes(sub) ? fail(404, "DEVICE_NOT_FOUND") : undefined;
+  if (!d) return ["", "/semantic", "/model-suggestions", "/activate", "/deactivate"].includes(sub) ? fail(404, "DEVICE_NOT_FOUND") : undefined;
 
   if (sub === "" && method === "GET") return ok(core.deviceDetail(d));
   if (sub === "" && method === "PATCH") {
@@ -184,7 +183,6 @@ export const devicesHandler: CoreHandler = (core, { method, path, url, body, can
     touch(d);
     return ok({ id: d.id, status: d.status, version: d.version });
   }
-  if (sub === "/history" && method === "GET") return list(extra.history[d.id] ?? [], url);
   if (sub === "/model-suggestions" && method === "GET") {
     if (!can("DEV_PLACE")) return fail(403, "PERMISSION_DENIED");
     const hits = d.latest.map((l) => SUGGEST[l.metricKey]).filter(Boolean);

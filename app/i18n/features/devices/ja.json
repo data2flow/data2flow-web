@@ -157,7 +157,8 @@
       "reject": "拒否",
       "rejectTitle": "デバイスを拒否",
       "rejectBody": "選択した{{n}}台を拒否します。",
-      "ignoreAgain": "再び届いても登録しない"
+      "ignoreAgain": "再び届いても登録しない",
+      "signingKeyOnce": "デバイス {{id}} の署名キーです。今回だけ表示されます。デバイスに入力してください。"
     },
     "new": {
       "title": "デバイス追加",

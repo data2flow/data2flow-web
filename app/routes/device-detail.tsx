@@ -11,7 +11,7 @@ import { Form, Link, data, redirect, useRouteLoaderData } from "react-router";
 import { callApi, callList, field, orThrow } from "~/bff/api.server";
 import { bff } from "~/bff/middleware.server";
 import { SpaceSelect } from "~/components/space-picker";
-import { Alert, Badge, Button, ButtonLink, Card, CsrfField, Dialog, EmptyState, PageHeader, Pager, SelectField, Table, Tabs, TextField } from "~/components/ui";
+import { Alert, Badge, Button, ButtonLink, Card, CsrfField, Dialog, EmptyState, PageHeader, SelectField, Table, Tabs, TextField } from "~/components/ui";
 import { DeviceAreaTabs } from "~/features/devices/area-tabs";
 import { ConnectivityLabel, DeviceDataPanel, DeviceOverview, DeviceStatusBadge } from "~/features/devices/components";
 import { DEVICE_KINDS, isFavorite, metricChoices, parseTags, toggleFavorite, type DeviceDetail } from "~/features/devices/model/devices";
@@ -28,7 +28,8 @@ export function meta() {
   return [{ title: "data2flow" }];
 }
 
-const TABS = ["overview", "data", "raw", "history", "semantic", "credentials"] as const;
+// 변경 이력(API-DEV-27)은 core M2에 아직 없어 탭을 두지 않는다(DEV-02.07은 M4)
+const TABS = ["overview", "data", "raw", "semantic", "credentials"] as const;
 type Tab = (typeof TABS)[number];
 
 interface RawRow {
@@ -47,12 +48,6 @@ interface RawDetail {
   status?: string;
   errorCode?: string | null;
   canonical?: unknown;
-}
-interface HistoryRow {
-  at: string;
-  actor?: string | { name?: string };
-  action: string;
-  changes?: Record<string, [unknown, unknown]>;
 }
 interface Preferences {
   favorites?: { type: string; id: string; name?: string }[];
@@ -76,7 +71,6 @@ export async function loader({ request, context, params }: Route.LoaderArgs) {
   const detail = orThrow(device);
 
   let raw: { rows: RawRow[]; nextCursor?: string | null; failed: boolean; selected?: RawDetail | null } | undefined;
-  let history: { rows: HistoryRow[]; page: number; totalPages?: number } | undefined;
   let semantic: SemanticDoc | null | undefined;
   let modelMetrics: string[] = [];
   if (tab === "raw") {
@@ -89,10 +83,6 @@ export async function loader({ request, context, params }: Route.LoaderArgs) {
     const rawId = url.searchParams.get("raw");
     const selected = rawId ? await callApi<RawDetail>(ctx, request, `/api/v1/core/ingest/raw-messages/${encodeURIComponent(rawId)}`) : undefined;
     raw = { rows: list.ok ? list.list.responses : [], nextCursor: list.ok ? list.list.nextCursor : null, failed: !list.ok, selected: selected?.ok ? selected.data : null };
-  } else if (tab === "history") {
-    const page = Math.max(1, Number(url.searchParams.get("page")) || 1);
-    const list = await callList<HistoryRow>(ctx, request, `/api/v1/core/devices/${id}/history?page=${page}&size=20`);
-    history = { rows: list.ok ? list.list.responses : [], page, totalPages: list.ok ? list.list.totalPages : undefined };
   } else if (tab === "semantic") {
     const result = await callApi<SemanticDoc>(ctx, request, `/api/v1/core/devices/${id}/semantic`);
     semantic = result.ok ? result.data : null;
@@ -105,7 +95,7 @@ export async function loader({ request, context, params }: Route.LoaderArgs) {
     const [models, spaces] = await Promise.all([callList<{ id: string; code: string; name: string }>(ctx, request, "/api/v1/core/device-models?size=100"), callApi<SpaceNode[]>(ctx, request, "/api/v1/core/spaces")]);
     editOptions = { models: models.ok ? models.list.responses : [], spaces: spaces.ok ? (spaces.data ?? []) : [] };
   }
-  return { device: detail, tab, now, raw, history, semantic, modelMetrics, editOptions, preferences: prefs.ok ? prefs.data : null };
+  return { device: detail, tab, now, raw, semantic, modelMetrics, editOptions, preferences: prefs.ok ? prefs.data : null };
 }
 
 type ActionResult = { intent: string; done?: boolean; error?: { code: string; message?: string }; references?: { type: string; id: string; name?: string }[]; fieldErrors?: Record<string, string> };
@@ -197,7 +187,7 @@ export default function DeviceDetailRoute({ loaderData, actionData }: Route.Comp
   const canPlace = hasAny(permissions, ["DEV_PLACE"]);
   const canAdmin = hasAny(permissions, ["DEV_ADMIN"]);
   const timezone = root?.timezone ?? "Asia/Seoul";
-  const { device, tab, now, raw, history, semantic, modelMetrics, editOptions, preferences } = loaderData;
+  const { device, tab, now, raw, semantic, modelMetrics, editOptions, preferences } = loaderData;
   const result = actionData as ActionResult | undefined;
   const [deleteOpen, setDeleteOpen] = useState(false);
   const favorite = isFavorite(preferences?.favorites, "DEVICE", device.id);
@@ -336,39 +326,6 @@ export default function DeviceDetailRoute({ loaderData, actionData }: Route.Comp
               {raw.selected.canonical !== undefined && raw.selected.canonical !== null && <pre className="mt-2 max-h-80 overflow-auto rounded bg-bg p-3 font-mono text-[12px]">{JSON.stringify(raw.selected.canonical, null, 2)}</pre>}
             </section>
           )}
-        </Card>
-      )}
-      {tab === "history" && history && (
-        <Card title={t("devices.history.title")}>
-          {history.rows.length === 0 ? (
-            <EmptyState title={t("devices.history.empty")} />
-          ) : (
-            <Table>
-              <thead>
-                <tr>
-                  <th>{t("devices.history.at")}</th>
-                  <th>{t("devices.history.actor")}</th>
-                  <th>{t("devices.history.action")}</th>
-                  <th>{t("devices.history.changes")}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {history.rows.map((h, i) => (
-                  <tr key={`${h.at}-${i}`}>
-                    <td>{fmt(h.at)}</td>
-                    <td>{typeof h.actor === "string" ? h.actor : (h.actor?.name ?? "–")}</td>
-                    <td>{h.action}</td>
-                    <td className="font-mono text-[12px]">
-                      {Object.entries(h.changes ?? {})
-                        .map(([k, [a, b]]) => `${k}: ${String(a ?? "–")} → ${String(b ?? "–")}`)
-                        .join(", ")}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
-          )}
-          <Pager page={history.page} totalPages={history.totalPages} />
         </Card>
       )}
       {tab === "semantic" && <SemanticTab semantic={semantic ?? null} canEdit={canAdmin} fieldErrors={result?.intent === "semantic-save" ? result.fieldErrors : undefined} />}

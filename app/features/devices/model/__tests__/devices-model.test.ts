@@ -78,6 +78,9 @@ describe("TC-DEV-047 승인(UI-DEV-05)", () => {
     ];
     expect(suggestSpace(spaces, { tags: { location: " 실습실 ", point: "중앙" } })).toBe("31");
     expect(suggestSpace(spaces, { tags: { room: "숨김" } })).toBeUndefined();
+    // core가 준 추천 공간(suggestedSpaceId)이 트리에 있으면 우선, 없으면 태그 이름 일치
+    expect(suggestSpace(spaces, { tags: { location: "실습실" } }, "2")).toBe("2");
+    expect(suggestSpace(spaces, { tags: { location: "실습실" } }, "999")).toBe("31");
     expect(suggestSpace(spaces, { tags: {} })).toBeUndefined();
     expect(suggestSpace(spaces, null)).toBeUndefined();
   });

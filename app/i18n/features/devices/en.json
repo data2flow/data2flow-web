@@ -157,7 +157,8 @@
       "reject": "Reject",
       "rejectTitle": "Reject devices",
       "rejectBody": "Reject the {{n}} selected devices.",
-      "ignoreAgain": "Do not register them if they appear again"
+      "ignoreAgain": "Do not register them if they appear again",
+      "signingKeyOnce": "Signing key for device {{id}}. It is shown only once; enter it on the device."
     },
     "new": {
       "title": "Add device",

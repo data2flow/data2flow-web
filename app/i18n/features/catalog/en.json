@@ -3,8 +3,19 @@
     "askAdmin": "Ask an administrator (INTEGRATOR or above) to create one.",
     "required": "Required",
     "listHint": "Separate with commas",
-    "protocol": { "LORAWAN": "LoRaWAN", "MQTT": "MQTT", "HTTP": "HTTP", "VIRTUAL": "Virtual", "OTHER": "Other" },
-    "kind": { "SENSOR": "Sensor", "ACTUATOR": "Actuator", "GATEWAY": "Gateway", "HYBRID": "Hybrid" },
+    "protocol": {
+      "LORAWAN": "LoRaWAN",
+      "MQTT": "MQTT",
+      "HTTP": "HTTP",
+      "VIRTUAL": "Virtual",
+      "OTHER": "Other"
+    },
+    "kind": {
+      "SENSOR": "Sensor",
+      "ACTUATOR": "Actuator",
+      "GATEWAY": "Gateway",
+      "HYBRID": "Hybrid"
+    },
     "validation": {
       "modelCode": "Code must start with an uppercase letter or digit, 50 characters or fewer",
       "nameRequired": "Enter a name (100 characters or fewer)",
@@ -51,7 +62,13 @@
       "confirmDeprecate": "Deprecate this model? It can no longer be chosen for new devices.",
       "confirmDelete": "Delete this model?",
       "inUseHint": "A model used by devices can only be deprecated.",
-      "tab": { "info": "Info", "metrics": "Metrics", "capabilities": "Capabilities", "package": "Package", "devices": "Devices" },
+      "tab": {
+        "info": "Info",
+        "metrics": "Metrics",
+        "capabilities": "Capabilities",
+        "package": "Package",
+        "devices": "Devices"
+      },
       "include": "Include",
       "includeOf": "Include {{key}}",
       "requiredOf": "{{key}} required",
@@ -74,7 +91,11 @@
       },
       "preview": "Form preview · validate device values",
       "noFields": "No attributes.",
-      "attrError": { "required": "Required", "type": "Must be {{type}}", "unknown": "Not in the schema" },
+      "attrError": {
+        "required": "Required",
+        "type": "Must be {{type}}",
+        "unknown": "Not in the schema"
+      },
       "validateHint": "Enter values to validate device input",
       "valid": "Values match the schema",
       "invalid": "{{n}} values do not match the schema"
@@ -82,7 +103,12 @@
     "metrics": {
       "title": "Metrics",
       "new": "New metric",
-      "tab": { "verified": "Verified", "unverified": "Unverified", "ignored": "Ignored", "aliases": "Aliases" },
+      "tab": {
+        "verified": "Verified",
+        "unverified": "Unverified",
+        "ignored": "Ignored",
+        "aliases": "Aliases"
+      },
       "key": "Key",
       "keyHint": "e.g. co2, pm2_5. Cannot be changed later",
       "displayName": "Display name",
@@ -160,7 +186,11 @@
       "removeSelected": "Remove {{n}} selected",
       "addMembers": "Add devices",
       "confirmDelete": "Delete this group?",
-      "refType": { "RULE": "Rule", "FLOW": "Flow", "DASHBOARD": "Dashboard" }
+      "refType": {
+        "RULE": "Rule",
+        "FLOW": "Flow",
+        "DASHBOARD": "Dashboard"
+      }
     }
   },
   "errors": {
@@ -174,6 +204,9 @@
     "METRIC_NOT_FOUND": "Metric not found.",
     "GROUP_NAME_DUPLICATE": "A group with this name already exists.",
     "GROUP_SIZE_EXCEEDED": "A group can contain up to 1,000 devices.",
-    "GROUP_IN_USE": "This group is in use and cannot be deleted."
+    "GROUP_IN_USE": "This group is in use and cannot be deleted.",
+    "MODEL_NOT_FOUND": "Device model not found.",
+    "GROUP_NOT_FOUND": "Group not found.",
+    "ATTRIBUTE_SCHEMA_VIOLATION": "Attribute values do not match the model's attribute schema."
   }
 }

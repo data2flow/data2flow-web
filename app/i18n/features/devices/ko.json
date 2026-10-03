@@ -157,7 +157,8 @@
       "reject": "거부",
       "rejectTitle": "기기 거부",
       "rejectBody": "선택한 {{n}}대를 거부합니다.",
-      "ignoreAgain": "다시 들어와도 등록하지 않음"
+      "ignoreAgain": "다시 들어와도 등록하지 않음",
+      "signingKeyOnce": "기기 {{id}}의 서명 키입니다. 지금 한 번만 보입니다. 기기에 입력하세요."
     },
     "new": {
       "title": "기기 추가",

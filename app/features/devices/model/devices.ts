@@ -39,6 +39,9 @@ export interface DeviceSummary {
   onboardingComplete?: boolean;
   metrics?: string[];
   sourceMeta?: { deviceName?: string; tags?: Record<string, string> } | null;
+  /** core가 원본 위치 태그로 고른 추천 공간(ING-03.03) */
+  suggestedSpaceId?: string | null;
+  autoRegistered?: boolean;
   version?: number;
 }
 
@@ -170,7 +173,9 @@ export function checkApproval(input: { count: number; modelId: string; spaceId: 
  * 추천 공간(AT-DEV-03.3): 원본 tags의 location(또는 space·room) 값과 이름이 같은 공간. 확정은 사용자가 한다.
  * 같은 이름이 여러 개면 더 깊은(구체적인) 공간을 고른다.
  */
-export function suggestSpace(spaces: SpaceNode[], sourceMeta: DeviceSummary["sourceMeta"]): string | undefined {
+export function suggestSpace(spaces: SpaceNode[], sourceMeta: DeviceSummary["sourceMeta"], suggestedSpaceId?: string | null): string | undefined {
+  // core가 고른 추천 공간이 트리에 있으면 그것을 쓴다
+  if (suggestedSpaceId && flattenSpaces(spaces).some((s) => s.id === String(suggestedSpaceId) && s.node.accessible !== false)) return String(suggestedSpaceId);
   const tags = sourceMeta?.tags ?? {};
   const wanted = [tags.location, tags.space, tags.room].filter((v): v is string => typeof v === "string" && v.trim() !== "").map((v) => v.trim().toLowerCase());
   if (wanted.length === 0) return undefined;
@@ -182,6 +187,8 @@ export interface ApproveResult {
   deviceId: string;
   ok: boolean;
   errorCode?: string;
+  /** 플랫폼 브로커 기기의 서명 키(승인 때 한 번만, DSC-03.05·ADR-031) */
+  signingKey?: string;
 }
 
 export function summarizeResults(results: ApproveResult[]) {

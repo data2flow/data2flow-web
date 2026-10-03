@@ -124,6 +124,17 @@ describe("DEV-02.03 UI-DEV-05 승인 대기", () => {
     expect(detail.body).toContain("실습실 중앙 온습도");
   });
 
+  it("DSC-03.05 플랫폼 브로커 기기는 승인 결과의 서명 키를 한 번만 보여 준다(ADR-031)", async () => {
+    app.gateway.m2.sources.push({ ...app.gateway.m2.sources[0], id: "8", code: "esp-broker", name: "ESP 브로커", type: "PLATFORM_BROKER" });
+    app.gateway.m2.devices.find((d) => d.id === "1050")!.sourceId = "8";
+    const browser = await operator();
+    await browser.get("/devices/pending");
+    const result = await browser.post("/devices/pending", { intent: "approve", deviceId: ["1050"], "version:1050": "1", modelId: "11", spaceId: "31" });
+    expect(result.body).toContain("sk-1050-hmac");
+    expect(result.body).toContain("지금 한 번만 보입니다");
+    expect((await browser.get("/devices/pending")).body).not.toContain("sk-1050-hmac");
+  });
+
   it("TC-DEV-047 모델·공간 없으면 400과 문구, 부분 실패는 실패 행을 남기고 사유 표시", async () => {
     const browser = await operator();
     await browser.get("/devices/pending");
@@ -280,9 +291,10 @@ describe("DEV-02.01 UI-DEV-06 기기 상세", () => {
     expect(raw.body).toContain("412B");
     expect(raw.body).toContain("{&quot;temperature&quot;:22.3}");
     expect(raw.body).toContain("cursor=c2");
+    // 변경 이력(API-DEV-27)은 core M2에 없어 탭을 두지 않는다: ?tab=history는 개요로
     const history = await browser.get("/devices/1042?tab=history");
-    expect(history.body).toContain("spaceId: 3 → 31");
-    expect(history.body).toContain("홍길동");
+    expect(history.body).not.toContain(`href="/devices/1042?tab=history"`);
+    expect(app.gateway.received.some((r) => r.path.includes("/history"))).toBe(false);
   });
 
   it("원본 메시지를 못 불러오면 안내, 데이터 탭은 모델 측정 항목을 후보로", async () => {

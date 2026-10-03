@@ -152,7 +152,7 @@ export default function DevicesPending({ loaderData, actionData }: Route.Compone
   const toggle = (id: string) => setSelected((cur) => (cur.includes(id) ? cur.filter((x) => x !== id) : [...cur, id]));
   const single = selected.length === 1 ? rows.find((d) => d.id === selected[0]) : undefined;
   const suggestedModel = preview && single && preview.device.id === single.id ? preview.suggestions[0]?.modelId : undefined;
-  const suggestedSpace = single ? suggestSpace(spaces, single.sourceMeta) : undefined;
+  const suggestedSpace = single ? suggestSpace(spaces, single.sourceMeta, single.suggestedSpaceId) : undefined;
   const fieldErrors = result?.fieldErrors ?? {};
   const fmt = (iso?: string | null) => formatDateTime(iso ?? undefined, timezone, i18n.language);
   const previewLink = (id: string) => {
@@ -168,6 +168,18 @@ export default function DevicesPending({ loaderData, actionData }: Route.Compone
       {summary && result?.intent === "approve" && (
         <div className="mb-3">
           <Alert tone={summary.failed ? "warning" : "success"}>{t("devices.resultSummary", { ok: summary.succeeded, failed: summary.failed })}</Alert>
+          {(result.results ?? [])
+            .filter((r) => r.ok && r.signingKey)
+            .map((r) => (
+              <div key={r.deviceId} className="mt-2">
+                <Alert tone="warning">
+                  <p className="font-semibold">{t("devices.pending.signingKeyOnce", { id: r.deviceId })}</p>
+                  <p className="font-mono" data-testid="signing-key">
+                    {r.signingKey}
+                  </p>
+                </Alert>
+              </div>
+            ))}
         </div>
       )}
       {summary && result?.intent === "reject" && (

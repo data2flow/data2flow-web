@@ -157,7 +157,8 @@
       "reject": "拒绝",
       "rejectTitle": "拒绝设备",
       "rejectBody": "将拒绝所选的 {{n}} 台设备。",
-      "ignoreAgain": "再次出现时也不注册"
+      "ignoreAgain": "再次出现时也不注册",
+      "signingKeyOnce": "设备 {{id}} 的签名密钥，仅显示这一次，请输入到设备中。"
     },
     "new": {
       "title": "添加设备",

@@ -3,8 +3,19 @@
     "askAdmin": "如需创建，请联系管理员（INTEGRATOR 及以上）。",
     "required": "必填",
     "listHint": "用逗号分隔",
-    "protocol": { "LORAWAN": "LoRaWAN", "MQTT": "MQTT", "HTTP": "HTTP", "VIRTUAL": "虚拟", "OTHER": "其他" },
-    "kind": { "SENSOR": "传感器", "ACTUATOR": "执行器", "GATEWAY": "网关", "HYBRID": "复合" },
+    "protocol": {
+      "LORAWAN": "LoRaWAN",
+      "MQTT": "MQTT",
+      "HTTP": "HTTP",
+      "VIRTUAL": "虚拟",
+      "OTHER": "其他"
+    },
+    "kind": {
+      "SENSOR": "传感器",
+      "ACTUATOR": "执行器",
+      "GATEWAY": "网关",
+      "HYBRID": "复合"
+    },
     "validation": {
       "modelCode": "代码须以大写字母或数字开头，不超过50个字符",
       "nameRequired": "请输入名称（不超过100个字符）",
@@ -51,7 +62,13 @@
       "confirmDeprecate": "要停用此型号吗？新设备将不能选择它。",
       "confirmDelete": "要删除此型号吗？",
       "inUseHint": "有设备在使用的型号只能[停用]。",
-      "tab": { "info": "信息", "metrics": "测量项", "capabilities": "功能", "package": "包", "devices": "设备" },
+      "tab": {
+        "info": "信息",
+        "metrics": "测量项",
+        "capabilities": "功能",
+        "package": "包",
+        "devices": "设备"
+      },
       "include": "包含",
       "includeOf": "包含 {{key}}",
       "requiredOf": "{{key}} 必填",
@@ -74,7 +91,11 @@
       },
       "preview": "输入表单预览 · 设备输入值校验",
       "noFields": "没有属性。",
-      "attrError": { "required": "必填值", "type": "必须是 {{type}} 类型", "unknown": "模式中没有此属性" },
+      "attrError": {
+        "required": "必填值",
+        "type": "必须是 {{type}} 类型",
+        "unknown": "模式中没有此属性"
+      },
       "validateHint": "输入值以校验设备输入",
       "valid": "输入值符合模式",
       "invalid": "{{n}} 个值不符合模式"
@@ -82,7 +103,12 @@
     "metrics": {
       "title": "测量项",
       "new": "新建测量项",
-      "tab": { "verified": "已验证", "unverified": "未验证", "ignored": "已忽略", "aliases": "别名" },
+      "tab": {
+        "verified": "已验证",
+        "unverified": "未验证",
+        "ignored": "已忽略",
+        "aliases": "别名"
+      },
       "key": "键",
       "keyHint": "例如 co2、pm2_5。创建后不能修改",
       "displayName": "显示名称",
@@ -160,7 +186,11 @@
       "removeSelected": "移除所选 {{n}} 台",
       "addMembers": "添加设备",
       "confirmDelete": "要删除此分组吗？",
-      "refType": { "RULE": "规则", "FLOW": "流程", "DASHBOARD": "仪表板" }
+      "refType": {
+        "RULE": "规则",
+        "FLOW": "流程",
+        "DASHBOARD": "仪表板"
+      }
     }
   },
   "errors": {
@@ -174,6 +204,9 @@
     "METRIC_NOT_FOUND": "找不到测量项。",
     "GROUP_NAME_DUPLICATE": "已存在相同名称的分组。",
     "GROUP_SIZE_EXCEEDED": "一个分组最多可包含1,000台设备。",
-    "GROUP_IN_USE": "此分组正在使用中，无法删除。"
+    "GROUP_IN_USE": "此分组正在使用中，无法删除。",
+    "MODEL_NOT_FOUND": "找不到设备型号。",
+    "GROUP_NOT_FOUND": "找不到分组。",
+    "ATTRIBUTE_SCHEMA_VIOLATION": "属性值不符合型号的属性模式。"
   }
 }
