@@ -1,0 +1,152 @@
+{
+  "ingest": {
+    "area": {
+      "monitor": "수집 모니터",
+      "sources": "데이터 소스",
+      "scripts": "스크립트",
+      "failures": "실패 메시지"
+    },
+    "stage": {
+      "SOURCE": "소스",
+      "DECODE": "디코딩",
+      "SCRIPT": "스크립트",
+      "VALIDATE": "검증",
+      "STORE": "저장",
+      "EVENT": "이벤트"
+    },
+    "failureStage": {
+      "DECODE": "디코딩",
+      "SCRIPT": "스크립트",
+      "STORE": "저장",
+      "PUBLISH": "발행"
+    },
+    "monitor": {
+      "title": "수집 모니터",
+      "diagram": "수집 흐름",
+      "inPerMin": "처리 {{n}}/분",
+      "failPerMin": "실패 {{n}}/분",
+      "noFailure": "실패 없음",
+      "stageLink": "{{stage}} 단계 실패 메시지 보기",
+      "causeHints": "원인 후보: {{hints}}",
+      "updatedAgo": "갱신 {{n}}초 전",
+      "sources": "소스별 수신",
+      "sourceName": "소스",
+      "type": "유형",
+      "connection": "연결 상태",
+      "perMin": "분당",
+      "lastReceived": "마지막 수신",
+      "metricsFailed": "지표를 불러오지 못했습니다",
+      "noSources": "등록된 데이터 소스가 없습니다",
+      "noSourcesBody": "데이터 소스를 연결하면 수집 흐름과 처리량이 여기에 보입니다.",
+      "addSource": "데이터 소스 등록",
+      "askAdmin": "데이터 소스 등록은 관리자에게 요청하세요.",
+      "tabOverview": "흐름",
+      "tabStream": "메시지 스트림",
+      "throughput": "소스별 처리량({{window}})",
+      "perMinUnit": "건/분",
+      "latency": "처리 지연 p50/p95",
+      "heartbeat": "하트비트 구간"
+    },
+    "card": {
+      "perMinute": "분당 수신",
+      "latencyP95Ms": "처리 지연 p95",
+      "streamLagSec": "스트림 lag",
+      "heartbeat": "하트비트",
+      "failuresToday": "오늘 실패"
+    },
+    "alertLevel": {
+      "WARNING": "경고",
+      "CRITICAL": "위험"
+    },
+    "stream": {
+      "title": "수집 메시지 스트림",
+      "source": "소스",
+      "device": "기기",
+      "result": "처리 결과",
+      "waiting": "일시정지 중 {{n}}건 대기",
+      "empty": "아직 받은 메시지가 없습니다.",
+      "receivedAt": "수신 시각",
+      "topic": "토픽",
+      "collapse": "접기",
+      "expand": "펼치기",
+      "raw": "원본",
+      "rawHidden": "원본 권한 없음",
+      "canonical": "표준 메시지"
+    },
+    "threshold": {
+      "title": "수집 알람 기준",
+      "lagWarnSec": "처리 지연 경고(초)",
+      "lagCriticalSec": "처리 지연 위험(초)",
+      "heartbeatCriticalSec": "하트비트 위험(초)",
+      "order": "경고 기준은 위험 기준보다 작아야 합니다",
+      "range": {
+        "lagWarnSec": "10~3,600초 사이로 입력하세요",
+        "lagCriticalSec": "7,200초 이하로 입력하세요",
+        "heartbeatCriticalSec": "10~600초 사이로 입력하세요"
+      }
+    },
+    "failures": {
+      "title": "실패 메시지",
+      "stageAll": "전체",
+      "days": "{{n}}일",
+      "empty": "실패한 메시지가 없습니다",
+      "emptyBody": "처리에 실패한 메시지가 생기면 사유별로 묶어 보여 줍니다.",
+      "groupCount": "{{n}}건",
+      "reprocessGroup": "묶음 전체 재처리",
+      "tooMany": "한 번에 최대 {{max}}건까지 재처리할 수 있습니다",
+      "discarded": "{{n}}건을 폐기했습니다.",
+      "reasonRequired": "폐기 사유를 입력하세요",
+      "selectAll": "모두 선택",
+      "selectItem": "{{id}} 선택",
+      "failedAt": "실패 시각",
+      "source": "소스",
+      "device": "기기",
+      "unidentified": "(식별 불가)",
+      "errorCode": "오류 코드",
+      "errorMessage": "오류 메시지",
+      "attempts": "시도",
+      "status": "상태",
+      "itemStatus": {
+        "OPEN": "열림",
+        "REPROCESSING": "재처리 중",
+        "RESOLVED": "해결",
+        "DISCARDED": "폐기"
+      },
+      "locked": "다른 사용자가 처리 중",
+      "reprocessSelected": "선택 재처리",
+      "discard": "폐기",
+      "discardTitle": "실패 메시지 폐기",
+      "discardConfirm": "{{n}}건 폐기",
+      "discardBody": "선택한 {{n}}건을 폐기합니다. 원본 메시지는 보관 기간까지 남습니다.",
+      "reason": "폐기 사유",
+      "result": {
+        "title": "재처리 결과",
+        "outcome": "결과"
+      },
+      "outcome": {
+        "RESOLVED": "성공",
+        "SAME_ERROR": "같은 오류",
+        "OTHER_ERROR": "다른 오류",
+        "LOCKED": "잠김"
+      }
+    },
+    "raw": {
+      "title": "원본 메시지 {{id}}",
+      "receivedAt": "수신 시각",
+      "topic": "토픽",
+      "status": "처리 결과",
+      "trace": "처리 단계",
+      "metric": "측정 항목",
+      "value": "값",
+      "quality": "품질"
+    }
+  },
+  "errors": {
+    "ING_DLQ_BATCH_TOO_LARGE": "한 번에 최대 5,000건까지 재처리할 수 있습니다.",
+    "ING_DLQ_ITEM_LOCKED": "다른 사용자가 처리 중인 항목이 있습니다. 잠시 후 다시 시도해 주세요.",
+    "ING_QUERY_RANGE_TOO_LARGE": "조회 기간은 31일 이하여야 합니다.",
+    "ING_REPROCESS_OUT_OF_RETENTION": "보관 기간이 지난 메시지는 재처리할 수 없습니다.",
+    "ING_RAW_MESSAGE_NOT_FOUND": "원본 메시지를 찾을 수 없습니다.",
+    "METRICS_UNAVAILABLE": "지표를 불러오지 못했습니다."
+  }
+}

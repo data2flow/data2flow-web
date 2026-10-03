@@ -1,0 +1,152 @@
+{
+  "ingest": {
+    "area": {
+      "monitor": "采集监控",
+      "sources": "数据源",
+      "scripts": "脚本",
+      "failures": "失败消息"
+    },
+    "stage": {
+      "SOURCE": "数据源",
+      "DECODE": "解码",
+      "SCRIPT": "脚本",
+      "VALIDATE": "验证",
+      "STORE": "存储",
+      "EVENT": "事件"
+    },
+    "failureStage": {
+      "DECODE": "解码",
+      "SCRIPT": "脚本",
+      "STORE": "存储",
+      "PUBLISH": "发布"
+    },
+    "monitor": {
+      "title": "采集监控",
+      "diagram": "采集流程",
+      "inPerMin": "处理 {{n}}/分",
+      "failPerMin": "失败 {{n}}/分",
+      "noFailure": "无失败",
+      "stageLink": "查看{{stage}}阶段的失败消息",
+      "causeHints": "可能原因：{{hints}}",
+      "updatedAgo": "{{n}}秒前更新",
+      "sources": "按数据源",
+      "sourceName": "数据源",
+      "type": "类型",
+      "connection": "连接状态",
+      "perMin": "每分钟",
+      "lastReceived": "最后接收",
+      "metricsFailed": "无法加载指标",
+      "noSources": "没有已注册的数据源",
+      "noSourcesBody": "连接数据源后，这里会显示采集流程和吞吐量。",
+      "addSource": "注册数据源",
+      "askAdmin": "请联系管理员注册数据源。",
+      "tabOverview": "流程",
+      "tabStream": "消息流",
+      "throughput": "按数据源吞吐量（{{window}}）",
+      "perMinUnit": "条/分",
+      "latency": "处理延迟 p50/p95",
+      "heartbeat": "心跳阶段"
+    },
+    "card": {
+      "perMinute": "每分钟接收",
+      "latencyP95Ms": "处理延迟 p95",
+      "streamLagSec": "流延迟",
+      "heartbeat": "心跳",
+      "failuresToday": "今日失败"
+    },
+    "alertLevel": {
+      "WARNING": "警告",
+      "CRITICAL": "严重"
+    },
+    "stream": {
+      "title": "采集消息流",
+      "source": "数据源",
+      "device": "设备",
+      "result": "处理结果",
+      "waiting": "已暂停，{{n}} 条等待",
+      "empty": "尚未收到消息。",
+      "receivedAt": "接收时间",
+      "topic": "主题",
+      "collapse": "收起",
+      "expand": "展开",
+      "raw": "原始",
+      "rawHidden": "无权查看原始数据",
+      "canonical": "标准消息"
+    },
+    "threshold": {
+      "title": "采集告警阈值",
+      "lagWarnSec": "延迟警告（秒）",
+      "lagCriticalSec": "延迟严重（秒）",
+      "heartbeatCriticalSec": "心跳严重（秒）",
+      "order": "警告阈值必须小于严重阈值",
+      "range": {
+        "lagWarnSec": "请输入 10～3,600 秒",
+        "lagCriticalSec": "请输入 7,200 秒以下",
+        "heartbeatCriticalSec": "请输入 10～600 秒"
+      }
+    },
+    "failures": {
+      "title": "失败消息",
+      "stageAll": "全部",
+      "days": "{{n}}天",
+      "empty": "没有失败的消息",
+      "emptyBody": "处理失败的消息会按原因分组显示在这里。",
+      "groupCount": "{{n}} 条",
+      "reprocessGroup": "重新处理整组",
+      "tooMany": "一次最多可重新处理 {{max}} 条",
+      "discarded": "已丢弃 {{n}} 条。",
+      "reasonRequired": "请输入丢弃原因",
+      "selectAll": "全选",
+      "selectItem": "选择 {{id}}",
+      "failedAt": "失败时间",
+      "source": "数据源",
+      "device": "设备",
+      "unidentified": "（无法识别）",
+      "errorCode": "错误代码",
+      "errorMessage": "错误信息",
+      "attempts": "尝试",
+      "status": "状态",
+      "itemStatus": {
+        "OPEN": "待处理",
+        "REPROCESSING": "重新处理中",
+        "RESOLVED": "已解决",
+        "DISCARDED": "已丢弃"
+      },
+      "locked": "其他用户处理中",
+      "reprocessSelected": "重新处理所选",
+      "discard": "丢弃",
+      "discardTitle": "丢弃失败消息",
+      "discardConfirm": "丢弃 {{n}} 条",
+      "discardBody": "将丢弃所选 {{n}} 条。原始消息会保留到保存期限。",
+      "reason": "丢弃原因",
+      "result": {
+        "title": "重新处理结果",
+        "outcome": "结果"
+      },
+      "outcome": {
+        "RESOLVED": "成功",
+        "SAME_ERROR": "相同错误",
+        "OTHER_ERROR": "其他错误",
+        "LOCKED": "已锁定"
+      }
+    },
+    "raw": {
+      "title": "原始消息 {{id}}",
+      "receivedAt": "接收时间",
+      "topic": "主题",
+      "status": "处理结果",
+      "trace": "处理阶段",
+      "metric": "测量项",
+      "value": "值",
+      "quality": "质量"
+    }
+  },
+  "errors": {
+    "ING_DLQ_BATCH_TOO_LARGE": "一次最多可重新处理 5,000 条。",
+    "ING_DLQ_ITEM_LOCKED": "部分项目正由其他用户处理，请稍后重试。",
+    "ING_QUERY_RANGE_TOO_LARGE": "查询期间不能超过 31 天。",
+    "ING_REPROCESS_OUT_OF_RETENTION": "已超过保存期限的消息无法重新处理。",
+    "ING_RAW_MESSAGE_NOT_FOUND": "找不到原始消息。",
+    "METRICS_UNAVAILABLE": "无法加载指标。"
+  }
+}

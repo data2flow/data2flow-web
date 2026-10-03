@@ -1,0 +1,152 @@
+{
+  "ingest": {
+    "area": {
+      "monitor": "Ingestion monitor",
+      "sources": "Data sources",
+      "scripts": "Scripts",
+      "failures": "Failed messages"
+    },
+    "stage": {
+      "SOURCE": "Source",
+      "DECODE": "Decode",
+      "SCRIPT": "Script",
+      "VALIDATE": "Validate",
+      "STORE": "Store",
+      "EVENT": "Event"
+    },
+    "failureStage": {
+      "DECODE": "Decode",
+      "SCRIPT": "Script",
+      "STORE": "Store",
+      "PUBLISH": "Publish"
+    },
+    "monitor": {
+      "title": "Ingestion monitor",
+      "diagram": "Ingestion pipeline",
+      "inPerMin": "{{n}}/min processed",
+      "failPerMin": "{{n}}/min failed",
+      "noFailure": "No failures",
+      "stageLink": "View failed messages at {{stage}}",
+      "causeHints": "Possible causes: {{hints}}",
+      "updatedAgo": "Updated {{n}}s ago",
+      "sources": "By source",
+      "sourceName": "Source",
+      "type": "Type",
+      "connection": "Connection",
+      "perMin": "Per min",
+      "lastReceived": "Last received",
+      "metricsFailed": "Could not load metrics",
+      "noSources": "No data sources are registered",
+      "noSourcesBody": "Connect a data source to see the pipeline and throughput here.",
+      "addSource": "Register a data source",
+      "askAdmin": "Ask an administrator to register a data source.",
+      "tabOverview": "Pipeline",
+      "tabStream": "Message stream",
+      "throughput": "Throughput by source ({{window}})",
+      "perMinUnit": "msg/min",
+      "latency": "Processing latency p50/p95",
+      "heartbeat": "Heartbeat stages"
+    },
+    "card": {
+      "perMinute": "Received per min",
+      "latencyP95Ms": "Latency p95",
+      "streamLagSec": "Stream lag",
+      "heartbeat": "Heartbeat",
+      "failuresToday": "Failures today"
+    },
+    "alertLevel": {
+      "WARNING": "Warning",
+      "CRITICAL": "Critical"
+    },
+    "stream": {
+      "title": "Ingested message stream",
+      "source": "Source",
+      "device": "Device",
+      "result": "Result",
+      "waiting": "Paused: {{n}} waiting",
+      "empty": "No messages received yet.",
+      "receivedAt": "Received at",
+      "topic": "Topic",
+      "collapse": "Collapse",
+      "expand": "Expand",
+      "raw": "Raw",
+      "rawHidden": "No permission to view raw payload",
+      "canonical": "Canonical message"
+    },
+    "threshold": {
+      "title": "Ingestion alert thresholds",
+      "lagWarnSec": "Lag warning (s)",
+      "lagCriticalSec": "Lag critical (s)",
+      "heartbeatCriticalSec": "Heartbeat critical (s)",
+      "order": "The warning threshold must be lower than the critical threshold",
+      "range": {
+        "lagWarnSec": "Enter 10–3,600 seconds",
+        "lagCriticalSec": "Enter 7,200 seconds or less",
+        "heartbeatCriticalSec": "Enter 10–600 seconds"
+      }
+    },
+    "failures": {
+      "title": "Failed messages",
+      "stageAll": "All",
+      "days": "{{n}} days",
+      "empty": "There are no failed messages",
+      "emptyBody": "Failed messages will be grouped by reason here.",
+      "groupCount": "{{n}} items",
+      "reprocessGroup": "Reprocess group",
+      "tooMany": "You can reprocess up to {{max}} items at once",
+      "discarded": "Discarded {{n}} items.",
+      "reasonRequired": "Enter a reason for discarding",
+      "selectAll": "Select all",
+      "selectItem": "Select {{id}}",
+      "failedAt": "Failed at",
+      "source": "Source",
+      "device": "Device",
+      "unidentified": "(unidentified)",
+      "errorCode": "Error code",
+      "errorMessage": "Error message",
+      "attempts": "Attempts",
+      "status": "Status",
+      "itemStatus": {
+        "OPEN": "Open",
+        "REPROCESSING": "Reprocessing",
+        "RESOLVED": "Resolved",
+        "DISCARDED": "Discarded"
+      },
+      "locked": "Being processed by another user",
+      "reprocessSelected": "Reprocess selected",
+      "discard": "Discard",
+      "discardTitle": "Discard failed messages",
+      "discardConfirm": "Discard {{n}}",
+      "discardBody": "Discard {{n}} selected items. Raw messages are kept for the retention period.",
+      "reason": "Reason",
+      "result": {
+        "title": "Reprocess result",
+        "outcome": "Outcome"
+      },
+      "outcome": {
+        "RESOLVED": "Resolved",
+        "SAME_ERROR": "Same error",
+        "OTHER_ERROR": "Other error",
+        "LOCKED": "Locked"
+      }
+    },
+    "raw": {
+      "title": "Raw message {{id}}",
+      "receivedAt": "Received at",
+      "topic": "Topic",
+      "status": "Result",
+      "trace": "Processing trace",
+      "metric": "Metric",
+      "value": "Value",
+      "quality": "Quality"
+    }
+  },
+  "errors": {
+    "ING_DLQ_BATCH_TOO_LARGE": "You can reprocess up to 5,000 items at once.",
+    "ING_DLQ_ITEM_LOCKED": "Some items are being processed by another user. Try again shortly.",
+    "ING_QUERY_RANGE_TOO_LARGE": "The query range must be 31 days or less.",
+    "ING_REPROCESS_OUT_OF_RETENTION": "Messages past the retention period cannot be reprocessed.",
+    "ING_RAW_MESSAGE_NOT_FOUND": "Raw message not found.",
+    "METRICS_UNAVAILABLE": "Could not load metrics."
+  }
+}

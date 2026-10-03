@@ -1,0 +1,152 @@
+{
+  "ingest": {
+    "area": {
+      "monitor": "収集モニター",
+      "sources": "データソース",
+      "scripts": "スクリプト",
+      "failures": "失敗メッセージ"
+    },
+    "stage": {
+      "SOURCE": "ソース",
+      "DECODE": "デコード",
+      "SCRIPT": "スクリプト",
+      "VALIDATE": "検証",
+      "STORE": "保存",
+      "EVENT": "イベント"
+    },
+    "failureStage": {
+      "DECODE": "デコード",
+      "SCRIPT": "スクリプト",
+      "STORE": "保存",
+      "PUBLISH": "発行"
+    },
+    "monitor": {
+      "title": "収集モニター",
+      "diagram": "収集フロー",
+      "inPerMin": "処理 {{n}}/分",
+      "failPerMin": "失敗 {{n}}/分",
+      "noFailure": "失敗なし",
+      "stageLink": "{{stage}} 段階の失敗メッセージを見る",
+      "causeHints": "原因候補: {{hints}}",
+      "updatedAgo": "{{n}}秒前に更新",
+      "sources": "ソース別受信",
+      "sourceName": "ソース",
+      "type": "種類",
+      "connection": "接続状態",
+      "perMin": "毎分",
+      "lastReceived": "最終受信",
+      "metricsFailed": "指標を読み込めませんでした",
+      "noSources": "登録されたデータソースがありません",
+      "noSourcesBody": "データソースを接続すると、ここに収集フローと処理量が表示されます。",
+      "addSource": "データソースを登録",
+      "askAdmin": "データソースの登録は管理者に依頼してください。",
+      "tabOverview": "フロー",
+      "tabStream": "メッセージストリーム",
+      "throughput": "ソース別処理量（{{window}}）",
+      "perMinUnit": "件/分",
+      "latency": "処理遅延 p50/p95",
+      "heartbeat": "ハートビート区間"
+    },
+    "card": {
+      "perMinute": "毎分受信",
+      "latencyP95Ms": "処理遅延 p95",
+      "streamLagSec": "ストリーム遅延",
+      "heartbeat": "ハートビート",
+      "failuresToday": "本日の失敗"
+    },
+    "alertLevel": {
+      "WARNING": "警告",
+      "CRITICAL": "危険"
+    },
+    "stream": {
+      "title": "収集メッセージストリーム",
+      "source": "ソース",
+      "device": "デバイス",
+      "result": "処理結果",
+      "waiting": "一時停止中 {{n}}件待機",
+      "empty": "まだメッセージを受信していません。",
+      "receivedAt": "受信時刻",
+      "topic": "トピック",
+      "collapse": "閉じる",
+      "expand": "開く",
+      "raw": "元データ",
+      "rawHidden": "元データの閲覧権限がありません",
+      "canonical": "標準メッセージ"
+    },
+    "threshold": {
+      "title": "収集アラーム基準",
+      "lagWarnSec": "遅延警告（秒）",
+      "lagCriticalSec": "遅延危険（秒）",
+      "heartbeatCriticalSec": "ハートビート危険（秒）",
+      "order": "警告基準は危険基準より小さくしてください",
+      "range": {
+        "lagWarnSec": "10～3,600秒で入力してください",
+        "lagCriticalSec": "7,200秒以下で入力してください",
+        "heartbeatCriticalSec": "10～600秒で入力してください"
+      }
+    },
+    "failures": {
+      "title": "失敗メッセージ",
+      "stageAll": "すべて",
+      "days": "{{n}}日",
+      "empty": "失敗したメッセージはありません",
+      "emptyBody": "処理に失敗したメッセージは理由別にまとめて表示します。",
+      "groupCount": "{{n}}件",
+      "reprocessGroup": "グループ全体を再処理",
+      "tooMany": "一度に再処理できるのは最大{{max}}件です",
+      "discarded": "{{n}}件を破棄しました。",
+      "reasonRequired": "破棄理由を入力してください",
+      "selectAll": "すべて選択",
+      "selectItem": "{{id}} を選択",
+      "failedAt": "失敗時刻",
+      "source": "ソース",
+      "device": "デバイス",
+      "unidentified": "（識別不可）",
+      "errorCode": "エラーコード",
+      "errorMessage": "エラーメッセージ",
+      "attempts": "試行",
+      "status": "状態",
+      "itemStatus": {
+        "OPEN": "未処理",
+        "REPROCESSING": "再処理中",
+        "RESOLVED": "解決",
+        "DISCARDED": "破棄"
+      },
+      "locked": "他のユーザーが処理中",
+      "reprocessSelected": "選択を再処理",
+      "discard": "破棄",
+      "discardTitle": "失敗メッセージの破棄",
+      "discardConfirm": "{{n}}件を破棄",
+      "discardBody": "選択した{{n}}件を破棄します。元メッセージは保管期間まで残ります。",
+      "reason": "破棄理由",
+      "result": {
+        "title": "再処理結果",
+        "outcome": "結果"
+      },
+      "outcome": {
+        "RESOLVED": "成功",
+        "SAME_ERROR": "同じエラー",
+        "OTHER_ERROR": "別のエラー",
+        "LOCKED": "ロック中"
+      }
+    },
+    "raw": {
+      "title": "元メッセージ {{id}}",
+      "receivedAt": "受信時刻",
+      "topic": "トピック",
+      "status": "処理結果",
+      "trace": "処理段階",
+      "metric": "測定項目",
+      "value": "値",
+      "quality": "品質"
+    }
+  },
+  "errors": {
+    "ING_DLQ_BATCH_TOO_LARGE": "一度に再処理できるのは最大5,000件です。",
+    "ING_DLQ_ITEM_LOCKED": "他のユーザーが処理中の項目があります。しばらくしてから再試行してください。",
+    "ING_QUERY_RANGE_TOO_LARGE": "照会期間は31日以内にしてください。",
+    "ING_REPROCESS_OUT_OF_RETENTION": "保管期間を過ぎたメッセージは再処理できません。",
+    "ING_RAW_MESSAGE_NOT_FOUND": "元メッセージが見つかりません。",
+    "METRICS_UNAVAILABLE": "指標を読み込めませんでした。"
+  }
+}
