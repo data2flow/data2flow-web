@@ -1,0 +1,42 @@
+{
+  "home": {
+    "summaryFailed": "요약을 불러오지 못했습니다. 잠시 후 새로 고침해 주세요.",
+    "cards": {
+      "alarms": "열린 알람",
+      "alarmsDetail": "위험 {{critical}} · 주요 {{major}} · 경미 {{minor}}",
+      "offline": "오프라인 기기",
+      "devicesN": "{{n}}대",
+      "pending": "승인 대기 기기",
+      "ingest": "분당 수신",
+      "perMinute": "{{n}}건/분",
+      "sources": "소스 연결",
+      "sourcesValue": "{{connected}}/{{total}} 정상"
+    },
+    "comfort": {
+      "title": "공간 쾌적도",
+      "all": "전체 보기",
+      "empty": "목표 환경이 정해진 공간이 없습니다.",
+      "space": "공간",
+      "state": "상태",
+      "cause": "원인 측정 항목",
+      "updated": "마지막 갱신",
+      "more": "외 {{n}}곳"
+    },
+    "timeline": {
+      "title": "최근 알람·제어",
+      "empty": "최근 알람·제어가 없습니다.",
+      "type": {
+        "ALARM_RAISED": "알람 발생",
+        "ALARM_CLEARED": "알람 해제",
+        "CONTROL": "제어"
+      }
+    },
+    "empty": {
+      "title": "아직 데이터가 없습니다",
+      "body": "데이터 소스를 연결하고 공간을 만들면 센서 값이 이곳에 보입니다.",
+      "askAdmin": "데이터 소스 연결과 공간 만들기는 관리자에게 요청하세요.",
+      "connectSource": "데이터 소스 연결",
+      "createSpace": "공간 만들기"
+    }
+  }
+}

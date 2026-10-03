@@ -1,0 +1,178 @@
+{
+  "spaces": {
+    "tree": {
+      "label": "공간 트리",
+      "search": "공간 검색",
+      "offline": "오프라인 {{n}}",
+      "noMatch": "검색 결과가 없습니다.",
+      "addSite": "사이트 추가",
+      "addChild": "하위 추가",
+      "addChildTitle": "{{name}} 아래에 공간 추가",
+      "rename": "이름 바꾸기",
+      "move": "이동",
+      "moveTitle": "{{name}} 이동",
+      "newParent": "새 상위 공간",
+      "noMoveTarget": "옮길 수 있는 상위 공간이 없습니다.",
+      "deleteTitle": "{{name}} 삭제",
+      "deleteBody": "하위 공간·기기·평면도 마커·작업 지시가 없는 공간만 삭제할 수 있습니다.",
+      "typeName": "확인을 위해 공간 이름 \"{{name}}\"을 입력하세요",
+      "blockers": "하위 공간 {{children}}개, 기기 {{devices}}대, 마커 {{markers}}개, 작업 지시 {{workOrders}}건이 있어 삭제할 수 없습니다.",
+      "viewDevices": "기기 보기"
+    },
+    "field": {
+      "name": "이름",
+      "type": "종류",
+      "code": "코드",
+      "timezone": "시간대",
+      "address": "주소",
+      "latitude": "위도",
+      "longitude": "경도",
+      "usage": "용도",
+      "areaM2": "면적(㎡)",
+      "capacity": "정원(명)",
+      "grid": "기상청 격자 nx {{nx}}, ny {{ny}}(자동 계산)"
+    },
+    "validation": {
+      "nameRequired": "이름을 입력하세요",
+      "nameDuplicate": "같은 이름의 공간이 이미 있습니다",
+      "typeRequired": "종류를 고르세요",
+      "timezoneRequired": "시간대를 선택하세요",
+      "codeInvalid": "코드 형식이 올바르지 않습니다",
+      "latitudeInvalid": "위도는 -90~90 사이여야 합니다",
+      "longitudeInvalid": "경도는 -180~180 사이여야 합니다",
+      "notNumber": "숫자를 입력하세요",
+      "metricRequired": "측정 항목을 고르세요",
+      "duplicate": "같은 측정 항목이 이미 있습니다",
+      "valueRequired": "최소나 최대 중 하나 이상 입력하세요",
+      "minGreaterThanMax": "최소값이 최대값보다 큽니다",
+      "dayInvalid": "요일을 고르세요",
+      "timeInvalid": "시각은 HH:mm 형식으로 입력하세요",
+      "startAfterEnd": "시작이 종료보다 빨라야 합니다",
+      "overlap": "같은 요일의 시간 구간이 겹칩니다",
+      "untilInvalid": "종료 시각이 올바르지 않습니다",
+      "untilRange": "7일 이내로 지정하세요"
+    },
+    "usage": {
+      "CLASSROOM": "강의실",
+      "OFFICE": "사무실",
+      "MEETING": "회의실",
+      "LAB": "실습실",
+      "HALLWAY": "복도",
+      "OTHER": "기타"
+    },
+    "tab": {
+      "overview": "개요",
+      "devices": "기기",
+      "props": "속성",
+      "targets": "목표 환경",
+      "schedule": "운영 시간",
+      "floorplan": "평면도"
+    },
+    "targets": {
+      "inherit": "상위 값 사용",
+      "metric": "측정 항목",
+      "min": "최소",
+      "max": "최대",
+      "source": "출처",
+      "direct": "직접",
+      "inheritedFrom": "상속: {{name}}",
+      "addRow": "항목 추가"
+    },
+    "schedule": {
+      "inherit": "상위 시간표 사용",
+      "inheritedFrom": "상위 공간({{name}})의 시간표를 따릅니다.",
+      "day": "요일",
+      "start": "시작",
+      "end": "종료",
+      "empty": "운영 시간 구간이 없습니다(항상 미운영).",
+      "addSlot": "구간 추가"
+    },
+    "day": {
+      "1": "월",
+      "2": "화",
+      "3": "수",
+      "4": "목",
+      "5": "금",
+      "6": "토",
+      "7": "일"
+    },
+    "mode": {
+      "title": "현재 운영 모드",
+      "value": {
+        "OCCUPIED": "운영 중",
+        "UNOCCUPIED": "미운영",
+        "HOLIDAY": "휴일",
+        "MAINTENANCE": "점검"
+      },
+      "source": "원인: {{source}}",
+      "sourceValue": {
+        "OVERRIDE": "수동 지정",
+        "MAINTENANCE": "점검",
+        "CALENDAR": "달력",
+        "SCHEDULE": "시간표"
+      },
+      "next": "다음 변경 {{at}}",
+      "none": "운영 모드 정보가 없습니다.",
+      "override": "수동 지정",
+      "clear": "수동 지정 해제",
+      "until": "종료 시각"
+    },
+    "floorplan": {
+      "file": "평면도 이미지(PNG·JPG·SVG, 10MB 이하)",
+      "upload": "업로드",
+      "empty": "평면도 이미지를 올려 기기를 배치하세요",
+      "askAdmin": "평면도는 관리자가 올릴 수 있습니다.",
+      "viewMode": "보기 모드",
+      "editMode": "편집 모드",
+      "unplaced": "배치 안 된 기기",
+      "allPlaced": "모든 기기를 배치했습니다.",
+      "clickToPlace": "평면도에서 놓을 위치를 누르세요.",
+      "alt": "공간 평면도",
+      "removeMarker": "{{name}} 마커 제거"
+    },
+    "overview": {
+      "noDevices": "이 공간에 기기가 없습니다",
+      "placeDevices": "기기 배치",
+      "lastSeen": "마지막 수신 {{at}}",
+      "battery": "배터리 {{n}}%",
+      "children": "하위 공간",
+      "causes": "원인:"
+    },
+    "favorite": {
+      "on": "★ 즐겨찾기 해제",
+      "off": "☆ 즐겨찾기"
+    },
+    "devices": {
+      "openList": "기기 목록에서 보기",
+      "name": "이름",
+      "status": "상태",
+      "model": "모델",
+      "path": "공간",
+      "lastSeen": "마지막 수신"
+    },
+    "empty": {
+      "title": "첫 사이트를 만들어 시작하세요",
+      "body": "사이트 → 건물 → 층 → 실 순서로 공간을 만들고 기기를 배치합니다.",
+      "askAdmin": "공간은 관리자(INTEGRATOR 이상)가 만들 수 있습니다. 관리자에게 요청하세요."
+    }
+  },
+  "sites": {
+    "title": "사이트",
+    "empty": "아직 사이트가 없습니다",
+    "goSpaces": "공간 화면에서 사이트 만들기",
+    "stats": "기기 {{devices}} · 오프라인 {{offline}} · 알람 {{alarms}}",
+    "comfort": "쾌적 {{score}}",
+    "noLocation": "위치 정보 없음"
+  },
+  "errors": {
+    "SPACE_DEPTH_EXCEEDED": "공간 계층은 6단계까지 만들 수 있습니다.",
+    "SPACE_TYPE_INVALID": "이 위치에 만들 수 없는 공간 종류입니다.",
+    "SPACE_NAME_DUPLICATE": "같은 이름의 공간이 이미 있습니다.",
+    "SPACE_NOT_EMPTY": "하위 공간이나 기기가 있어 삭제할 수 없습니다.",
+    "SPACE_MOVE_CYCLE": "자기 하위 공간으로는 옮길 수 없습니다.",
+    "SCHEDULE_OVERLAP": "같은 요일의 시간 구간이 겹칩니다.",
+    "FLOORPLAN_IMAGE_INVALID": "이미지 형식이나 크기가 올바르지 않습니다",
+    "METRIC_NOT_FOUND": "측정 항목을 찾을 수 없습니다.",
+    "SPACE_NOT_FOUND": "공간을 찾을 수 없습니다."
+  }
+}

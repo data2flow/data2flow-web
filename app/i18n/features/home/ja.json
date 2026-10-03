@@ -1,0 +1,42 @@
+{
+  "home": {
+    "summaryFailed": "概要を読み込めませんでした。しばらくしてから再読み込みしてください。",
+    "cards": {
+      "alarms": "未解決アラーム",
+      "alarmsDetail": "重大 {{critical}} ・ 主要 {{major}} ・ 軽微 {{minor}}",
+      "offline": "オフラインデバイス",
+      "devicesN": "{{n}}台",
+      "pending": "承認待ちデバイス",
+      "ingest": "分あたり受信",
+      "perMinute": "{{n}}件/分",
+      "sources": "ソース接続",
+      "sourcesValue": "{{connected}}/{{total}} 正常"
+    },
+    "comfort": {
+      "title": "空間の快適度",
+      "all": "すべて表示",
+      "empty": "目標環境が設定された空間がありません。",
+      "space": "空間",
+      "state": "状態",
+      "cause": "原因の測定項目",
+      "updated": "最終更新",
+      "more": "ほか {{n}} か所"
+    },
+    "timeline": {
+      "title": "最近のアラーム・制御",
+      "empty": "最近のアラーム・制御はありません。",
+      "type": {
+        "ALARM_RAISED": "アラーム発生",
+        "ALARM_CLEARED": "アラーム解除",
+        "CONTROL": "制御"
+      }
+    },
+    "empty": {
+      "title": "まだデータがありません",
+      "body": "データソースを接続して空間を作成すると、センサー値がここに表示されます。",
+      "askAdmin": "データソースの接続と空間の作成は管理者に依頼してください。",
+      "connectSource": "データソースを接続",
+      "createSpace": "空間を作成"
+    }
+  }
+}

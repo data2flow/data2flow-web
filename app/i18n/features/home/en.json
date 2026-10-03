@@ -1,0 +1,42 @@
+{
+  "home": {
+    "summaryFailed": "Could not load the summary. Please refresh in a moment.",
+    "cards": {
+      "alarms": "Open alarms",
+      "alarmsDetail": "Critical {{critical}} · Major {{major}} · Minor {{minor}}",
+      "offline": "Offline devices",
+      "devicesN": "{{n}}",
+      "pending": "Pending devices",
+      "ingest": "Messages per minute",
+      "perMinute": "{{n}}/min",
+      "sources": "Sources connected",
+      "sourcesValue": "{{connected}}/{{total}} OK"
+    },
+    "comfort": {
+      "title": "Space comfort",
+      "all": "View all",
+      "empty": "No space has a target environment yet.",
+      "space": "Space",
+      "state": "State",
+      "cause": "Cause",
+      "updated": "Updated",
+      "more": "and {{n}} more"
+    },
+    "timeline": {
+      "title": "Recent alarms and controls",
+      "empty": "No recent alarms or controls.",
+      "type": {
+        "ALARM_RAISED": "Alarm raised",
+        "ALARM_CLEARED": "Alarm cleared",
+        "CONTROL": "Control"
+      }
+    },
+    "empty": {
+      "title": "There is no data yet",
+      "body": "Connect a data source and create spaces to see sensor values here.",
+      "askAdmin": "Ask an administrator to connect data sources and create spaces.",
+      "connectSource": "Connect a data source",
+      "createSpace": "Create spaces"
+    }
+  }
+}

@@ -1,0 +1,178 @@
+{
+  "spaces": {
+    "tree": {
+      "label": "空间树",
+      "search": "搜索空间",
+      "offline": "离线 {{n}}",
+      "noMatch": "没有匹配的空间。",
+      "addSite": "添加站点",
+      "addChild": "添加下级",
+      "addChildTitle": "在 {{name}} 下添加空间",
+      "rename": "重命名",
+      "move": "移动",
+      "moveTitle": "移动 {{name}}",
+      "newParent": "新的上级空间",
+      "noMoveTarget": "没有可移动到的上级空间。",
+      "deleteTitle": "删除 {{name}}",
+      "deleteBody": "只能删除没有下级空间、设备、平面图标记和工单的空间。",
+      "typeName": "请输入空间名称“{{name}}”以确认",
+      "blockers": "存在 {{children}} 个下级空间、{{devices}} 台设备、{{markers}} 个标记、{{workOrders}} 个工单，无法删除。",
+      "viewDevices": "查看设备"
+    },
+    "field": {
+      "name": "名称",
+      "type": "类型",
+      "code": "代码",
+      "timezone": "时区",
+      "address": "地址",
+      "latitude": "纬度",
+      "longitude": "经度",
+      "usage": "用途",
+      "areaM2": "面积（㎡）",
+      "capacity": "容纳人数",
+      "grid": "气象格点 nx {{nx}}，ny {{ny}}（自动计算）"
+    },
+    "validation": {
+      "nameRequired": "请输入名称",
+      "nameDuplicate": "已存在同名空间",
+      "typeRequired": "请选择类型",
+      "timezoneRequired": "请选择时区",
+      "codeInvalid": "代码格式不正确",
+      "latitudeInvalid": "纬度必须在 -90～90 之间",
+      "longitudeInvalid": "经度必须在 -180～180 之间",
+      "notNumber": "请输入数字",
+      "metricRequired": "请选择测量项",
+      "duplicate": "该测量项已存在",
+      "valueRequired": "请至少输入最小值或最大值",
+      "minGreaterThanMax": "最小值大于最大值",
+      "dayInvalid": "请选择星期",
+      "timeInvalid": "时间格式应为 HH:mm",
+      "startAfterEnd": "开始时间必须早于结束时间",
+      "overlap": "同一天的时间段重叠",
+      "untilInvalid": "结束时间不正确",
+      "untilRange": "请指定 7 天以内的时间"
+    },
+    "usage": {
+      "CLASSROOM": "教室",
+      "OFFICE": "办公室",
+      "MEETING": "会议室",
+      "LAB": "实验室",
+      "HALLWAY": "走廊",
+      "OTHER": "其他"
+    },
+    "tab": {
+      "overview": "概览",
+      "devices": "设备",
+      "props": "属性",
+      "targets": "目标环境",
+      "schedule": "运营时间",
+      "floorplan": "平面图"
+    },
+    "targets": {
+      "inherit": "使用上级值",
+      "metric": "测量项",
+      "min": "最小",
+      "max": "最大",
+      "source": "来源",
+      "direct": "直接",
+      "inheritedFrom": "继承：{{name}}",
+      "addRow": "添加项"
+    },
+    "schedule": {
+      "inherit": "使用上级时间表",
+      "inheritedFrom": "沿用上级空间（{{name}}）的时间表。",
+      "day": "星期",
+      "start": "开始",
+      "end": "结束",
+      "empty": "没有运营时间段（始终非运营）。",
+      "addSlot": "添加时间段"
+    },
+    "day": {
+      "1": "周一",
+      "2": "周二",
+      "3": "周三",
+      "4": "周四",
+      "5": "周五",
+      "6": "周六",
+      "7": "周日"
+    },
+    "mode": {
+      "title": "当前运营模式",
+      "value": {
+        "OCCUPIED": "运营中",
+        "UNOCCUPIED": "非运营",
+        "HOLIDAY": "假日",
+        "MAINTENANCE": "维护"
+      },
+      "source": "原因：{{source}}",
+      "sourceValue": {
+        "OVERRIDE": "手动指定",
+        "MAINTENANCE": "维护",
+        "CALENDAR": "日历",
+        "SCHEDULE": "时间表"
+      },
+      "next": "下次变更 {{at}}",
+      "none": "没有运营模式信息。",
+      "override": "手动指定",
+      "clear": "取消手动指定",
+      "until": "结束时间"
+    },
+    "floorplan": {
+      "file": "平面图图片（PNG、JPG、SVG，10MB 以内）",
+      "upload": "上传",
+      "empty": "请上传平面图图片以放置设备",
+      "askAdmin": "平面图可由管理员上传。",
+      "viewMode": "查看模式",
+      "editMode": "编辑模式",
+      "unplaced": "未放置的设备",
+      "allPlaced": "所有设备均已放置。",
+      "clickToPlace": "请在平面图上点击放置位置。",
+      "alt": "空间平面图",
+      "removeMarker": "移除 {{name}} 标记"
+    },
+    "overview": {
+      "noDevices": "此空间没有设备",
+      "placeDevices": "放置设备",
+      "lastSeen": "最后接收 {{at}}",
+      "battery": "电池 {{n}}%",
+      "children": "下级空间",
+      "causes": "原因："
+    },
+    "favorite": {
+      "on": "★ 取消收藏",
+      "off": "☆ 收藏"
+    },
+    "devices": {
+      "openList": "在设备列表中查看",
+      "name": "名称",
+      "status": "状态",
+      "model": "型号",
+      "path": "空间",
+      "lastSeen": "最后接收"
+    },
+    "empty": {
+      "title": "创建第一个站点即可开始",
+      "body": "按站点 → 建筑 → 楼层 → 房间的顺序创建空间并放置设备。",
+      "askAdmin": "空间由管理员（INTEGRATOR 及以上）创建，请联系管理员。"
+    }
+  },
+  "sites": {
+    "title": "站点",
+    "empty": "还没有站点",
+    "goSpaces": "在空间页面创建站点",
+    "stats": "设备 {{devices}} · 离线 {{offline}} · 告警 {{alarms}}",
+    "comfort": "舒适度 {{score}}",
+    "noLocation": "无位置信息"
+  },
+  "errors": {
+    "SPACE_DEPTH_EXCEEDED": "空间层级最多 6 级。",
+    "SPACE_TYPE_INVALID": "此位置不能创建该类型的空间。",
+    "SPACE_NAME_DUPLICATE": "已存在同名空间。",
+    "SPACE_NOT_EMPTY": "空间不为空，无法删除。",
+    "SPACE_MOVE_CYCLE": "不能移动到自身的下级空间。",
+    "SCHEDULE_OVERLAP": "同一天的时间段重叠。",
+    "FLOORPLAN_IMAGE_INVALID": "图片格式或大小不正确",
+    "METRIC_NOT_FOUND": "找不到测量项。",
+    "SPACE_NOT_FOUND": "找不到空间。"
+  }
+}

@@ -1,0 +1,178 @@
+{
+  "spaces": {
+    "tree": {
+      "label": "空間ツリー",
+      "search": "空間を検索",
+      "offline": "オフライン {{n}}",
+      "noMatch": "該当する空間がありません。",
+      "addSite": "サイトを追加",
+      "addChild": "下位を追加",
+      "addChildTitle": "{{name}} の下に空間を追加",
+      "rename": "名前を変更",
+      "move": "移動",
+      "moveTitle": "{{name}} を移動",
+      "newParent": "新しい上位空間",
+      "noMoveTarget": "移動できる上位空間がありません。",
+      "deleteTitle": "{{name}} を削除",
+      "deleteBody": "下位空間・デバイス・平面図マーカー・作業指示がない空間のみ削除できます。",
+      "typeName": "確認のため空間名「{{name}}」を入力してください",
+      "blockers": "下位空間 {{children}} 件、デバイス {{devices}} 台、マーカー {{markers}} 件、作業指示 {{workOrders}} 件があるため削除できません。",
+      "viewDevices": "デバイスを見る"
+    },
+    "field": {
+      "name": "名前",
+      "type": "種類",
+      "code": "コード",
+      "timezone": "タイムゾーン",
+      "address": "住所",
+      "latitude": "緯度",
+      "longitude": "経度",
+      "usage": "用途",
+      "areaM2": "面積（㎡）",
+      "capacity": "定員（名）",
+      "grid": "気象庁格子 nx {{nx}}, ny {{ny}}（自動計算）"
+    },
+    "validation": {
+      "nameRequired": "名前を入力してください",
+      "nameDuplicate": "同じ名前の空間が既にあります",
+      "typeRequired": "種類を選択してください",
+      "timezoneRequired": "タイムゾーンを選択してください",
+      "codeInvalid": "コードの形式が正しくありません",
+      "latitudeInvalid": "緯度は -90～90 の範囲で入力してください",
+      "longitudeInvalid": "経度は -180～180 の範囲で入力してください",
+      "notNumber": "数値を入力してください",
+      "metricRequired": "測定項目を選択してください",
+      "duplicate": "同じ測定項目が既にあります",
+      "valueRequired": "最小値か最大値のどちらかを入力してください",
+      "minGreaterThanMax": "最小値が最大値より大きいです",
+      "dayInvalid": "曜日を選択してください",
+      "timeInvalid": "時刻は HH:mm 形式で入力してください",
+      "startAfterEnd": "開始は終了より前にしてください",
+      "overlap": "同じ曜日の時間帯が重なっています",
+      "untilInvalid": "終了時刻が正しくありません",
+      "untilRange": "7日以内で指定してください"
+    },
+    "usage": {
+      "CLASSROOM": "講義室",
+      "OFFICE": "事務室",
+      "MEETING": "会議室",
+      "LAB": "実習室",
+      "HALLWAY": "廊下",
+      "OTHER": "その他"
+    },
+    "tab": {
+      "overview": "概要",
+      "devices": "デバイス",
+      "props": "属性",
+      "targets": "目標環境",
+      "schedule": "運用時間",
+      "floorplan": "平面図"
+    },
+    "targets": {
+      "inherit": "上位の値を使用",
+      "metric": "測定項目",
+      "min": "最小",
+      "max": "最大",
+      "source": "出所",
+      "direct": "直接",
+      "inheritedFrom": "継承: {{name}}",
+      "addRow": "項目を追加"
+    },
+    "schedule": {
+      "inherit": "上位の時間表を使用",
+      "inheritedFrom": "上位空間（{{name}}）の時間表に従います。",
+      "day": "曜日",
+      "start": "開始",
+      "end": "終了",
+      "empty": "運用時間帯がありません（常に非運用）。",
+      "addSlot": "時間帯を追加"
+    },
+    "day": {
+      "1": "月",
+      "2": "火",
+      "3": "水",
+      "4": "木",
+      "5": "金",
+      "6": "土",
+      "7": "日"
+    },
+    "mode": {
+      "title": "現在の運用モード",
+      "value": {
+        "OCCUPIED": "運用中",
+        "UNOCCUPIED": "非運用",
+        "HOLIDAY": "休日",
+        "MAINTENANCE": "点検"
+      },
+      "source": "原因: {{source}}",
+      "sourceValue": {
+        "OVERRIDE": "手動指定",
+        "MAINTENANCE": "点検",
+        "CALENDAR": "カレンダー",
+        "SCHEDULE": "時間表"
+      },
+      "next": "次の変更 {{at}}",
+      "none": "運用モード情報がありません。",
+      "override": "手動指定",
+      "clear": "手動指定を解除",
+      "until": "終了時刻"
+    },
+    "floorplan": {
+      "file": "平面図画像（PNG・JPG・SVG、10MB以下）",
+      "upload": "アップロード",
+      "empty": "平面図画像をアップロードしてデバイスを配置してください",
+      "askAdmin": "平面図は管理者がアップロードできます。",
+      "viewMode": "表示モード",
+      "editMode": "編集モード",
+      "unplaced": "未配置のデバイス",
+      "allPlaced": "すべてのデバイスを配置しました。",
+      "clickToPlace": "平面図で配置する位置をクリックしてください。",
+      "alt": "空間の平面図",
+      "removeMarker": "{{name}} のマーカーを削除"
+    },
+    "overview": {
+      "noDevices": "この空間にデバイスがありません",
+      "placeDevices": "デバイスを配置",
+      "lastSeen": "最終受信 {{at}}",
+      "battery": "バッテリー {{n}}%",
+      "children": "下位空間",
+      "causes": "原因:"
+    },
+    "favorite": {
+      "on": "★ お気に入り解除",
+      "off": "☆ お気に入り"
+    },
+    "devices": {
+      "openList": "デバイス一覧で見る",
+      "name": "名前",
+      "status": "状態",
+      "model": "モデル",
+      "path": "空間",
+      "lastSeen": "最終受信"
+    },
+    "empty": {
+      "title": "最初のサイトを作成して始めましょう",
+      "body": "サイト → 建物 → フロア → 部屋の順に空間を作成し、デバイスを配置します。",
+      "askAdmin": "空間は管理者（INTEGRATOR 以上）が作成できます。管理者に依頼してください。"
+    }
+  },
+  "sites": {
+    "title": "サイト",
+    "empty": "サイトがまだありません",
+    "goSpaces": "空間画面でサイトを作成",
+    "stats": "デバイス {{devices}} ・ オフライン {{offline}} ・ アラーム {{alarms}}",
+    "comfort": "快適度 {{score}}",
+    "noLocation": "位置情報なし"
+  },
+  "errors": {
+    "SPACE_DEPTH_EXCEEDED": "空間階層は6段階まで作成できます。",
+    "SPACE_TYPE_INVALID": "この位置には作成できない空間の種類です。",
+    "SPACE_NAME_DUPLICATE": "同じ名前の空間が既にあります。",
+    "SPACE_NOT_EMPTY": "下位空間やデバイスがあるため削除できません。",
+    "SPACE_MOVE_CYCLE": "自分の下位空間には移動できません。",
+    "SCHEDULE_OVERLAP": "同じ曜日の時間帯が重なっています。",
+    "FLOORPLAN_IMAGE_INVALID": "画像の形式またはサイズが正しくありません",
+    "METRIC_NOT_FOUND": "測定項目が見つかりません。",
+    "SPACE_NOT_FOUND": "空間が見つかりません。"
+  }
+}

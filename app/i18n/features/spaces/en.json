@@ -1,0 +1,178 @@
+{
+  "spaces": {
+    "tree": {
+      "label": "Space tree",
+      "search": "Search spaces",
+      "offline": "{{n}} offline",
+      "noMatch": "No matching spaces.",
+      "addSite": "Add site",
+      "addChild": "Add child",
+      "addChildTitle": "Add a space under {{name}}",
+      "rename": "Rename",
+      "move": "Move",
+      "moveTitle": "Move {{name}}",
+      "newParent": "New parent space",
+      "noMoveTarget": "There is no parent this space can move to.",
+      "deleteTitle": "Delete {{name}}",
+      "deleteBody": "Only spaces without child spaces, devices, floor plan markers or work orders can be deleted.",
+      "typeName": "Type the space name \"{{name}}\" to confirm",
+      "blockers": "Cannot delete: {{children}} child spaces, {{devices}} devices, {{markers}} markers, {{workOrders}} work orders.",
+      "viewDevices": "View devices"
+    },
+    "field": {
+      "name": "Name",
+      "type": "Type",
+      "code": "Code",
+      "timezone": "Time zone",
+      "address": "Address",
+      "latitude": "Latitude",
+      "longitude": "Longitude",
+      "usage": "Usage",
+      "areaM2": "Area (㎡)",
+      "capacity": "Capacity (people)",
+      "grid": "KMA grid nx {{nx}}, ny {{ny}} (calculated)"
+    },
+    "validation": {
+      "nameRequired": "Enter a name",
+      "nameDuplicate": "A space with the same name already exists",
+      "typeRequired": "Choose a type",
+      "timezoneRequired": "Choose a time zone",
+      "codeInvalid": "The code format is invalid",
+      "latitudeInvalid": "Latitude must be between -90 and 90",
+      "longitudeInvalid": "Longitude must be between -180 and 180",
+      "notNumber": "Enter a number",
+      "metricRequired": "Choose a metric",
+      "duplicate": "This metric is already listed",
+      "valueRequired": "Enter a minimum or a maximum",
+      "minGreaterThanMax": "The minimum is greater than the maximum",
+      "dayInvalid": "Choose a day",
+      "timeInvalid": "Enter times as HH:mm",
+      "startAfterEnd": "Start must be before end",
+      "overlap": "Time ranges on the same day overlap",
+      "untilInvalid": "The end time is invalid",
+      "untilRange": "Choose a time within 7 days"
+    },
+    "usage": {
+      "CLASSROOM": "Classroom",
+      "OFFICE": "Office",
+      "MEETING": "Meeting room",
+      "LAB": "Lab",
+      "HALLWAY": "Hallway",
+      "OTHER": "Other"
+    },
+    "tab": {
+      "overview": "Overview",
+      "devices": "Devices",
+      "props": "Properties",
+      "targets": "Target environment",
+      "schedule": "Operating hours",
+      "floorplan": "Floor plan"
+    },
+    "targets": {
+      "inherit": "Use parent values",
+      "metric": "Metric",
+      "min": "Min",
+      "max": "Max",
+      "source": "Source",
+      "direct": "Direct",
+      "inheritedFrom": "Inherited: {{name}}",
+      "addRow": "Add metric"
+    },
+    "schedule": {
+      "inherit": "Use parent schedule",
+      "inheritedFrom": "Following the schedule of {{name}}.",
+      "day": "Day",
+      "start": "Start",
+      "end": "End",
+      "empty": "No operating hours (always unoccupied).",
+      "addSlot": "Add range"
+    },
+    "day": {
+      "1": "Mon",
+      "2": "Tue",
+      "3": "Wed",
+      "4": "Thu",
+      "5": "Fri",
+      "6": "Sat",
+      "7": "Sun"
+    },
+    "mode": {
+      "title": "Current mode",
+      "value": {
+        "OCCUPIED": "Occupied",
+        "UNOCCUPIED": "Unoccupied",
+        "HOLIDAY": "Holiday",
+        "MAINTENANCE": "Maintenance"
+      },
+      "source": "Cause: {{source}}",
+      "sourceValue": {
+        "OVERRIDE": "Manual",
+        "MAINTENANCE": "Maintenance",
+        "CALENDAR": "Calendar",
+        "SCHEDULE": "Schedule"
+      },
+      "next": "Next change {{at}}",
+      "none": "No mode information.",
+      "override": "Set manually",
+      "clear": "Clear manual mode",
+      "until": "Until"
+    },
+    "floorplan": {
+      "file": "Floor plan image (PNG, JPG, SVG, up to 10 MB)",
+      "upload": "Upload",
+      "empty": "Upload a floor plan image to place devices",
+      "askAdmin": "An administrator can upload the floor plan.",
+      "viewMode": "View mode",
+      "editMode": "Edit mode",
+      "unplaced": "Unplaced devices",
+      "allPlaced": "All devices are placed.",
+      "clickToPlace": "Click the floor plan where the device goes.",
+      "alt": "Space floor plan",
+      "removeMarker": "Remove marker {{name}}"
+    },
+    "overview": {
+      "noDevices": "There are no devices in this space",
+      "placeDevices": "Place devices",
+      "lastSeen": "Last seen {{at}}",
+      "battery": "Battery {{n}}%",
+      "children": "Child spaces",
+      "causes": "Cause:"
+    },
+    "favorite": {
+      "on": "★ Remove favorite",
+      "off": "☆ Favorite"
+    },
+    "devices": {
+      "openList": "Open in device list",
+      "name": "Name",
+      "status": "Status",
+      "model": "Model",
+      "path": "Space",
+      "lastSeen": "Last seen"
+    },
+    "empty": {
+      "title": "Create your first site to get started",
+      "body": "Create spaces as site → building → floor → room and place devices in them.",
+      "askAdmin": "Spaces are created by an administrator (INTEGRATOR or above). Please ask an administrator."
+    }
+  },
+  "sites": {
+    "title": "Sites",
+    "empty": "There are no sites yet",
+    "goSpaces": "Create a site in Spaces",
+    "stats": "Devices {{devices}} · Offline {{offline}} · Alarms {{alarms}}",
+    "comfort": "Comfort {{score}}",
+    "noLocation": "No location"
+  },
+  "errors": {
+    "SPACE_DEPTH_EXCEEDED": "Spaces can be nested up to 6 levels.",
+    "SPACE_TYPE_INVALID": "This space type is not allowed here.",
+    "SPACE_NAME_DUPLICATE": "A space with the same name already exists.",
+    "SPACE_NOT_EMPTY": "The space is not empty and cannot be deleted.",
+    "SPACE_MOVE_CYCLE": "A space cannot be moved under its own child.",
+    "SCHEDULE_OVERLAP": "Time ranges on the same day overlap.",
+    "FLOORPLAN_IMAGE_INVALID": "The image type or size is invalid",
+    "METRIC_NOT_FOUND": "The metric was not found.",
+    "SPACE_NOT_FOUND": "The space was not found."
+  }
+}
