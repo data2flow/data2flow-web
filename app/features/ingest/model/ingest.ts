@@ -4,7 +4,7 @@
  */
 import type { ChartSeries } from "~/lib/chart-model";
 
-export const PIPELINE_STAGES = ["SOURCE", "DECODE", "SCRIPT", "VALIDATE", "STORE", "EVENT"] as const;
+export const PIPELINE_STAGES = ["SOURCE", "DECODE", "SCRIPT", "VALIDATE", "STORE", "PUBLISH"] as const;
 export type PipelineStage = (typeof PIPELINE_STAGES)[number];
 
 /** 실패 메시지 단계(API-ING-08 stage) */
@@ -58,6 +58,7 @@ export interface IngestSummary {
 
 /** 처리 흐름 단계 → 실패 메시지 단계. SOURCE·VALIDATE는 실패 보관함 단계가 없다 */
 export function failureStageOf(stage: string): FailureStage | undefined {
+  // 예전 이름 EVENT는 PUBLISH로 바뀌었다(API-DSH-05, 2026-10-04 결정)
   if (stage === "EVENT") return "PUBLISH";
   return (FAILURE_STAGES as readonly string[]).includes(stage) ? (stage as FailureStage) : undefined;
 }

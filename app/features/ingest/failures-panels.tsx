@@ -60,15 +60,32 @@ export interface RawMessageDetail {
   topic?: string;
   status?: string;
   errorCode?: string | null;
-  errorDetail?: string | null;
+  /** 처리 기록 그대로(문자열 또는 객체) */
+  errorDetail?: unknown;
   payload?: string | null;
+  /** INGEST_PAYLOAD_READ가 없어 원본을 가렸다(API-ING-06) */
+  payloadMasked?: boolean;
   payloadEncoding?: string;
-  trace?: { stage: string; ok: boolean; ms?: number; info?: string }[];
+  /** pipeline 처리 기록 그대로. 단계 배열일 때만 띠로 보인다 */
+  trace?: unknown;
   canonical?: unknown;
   stored?: { metricKey: string; value: unknown; unit?: string | null; quality?: number; late?: boolean }[];
 }
 
 type Loader = (id: string) => Promise<BffJsonResult<RawMessageDetail>>;
+type TraceStep = { stage: string; ok: boolean; ms?: number; info?: string };
+
+/** 처리 기록(trace)이 단계 배열이면 그대로, `{stages:[…]}`면 그 안을, 아니면 빈 배열 */
+export function traceSteps(trace: unknown): TraceStep[] {
+  const list = Array.isArray(trace) ? trace : trace && typeof trace === "object" && Array.isArray((trace as { stages?: unknown }).stages) ? (trace as { stages: unknown[] }).stages : [];
+  return list.filter((s): s is TraceStep => Boolean(s) && typeof (s as TraceStep).stage === "string").map((s) => ({ ...s, ok: s.ok !== false, info: typeof s.info === "string" ? s.info : s.info == null ? undefined : JSON.stringify(s.info) }));
+}
+
+export function detailText(detail: unknown): string {
+  if (detail == null) return "";
+  return typeof detail === "string" ? detail : JSON.stringify(detail);
+}
+
 const defaultLoader: Loader = (id) => bffJson<RawMessageDetail>(`/bff/api/core/ingest/raw-messages/${encodeURIComponent(id)}`);
 
 /** 원본 메시지 상세(API-ING-06). payload는 INGEST_PAYLOAD_READ가 있을 때만 서버가 준다 */
@@ -98,12 +115,12 @@ export function RawMessagePanel({ rawMessageId, timezone, onClose, load = defaul
             <dd className="font-mono">{result.data.topic ?? "–"}</dd>
             <dt className="text-muted">{t("ingest.raw.status")}</dt>
             <dd>
-              {result.data.status} {result.data.errorCode && <span className="font-mono text-bad">{result.data.errorCode}</span>} {result.data.errorDetail}
+              {result.data.status} {result.data.errorCode && <span className="font-mono text-bad">{result.data.errorCode}</span>} {detailText(result.data.errorDetail)}
             </dd>
           </dl>
-          {result.data.trace && (
+          {traceSteps(result.data.trace).length > 0 && (
             <ol aria-label={t("ingest.raw.trace")} className="flex flex-wrap gap-2">
-              {result.data.trace.map((step) => (
+              {traceSteps(result.data.trace).map((step) => (
                 <li key={step.stage}>
                   <Badge tone={step.ok ? "success" : "danger"}>
                     {step.stage} {step.ms != null ? `${step.ms}ms` : ""} {step.info ?? ""}

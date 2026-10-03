@@ -34,7 +34,7 @@ describe("DSH-03.01 수집 흐름 다이어그램(UI-DSH-03)", () => {
     const browser = await operator();
     const page = await browser.get("/ingest/monitor");
     expect(page.response.status).toBe(200);
-    for (const stage of ["소스", "디코딩", "스크립트", "검증", "저장", "이벤트"]) expect(page.body).toContain(stage);
+    for (const stage of ["소스", "디코딩", "스크립트", "검증", "저장", "발행"]) expect(page.body).toContain(stage);
     expect(page.body).toContain("실패 12/분");
     expect(page.body).toMatch(/data-stage="SCRIPT" data-failing="true"/);
     expect(page.body).toContain('href="/ingest/failures?stage=SCRIPT&amp;code=SCRIPT_ERROR"');

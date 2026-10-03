@@ -12,7 +12,7 @@
       "SCRIPT": "Script",
       "VALIDATE": "Validate",
       "STORE": "Store",
-      "EVENT": "Event"
+      "PUBLISH": "Publish"
     },
     "failureStage": {
       "DECODE": "Decode",

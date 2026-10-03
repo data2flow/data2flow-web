@@ -12,7 +12,7 @@
       "SCRIPT": "スクリプト",
       "VALIDATE": "検証",
       "STORE": "保存",
-      "EVENT": "イベント"
+      "PUBLISH": "発行"
     },
     "failureStage": {
       "DECODE": "デコード",

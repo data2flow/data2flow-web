@@ -28,13 +28,14 @@ describe("DSH-03.04 TC-DSH-021 단계 → 실패 목록 링크", () => {
     expect(failureLinkOf({ key: "SCRIPT" })).toBe("/ingest/failures?stage=SCRIPT&code=SCRIPT_ERROR");
     expect(failureLinkOf({ key: "DECODE" })).toBe("/ingest/failures?stage=DECODE&code=DECODE_ERROR");
     expect(failureLinkOf({ key: "EVENT" })).toBe("/ingest/failures?stage=PUBLISH");
+    expect(failureLinkOf({ key: "PUBLISH" })).toBe("/ingest/failures?stage=PUBLISH");
     expect(failureLinkOf({ key: "STORE" })).toBe("/ingest/failures?stage=STORE");
     expect(failureLinkOf({ key: "SOURCE" })).toBeUndefined();
     expect(failureStageOf("VALIDATE")).toBeUndefined();
   });
 
   it("단계 순서 고정, 실패 여부, 실시간 합치기", () => {
-    expect(orderedStages([{ key: "STORE", inPerMin: 2 }]).map((s) => s.key)).toEqual(["SOURCE", "DECODE", "SCRIPT", "VALIDATE", "STORE", "EVENT"]);
+    expect(orderedStages([{ key: "STORE", inPerMin: 2 }]).map((s) => s.key)).toEqual(["SOURCE", "DECODE", "SCRIPT", "VALIDATE", "STORE", "PUBLISH"]);
     expect(orderedStages(undefined)[4]).toEqual({ key: "STORE" });
     expect(stageFailing({ key: "SCRIPT", failPerMin: 12 })).toBe(true);
     expect(stageFailing({ key: "SCRIPT" })).toBe(false);

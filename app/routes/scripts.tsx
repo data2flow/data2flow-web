@@ -24,7 +24,8 @@ interface ScriptRow {
   activeVersion?: number | null;
   hasDraft?: boolean;
   bindingsSummary?: { sources?: number; models?: number; devices?: number; first?: string | null };
-  stats24h?: { processed?: number; errorRate?: number; p95Ms?: number };
+  /** pipeline 지표가 생기기 전(M5)까지 null. errorRate는 0~1 분수 */
+  stats24h?: { processed?: number | null; errorRate?: number | null; p95Ms?: number | null } | null;
   lastDeployedBy?: string | null;
   lastDeployedAt?: string | null;
 }
@@ -216,8 +217,8 @@ export default function Scripts({ loaderData, actionData }: Route.ComponentProps
                     <td>{targets.length === 0 ? t("scripts.targets.none") : targets.map((x) => t(`scripts.targets.${x.type}`, { n: x.n })).join(", ")}</td>
                     <td className="font-mono">{s.activeVersion ? `v${s.activeVersion}` : "–"}</td>
                     <td>{s.hasDraft && <span title={t("scripts.hasDraft")} aria-label={t("scripts.hasDraft")} className="text-accent">●</span>}</td>
-                    <td className="font-mono">{(s.stats24h?.processed ?? 0).toLocaleString(i18n.language)}</td>
-                    <td className={isHighErrorRate(rate) ? "font-mono text-bad" : "font-mono"}>{rate === undefined ? "–" : `${(rate * 100).toFixed(1)}%`}</td>
+                    <td className="font-mono">{s.stats24h?.processed == null ? "–" : s.stats24h.processed.toLocaleString(i18n.language)}</td>
+                    <td className={isHighErrorRate(rate) ? "font-mono text-bad" : "font-mono"}>{rate == null ? "–" : `${(rate * 100).toFixed(1)}%`}</td>
                     <td className="font-mono">{s.stats24h?.p95Ms ?? "–"}</td>
                     <td>{s.lastDeployedAt ? `${s.lastDeployedBy ?? ""} ${formatDateTime(s.lastDeployedAt, root?.timezone ?? "Asia/Seoul", i18n.language)}` : "–"}</td>
                   </tr>

@@ -83,7 +83,7 @@ export function ingestState(core: CoreState): IngestState {
         { key: "SCRIPT", inPerMin: 14, failPerMin: 12, latencyP95Ms: 1, failureLink: "/ingest/failures?stage=SCRIPT&code=SCRIPT_ERROR" },
         { key: "VALIDATE", inPerMin: 2, failPerMin: 0, latencyP95Ms: 1 },
         { key: "STORE", inPerMin: 2, failPerMin: 0, latencyP95Ms: 30 },
-        { key: "EVENT", inPerMin: 2, failPerMin: 0, latencyP95Ms: 8 },
+        { key: "PUBLISH", inPerMin: 2, failPerMin: 0, latencyP95Ms: null, failureLink: "/ingest/failures?stage=PUBLISH" },
       ],
       sources: [{ id: "7", name: "ChirpStack s3", state: "CONNECTED", perMin: 11.9, lastMessageAt: "2026-10-03T23:59:48Z" }],
       throughput: [{ sourceId: "7", points: [["2026-10-03T23:58:00Z", 11], ["2026-10-03T23:59:00Z", 12]] }],

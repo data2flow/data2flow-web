@@ -10,13 +10,21 @@ import { MessageBuffer, liveUrl, type StreamEvent } from "~/lib/event-stream";
 import { formatDateTime } from "~/lib/format";
 import { RESULT_CODES, messageTopic, type StreamFilter } from "./model/ingest";
 
+/** API-DSH-21 `message` 이벤트(core LiveDtos.IngestMessage) */
 export interface StreamMessage {
+  id?: string;
   receivedAt: string;
   sourceId: string;
   topic: string;
   deviceId?: string | null;
+  externalId?: string | null;
   result: string;
+  errorCode?: string | null;
+  /** 원본 앞 4KB. INGEST_PAYLOAD_READ가 없으면 빠진다 */
   raw?: unknown;
+  /** TEXT 또는 BASE64(바이너리) */
+  rawEncoding?: string;
+  rawTruncated?: boolean;
   canonical?: unknown;
 }
 
@@ -142,8 +150,11 @@ function MessageRow({ message, sourceName, timezone, lang, open, onToggle }: { m
         <td className="font-mono">{formatDateTime(message.receivedAt, timezone, lang, true)}</td>
         <td>{sourceName}</td>
         <td className="max-w-[260px] truncate font-mono text-[12px]">{message.topic}</td>
-        <td className="font-mono">{message.deviceId ?? "–"}</td>
-        <td className={message.result === "OK" ? "" : "text-bad"}>{message.result}</td>
+        <td className="font-mono">{message.deviceId ?? message.externalId ?? "–"}</td>
+        <td className={message.result === "OK" ? "" : "text-bad"}>
+          {message.result}
+          {message.errorCode && <span className="ml-1 font-mono text-[11.5px]">{message.errorCode}</span>}
+        </td>
         <td>
           <Button variant="ghost" aria-expanded={open} onClick={onToggle}>
             {open ? t("ingest.stream.collapse") : t("ingest.stream.expand")}
@@ -161,6 +172,7 @@ function MessageRow({ message, sourceName, timezone, lang, open, onToggle }: { m
                 ) : (
                   <pre aria-label={t("ingest.stream.raw")} className="max-h-64 overflow-auto rounded bg-bg p-2 font-mono text-[12px]">
                     {pretty(message.raw)}
+                    {message.rawTruncated ? "\n…" : ""}
                   </pre>
                 )}
               </div>
