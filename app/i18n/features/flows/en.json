@@ -1,1 +1,369 @@
-{}
+{
+  "flows": {
+    "crumb": "Automation",
+    "title": "Flows",
+    "newTitle": "New flow",
+    "newFlow": "New flow",
+    "fromTemplate": "Create from template",
+    "status": {
+      "DRAFT": "Draft",
+      "ACTIVE": "Active",
+      "PAUSED": "Paused",
+      "DEGRADED": "Degraded",
+      "DISABLED": "Disabled",
+      "DELETED": "Deleted",
+      "NEW": "New"
+    },
+    "kind": {
+      "FLOW": "Flow",
+      "RULE": "From rule",
+      "CATCH": "Catch"
+    },
+    "list": {
+      "search": "Search by name",
+      "status": "Status",
+      "kind": "Kind",
+      "space": "Space",
+      "noMatch": "No flows match the filters",
+      "empty": "No automations yet. Start from a template",
+      "col": {
+        "status": "Status",
+        "name": "Name",
+        "kind": "Kind",
+        "space": "Spaces",
+        "version": "Running version",
+        "executions": "Runs (1h)",
+        "errorRate": "Error rate",
+        "actions": "Actions",
+        "updated": "Updated"
+      },
+      "pause": "Pause",
+      "resume": "Resume",
+      "disable": "Disable",
+      "confirmState": "Do you want to {{action}}?",
+      "deleteTitle": "Delete flow: {{name}}",
+      "deleteBody": "Type the flow name \"{{name}}\" to delete it. This cannot be undone.",
+      "confirmName": "Flow name",
+      "confirmMismatch": "The name does not match",
+      "deleted": "Flow deleted."
+    },
+    "editor": {
+      "name": "Flow name",
+      "namePlaceholder": "Enter a name",
+      "nameRule": "Name must be 1-{{max}} characters",
+      "versions": "Running {{active}} · Editing from {{base}}",
+      "converged": "All instances on v{{v}}",
+      "converging": "Applying v{{v}}…",
+      "editors": "Editing now: {{names}}",
+      "unsaved": "Unsaved changes",
+      "readOnly": "View only (no permission)",
+      "apply": "Apply",
+      "leaveWarning": "You have unsaved changes. Leave anyway?",
+      "added": "Added node {{name}}",
+      "inserted": "Inserted {{name}} into the wire",
+      "saved": "Saved draft v{{v}}",
+      "emergencyStop": "Automatic control emergency stop — control nodes are skipped",
+      "virtualBadge": "Virtual",
+      "virtualTargets": "This flow targets a virtual space. Run a scenario in the virtual environment to check it.",
+      "runScenario": "Run in virtual environment"
+    },
+    "applyBlock": {
+      "readOnly": "View only; you cannot apply",
+      "busy": "Processing",
+      "empty": "Add nodes before applying",
+      "unsaved": "Save your changes first",
+      "noChanges": "There is no new draft to apply",
+      "errors": "Fix the validation errors to apply"
+    },
+    "toolbar": {
+      "label": "Editing tools",
+      "undo": "Undo",
+      "redo": "Redo",
+      "selectAll": "Select all",
+      "copy": "Copy",
+      "paste": "Paste",
+      "align": "Align to grid",
+      "delete": "Delete"
+    },
+    "palette": {
+      "label": "Node palette",
+      "search": "Search nodes",
+      "noMatch": "No matching nodes",
+      "add": "Add {{name}}",
+      "locked": "Control and scene nodes require the control deploy permission",
+      "lockedShort": "Locked"
+    },
+    "category": {
+      "trigger": "Triggers",
+      "condition": "Conditions",
+      "transform": "Transform",
+      "flow": "Flow control",
+      "action": "Actions",
+      "sink": "Sinks",
+      "debug": "Debug",
+      "enrich": "Enrich",
+      "ai": "AI"
+    },
+    "canvas": {
+      "empty": "Drag a trigger from the palette",
+      "emptyReadOnly": "No nodes",
+      "minimap": "Minimap",
+      "wires": "Wires",
+      "wire": "{{from}} → {{to}} ({{port}})"
+    },
+    "node": {
+      "errorBadge": "{{n}} error(s)",
+      "errors1h": "{{n}} errors in last hour"
+    },
+    "connect": {
+      "SELF": "A node cannot connect to itself",
+      "DUPLICATE": "These ports are already connected",
+      "UNKNOWN_NODE": "Unknown node",
+      "NO_PORT": "Unknown output port",
+      "NO_INPUT": "Triggers have no input",
+      "TYPE_MISMATCH": "Port types are incompatible"
+    },
+    "diff": {
+      "added": "Added",
+      "changed": "Changed",
+      "removed": "Removed",
+      "showing": "Comparing versions: {{label}}",
+      "clear": "Stop comparing"
+    },
+    "panel": {
+      "aside": "Settings panel",
+      "empty": "Select a node to see its settings",
+      "label": "{{name}} settings",
+      "readOnly": "View only",
+      "name": "Node name",
+      "description": "Description",
+      "retry": "Retry",
+      "maxAttempts": "Retry attempts (0-10)",
+      "intervalMs": "Interval (ms)",
+      "timeoutMs": "Timeout (ms)"
+    },
+    "js": {
+      "size": "{{n}} / {{max}} bytes"
+    },
+    "field": {
+      "metric": "Metric",
+      "op": "Operator",
+      "value": "Value",
+      "for": "Duration",
+      "clear": "Clear value",
+      "repeat": "Repeat",
+      "target": "Target",
+      "metrics": "Metrics",
+      "cron": "cron",
+      "timezone": "Time zone",
+      "days": "Days",
+      "from": "From",
+      "to": "To",
+      "window": "Window",
+      "fn": "Function",
+      "groupBy": "Group by",
+      "code": "Code",
+      "outputs": "Outputs (1-10)",
+      "duration": "Duration",
+      "validitySeconds": "Validity (s)",
+      "level": "Level",
+      "spaceId": "Target space",
+      "threshold": "Threshold",
+      "targetTemperature": "Target temperature",
+      "commaHint": "Separate with commas"
+    },
+    "rule": {
+      "required": "Required",
+      "type": "Wrong type ({{limit}})",
+      "minimum": "Must be at least {{limit}}",
+      "maximum": "Must be at most {{limit}}",
+      "enum": "Not an allowed value",
+      "minLength": "Enter at least {{limit}} characters",
+      "maxLength": "Enter at most {{limit}} characters",
+      "minItems": "Choose at least {{limit}}",
+      "maxItems": "Choose at most {{limit}}",
+      "duration": "Enter between 1 second and 24 hours",
+      "maxBytes": "Code must be at most {{limit}} bytes"
+    },
+    "duration": {
+      "s": "sec",
+      "m": "min",
+      "h": "hour",
+      "unit": "{{label}} unit"
+    },
+    "target": {
+      "mode": "Target by",
+      "modes": {
+        "space": "Space + relation",
+        "devices": "Specific devices",
+        "model": "Device model",
+        "tags": "Tags"
+      },
+      "space": "Space",
+      "relation": "Relation",
+      "measures": "Measures",
+      "controls": "Controls",
+      "includeChildren": "Include child spaces",
+      "devices": "Devices",
+      "noDevices": "No devices available",
+      "model": "Device model",
+      "chooseModel": "Choose a model",
+      "tags": "Tags (comma separated)",
+      "count": "{{n}} devices targeted"
+    },
+    "control": {
+      "capability": "Capability",
+      "command": "Command",
+      "choose": "Choose",
+      "unset": "(not set)",
+      "loadFailed": "Could not load capabilities",
+      "range": "{{min}}-{{max}}{{unit}}",
+      "problem": {
+        "range": "Set a value between {{min}} and {{max}}{{unit}}",
+        "step": "Use steps of {{step}}",
+        "enum": "Not an allowed value",
+        "number": "Enter a number"
+      }
+    },
+    "issue": {
+      "NO_TRIGGER": "No trigger node",
+      "UNCONNECTED": "Unconnected node",
+      "CYCLE": "Cycle",
+      "INVALID_CONFIG": "Invalid settings",
+      "TYPE_MISMATCH": "Port type mismatch",
+      "SUBFLOW_RECURSION": "Subflow recursion",
+      "TARGET_MISSING": "No target device",
+      "LIMIT": "Limit exceeded",
+      "TARGET_OFFLINE": "Target device offline",
+      "TARGET_EMPTY": "Target is empty",
+      "SINK_SCHEMA_MISSING": "Sink schema missing",
+      "DEPRECATED_NODE": "Deprecated node"
+    },
+    "bottom": {
+      "label": "Bottom panel",
+      "validation": "Validation ({{n}})",
+      "versions": "Versions",
+      "errors": "Errors"
+    },
+    "validation": {
+      "ok": "No validation problems",
+      "error": "Error",
+      "warning": "Warning"
+    },
+    "delete": {
+      "title": "Delete node",
+      "question": "Delete {{name}}. Connect the nodes before and after it?",
+      "only": "Delete only",
+      "reconnect": "Delete and reconnect"
+    },
+    "apply": {
+      "title": "Confirm apply: {{name}} {{from}} → {{to}}",
+      "counts": "Validation: {{errors}} errors · {{warnings}} warnings",
+      "errors": "Errors (cannot apply)",
+      "warnings": "Warnings (can apply)",
+      "changes": "Change summary",
+      "added": "+ {{name}} · state: starts fresh",
+      "changed": "~ {{name}} · state: {{policy}}",
+      "removed": "- {{name}}",
+      "removedRetained": "- {{name}} · remaining state kept 24 hours",
+      "noChanges": "No node changes",
+      "approvalRequired": "Control node changes are applied after ADMIN approval",
+      "riskControl": "Control nodes are added or changed",
+      "riskMode": "The execution mode changes",
+      "acknowledge": "I understand",
+      "memo": "Deployment memo (0-500 chars)",
+      "memoTooLong": "Memo must be at most {{max}} characters",
+      "confirm": "Apply",
+      "approvalSent": "Approval request sent",
+      "applied": "Applied v{{v}}",
+      "noControlPermission": "You do not have permission to apply flows with control nodes"
+    },
+    "statePolicy": {
+      "KEEP": "Keep (KEEP)",
+      "RESET": "Reset (RESET)",
+      "MIGRATE": "Migrate (MIGRATE)"
+    },
+    "versions": {
+      "version": "Version",
+      "state": "State",
+      "appliedBy": "Applied by",
+      "appliedAt": "Time",
+      "memo": "Memo",
+      "empty": "No versions",
+      "notSaved": "Save to start the version history",
+      "stopCompare": "Stop comparing",
+      "rollbackConfirm": "Roll back",
+      "compare": "Compare v{{v}}",
+      "rollback": "Roll back to v{{v}}",
+      "rollbackTitle": "Roll back to v{{v}}",
+      "rollbackBody": "The definition of v{{v}} will be applied immediately as a new version. Continue?",
+      "rolledBack": "Rolled back as v{{v}}"
+    },
+    "versionState": {
+      "ACTIVE": "ACTIVE",
+      "DRAFT": "DRAFT",
+      "ARCHIVED": "ARCHIVED",
+      "PENDING_APPROVAL": "Pending approval"
+    },
+    "errors": {
+      "unavailable": "Metrics are unavailable",
+      "summary": "Last hour: {{executions}} runs · {{errors}} errors · {{rate}}% error rate",
+      "isolation": "A node error ends only that run and raises the error count. Other flows and the next messages from the same device keep running.",
+      "none": "No errors in the last hour",
+      "node": "Node",
+      "processed": "Processed",
+      "count": "Errors"
+    },
+    "templates": {
+      "title": "Templates",
+      "search": "Search templates",
+      "category": "Category",
+      "categories": {
+        "COMFORT": "Comfort",
+        "SAFETY": "Safety",
+        "ENERGY": "Energy",
+        "FACILITY": "Facility"
+      },
+      "empty": "No templates",
+      "required": "Requires: {{items}}",
+      "use": "Use",
+      "formTitle": "Create from {{name}}",
+      "flowName": "Flow name",
+      "notApplied": "The new flow is a DRAFT and is not applied automatically",
+      "create": "Create flow"
+    },
+    "approvals": {
+      "title": "Pending approvals",
+      "empty": "No pending requests",
+      "ownOnly": "Only your requests are shown. An ADMIN approves them.",
+      "flow": "Flow",
+      "kind": "Kind",
+      "kinds": {
+        "APPLY": "Apply",
+        "PROMOTE": "Promote"
+      },
+      "requestedBy": "Requested by",
+      "requestedAt": "Requested at",
+      "control": "Control node",
+      "approve": "Approve",
+      "reject": "Reject",
+      "reason": "Reason",
+      "reasonRequired": "Enter a reason (1-500 characters)",
+      "approved": "Approved. It is applied atomically.",
+      "rejected": "Rejected"
+    }
+  },
+  "errors": {
+    "FLOW_NOT_FOUND": "Flow not found",
+    "FLOW_NAME_DUPLICATED": "A flow with the same name exists",
+    "FLOW_VERSION_CONFLICT": "Someone else changed it first. Reload and edit again",
+    "FLOW_VALIDATION_FAILED": "Validation failed; not applied",
+    "FLOW_APPROVAL_REQUIRED": "Approval request sent",
+    "FLOW_STATE_CONFLICT": "Not allowed in the current state",
+    "FLOW_NODE_LIMIT_EXCEEDED": "Too many nodes",
+    "FLOW_DEFINITION_TOO_LARGE": "The flow definition is too large",
+    "FLOW_LIMIT_EXCEEDED": "Flow limit exceeded",
+    "FLOW_SHADOW_IN_PROGRESS": "Cannot apply during a shadow run",
+    "CAPABILITY_NOT_FOUND": "Capability not found"
+  }
+}

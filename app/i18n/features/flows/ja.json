@@ -1,1 +1,369 @@
-{}
+{
+  "flows": {
+    "crumb": "自動化",
+    "title": "フロー",
+    "newTitle": "新しいフロー",
+    "newFlow": "新しいフロー",
+    "fromTemplate": "テンプレートから作成",
+    "status": {
+      "DRAFT": "下書き",
+      "ACTIVE": "実行中",
+      "PAUSED": "一時停止",
+      "DEGRADED": "性能低下",
+      "DISABLED": "無効",
+      "DELETED": "削除済み",
+      "NEW": "新規"
+    },
+    "kind": {
+      "FLOW": "フロー",
+      "RULE": "ルールから作成",
+      "CATCH": "エラー処理"
+    },
+    "list": {
+      "search": "名前で検索",
+      "status": "状態",
+      "kind": "種類",
+      "space": "空間",
+      "noMatch": "条件に合うフローがありません",
+      "empty": "まだ自動化がありません。テンプレートから始めましょう",
+      "col": {
+        "status": "状態",
+        "name": "名前",
+        "kind": "種類",
+        "space": "対象空間",
+        "version": "実行バージョン",
+        "executions": "実行数(1時間)",
+        "errorRate": "エラー率",
+        "actions": "アクション数",
+        "updated": "更新"
+      },
+      "pause": "一時停止",
+      "resume": "再開",
+      "disable": "無効化",
+      "confirmState": "{{action}}しますか？",
+      "deleteTitle": "フローの削除: {{name}}",
+      "deleteBody": "削除するにはフロー名「{{name}}」を入力してください。元に戻せません。",
+      "confirmName": "フロー名",
+      "confirmMismatch": "名前が一致しません",
+      "deleted": "フローを削除しました。"
+    },
+    "editor": {
+      "name": "フロー名",
+      "namePlaceholder": "名前を入力",
+      "nameRule": "名前は1〜{{max}}文字で入力してください",
+      "versions": "実行 {{active}} · 編集基準 {{base}}",
+      "converged": "全インスタンスに v{{v}} 適用済み",
+      "converging": "v{{v}} 適用中…",
+      "editors": "編集中: {{names}}",
+      "unsaved": "未保存の変更",
+      "readOnly": "閲覧のみ(権限なし)",
+      "apply": "適用",
+      "leaveWarning": "保存されていない変更があります。移動しますか？",
+      "added": "{{name}} ノードを追加しました",
+      "inserted": "{{name}} をワイヤーの間に挿入しました",
+      "saved": "下書き v{{v}} を保存しました",
+      "emergencyStop": "自動制御の非常停止中 — 制御ノードはスキップされます",
+      "virtualBadge": "仮想",
+      "virtualTargets": "このフローは仮想空間が対象です。仮想環境でシナリオを実行して確認してください。",
+      "runScenario": "仮想環境で実行"
+    },
+    "applyBlock": {
+      "readOnly": "閲覧のみのため適用できません",
+      "busy": "処理中です",
+      "empty": "ノードを追加してから適用できます",
+      "unsaved": "先に変更を保存してください",
+      "noChanges": "適用する新しい下書きがありません",
+      "errors": "検証エラーを修正すると適用できます"
+    },
+    "toolbar": {
+      "label": "編集ツール",
+      "undo": "元に戻す",
+      "redo": "やり直し",
+      "selectAll": "すべて選択",
+      "copy": "コピー",
+      "paste": "貼り付け",
+      "align": "整列",
+      "delete": "削除"
+    },
+    "palette": {
+      "label": "ノードパレット",
+      "search": "ノード検索",
+      "noMatch": "該当するノードがありません",
+      "add": "{{name}} を追加",
+      "locked": "制御・シーンノードには制御デプロイ権限が必要です",
+      "lockedShort": "ロック"
+    },
+    "category": {
+      "trigger": "トリガー",
+      "condition": "条件・検知",
+      "transform": "変換",
+      "flow": "フロー制御",
+      "action": "アクション",
+      "sink": "出力",
+      "debug": "デバッグ",
+      "enrich": "補強",
+      "ai": "AI"
+    },
+    "canvas": {
+      "empty": "パレットからトリガーをドラッグしてください",
+      "emptyReadOnly": "ノードがありません",
+      "minimap": "ミニマップ",
+      "wires": "ワイヤー一覧",
+      "wire": "{{from}} → {{to}} ({{port}})"
+    },
+    "node": {
+      "errorBadge": "エラー {{n}}",
+      "errors1h": "直近1時間のエラー {{n}}件"
+    },
+    "connect": {
+      "SELF": "ノードを自分自身に接続できません",
+      "DUPLICATE": "同じポートはすでに接続されています",
+      "UNKNOWN_NODE": "存在しないノードです",
+      "NO_PORT": "存在しない出力ポートです",
+      "NO_INPUT": "トリガーには入力を接続できません",
+      "TYPE_MISMATCH": "ポートの型が合わないため接続できません"
+    },
+    "diff": {
+      "added": "追加",
+      "changed": "変更",
+      "removed": "削除",
+      "showing": "バージョン比較を表示中: {{label}}",
+      "clear": "比較を終了"
+    },
+    "panel": {
+      "aside": "設定パネル",
+      "empty": "ノードを選択すると設定が表示されます",
+      "label": "{{name}} の設定",
+      "readOnly": "閲覧のみです",
+      "name": "ノード名",
+      "description": "説明",
+      "retry": "再試行",
+      "maxAttempts": "再試行回数(0〜10)",
+      "intervalMs": "間隔(ms)",
+      "timeoutMs": "タイムアウト(ms)"
+    },
+    "js": {
+      "size": "{{n}} / {{max}} バイト"
+    },
+    "field": {
+      "metric": "測定項目",
+      "op": "演算子",
+      "value": "値",
+      "for": "継続",
+      "clear": "解除値",
+      "repeat": "繰り返し",
+      "target": "対象",
+      "metrics": "測定項目",
+      "cron": "cron",
+      "timezone": "タイムゾーン",
+      "days": "曜日",
+      "from": "開始",
+      "to": "終了",
+      "window": "ウィンドウ",
+      "fn": "関数",
+      "groupBy": "グループ",
+      "code": "コード",
+      "outputs": "出力数(1〜10)",
+      "duration": "期間",
+      "validitySeconds": "有効時間(秒)",
+      "level": "レベル",
+      "spaceId": "対象空間",
+      "threshold": "基準値",
+      "targetTemperature": "目標温度",
+      "commaHint": "カンマ区切り"
+    },
+    "rule": {
+      "required": "必須項目です",
+      "type": "形式が正しくありません({{limit}})",
+      "minimum": "{{limit}} 以上にしてください",
+      "maximum": "{{limit}} 以下にしてください",
+      "enum": "許可された値ではありません",
+      "minLength": "{{limit}}文字以上入力してください",
+      "maxLength": "{{limit}}文字以下で入力してください",
+      "minItems": "{{limit}}個以上選んでください",
+      "maxItems": "{{limit}}個以下にしてください",
+      "duration": "1秒〜24時間で入力してください",
+      "maxBytes": "コードは {{limit}} バイト以下にしてください"
+    },
+    "duration": {
+      "s": "秒",
+      "m": "分",
+      "h": "時間",
+      "unit": "{{label}} の単位"
+    },
+    "target": {
+      "mode": "対象の指定方法",
+      "modes": {
+        "space": "空間 + 関係",
+        "devices": "機器を直接選択",
+        "model": "機器モデル",
+        "tags": "タグ"
+      },
+      "space": "空間",
+      "relation": "関係",
+      "measures": "計測(measures)",
+      "controls": "制御(controls)",
+      "includeChildren": "下位空間を含む",
+      "devices": "機器",
+      "noDevices": "選択できる機器がありません",
+      "model": "機器モデル",
+      "chooseModel": "モデルを選択",
+      "tags": "タグ(カンマ区切り)",
+      "count": "現在の対象 {{n}}台"
+    },
+    "control": {
+      "capability": "機能",
+      "command": "コマンド",
+      "choose": "選択してください",
+      "unset": "(指定なし)",
+      "loadFailed": "機能一覧を読み込めませんでした",
+      "range": "{{min}}〜{{max}}{{unit}}",
+      "problem": {
+        "range": "{{min}}〜{{max}}{{unit}}の範囲で設定してください",
+        "step": "{{step}} 単位で入力してください",
+        "enum": "許可された値ではありません",
+        "number": "数値を入力してください"
+      }
+    },
+    "issue": {
+      "NO_TRIGGER": "トリガーノードがありません",
+      "UNCONNECTED": "接続されていないノード",
+      "CYCLE": "循環接続",
+      "INVALID_CONFIG": "設定エラー",
+      "TYPE_MISMATCH": "ポート型の不一致",
+      "SUBFLOW_RECURSION": "サブフローの再帰",
+      "TARGET_MISSING": "対象機器なし",
+      "LIMIT": "上限超過",
+      "TARGET_OFFLINE": "対象機器オフライン",
+      "TARGET_EMPTY": "対象が空です",
+      "SINK_SCHEMA_MISSING": "保存先スキーマなし",
+      "DEPRECATED_NODE": "非推奨ノード"
+    },
+    "bottom": {
+      "label": "下部パネル",
+      "validation": "検証 ({{n}})",
+      "versions": "バージョン",
+      "errors": "エラー"
+    },
+    "validation": {
+      "ok": "検証の問題はありません",
+      "error": "エラー",
+      "warning": "警告"
+    },
+    "delete": {
+      "title": "ノードの削除",
+      "question": "{{name}} を削除します。前後をつなぎますか？",
+      "only": "つながずに削除",
+      "reconnect": "前後をつないで削除"
+    },
+    "apply": {
+      "title": "適用の確認: {{name}} {{from}} → {{to}}",
+      "counts": "検証: エラー {{errors}} · 警告 {{warnings}}",
+      "errors": "エラー(適用不可)",
+      "warnings": "警告(適用可能)",
+      "changes": "変更の概要",
+      "added": "+ {{name}} · 状態: 新規開始",
+      "changed": "~ {{name}} · 状態: {{policy}}",
+      "removed": "- {{name}}",
+      "removedRetained": "- {{name}} · 残った状態を24時間保管",
+      "noChanges": "変更されたノードはありません",
+      "approvalRequired": "制御ノードの変更のため、ADMINの承認後に適用されます",
+      "riskControl": "制御ノードが追加・変更されます",
+      "riskMode": "実行モードが変わります",
+      "acknowledge": "理解しました",
+      "memo": "デプロイメモ(0〜500文字)",
+      "memoTooLong": "メモは{{max}}文字以下にしてください",
+      "confirm": "適用",
+      "approvalSent": "承認依頼を送信しました",
+      "applied": "v{{v}} を適用しました",
+      "noControlPermission": "制御ノードを含むフローを適用する権限がありません"
+    },
+    "statePolicy": {
+      "KEEP": "維持(KEEP)",
+      "RESET": "リセット(RESET)",
+      "MIGRATE": "移行(MIGRATE)"
+    },
+    "versions": {
+      "version": "バージョン",
+      "state": "状態",
+      "appliedBy": "適用者",
+      "appliedAt": "日時",
+      "memo": "メモ",
+      "empty": "バージョンがありません",
+      "notSaved": "保存するとバージョン履歴が作成されます",
+      "stopCompare": "比較を終了",
+      "rollbackConfirm": "ロールバック",
+      "compare": "v{{v}} と比較",
+      "rollback": "v{{v}} にロールバック",
+      "rollbackTitle": "v{{v}} にロールバック",
+      "rollbackBody": "v{{v}} の定義を新しいバージョンとして即時適用します。続けますか？",
+      "rolledBack": "v{{v}} としてロールバックしました"
+    },
+    "versionState": {
+      "ACTIVE": "ACTIVE",
+      "DRAFT": "DRAFT",
+      "ARCHIVED": "ARCHIVED",
+      "PENDING_APPROVAL": "承認待ち"
+    },
+    "errors": {
+      "unavailable": "指標を読み込めませんでした",
+      "summary": "直近1時間: 実行 {{executions}}回 · エラー {{errors}}件 · エラー率 {{rate}}%",
+      "isolation": "ノードのエラーはその実行だけを終了しエラー指標を増やします。他のフローや同じ機器の次のメッセージ処理は止まりません。",
+      "none": "直近1時間のエラーはありません",
+      "node": "ノード",
+      "processed": "処理",
+      "count": "エラー"
+    },
+    "templates": {
+      "title": "テンプレート",
+      "search": "テンプレート検索",
+      "category": "分類",
+      "categories": {
+        "COMFORT": "快適",
+        "SAFETY": "安全",
+        "ENERGY": "エネルギー",
+        "FACILITY": "設備"
+      },
+      "empty": "テンプレートがありません",
+      "required": "必要: {{items}}",
+      "use": "使う",
+      "formTitle": "{{name}} テンプレートで作成",
+      "flowName": "フロー名",
+      "notApplied": "作成したフローは下書き(DRAFT)で、自動では適用されません",
+      "create": "フローを作成"
+    },
+    "approvals": {
+      "title": "承認待ち",
+      "empty": "承認待ちの依頼はありません",
+      "ownOnly": "自分の依頼のみ表示されます。承認はADMINが行います。",
+      "flow": "フロー",
+      "kind": "種類",
+      "kinds": {
+        "APPLY": "適用",
+        "PROMOTE": "昇格"
+      },
+      "requestedBy": "依頼者",
+      "requestedAt": "日時",
+      "control": "制御ノード",
+      "approve": "承認",
+      "reject": "却下",
+      "reason": "却下理由",
+      "reasonRequired": "却下理由を1〜500文字で入力してください",
+      "approved": "承認しました。アトミックに適用されます。",
+      "rejected": "却下しました"
+    }
+  },
+  "errors": {
+    "FLOW_NOT_FOUND": "フローが見つかりません",
+    "FLOW_NAME_DUPLICATED": "同じ名前のフローがあります",
+    "FLOW_VERSION_CONFLICT": "他のユーザーが先に変更しました。再読み込みしてから編集してください",
+    "FLOW_VALIDATION_FAILED": "検証に失敗したため適用できませんでした",
+    "FLOW_APPROVAL_REQUIRED": "承認依頼を送信しました",
+    "FLOW_STATE_CONFLICT": "現在の状態ではできません",
+    "FLOW_NODE_LIMIT_EXCEEDED": "ノード数の上限を超えました",
+    "FLOW_DEFINITION_TOO_LARGE": "フロー定義が大きすぎます",
+    "FLOW_LIMIT_EXCEEDED": "フローの上限を超えました",
+    "FLOW_SHADOW_IN_PROGRESS": "シャドー実行中は適用できません",
+    "CAPABILITY_NOT_FOUND": "機能が見つかりません"
+  }
+}

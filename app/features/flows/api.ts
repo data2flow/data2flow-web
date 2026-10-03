@@ -43,6 +43,7 @@ export interface CapabilityDetail {
 
 export interface FlowApi {
   create(body: { name: string; description?: string; environment?: string; definition: FlowDefinition }): Promise<BffJsonResult<SaveResult>>;
+  rename(flowId: string, name: string): Promise<BffJsonResult<{ flowId: string; name: string }>>;
   saveDraft(flowId: string, body: { name?: string; baseVersion: number; definition: FlowDefinition }): Promise<BffJsonResult<SaveResult>>;
   validate(flowId: string, version: number): Promise<BffJsonResult<ValidateResponse>>;
   apply(flowId: string, body: { version: number; baseVersion: number; memo?: string; acknowledgedRisks: boolean }): Promise<BffJsonResult<ApplyResult>>;
@@ -59,6 +60,7 @@ const flow = (id: string) => `${base}/flows/${encodeURIComponent(id)}`;
 
 export const flowApi: FlowApi = {
   create: (body) => bffJson(`${base}/flows`, { method: "POST", body, idempotencyKey: clientIdempotencyKey() }),
+  rename: (id, name) => bffJson(flow(id), { method: "PATCH", body: { name } }),
   saveDraft: (id, body) => bffJson(`${flow(id)}/draft`, { method: "PUT", body }),
   validate: (id, version) => bffJson(`${flow(id)}/validate`, { method: "POST", body: { version } }),
   apply: (id, body) => bffJson(`${flow(id)}/apply`, { method: "POST", body, idempotencyKey: clientIdempotencyKey() }),

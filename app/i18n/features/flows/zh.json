@@ -1,1 +1,369 @@
-{}
+{
+  "flows": {
+    "crumb": "自动化",
+    "title": "流程",
+    "newTitle": "新建流程",
+    "newFlow": "新建流程",
+    "fromTemplate": "从模板创建",
+    "status": {
+      "DRAFT": "草稿",
+      "ACTIVE": "运行中",
+      "PAUSED": "已暂停",
+      "DEGRADED": "性能下降",
+      "DISABLED": "已停用",
+      "DELETED": "已删除",
+      "NEW": "新建"
+    },
+    "kind": {
+      "FLOW": "流程",
+      "RULE": "由规则生成",
+      "CATCH": "错误处理"
+    },
+    "list": {
+      "search": "按名称搜索",
+      "status": "状态",
+      "kind": "类型",
+      "space": "空间",
+      "noMatch": "没有符合条件的流程",
+      "empty": "还没有自动化。请从模板开始",
+      "col": {
+        "status": "状态",
+        "name": "名称",
+        "kind": "类型",
+        "space": "目标空间",
+        "version": "运行版本",
+        "executions": "执行次数(1小时)",
+        "errorRate": "错误率",
+        "actions": "动作数",
+        "updated": "更新"
+      },
+      "pause": "暂停",
+      "resume": "恢复",
+      "disable": "停用",
+      "confirmState": "确定要{{action}}吗？",
+      "deleteTitle": "删除流程：{{name}}",
+      "deleteBody": "请输入流程名称“{{name}}”以删除。此操作无法撤销。",
+      "confirmName": "流程名称",
+      "confirmMismatch": "名称不匹配",
+      "deleted": "流程已删除。"
+    },
+    "editor": {
+      "name": "流程名称",
+      "namePlaceholder": "请输入名称",
+      "nameRule": "名称需为1~{{max}}个字符",
+      "versions": "运行 {{active}} · 编辑基准 {{base}}",
+      "converged": "所有实例已应用 v{{v}}",
+      "converging": "正在应用 v{{v}}…",
+      "editors": "正在编辑：{{names}}",
+      "unsaved": "未保存的更改",
+      "readOnly": "仅查看(无权限)",
+      "apply": "应用",
+      "leaveWarning": "有未保存的更改。确定离开吗？",
+      "added": "已添加节点 {{name}}",
+      "inserted": "已将 {{name}} 插入连线中",
+      "saved": "已保存草稿 v{{v}}",
+      "emergencyStop": "自动控制紧急停止中 — 将跳过控制节点",
+      "virtualBadge": "虚拟",
+      "virtualTargets": "此流程以虚拟空间为目标。请在虚拟环境中运行场景进行验证。",
+      "runScenario": "在虚拟环境中运行"
+    },
+    "applyBlock": {
+      "readOnly": "仅查看，无法应用",
+      "busy": "处理中",
+      "empty": "添加节点后才能应用",
+      "unsaved": "请先保存更改",
+      "noChanges": "没有可应用的新草稿",
+      "errors": "修正验证错误后才能应用"
+    },
+    "toolbar": {
+      "label": "编辑工具",
+      "undo": "撤销",
+      "redo": "重做",
+      "selectAll": "全选",
+      "copy": "复制",
+      "paste": "粘贴",
+      "align": "对齐",
+      "delete": "删除"
+    },
+    "palette": {
+      "label": "节点面板",
+      "search": "搜索节点",
+      "noMatch": "没有匹配的节点",
+      "add": "添加 {{name}}",
+      "locked": "控制和场景节点需要控制部署权限",
+      "lockedShort": "已锁定"
+    },
+    "category": {
+      "trigger": "触发器",
+      "condition": "条件・检测",
+      "transform": "转换",
+      "flow": "流程控制",
+      "action": "动作",
+      "sink": "输出",
+      "debug": "调试",
+      "enrich": "增强",
+      "ai": "AI"
+    },
+    "canvas": {
+      "empty": "请从面板拖入一个触发器",
+      "emptyReadOnly": "没有节点",
+      "minimap": "小地图",
+      "wires": "连线列表",
+      "wire": "{{from}} → {{to}} ({{port}})"
+    },
+    "node": {
+      "errorBadge": "错误 {{n}}",
+      "errors1h": "最近1小时错误 {{n}} 次"
+    },
+    "connect": {
+      "SELF": "节点不能连接到自身",
+      "DUPLICATE": "这些端口已连接",
+      "UNKNOWN_NODE": "节点不存在",
+      "NO_PORT": "输出端口不存在",
+      "NO_INPUT": "触发器没有输入",
+      "TYPE_MISMATCH": "端口类型不兼容，无法连接"
+    },
+    "diff": {
+      "added": "新增",
+      "changed": "已更改",
+      "removed": "已删除",
+      "showing": "正在比较版本：{{label}}",
+      "clear": "停止比较"
+    },
+    "panel": {
+      "aside": "设置面板",
+      "empty": "选择节点后在此显示设置",
+      "label": "{{name}} 设置",
+      "readOnly": "仅查看",
+      "name": "节点名称",
+      "description": "说明",
+      "retry": "重试",
+      "maxAttempts": "重试次数(0~10)",
+      "intervalMs": "间隔(ms)",
+      "timeoutMs": "超时(ms)"
+    },
+    "js": {
+      "size": "{{n}} / {{max}} 字节"
+    },
+    "field": {
+      "metric": "测量项",
+      "op": "运算符",
+      "value": "值",
+      "for": "持续",
+      "clear": "解除值",
+      "repeat": "重复",
+      "target": "目标",
+      "metrics": "测量项",
+      "cron": "cron",
+      "timezone": "时区",
+      "days": "星期",
+      "from": "开始",
+      "to": "结束",
+      "window": "窗口",
+      "fn": "函数",
+      "groupBy": "分组",
+      "code": "代码",
+      "outputs": "输出数(1~10)",
+      "duration": "时长",
+      "validitySeconds": "有效时间(秒)",
+      "level": "级别",
+      "spaceId": "目标空间",
+      "threshold": "阈值",
+      "targetTemperature": "目标温度",
+      "commaHint": "用逗号分隔"
+    },
+    "rule": {
+      "required": "必填",
+      "type": "类型不正确({{limit}})",
+      "minimum": "必须不小于 {{limit}}",
+      "maximum": "必须不大于 {{limit}}",
+      "enum": "不是允许的值",
+      "minLength": "请至少输入 {{limit}} 个字符",
+      "maxLength": "最多输入 {{limit}} 个字符",
+      "minItems": "请至少选择 {{limit}} 个",
+      "maxItems": "最多选择 {{limit}} 个",
+      "duration": "请输入1秒~24小时之间的值",
+      "maxBytes": "代码不得超过 {{limit}} 字节"
+    },
+    "duration": {
+      "s": "秒",
+      "m": "分",
+      "h": "小时",
+      "unit": "{{label}} 单位"
+    },
+    "target": {
+      "mode": "目标指定方式",
+      "modes": {
+        "space": "空间 + 关系",
+        "devices": "直接选择设备",
+        "model": "设备型号",
+        "tags": "标签"
+      },
+      "space": "空间",
+      "relation": "关系",
+      "measures": "测量(measures)",
+      "controls": "控制(controls)",
+      "includeChildren": "包含子空间",
+      "devices": "设备",
+      "noDevices": "没有可选设备",
+      "model": "设备型号",
+      "chooseModel": "选择型号",
+      "tags": "标签(逗号分隔)",
+      "count": "当前目标 {{n}} 台"
+    },
+    "control": {
+      "capability": "功能",
+      "command": "命令",
+      "choose": "请选择",
+      "unset": "(不指定)",
+      "loadFailed": "无法加载功能列表",
+      "range": "{{min}}~{{max}}{{unit}}",
+      "problem": {
+        "range": "请设置在 {{min}}~{{max}}{{unit}} 之间",
+        "step": "请以 {{step}} 为步长输入",
+        "enum": "不是允许的值",
+        "number": "请输入数字"
+      }
+    },
+    "issue": {
+      "NO_TRIGGER": "没有触发器节点",
+      "UNCONNECTED": "未连接的节点",
+      "CYCLE": "循环连接",
+      "INVALID_CONFIG": "设置错误",
+      "TYPE_MISMATCH": "端口类型不匹配",
+      "SUBFLOW_RECURSION": "子流程递归",
+      "TARGET_MISSING": "没有目标设备",
+      "LIMIT": "超出限制",
+      "TARGET_OFFLINE": "目标设备离线",
+      "TARGET_EMPTY": "目标为空",
+      "SINK_SCHEMA_MISSING": "缺少输出模式",
+      "DEPRECATED_NODE": "已弃用节点"
+    },
+    "bottom": {
+      "label": "底部面板",
+      "validation": "验证 ({{n}})",
+      "versions": "版本",
+      "errors": "错误"
+    },
+    "validation": {
+      "ok": "没有验证问题",
+      "error": "错误",
+      "warning": "警告"
+    },
+    "delete": {
+      "title": "删除节点",
+      "question": "将删除 {{name}}。是否连接其前后节点？",
+      "only": "仅删除",
+      "reconnect": "删除并重新连接"
+    },
+    "apply": {
+      "title": "确认应用：{{name}} {{from}} → {{to}}",
+      "counts": "验证：错误 {{errors}} · 警告 {{warnings}}",
+      "errors": "错误(无法应用)",
+      "warnings": "警告(可以应用)",
+      "changes": "变更摘要",
+      "added": "+ {{name}} · 状态：重新开始",
+      "changed": "~ {{name}} · 状态：{{policy}}",
+      "removed": "- {{name}}",
+      "removedRetained": "- {{name}} · 剩余状态保留24小时",
+      "noChanges": "没有更改的节点",
+      "approvalRequired": "控制节点变更需经 ADMIN 批准后应用",
+      "riskControl": "将新增或更改控制节点",
+      "riskMode": "执行模式将变更",
+      "acknowledge": "我已了解",
+      "memo": "部署备注(0~500字)",
+      "memoTooLong": "备注最多 {{max}} 个字符",
+      "confirm": "应用",
+      "approvalSent": "已发送审批请求",
+      "applied": "已应用 v{{v}}",
+      "noControlPermission": "您没有应用含控制节点流程的权限"
+    },
+    "statePolicy": {
+      "KEEP": "保留(KEEP)",
+      "RESET": "重置(RESET)",
+      "MIGRATE": "迁移(MIGRATE)"
+    },
+    "versions": {
+      "version": "版本",
+      "state": "状态",
+      "appliedBy": "应用人",
+      "appliedAt": "时间",
+      "memo": "备注",
+      "empty": "没有版本",
+      "notSaved": "保存后将生成版本记录",
+      "stopCompare": "停止比较",
+      "rollbackConfirm": "回滚",
+      "compare": "与 v{{v}} 比较",
+      "rollback": "回滚到 v{{v}}",
+      "rollbackTitle": "回滚到 v{{v}}",
+      "rollbackBody": "将立即把 v{{v}} 的定义作为新版本应用。继续吗？",
+      "rolledBack": "已回滚为 v{{v}}"
+    },
+    "versionState": {
+      "ACTIVE": "ACTIVE",
+      "DRAFT": "DRAFT",
+      "ARCHIVED": "ARCHIVED",
+      "PENDING_APPROVAL": "待审批"
+    },
+    "errors": {
+      "unavailable": "无法加载指标",
+      "summary": "最近1小时：执行 {{executions}} 次 · 错误 {{errors}} 次 · 错误率 {{rate}}%",
+      "isolation": "节点错误只会结束该次执行并增加错误计数，不会阻塞其他流程以及同一设备的后续消息。",
+      "none": "最近1小时没有错误",
+      "node": "节点",
+      "processed": "处理",
+      "count": "错误"
+    },
+    "templates": {
+      "title": "模板",
+      "search": "搜索模板",
+      "category": "分类",
+      "categories": {
+        "COMFORT": "舒适",
+        "SAFETY": "安全",
+        "ENERGY": "能源",
+        "FACILITY": "设施"
+      },
+      "empty": "没有模板",
+      "required": "需要：{{items}}",
+      "use": "使用",
+      "formTitle": "使用 {{name}} 模板创建",
+      "flowName": "流程名称",
+      "notApplied": "创建的流程为草稿(DRAFT)，不会自动应用",
+      "create": "创建流程"
+    },
+    "approvals": {
+      "title": "待审批",
+      "empty": "没有待审批的请求",
+      "ownOnly": "仅显示您的请求。审批由 ADMIN 完成。",
+      "flow": "流程",
+      "kind": "类型",
+      "kinds": {
+        "APPLY": "应用",
+        "PROMOTE": "晋升"
+      },
+      "requestedBy": "申请人",
+      "requestedAt": "时间",
+      "control": "控制节点",
+      "approve": "批准",
+      "reject": "拒绝",
+      "reason": "拒绝原因",
+      "reasonRequired": "请输入1~500字的拒绝原因",
+      "approved": "已批准，将以原子方式应用。",
+      "rejected": "已拒绝"
+    }
+  },
+  "errors": {
+    "FLOW_NOT_FOUND": "找不到流程",
+    "FLOW_NAME_DUPLICATED": "已存在同名流程",
+    "FLOW_VERSION_CONFLICT": "其他用户已先修改。请刷新后重新编辑",
+    "FLOW_VALIDATION_FAILED": "验证失败，未应用",
+    "FLOW_APPROVAL_REQUIRED": "已发送审批请求",
+    "FLOW_STATE_CONFLICT": "当前状态下无法执行",
+    "FLOW_NODE_LIMIT_EXCEEDED": "节点数量超出限制",
+    "FLOW_DEFINITION_TOO_LARGE": "流程定义过大",
+    "FLOW_LIMIT_EXCEEDED": "超出流程限制",
+    "FLOW_SHADOW_IN_PROGRESS": "影子运行期间无法应用",
+    "CAPABILITY_NOT_FOUND": "找不到功能"
+  }
+}

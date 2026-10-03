@@ -1,1 +1,369 @@
-{}
+{
+  "flows": {
+    "crumb": "자동화",
+    "title": "플로우",
+    "newTitle": "새 플로우",
+    "newFlow": "새 플로우",
+    "fromTemplate": "템플릿에서 만들기",
+    "status": {
+      "DRAFT": "초안",
+      "ACTIVE": "실행 중",
+      "PAUSED": "일시 정지",
+      "DEGRADED": "성능 저하",
+      "DISABLED": "비활성",
+      "DELETED": "삭제됨",
+      "NEW": "새 플로우"
+    },
+    "kind": {
+      "FLOW": "플로우",
+      "RULE": "규칙에서 생성",
+      "CATCH": "오류 처리"
+    },
+    "list": {
+      "search": "이름 검색",
+      "status": "상태",
+      "kind": "종류",
+      "space": "공간",
+      "noMatch": "조건에 맞는 플로우가 없습니다",
+      "empty": "아직 자동화가 없습니다. 템플릿으로 시작해 보세요",
+      "col": {
+        "status": "상태",
+        "name": "이름",
+        "kind": "종류",
+        "space": "대상 공간",
+        "version": "실행 버전",
+        "executions": "1시간 실행",
+        "errorRate": "오류율",
+        "actions": "행동 수",
+        "updated": "수정"
+      },
+      "pause": "일시 정지",
+      "resume": "재개",
+      "disable": "비활성화",
+      "confirmState": "{{action}} 하시겠습니까?",
+      "deleteTitle": "플로우 삭제: {{name}}",
+      "deleteBody": "삭제하려면 플로우 이름 \"{{name}}\"을(를) 입력하세요. 되돌릴 수 없습니다.",
+      "confirmName": "플로우 이름",
+      "confirmMismatch": "이름이 일치하지 않습니다",
+      "deleted": "플로우를 삭제했습니다."
+    },
+    "editor": {
+      "name": "플로우 이름",
+      "namePlaceholder": "이름을 입력하세요",
+      "nameRule": "이름은 1~{{max}}자로 입력하세요",
+      "versions": "실행 {{active}} · 편집 기준 {{base}}",
+      "converged": "모든 인스턴스 v{{v}} 적용됨",
+      "converging": "v{{v}} 적용 중…",
+      "editors": "편집 중: {{names}}",
+      "unsaved": "저장 안 된 변경",
+      "readOnly": "보기 전용(권한 없음)",
+      "apply": "적용",
+      "leaveWarning": "저장하지 않은 변경이 있습니다. 나가시겠습니까?",
+      "added": "{{name}} 노드를 추가했습니다",
+      "inserted": "{{name}} 노드를 와이어 사이에 끼워 넣었습니다",
+      "saved": "초안 v{{v}}을(를) 저장했습니다",
+      "emergencyStop": "자동 제어 비상 정지 중 — 제어 노드는 건너뜁니다",
+      "virtualBadge": "가상",
+      "virtualTargets": "이 플로우는 가상 공간을 대상으로 합니다. 가상 환경에서 시나리오를 실행해 동작을 확인하세요.",
+      "runScenario": "가상 환경에서 실행"
+    },
+    "applyBlock": {
+      "readOnly": "보기 전용이라 적용할 수 없습니다",
+      "busy": "처리 중입니다",
+      "empty": "노드를 추가한 뒤 적용할 수 있습니다",
+      "unsaved": "변경 내용을 먼저 저장하세요",
+      "noChanges": "적용할 새 초안이 없습니다",
+      "errors": "검증 오류를 고쳐야 적용할 수 있습니다"
+    },
+    "toolbar": {
+      "label": "편집 도구",
+      "undo": "실행 취소",
+      "redo": "다시 실행",
+      "selectAll": "전체 선택",
+      "copy": "복사",
+      "paste": "붙여넣기",
+      "align": "정렬",
+      "delete": "삭제"
+    },
+    "palette": {
+      "label": "노드 팔레트",
+      "search": "노드 검색",
+      "noMatch": "맞는 노드가 없습니다",
+      "add": "{{name}} 추가",
+      "locked": "제어·장면 노드는 제어 배포 권한이 있어야 쓸 수 있습니다",
+      "lockedShort": "잠김"
+    },
+    "category": {
+      "trigger": "트리거",
+      "condition": "조건·탐지",
+      "transform": "변환",
+      "flow": "흐름 제어",
+      "action": "행동",
+      "sink": "출력",
+      "debug": "디버그",
+      "enrich": "보강",
+      "ai": "AI"
+    },
+    "canvas": {
+      "empty": "팔레트에서 트리거를 끌어다 놓으세요",
+      "emptyReadOnly": "노드가 없습니다",
+      "minimap": "미니맵",
+      "wires": "와이어 목록",
+      "wire": "{{from}} → {{to}} ({{port}})"
+    },
+    "node": {
+      "errorBadge": "오류 {{n}}",
+      "errors1h": "최근 1시간 오류 {{n}}건"
+    },
+    "connect": {
+      "SELF": "노드를 자기 자신에게 이을 수 없습니다",
+      "DUPLICATE": "이미 같은 포트끼리 이어져 있습니다",
+      "UNKNOWN_NODE": "없는 노드입니다",
+      "NO_PORT": "없는 출력 포트입니다",
+      "NO_INPUT": "트리거에는 입력 와이어를 이을 수 없습니다",
+      "TYPE_MISMATCH": "포트 타입이 맞지 않아 이을 수 없습니다"
+    },
+    "diff": {
+      "added": "추가됨",
+      "changed": "변경됨",
+      "removed": "삭제됨",
+      "showing": "버전 비교 표시 중: {{label}}",
+      "clear": "비교 끄기"
+    },
+    "panel": {
+      "aside": "설정 패널",
+      "empty": "노드를 선택하면 설정이 여기에 나옵니다",
+      "label": "{{name}} 설정",
+      "readOnly": "보기 전용입니다",
+      "name": "노드 이름",
+      "description": "설명",
+      "retry": "재시도",
+      "maxAttempts": "재시도 횟수(0~10)",
+      "intervalMs": "간격(ms)",
+      "timeoutMs": "시간 제한(ms)"
+    },
+    "js": {
+      "size": "{{n}} / {{max}} 바이트"
+    },
+    "field": {
+      "metric": "측정 항목",
+      "op": "연산자",
+      "value": "값",
+      "for": "지속",
+      "clear": "해제 값",
+      "repeat": "반복",
+      "target": "대상",
+      "metrics": "측정 항목",
+      "cron": "cron",
+      "timezone": "시간대",
+      "days": "요일",
+      "from": "시작",
+      "to": "끝",
+      "window": "창",
+      "fn": "함수",
+      "groupBy": "묶음",
+      "code": "코드",
+      "outputs": "출력 수(1~10)",
+      "duration": "기간",
+      "validitySeconds": "유효 시간(초)",
+      "level": "수준",
+      "spaceId": "대상 공간",
+      "threshold": "기준 값",
+      "targetTemperature": "목표 온도",
+      "commaHint": "쉼표로 구분"
+    },
+    "rule": {
+      "required": "필수 입력입니다",
+      "type": "형식이 맞지 않습니다({{limit}})",
+      "minimum": "{{limit}} 이상이어야 합니다",
+      "maximum": "{{limit}} 이하여야 합니다",
+      "enum": "허용된 값이 아닙니다",
+      "minLength": "{{limit}}자 이상 입력하세요",
+      "maxLength": "{{limit}}자 이하로 입력하세요",
+      "minItems": "{{limit}}개 이상 고르세요",
+      "maxItems": "{{limit}}개 이하로 고르세요",
+      "duration": "1초~24시간 사이로 입력하세요",
+      "maxBytes": "코드는 {{limit}}바이트 이하여야 합니다"
+    },
+    "duration": {
+      "s": "초",
+      "m": "분",
+      "h": "시간",
+      "unit": "{{label}} 단위"
+    },
+    "target": {
+      "mode": "대상 지정 방식",
+      "modes": {
+        "space": "공간 + 관계",
+        "devices": "기기 직접 선택",
+        "model": "기기 모델",
+        "tags": "태그"
+      },
+      "space": "공간",
+      "relation": "관계",
+      "measures": "측정(measures)",
+      "controls": "제어(controls)",
+      "includeChildren": "하위 공간 포함",
+      "devices": "기기",
+      "noDevices": "고를 수 있는 기기가 없습니다",
+      "model": "기기 모델",
+      "chooseModel": "모델 선택",
+      "tags": "태그(쉼표로 구분)",
+      "count": "현재 대상 {{n}}대"
+    },
+    "control": {
+      "capability": "기능",
+      "command": "명령",
+      "choose": "선택하세요",
+      "unset": "(지정 안 함)",
+      "loadFailed": "기능 목록을 불러오지 못했습니다",
+      "range": "{{min}}~{{max}}{{unit}}",
+      "problem": {
+        "range": "{{min}}~{{max}}{{unit}} 사이로 설정하세요",
+        "step": "{{step}} 단위로 입력하세요",
+        "enum": "허용된 값이 아닙니다",
+        "number": "숫자를 입력하세요"
+      }
+    },
+    "issue": {
+      "NO_TRIGGER": "트리거 노드가 없습니다",
+      "UNCONNECTED": "연결되지 않은 노드",
+      "CYCLE": "순환 연결",
+      "INVALID_CONFIG": "설정 오류",
+      "TYPE_MISMATCH": "포트 타입 불일치",
+      "SUBFLOW_RECURSION": "서브플로우 재귀",
+      "TARGET_MISSING": "대상 기기 없음",
+      "LIMIT": "한도 초과",
+      "TARGET_OFFLINE": "대상 기기 오프라인",
+      "TARGET_EMPTY": "대상이 비어 있음",
+      "SINK_SCHEMA_MISSING": "저장 대상 스키마 없음",
+      "DEPRECATED_NODE": "지원 중단 노드"
+    },
+    "bottom": {
+      "label": "하단 패널",
+      "validation": "검증 ({{n}})",
+      "versions": "버전",
+      "errors": "오류"
+    },
+    "validation": {
+      "ok": "검증 문제가 없습니다",
+      "error": "오류",
+      "warning": "경고"
+    },
+    "delete": {
+      "title": "노드 삭제",
+      "question": "{{name}} 노드를 지웁니다. 앞뒤를 이을까요?",
+      "only": "잇지 않고 삭제",
+      "reconnect": "앞뒤를 이어 삭제"
+    },
+    "apply": {
+      "title": "적용 확인: {{name}} {{from}} → {{to}}",
+      "counts": "검증: 오류 {{errors}} · 경고 {{warnings}}",
+      "errors": "오류(적용 불가)",
+      "warnings": "경고(적용 가능)",
+      "changes": "변경 요약",
+      "added": "+ {{name}} · 상태: 새로 시작",
+      "changed": "~ {{name}} · 상태: {{policy}}",
+      "removed": "- {{name}}",
+      "removedRetained": "- {{name}} · 남은 상태 24시간 보관",
+      "noChanges": "바뀐 노드가 없습니다",
+      "approvalRequired": "제어 노드 변경이라 ADMIN 승인 뒤에 적용됩니다",
+      "riskControl": "제어 노드가 추가·변경됩니다",
+      "riskMode": "실행 모드가 바뀝니다",
+      "acknowledge": "이해했습니다",
+      "memo": "배포 메모(0~500자)",
+      "memoTooLong": "메모는 {{max}}자 이하로 입력하세요",
+      "confirm": "적용",
+      "approvalSent": "승인 요청을 보냈습니다",
+      "applied": "v{{v}}을(를) 적용했습니다",
+      "noControlPermission": "제어 노드가 있는 플로우를 적용할 권한이 없습니다"
+    },
+    "statePolicy": {
+      "KEEP": "유지(KEEP)",
+      "RESET": "초기화(RESET)",
+      "MIGRATE": "변환(MIGRATE)"
+    },
+    "versions": {
+      "version": "버전",
+      "state": "상태",
+      "appliedBy": "적용자",
+      "appliedAt": "시각",
+      "memo": "메모",
+      "empty": "버전이 없습니다",
+      "notSaved": "저장하면 버전 기록이 생깁니다",
+      "stopCompare": "비교 끄기",
+      "rollbackConfirm": "롤백",
+      "compare": "v{{v}}와 비교",
+      "rollback": "v{{v}}로 롤백",
+      "rollbackTitle": "v{{v}}로 롤백",
+      "rollbackBody": "v{{v}}의 정의를 새 버전으로 즉시 적용합니다. 계속할까요?",
+      "rolledBack": "v{{v}}로 롤백했습니다"
+    },
+    "versionState": {
+      "ACTIVE": "ACTIVE",
+      "DRAFT": "DRAFT",
+      "ARCHIVED": "ARCHIVED",
+      "PENDING_APPROVAL": "승인 대기"
+    },
+    "errors": {
+      "unavailable": "지표를 불러오지 못했습니다",
+      "summary": "최근 1시간: 실행 {{executions}}회 · 오류 {{errors}}건 · 오류율 {{rate}}%",
+      "isolation": "노드 오류는 그 실행만 끝내고 오류 지표를 올립니다. 다른 플로우와 같은 기기의 다음 메시지 처리는 막지 않습니다.",
+      "none": "최근 1시간 동안 오류가 없습니다",
+      "node": "노드",
+      "processed": "처리",
+      "count": "오류"
+    },
+    "templates": {
+      "title": "템플릿",
+      "search": "템플릿 검색",
+      "category": "분류",
+      "categories": {
+        "COMFORT": "쾌적",
+        "SAFETY": "안전",
+        "ENERGY": "에너지",
+        "FACILITY": "설비"
+      },
+      "empty": "템플릿이 없습니다",
+      "required": "필요: {{items}}",
+      "use": "사용하기",
+      "formTitle": "{{name}} 템플릿으로 만들기",
+      "flowName": "플로우 이름",
+      "notApplied": "만든 플로우는 초안(DRAFT)이고 자동으로 적용되지 않습니다",
+      "create": "플로우 만들기"
+    },
+    "approvals": {
+      "title": "승인 대기",
+      "empty": "승인 대기 중인 요청이 없습니다",
+      "ownOnly": "내가 보낸 요청만 보입니다. 승인은 ADMIN이 합니다.",
+      "flow": "플로우",
+      "kind": "종류",
+      "kinds": {
+        "APPLY": "적용",
+        "PROMOTE": "승격"
+      },
+      "requestedBy": "요청자",
+      "requestedAt": "시각",
+      "control": "제어 노드",
+      "approve": "승인",
+      "reject": "거절",
+      "reason": "거절 사유",
+      "reasonRequired": "거절 사유를 1~500자로 입력하세요",
+      "approved": "승인했습니다. 원자적으로 적용됩니다.",
+      "rejected": "거절했습니다"
+    }
+  },
+  "errors": {
+    "FLOW_NOT_FOUND": "플로우를 찾을 수 없습니다",
+    "FLOW_NAME_DUPLICATED": "같은 이름의 플로우가 있습니다",
+    "FLOW_VERSION_CONFLICT": "다른 사용자가 먼저 바꿨습니다. 새로 고친 뒤 다시 편집하세요",
+    "FLOW_VALIDATION_FAILED": "검증에 실패해 적용하지 못했습니다",
+    "FLOW_APPROVAL_REQUIRED": "승인 요청을 보냈습니다",
+    "FLOW_STATE_CONFLICT": "지금 상태에서는 할 수 없습니다",
+    "FLOW_NODE_LIMIT_EXCEEDED": "노드 수 한도를 넘었습니다",
+    "FLOW_DEFINITION_TOO_LARGE": "플로우 정의가 너무 큽니다",
+    "FLOW_LIMIT_EXCEEDED": "플로우 한도를 넘었습니다",
+    "FLOW_SHADOW_IN_PROGRESS": "섀도우 실행 중에는 적용할 수 없습니다",
+    "CAPABILITY_NOT_FOUND": "기능을 찾을 수 없습니다"
+  }
+}

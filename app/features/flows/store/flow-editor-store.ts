@@ -33,6 +33,8 @@ export type EditorAction =
   | { type: "change"; graph: FlowGraph; select?: string[] }
   /** 끄는 중 위치처럼 이력에 남기지 않는 변경 */
   | { type: "replace"; graph: FlowGraph }
+  /** 끌기를 마칠 때: 끌기 전 그래프를 이력에 남기고 결과를 현재로 */
+  | { type: "commit"; before: FlowGraph; graph: FlowGraph }
   | { type: "select"; ids: string[] }
   | { type: "undo" }
   | { type: "redo" }
@@ -76,6 +78,8 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
       return { ...state, history: record(state.history, action.graph), selected: action.select ?? state.selected.filter((id) => action.graph.nodes.some((n) => n.id === id)) };
     case "replace":
       return { ...state, history: { ...state.history, present: action.graph } };
+    case "commit":
+      return { ...state, history: record({ ...state.history, present: action.before }, action.graph) };
     case "select":
       return { ...state, selected: action.ids };
     case "undo":
