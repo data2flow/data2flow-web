@@ -237,7 +237,7 @@ export default function SpaceDetailPage() {
         {tab === "schedule" && loaded.schedule && (
           <div className="grid gap-4 lg:grid-cols-[1fr_280px]">
             <ScheduleEditor data={loaded.schedule} canEdit={canEdit} result={result} />
-            {/* 운영 모드 수동 지정(API-DEV-08 POST …/override-mode)은 core M2에 아직 없어 조회만 보인다(DEV-11.02는 M3) */}
+            {/* 운영 모드 수동 지정(API-DEV-08 POST …/override-mode)은 DEV-11.02(M5, 조직 달력 DEV-12.01 필요) 범위라 M2에서는 조회만 보인다 */}
             <ModeCard data={loaded.mode} canOverride={false} timezone={timezone} lang={lang} now={loaded.now} result={result} />
           </div>
         )}

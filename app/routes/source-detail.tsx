@@ -20,6 +20,7 @@ import { findSpace, type SpaceNode } from "~/lib/spaces";
 import { IngestTabs, LifecycleBadge, StateBadge, useTimezone } from "~/features/sources/components/common";
 import { LifecycleActions, type UsageSummary } from "~/features/sources/components/lifecycle-actions";
 import { LiveMessages } from "~/features/sources/components/live-messages";
+import { useSourceStates } from "~/features/sources/components/source-state-live";
 import type { BrokerInfo } from "~/features/sources/device-credentials";
 import { STAT_RANGES, STAT_SERIES, representativeState, statBucket, type RuntimeInstance, type SourceDetail } from "~/features/sources/model/source";
 import type { Route } from "./+types/source-detail";
@@ -149,7 +150,9 @@ export default function SourceDetailPage({ loaderData, actionData }: Route.Compo
   const timezone = useTimezone();
   const { source, canAdmin, tabs, tab, usage, runtime } = loaderData;
   const error = actionData && "error" in actionData ? actionData.error : undefined;
-  const representative = representativeState(source, runtime);
+  // 실시간 상태(DSC-02.01, `sources` 토픽)가 오면 대표 상태를 바로 바꾼다. ACTIVE가 아니면 DISABLED 그대로
+  const live = useSourceStates(source.lifecycle === "ACTIVE");
+  const representative = source.lifecycle === "ACTIVE" ? (live.states[source.id] ?? representativeState(source, runtime)) : representativeState(source, runtime);
   return (
     <>
       <IngestTabs current="sources" />

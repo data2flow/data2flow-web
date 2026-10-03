@@ -22,7 +22,7 @@ export function clampTestTimeout(value: number | null | undefined): number {
   return Math.max(TEST_TIMEOUT_RANGE.min, Math.min(TEST_TIMEOUT_RANGE.max, Math.round(value)));
 }
 
-/** 연결 테스트 단계 실패 표기: 문서·ingress는 FAILED, core 정규화는 FAIL. 둘 다 실패로 본다 */
+/** 연결 테스트 단계 실패 표기는 FAILED(API-DSC-57, 문서·ingress·core 같음). 예전 core 표기 FAIL도 실패로 본다 */
 export function isFailedStep(status: string | null | undefined): boolean {
   return status === "FAILED" || status === "FAIL";
 }
@@ -382,6 +382,34 @@ export interface RuntimeInstance {
   reconnects24h?: number | null;
   /** 90초 넘게 보고 없음(대표 상태에서 빠진다) */
   stale?: boolean;
+}
+
+export const SOURCE_STATES = ["CONNECTED", "CONNECTING", "DISCONNECTED", "ERROR", "DISABLED"] as const;
+
+/** 실시간 `sources` 토픽의 `source-state` 이벤트(API-DSH-20, DSC-02.01) */
+export interface SourceStateEvent {
+  sourceId: string;
+  state: string;
+  previousState?: string | null;
+  errorKind?: string | null;
+  at?: string | null;
+}
+
+/** 이벤트 data를 읽는다. 형식이 틀리거나 모르는 상태면 null(무시) */
+export function parseSourceStateEvent(data: unknown): SourceStateEvent | null {
+  if (!data || typeof data !== "object") return null;
+  const d = data as Record<string, unknown>;
+  const id = typeof d.sourceId === "string" || typeof d.sourceId === "number" ? String(d.sourceId) : null;
+  const state = typeof d.state === "string" && (SOURCE_STATES as readonly string[]).includes(d.state) ? d.state : null;
+  if (!id || !state) return null;
+  return { sourceId: id, state, previousState: typeof d.previousState === "string" ? d.previousState : null, errorKind: typeof d.errorKind === "string" ? d.errorKind : null, at: typeof d.at === "string" ? d.at : null };
+}
+
+/** 실시간 상태를 덮어쓴 목록 표시 상태: ACTIVE 소스만 연결 상태가 있고, 그 밖의 생애주기는 DISABLED(TC-DSC-060) */
+export function displayState(source: { id: string; lifecycle: string; state?: string | null }, live: Record<string, string>): string {
+  if (source.lifecycle === "PAUSED" || source.lifecycle === "DRAFT") return "DISABLED";
+  if (source.lifecycle !== "ACTIVE") return source.state ?? "DISABLED";
+  return live[source.id] ?? source.state ?? "DISABLED";
 }
 
 /** 대표 상태: core가 계산한 `state`를 쓰고, 없으면 보고가 끊기지 않은 인스턴스 중 가장 나쁜 상태 */

@@ -17,6 +17,8 @@ import { LifecycleActions } from "../lifecycle-actions";
 import { LiveMessages, liveMessagesUrl } from "../live-messages";
 import { MappingEditor } from "../mapping-editor";
 import { SourceForm } from "../source-form";
+import { useSourceStates } from "../source-state-live";
+import { StateBadge } from "../common";
 
 afterEach(() => vi.unstubAllGlobals());
 
@@ -458,5 +460,30 @@ describe("수집 구역 탭·스파크라인", () => {
     await renderRoute(<IngestTabs current="sources" />, { session: meOf("OPERATOR") });
     expect(await screen.findByRole("link", { name: "데이터 소스" })).toHaveAttribute("aria-current", "page");
     expect(screen.getAllByRole("link")).toHaveLength(4);
+  });
+});
+
+describe("DSC-02.01 연결 상태 실시간 반영(sources 토픽)", () => {
+  function Probe({ enabled = true }: { enabled?: boolean }) {
+    const { states } = useSourceStates(enabled, { createSource: (u) => new FakeSource(u), checkSession: async () => true });
+    return <StateBadge state={states["7"] ?? "CONNECTED"} />;
+  }
+
+  it("TC-DSC-060 source-state 이벤트가 오면 다시 불러오지 않고 배지가 바로 바뀐다", async () => {
+    FakeSource.last = undefined;
+    await renderRoute(<Probe />);
+    await waitFor(() => expect(FakeSource.last?.url).toBe("/bff/stream/live?topics=sources"));
+    expect(screen.getByText("연결됨")).toBeInTheDocument();
+    act(() => FakeSource.last!.emit("source-state", { sourceId: "7", state: "DISCONNECTED", previousState: "CONNECTED", at: "2026-10-04T00:00:00Z" }));
+    expect(await screen.findByText("끊김")).toBeInTheDocument();
+    act(() => FakeSource.last!.emit("source-state", { sourceId: "8", state: "ERROR" }));
+    act(() => FakeSource.last!.emit("source-state", { sourceId: "7", state: "??" }));
+    expect(screen.getByText("끊김")).toBeInTheDocument();
+  });
+
+  it("꺼져 있으면 연결하지 않는다", async () => {
+    FakeSource.last = undefined;
+    await renderRoute(<Probe enabled={false} />);
+    expect(FakeSource.last).toBeUndefined();
   });
 });

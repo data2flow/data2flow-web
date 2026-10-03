@@ -1,6 +1,6 @@
 /**
  * UI-DEV-06 기기 상세 + UI-DEV-18 시맨틱 탭(DEV-02.01·02.03·02.10·13.01, DSH-07.05 즐겨찾기).
- * 탭: 개요(실시간 현재값) · 데이터(API-TSD-02 차트 + 실시간 점) · 원본 메시지(API-ING-05·06) · 변경 이력(API-DEV-27) · 시맨틱(API-DEV-131)
+ * 탭: 개요(실시간 현재값) · 데이터(API-TSD-02 차트 + 실시간 점) · 원본 메시지(API-ING-05·06) · 시맨틱(API-DEV-131). 변경 이력(API-DEV-27)은 M4
  * · 자격증명(플랫폼 브로커 소스만, UI-DSC-06).
  * 편집 API-DEV-13(baseVersion), 활성/비활성 API-DEV-16, 삭제 API-DEV-17(사용처 있으면 막음), 태그 API-DEV-21.
  * 권한: 조회 VIEWER+, 공간·태그·활성 OPERATOR+(DEV_PLACE), 이름·모델·주기·삭제·시맨틱 편집 INTEGRATOR+(DEV_ADMIN).
@@ -28,7 +28,7 @@ export function meta() {
   return [{ title: "data2flow" }];
 }
 
-// 변경 이력(API-DEV-27)은 core M2에 아직 없어 탭을 두지 않는다(DEV-02.07은 M4)
+// 변경 이력(API-DEV-27)은 DEV-02.07(M4, 규칙·알람·명령 이력과 함께) 범위라 M2에서는 탭을 두지 않는다
 const TABS = ["overview", "data", "raw", "semantic", "credentials"] as const;
 type Tab = (typeof TABS)[number];
 

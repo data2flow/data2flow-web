@@ -11,6 +11,8 @@ import {
   checkCode,
   checkTopic,
   clampTestTimeout,
+  displayState,
+  parseSourceStateEvent,
   clientIdPreview,
   connectorOfType,
   createBody,
@@ -154,7 +156,7 @@ describe("저장 본문(API-DSC-02·04)", () => {
     const steps = [{ name: "SUBSCRIBE", status: "OK" }];
     expect(testOutcome({ steps, preview: [] })).toBe("partial");
     expect(testOutcome({ steps, preview: [{ at: "", topic: "t", size: 1, rawExcerpt: "" }] })).toBe("success");
-    // 단계 실패: 문서·ingress 표기 FAILED, core 정규화 표기 FAIL 둘 다
+    // 단계 실패: API-DSC-57 표기 FAILED(core·ingress 같음), 예전 core 표기 FAIL도 실패로 본다
     expect(testOutcome({ steps: [{ name: "AUTH", status: "FAILED" }], preview: [] })).toBe("failed");
     expect(testOutcome({ steps: [{ name: "AUTH", status: "FAIL" }], preview: [] })).toBe("failed");
     expect(testOutcome({ ok: false, steps: [], preview: [] })).toBe("failed");
@@ -279,5 +281,33 @@ describe("DSC-09.01 커넥터 카탈로그", () => {
     expect(isLossy({ ackMode: "CURSOR" })).toBe(false);
     expect(isLossy({ ackMode: "AFTER_WRITE", lossPossible: true })).toBe(true);
     expect(isLossy({})).toBe(false);
+  });
+});
+
+describe("DSC-02.01 실시간 연결 상태(source-state)", () => {
+  it("TC-DSC-060 source-state 이벤트를 읽고, 모르는 상태·형식 오류는 무시한다", () => {
+    expect(parseSourceStateEvent({ sourceId: "7", state: "DISCONNECTED", previousState: "CONNECTED", errorKind: "NETWORK", at: "2026-10-04T00:00:00Z" })).toEqual({
+      sourceId: "7",
+      state: "DISCONNECTED",
+      previousState: "CONNECTED",
+      errorKind: "NETWORK",
+      at: "2026-10-04T00:00:00Z",
+    });
+    expect(parseSourceStateEvent({ sourceId: 7, state: "CONNECTING" })).toEqual({ sourceId: "7", state: "CONNECTING", previousState: null, errorKind: null, at: null });
+    expect(parseSourceStateEvent({ sourceId: "7", state: "WEIRD" })).toBeNull();
+    expect(parseSourceStateEvent({ state: "CONNECTED" })).toBeNull();
+    expect(parseSourceStateEvent("x")).toBeNull();
+    expect(parseSourceStateEvent(null)).toBeNull();
+  });
+
+  it("TC-DSC-060 목록 상태: ACTIVE는 실시간 값 우선, 일시정지·초안은 DISABLED, 보관은 저장된 값", () => {
+    const live = { "1": "DISCONNECTED" };
+    expect(displayState({ id: "1", lifecycle: "ACTIVE", state: "CONNECTED" }, live)).toBe("DISCONNECTED");
+    expect(displayState({ id: "2", lifecycle: "ACTIVE", state: "CONNECTED" }, live)).toBe("CONNECTED");
+    expect(displayState({ id: "3", lifecycle: "ACTIVE" }, live)).toBe("DISABLED");
+    expect(displayState({ id: "1", lifecycle: "PAUSED", state: "CONNECTED" }, live)).toBe("DISABLED");
+    expect(displayState({ id: "1", lifecycle: "DRAFT" }, live)).toBe("DISABLED");
+    expect(displayState({ id: "1", lifecycle: "ARCHIVED", state: null }, live)).toBe("DISABLED");
+    expect(displayState({ id: "1", lifecycle: "ARCHIVED", state: "ERROR" }, live)).toBe("ERROR");
   });
 });

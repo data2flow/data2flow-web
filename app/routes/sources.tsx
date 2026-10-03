@@ -2,7 +2,7 @@
  * UI-DSC-01 데이터 소스 목록(DSC-01.01, DSC-01.02, DSC-02.01, DSC-02.03, DSC-02.06, DSC-07.01, DSH-08.02).
  * API: 목록 API-DSC-01, 상태 변경 API-DSC-06(activate·pause·resume, baseVersion).
  * 조회 SRC_READ(OPERATOR 이상), [새 소스]·행의 [실시간 메시지]·상태 변경은 SRC_ADMIN(INTEGRATOR 이상).
- * 연결 상태는 실시간(API-DSH-20 `ingest` 토픽)으로 갱신하고, 수신량은 1분마다 다시 불러온다.
+ * 연결 상태는 실시간(API-DSH-20 `sources` 토픽의 `source-state`)으로 5초 안에 갱신하고(DSC-02.01), 수신량은 1분마다 다시 불러온다.
  */
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -15,7 +15,8 @@ import { errorText } from "~/lib/error-text";
 import { formatRelative } from "~/lib/format";
 import { hasAny } from "~/lib/permissions";
 import { IngestTabs, LifecycleBadge, Sparkline, StateBadge } from "~/features/sources/components/common";
-import { LIFECYCLES, TYPE_CARDS, percent, type SourceLimits, type SourceSummary } from "~/features/sources/model/source";
+import { useSourceStates } from "~/features/sources/components/source-state-live";
+import { LIFECYCLES, TYPE_CARDS, displayState, percent, type SourceLimits, type SourceSummary } from "~/features/sources/model/source";
 import type { Route } from "./+types/sources";
 
 export function meta() {
@@ -61,6 +62,7 @@ export default function Sources({ loaderData, actionData }: Route.ComponentProps
   const [params] = useSearchParams();
   const revalidator = useRevalidator();
   const [clock, setClock] = useState(now);
+  const live = useSourceStates(sources.responses.length > 0);
   // 수신량·마지막 수신은 1분마다 다시 불러온다(TC-DSC-075)
   useEffect(() => {
     const timer = setInterval(() => {
@@ -141,7 +143,7 @@ export default function Sources({ loaderData, actionData }: Route.ComponentProps
               {sources.responses.map((s) => (
                 <tr key={s.id}>
                   <td>
-                    <StateBadge state={s.lifecycle === "ACTIVE" ? s.state : s.lifecycle === "PAUSED" || s.lifecycle === "DRAFT" ? "DISABLED" : (s.state ?? "DISABLED")} />
+                    <StateBadge state={displayState(s, live.states)} />
                   </td>
                   <td>
                     <Link to={`/sources/${s.id}`} className="font-medium text-accent hover:underline">
