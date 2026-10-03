@@ -42,6 +42,29 @@ export function languageFromAcceptHeader(header: string | null | undefined): Lan
   return DEFAULT_LANGUAGE;
 }
 
+/** 로그인 전 공개 페이지의 언어 접두사(ADR-037). 한국어는 접두사가 없다 */
+export const PREFIXED_LANGUAGES = ["en", "ja", "zh"] as const;
+
+export function languageFromPath(pathname: string): Language | undefined {
+  const first = pathname.split("/")[1];
+  return (PREFIXED_LANGUAGES as readonly string[]).includes(first) ? (first as Language) : undefined;
+}
+
+/** 공개 페이지 주소에 언어 접두사를 붙인다. `/login` + en → `/en/login` */
+export function localizedPath(path: string, lang: Language): string {
+  const clean = path.startsWith("/") ? path : `/${path}`;
+  if (lang === DEFAULT_LANGUAGE) return clean;
+  return clean === "/" ? `/${lang}` : `/${lang}${clean}`;
+}
+
+/** 접두사를 떼어 낸 경로. `/en/login` → `/login` */
+export function stripLanguagePrefix(pathname: string): string {
+  const lang = languageFromPath(pathname);
+  if (!lang) return pathname;
+  const rest = pathname.slice(lang.length + 1);
+  return rest || "/";
+}
+
 export function createI18n(language: Language): i18n {
   const instance = i18next.createInstance();
   void instance.use(initReactI18next).init({
