@@ -1,1 +1,145 @@
-{}
+{
+  "devices": {
+    "tabs": {
+      "control": "制御",
+      "commands": "コマンド履歴"
+    }
+  },
+  "control": {
+    "on": "オン",
+    "off": "オフ",
+    "panel": {
+      "unavailable": "制御情報を読み込めませんでした。しばらくしてから再試行してください。",
+      "notControllable": "このデバイスは制御できません",
+      "emergencyStop": "自動制御の非常停止中 — 手動制御は可能です",
+      "circuitOpen": "ドライバーの一時障害: コマンドがすぐに失敗する場合があります",
+      "readOnly": "制御権限がないため閲覧のみ可能です",
+      "driver": "ドライバー",
+      "reportedAt": "最終報告 {{at}}",
+      "manualOverride": "手動優先 · 残り{{n}}分",
+      "releaseOverride": "自動に戻す",
+      "overrideReleased": "手動優先を解除しました",
+      "protection": "機器保護: {{at}} 以降にコマンド可能",
+      "apply": "適用",
+      "desiredReported": "目標値 {{desired}} · 実際の値 {{reported}}",
+      "unlockConfirm": "ロックを解除しますか？",
+      "slider": "スライダー",
+      "rangeHint": "{{min}}〜{{max}}{{unit}}",
+      "timeout": "デバイスが応答しません",
+      "progressLabel": "コマンド状態: {{status}}"
+    },
+    "connectivity": {
+      "UNKNOWN": "不明",
+      "ONLINE": "オンライン",
+      "OFFLINE": "オフライン"
+    },
+    "sync": {
+      "synced": "目標状態 = 実際の状態",
+      "pending": "適用待ち",
+      "deviceChanged": "デバイスで直接変更"
+    },
+    "attr": {
+      "on": "電源",
+      "mode": "モード",
+      "targetTemperature": "目標温度",
+      "currentTemperature": "現在温度",
+      "level": "レベル",
+      "auto": "自動",
+      "locked": "ロック",
+      "battery": "バッテリー",
+      "open": "開"
+    },
+    "enum": {
+      "off": "オフ",
+      "on": "オン",
+      "cool": "冷房",
+      "heat": "暖房",
+      "dry": "除湿",
+      "fan": "送風",
+      "auto": "自動"
+    },
+    "validation": {
+      "range": "{{min}}〜{{max}}{{unit}}の範囲で設定してください",
+      "enum": "このデバイスが対応していない値です",
+      "type": "値の形式が正しくありません"
+    },
+    "step": {
+      "REQUESTED": "要求",
+      "SENT": "送信",
+      "ACKED": "応答",
+      "APPLIED": "適用"
+    },
+    "status": {
+      "REQUESTED": "要求済み",
+      "REJECTED": "拒否",
+      "BLOCKED": "ブロック",
+      "SKIPPED": "スキップ",
+      "DELAYED": "遅延",
+      "QUEUED": "キュー待ち",
+      "QUEUED_FOR_DOWNLINK": "ダウンリンク待ち",
+      "SENT": "送信済み",
+      "ACKED": "応答済み",
+      "APPLIED": "適用済み",
+      "TIMEOUT": "タイムアウト",
+      "FAILED": "失敗",
+      "SUPERSEDED": "置換済み",
+      "CANCELLED": "取消"
+    },
+    "history": {
+      "title": "コマンド履歴",
+      "unavailable": "コマンド履歴を読み込めませんでした",
+      "empty": "コマンド履歴はありません",
+      "col": {
+        "time": "要求時刻",
+        "device": "デバイス",
+        "command": "コマンド",
+        "source": "出所",
+        "status": "状態",
+        "duration": "所要時間",
+        "reason": "理由",
+        "actions": "操作"
+      },
+      "source": {
+        "flow": "フロー {{name}} v{{version}} · {{node}}",
+        "user": "ユーザー {{name}}"
+      },
+      "sourceType": {
+        "USER": "ユーザー",
+        "FLOW": "フロー",
+        "RULE": "ルール",
+        "AI": "AI",
+        "SCHEDULE": "スケジュール",
+        "SCENE": "シーン",
+        "BULK": "一括制御",
+        "SYSTEM": "システム"
+      },
+      "expand": "展開",
+      "collapse": "閉じる",
+      "cancel": "取消",
+      "timeline": "状態タイムライン",
+      "commandId": "コマンドID",
+      "idempotencyKey": "冪等キー",
+      "priority": "優先度",
+      "filter": {
+        "from": "開始",
+        "to": "終了",
+        "source": "出所",
+        "status": "状態",
+        "capability": "機能"
+      }
+    }
+  },
+  "errors": {
+    "COMMAND_ABSOLUTE_LIMIT": "組織の絶対限界を超える値のため拒否しました",
+    "COMMAND_ARG_OUT_OF_RANGE": "デバイスモデルが許可する範囲外の値です",
+    "COMMAND_ARGS_INVALID": "コマンド引数が正しくありません",
+    "CAPABILITY_NOT_SUPPORTED": "このデバイスが対応していない機能です",
+    "DEVICE_NOT_CONTROLLABLE": "このデバイスは制御できません",
+    "COMMAND_BLOCKED": "インターロック・保護ルールによりコマンドがブロックされました",
+    "COMMAND_NOT_CANCELLABLE": "取り消せない状態です",
+    "COMMAND_NOT_FOUND": "コマンドが見つかりません",
+    "ACT_SANDBOX_FORBIDDEN": "サンドボックスでは実機を制御できません",
+    "COMMAND_RATE_LIMITED": "コマンド間隔が短すぎるため保留されました",
+    "DRIVER_CAPABILITY_MISMATCH": "このドライバーはモデルの機能に対応していません"
+  }
+}

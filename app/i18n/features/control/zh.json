@@ -1,1 +1,145 @@
-{}
+{
+  "devices": {
+    "tabs": {
+      "control": "控制",
+      "commands": "命令历史"
+    }
+  },
+  "control": {
+    "on": "开",
+    "off": "关",
+    "panel": {
+      "unavailable": "无法加载控制信息。请稍后重试。",
+      "notControllable": "此设备无法控制",
+      "emergencyStop": "自动控制紧急停止中 — 仍可手动控制",
+      "circuitOpen": "驱动暂时故障：命令可能立即失败",
+      "readOnly": "没有控制权限，仅可查看",
+      "driver": "驱动",
+      "reportedAt": "最后上报 {{at}}",
+      "manualOverride": "手动优先 · 剩余{{n}}分钟",
+      "releaseOverride": "恢复自动",
+      "overrideReleased": "已解除手动优先",
+      "protection": "设备保护：{{at}} 之后可发送命令",
+      "apply": "应用",
+      "desiredReported": "期望值 {{desired}} · 实际值 {{reported}}",
+      "unlockConfirm": "确定要解锁吗？",
+      "slider": "滑块",
+      "rangeHint": "{{min}}~{{max}}{{unit}}",
+      "timeout": "设备无响应",
+      "progressLabel": "命令状态：{{status}}"
+    },
+    "connectivity": {
+      "UNKNOWN": "未知",
+      "ONLINE": "在线",
+      "OFFLINE": "离线"
+    },
+    "sync": {
+      "synced": "期望状态 = 实际状态",
+      "pending": "等待应用",
+      "deviceChanged": "在设备上直接更改"
+    },
+    "attr": {
+      "on": "电源",
+      "mode": "模式",
+      "targetTemperature": "目标温度",
+      "currentTemperature": "当前温度",
+      "level": "档位",
+      "auto": "自动",
+      "locked": "锁定",
+      "battery": "电池",
+      "open": "打开"
+    },
+    "enum": {
+      "off": "关",
+      "on": "开",
+      "cool": "制冷",
+      "heat": "制热",
+      "dry": "除湿",
+      "fan": "送风",
+      "auto": "自动"
+    },
+    "validation": {
+      "range": "请设置在 {{min}}~{{max}}{{unit}} 之间",
+      "enum": "此设备不支持该值",
+      "type": "值格式不正确"
+    },
+    "step": {
+      "REQUESTED": "请求",
+      "SENT": "发送",
+      "ACKED": "响应",
+      "APPLIED": "应用"
+    },
+    "status": {
+      "REQUESTED": "已请求",
+      "REJECTED": "已拒绝",
+      "BLOCKED": "已阻止",
+      "SKIPPED": "已跳过",
+      "DELAYED": "延迟",
+      "QUEUED": "排队中",
+      "QUEUED_FOR_DOWNLINK": "等待下行",
+      "SENT": "已发送",
+      "ACKED": "已响应",
+      "APPLIED": "已应用",
+      "TIMEOUT": "超时",
+      "FAILED": "失败",
+      "SUPERSEDED": "已被替代",
+      "CANCELLED": "已取消"
+    },
+    "history": {
+      "title": "命令历史",
+      "unavailable": "无法加载命令历史",
+      "empty": "暂无命令",
+      "col": {
+        "time": "请求时间",
+        "device": "设备",
+        "command": "命令",
+        "source": "来源",
+        "status": "状态",
+        "duration": "耗时",
+        "reason": "原因",
+        "actions": "操作"
+      },
+      "source": {
+        "flow": "流程 {{name}} v{{version}} · {{node}}",
+        "user": "用户 {{name}}"
+      },
+      "sourceType": {
+        "USER": "用户",
+        "FLOW": "流程",
+        "RULE": "规则",
+        "AI": "AI",
+        "SCHEDULE": "计划",
+        "SCENE": "场景",
+        "BULK": "批量控制",
+        "SYSTEM": "系统"
+      },
+      "expand": "展开",
+      "collapse": "收起",
+      "cancel": "取消",
+      "timeline": "状态时间线",
+      "commandId": "命令 ID",
+      "idempotencyKey": "幂等键",
+      "priority": "优先级",
+      "filter": {
+        "from": "开始",
+        "to": "结束",
+        "source": "来源",
+        "status": "状态",
+        "capability": "功能"
+      }
+    }
+  },
+  "errors": {
+    "COMMAND_ABSOLUTE_LIMIT": "值超出组织绝对限制，已拒绝",
+    "COMMAND_ARG_OUT_OF_RANGE": "值超出设备型号允许的范围",
+    "COMMAND_ARGS_INVALID": "命令参数无效",
+    "CAPABILITY_NOT_SUPPORTED": "此设备不支持该功能",
+    "DEVICE_NOT_CONTROLLABLE": "此设备无法控制",
+    "COMMAND_BLOCKED": "命令因联锁或保护规则被阻止",
+    "COMMAND_NOT_CANCELLABLE": "当前状态无法取消",
+    "COMMAND_NOT_FOUND": "找不到命令",
+    "ACT_SANDBOX_FORBIDDEN": "沙箱中不能控制真实设备",
+    "COMMAND_RATE_LIMITED": "命令过于频繁，已暂缓",
+    "DRIVER_CAPABILITY_MISMATCH": "此驱动不支持该型号的功能"
+  }
+}

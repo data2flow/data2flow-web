@@ -1,1 +1,145 @@
-{}
+{
+  "devices": {
+    "tabs": {
+      "control": "Control",
+      "commands": "Command history"
+    }
+  },
+  "control": {
+    "on": "On",
+    "off": "Off",
+    "panel": {
+      "unavailable": "Could not load control information. Please try again later.",
+      "notControllable": "This device cannot be controlled",
+      "emergencyStop": "Automatic control is emergency-stopped — manual control is still available",
+      "circuitOpen": "Driver temporarily failing: commands may fail immediately",
+      "readOnly": "You can only view because you do not have control permission",
+      "driver": "Driver",
+      "reportedAt": "Last report {{at}}",
+      "manualOverride": "Manual override · {{n}} min left",
+      "releaseOverride": "Return to automatic",
+      "overrideReleased": "Manual override released",
+      "protection": "Equipment protection: commands allowed after {{at}}",
+      "apply": "Apply",
+      "desiredReported": "Desired {{desired}} · Reported {{reported}}",
+      "unlockConfirm": "Unlock this device?",
+      "slider": "slider",
+      "rangeHint": "{{min}}–{{max}}{{unit}}",
+      "timeout": "The device is not responding",
+      "progressLabel": "Command status: {{status}}"
+    },
+    "connectivity": {
+      "UNKNOWN": "Unknown",
+      "ONLINE": "Online",
+      "OFFLINE": "Offline"
+    },
+    "sync": {
+      "synced": "Desired = reported",
+      "pending": "Pending apply",
+      "deviceChanged": "Changed on the device"
+    },
+    "attr": {
+      "on": "Power",
+      "mode": "Mode",
+      "targetTemperature": "Target temperature",
+      "currentTemperature": "Current temperature",
+      "level": "Level",
+      "auto": "Auto",
+      "locked": "Locked",
+      "battery": "Battery",
+      "open": "Open"
+    },
+    "enum": {
+      "off": "Off",
+      "on": "On",
+      "cool": "Cool",
+      "heat": "Heat",
+      "dry": "Dry",
+      "fan": "Fan",
+      "auto": "Auto"
+    },
+    "validation": {
+      "range": "Set a value between {{min}} and {{max}}{{unit}}",
+      "enum": "This device does not support that value",
+      "type": "The value format is invalid"
+    },
+    "step": {
+      "REQUESTED": "Requested",
+      "SENT": "Sent",
+      "ACKED": "Acknowledged",
+      "APPLIED": "Applied"
+    },
+    "status": {
+      "REQUESTED": "Requested",
+      "REJECTED": "Rejected",
+      "BLOCKED": "Blocked",
+      "SKIPPED": "Skipped",
+      "DELAYED": "Delayed",
+      "QUEUED": "Queued",
+      "QUEUED_FOR_DOWNLINK": "Waiting for downlink",
+      "SENT": "Sent",
+      "ACKED": "Acknowledged",
+      "APPLIED": "Applied",
+      "TIMEOUT": "Timed out",
+      "FAILED": "Failed",
+      "SUPERSEDED": "Superseded",
+      "CANCELLED": "Cancelled"
+    },
+    "history": {
+      "title": "Command history",
+      "unavailable": "Could not load command history",
+      "empty": "No commands yet",
+      "col": {
+        "time": "Requested at",
+        "device": "Device",
+        "command": "Command",
+        "source": "Source",
+        "status": "Status",
+        "duration": "Duration",
+        "reason": "Reason",
+        "actions": "Actions"
+      },
+      "source": {
+        "flow": "Flow {{name}} v{{version}} · {{node}}",
+        "user": "User {{name}}"
+      },
+      "sourceType": {
+        "USER": "User",
+        "FLOW": "Flow",
+        "RULE": "Rule",
+        "AI": "AI",
+        "SCHEDULE": "Schedule",
+        "SCENE": "Scene",
+        "BULK": "Bulk control",
+        "SYSTEM": "System"
+      },
+      "expand": "Details",
+      "collapse": "Hide",
+      "cancel": "Cancel",
+      "timeline": "Status timeline",
+      "commandId": "Command ID",
+      "idempotencyKey": "Idempotency key",
+      "priority": "Priority",
+      "filter": {
+        "from": "From",
+        "to": "To",
+        "source": "Source",
+        "status": "Status",
+        "capability": "Capability"
+      }
+    }
+  },
+  "errors": {
+    "COMMAND_ABSOLUTE_LIMIT": "Rejected: the value exceeds the organization absolute limit",
+    "COMMAND_ARG_OUT_OF_RANGE": "The value is outside the range the device model allows",
+    "COMMAND_ARGS_INVALID": "The command arguments are invalid",
+    "CAPABILITY_NOT_SUPPORTED": "This device does not support the capability",
+    "DEVICE_NOT_CONTROLLABLE": "This device cannot be controlled",
+    "COMMAND_BLOCKED": "The command was blocked by an interlock or protection rule",
+    "COMMAND_NOT_CANCELLABLE": "The command can no longer be cancelled",
+    "COMMAND_NOT_FOUND": "Command not found",
+    "ACT_SANDBOX_FORBIDDEN": "Real devices cannot be controlled from a sandbox",
+    "COMMAND_RATE_LIMITED": "Held back because commands were too frequent",
+    "DRIVER_CAPABILITY_MISMATCH": "This driver does not support the model capabilities"
+  }
+}

@@ -22,6 +22,9 @@ import { hasAny } from "~/lib/permissions";
 import type { SpaceNode } from "~/lib/spaces";
 import type { RootData } from "~/root";
 import { DeviceCredentialsPanel } from "~/features/sources/device-credentials";
+import { CommandHistory, HistoryFilters } from "~/features/control/command-history";
+import { DeviceControlPanel } from "~/features/control/control-panel";
+import { historyQuery, type Command, type ControlInfo } from "~/features/control/model/control";
 import type { Route } from "./+types/device-detail";
 
 export function meta() {
@@ -29,7 +32,8 @@ export function meta() {
 }
 
 // 변경 이력(API-DEV-27)은 DEV-02.07(M4, 규칙·알람·명령 이력과 함께) 범위라 M2에서는 탭을 두지 않는다
-const TABS = ["overview", "data", "raw", "semantic", "credentials"] as const;
+// 제어(UI-ACT-01, ACT-02.04·04.01·04.02)·명령 이력(UI-ACT-02, ACT-04.03)은 M3
+const TABS = ["overview", "data", "control", "commands", "raw", "semantic", "credentials"] as const;
 type Tab = (typeof TABS)[number];
 
 interface RawRow {
@@ -73,6 +77,8 @@ export async function loader({ request, context, params }: Route.LoaderArgs) {
   let raw: { rows: RawRow[]; nextCursor?: string | null; failed: boolean; selected?: RawDetail | null } | undefined;
   let semantic: SemanticDoc | null | undefined;
   let modelMetrics: string[] = [];
+  let control: ControlInfo | null | undefined;
+  let commands: { rows: Command[]; nextCursor?: string | null; failed: boolean } | undefined;
   if (tab === "raw") {
     const from = new Date(now - 7 * 86_400_000).toISOString();
     const to = new Date(now).toISOString();
@@ -83,6 +89,14 @@ export async function loader({ request, context, params }: Route.LoaderArgs) {
     const rawId = url.searchParams.get("raw");
     const selected = rawId ? await callApi<RawDetail>(ctx, request, `/api/v1/core/ingest/raw-messages/${encodeURIComponent(rawId)}`) : undefined;
     raw = { rows: list.ok ? list.list.responses : [], nextCursor: list.ok ? list.list.nextCursor : null, failed: !list.ok, selected: selected?.ok ? selected.data : null };
+  } else if (tab === "control") {
+    // API-ACT-03 컨트롤 생성 정보(실패해도 화면은 열고 안내)
+    const result = await callApi<ControlInfo>(ctx, request, `/api/v1/core/devices/${id}/control`);
+    control = result.ok ? result.data : null;
+  } else if (tab === "commands") {
+    // API-ACT-02 기기별 명령 이력(커서 목록)
+    const result = await callList<Command>(ctx, request, `/api/v1/core/devices/${id}/commands?${historyQuery(url.searchParams)}`);
+    commands = { rows: result.ok ? result.list.responses : [], nextCursor: result.ok ? result.list.nextCursor : null, failed: !result.ok };
   } else if (tab === "semantic") {
     const result = await callApi<SemanticDoc>(ctx, request, `/api/v1/core/devices/${id}/semantic`);
     semantic = result.ok ? result.data : null;
@@ -95,7 +109,7 @@ export async function loader({ request, context, params }: Route.LoaderArgs) {
     const [models, spaces] = await Promise.all([callList<{ id: string; code: string; name: string }>(ctx, request, "/api/v1/core/device-models?size=100"), callApi<SpaceNode[]>(ctx, request, "/api/v1/core/spaces")]);
     editOptions = { models: models.ok ? models.list.responses : [], spaces: spaces.ok ? (spaces.data ?? []) : [] };
   }
-  return { device: detail, tab, now, raw, semantic, modelMetrics, editOptions, preferences: prefs.ok ? prefs.data : null };
+  return { device: detail, tab, now, raw, semantic, control, commands, modelMetrics, editOptions, preferences: prefs.ok ? prefs.data : null };
 }
 
 type ActionResult = { intent: string; done?: boolean; error?: { code: string; message?: string }; references?: { type: string; id: string; name?: string }[]; fieldErrors?: Record<string, string> };
@@ -187,7 +201,7 @@ export default function DeviceDetailRoute({ loaderData, actionData }: Route.Comp
   const canPlace = hasAny(permissions, ["DEV_PLACE"]);
   const canAdmin = hasAny(permissions, ["DEV_ADMIN"]);
   const timezone = root?.timezone ?? "Asia/Seoul";
-  const { device, tab, now, raw, semantic, modelMetrics, editOptions, preferences } = loaderData;
+  const { device, tab, now, raw, semantic, control, commands, modelMetrics, editOptions, preferences } = loaderData;
   const result = actionData as ActionResult | undefined;
   const [deleteOpen, setDeleteOpen] = useState(false);
   const favorite = isFavorite(preferences?.favorites, "DEVICE", device.id);
@@ -326,6 +340,13 @@ export default function DeviceDetailRoute({ loaderData, actionData }: Route.Comp
               {raw.selected.canonical !== undefined && raw.selected.canonical !== null && <pre className="mt-2 max-h-80 overflow-auto rounded bg-bg p-3 font-mono text-[12px]">{JSON.stringify(raw.selected.canonical, null, 2)}</pre>}
             </section>
           )}
+        </Card>
+      )}
+      {tab === "control" && <DeviceControlPanel deviceId={device.id} spaceId={device.space?.id} initial={control ?? null} canControl={hasAny(permissions, ["DEVICE_CONTROL"])} timezone={timezone} lang={i18n.language} />}
+      {tab === "commands" && commands && (
+        <Card title={t("devices.tabs.commands")}>
+          <HistoryFilters hidden={{ tab: "commands" }} />
+          <CommandHistory key={commands.rows.map((r) => r.id).join(",")} rows={commands.rows} failed={commands.failed} moreHref={commands.nextCursor ? `?tab=commands&cursor=${encodeURIComponent(commands.nextCursor)}` : null} showDevice={false} canControl={hasAny(permissions, ["DEVICE_CONTROL"])} timezone={timezone} lang={i18n.language} />
         </Card>
       )}
       {tab === "semantic" && <SemanticTab semantic={semantic ?? null} canEdit={canAdmin} fieldErrors={result?.intent === "semantic-save" ? result.fieldErrors : undefined} />}

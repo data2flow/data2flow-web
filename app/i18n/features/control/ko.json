@@ -1,1 +1,145 @@
-{}
+{
+  "devices": {
+    "tabs": {
+      "control": "제어",
+      "commands": "명령 이력"
+    }
+  },
+  "control": {
+    "on": "켜짐",
+    "off": "꺼짐",
+    "panel": {
+      "unavailable": "제어 정보를 불러오지 못했습니다. 잠시 뒤 다시 시도해 주세요.",
+      "notControllable": "이 기기는 제어할 수 없습니다",
+      "emergencyStop": "자동 제어 비상 정지 중 — 수동 제어는 가능합니다",
+      "circuitOpen": "드라이버 일시 장애: 명령이 바로 실패로 끝날 수 있습니다",
+      "readOnly": "제어 권한이 없어 보기만 할 수 있습니다",
+      "driver": "드라이버",
+      "reportedAt": "마지막 보고 {{at}}",
+      "manualOverride": "수동 우선 · {{n}}분 남음",
+      "releaseOverride": "자동으로 되돌리기",
+      "overrideReleased": "수동 우선을 해제했습니다",
+      "protection": "장비 보호: {{at}} 이후 명령 가능",
+      "apply": "적용",
+      "desiredReported": "원하는 값 {{desired}} · 실제 값 {{reported}}",
+      "unlockConfirm": "잠금을 여시겠습니까?",
+      "slider": "슬라이더",
+      "rangeHint": "{{min}}~{{max}}{{unit}}",
+      "timeout": "기기가 응답하지 않습니다",
+      "progressLabel": "명령 상태: {{status}}"
+    },
+    "connectivity": {
+      "UNKNOWN": "알 수 없음",
+      "ONLINE": "온라인",
+      "OFFLINE": "오프라인"
+    },
+    "sync": {
+      "synced": "원하는 상태 = 실제 상태",
+      "pending": "적용 대기",
+      "deviceChanged": "기기에서 직접 변경됨"
+    },
+    "attr": {
+      "on": "전원",
+      "mode": "모드",
+      "targetTemperature": "목표 온도",
+      "currentTemperature": "현재 온도",
+      "level": "단계",
+      "auto": "자동",
+      "locked": "잠금",
+      "battery": "배터리",
+      "open": "열림"
+    },
+    "enum": {
+      "off": "끄기",
+      "on": "켜기",
+      "cool": "냉방",
+      "heat": "난방",
+      "dry": "제습",
+      "fan": "송풍",
+      "auto": "자동"
+    },
+    "validation": {
+      "range": "{{min}}~{{max}}{{unit}} 사이로 설정하세요",
+      "enum": "이 기기가 지원하지 않는 값입니다",
+      "type": "값 형식이 올바르지 않습니다"
+    },
+    "step": {
+      "REQUESTED": "요청",
+      "SENT": "전송",
+      "ACKED": "응답",
+      "APPLIED": "적용"
+    },
+    "status": {
+      "REQUESTED": "요청됨",
+      "REJECTED": "거부됨",
+      "BLOCKED": "차단됨",
+      "SKIPPED": "건너뜀",
+      "DELAYED": "지연",
+      "QUEUED": "대기열",
+      "QUEUED_FOR_DOWNLINK": "다운링크 대기",
+      "SENT": "전송됨",
+      "ACKED": "응답받음",
+      "APPLIED": "적용됨",
+      "TIMEOUT": "시간 초과",
+      "FAILED": "실패",
+      "SUPERSEDED": "대체됨",
+      "CANCELLED": "취소됨"
+    },
+    "history": {
+      "title": "명령 이력",
+      "unavailable": "명령 이력을 불러오지 못했습니다",
+      "empty": "명령 이력이 없습니다",
+      "col": {
+        "time": "요청 시각",
+        "device": "기기",
+        "command": "명령",
+        "source": "출처",
+        "status": "상태",
+        "duration": "소요",
+        "reason": "사유",
+        "actions": "동작"
+      },
+      "source": {
+        "flow": "플로우 {{name}} v{{version}} · {{node}}",
+        "user": "사용자 {{name}}"
+      },
+      "sourceType": {
+        "USER": "사용자",
+        "FLOW": "플로우",
+        "RULE": "규칙",
+        "AI": "AI",
+        "SCHEDULE": "예약",
+        "SCENE": "장면",
+        "BULK": "일괄 제어",
+        "SYSTEM": "시스템"
+      },
+      "expand": "펼치기",
+      "collapse": "접기",
+      "cancel": "취소",
+      "timeline": "상태 타임라인",
+      "commandId": "명령 ID",
+      "idempotencyKey": "멱등 키",
+      "priority": "우선순위",
+      "filter": {
+        "from": "시작",
+        "to": "끝",
+        "source": "출처",
+        "status": "상태",
+        "capability": "기능"
+      }
+    }
+  },
+  "errors": {
+    "COMMAND_ABSOLUTE_LIMIT": "조직 절대 한계를 넘는 값이라 거부했습니다",
+    "COMMAND_ARG_OUT_OF_RANGE": "기기 모델이 허용하는 범위를 벗어난 값입니다",
+    "COMMAND_ARGS_INVALID": "명령 인자가 올바르지 않습니다",
+    "CAPABILITY_NOT_SUPPORTED": "이 기기가 지원하지 않는 기능입니다",
+    "DEVICE_NOT_CONTROLLABLE": "이 기기는 제어할 수 없습니다",
+    "COMMAND_BLOCKED": "인터락·보호 규칙 때문에 명령이 차단되었습니다",
+    "COMMAND_NOT_CANCELLABLE": "취소할 수 없는 상태입니다",
+    "COMMAND_NOT_FOUND": "명령을 찾을 수 없습니다",
+    "ACT_SANDBOX_FORBIDDEN": "샌드박스에서는 실제 기기를 제어할 수 없습니다",
+    "COMMAND_RATE_LIMITED": "명령 간격이 너무 짧아 보류되었습니다",
+    "DRIVER_CAPABILITY_MISMATCH": "이 드라이버는 모델의 기능을 지원하지 않습니다"
+  }
+}
