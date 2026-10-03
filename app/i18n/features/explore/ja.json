@@ -1,0 +1,103 @@
+{
+  "explore": {
+    "title": "データ探索",
+    "crumb": "分析",
+    "copyLink": "リンクをコピー",
+    "emptyTitle": "左側でデバイスまたは空間を追加してください",
+    "emptyBody": "デバイスや空間の測定項目を選び、期間ごとの値を比較します。",
+    "tooMany": "一度に比較できるのは50件までです",
+    "truncated": "点が多すぎるため一部のみ表示します。",
+    "series": {
+      "title": "時系列",
+      "empty": "時系列がまだありません。",
+      "add": "+ 時系列を追加",
+      "hide": "非表示",
+      "show": "表示",
+      "removeOf": "{{name}} を削除",
+      "agg": "{{name}} の集計関数"
+    },
+    "agg": {
+      "avg": "平均",
+      "min": "最小",
+      "max": "最大",
+      "sum": "合計",
+      "last": "最終",
+      "count": "件数",
+      "twa": "時間加重平均"
+    },
+    "add": {
+      "title": "時系列を追加",
+      "kind": "対象の種類",
+      "device": "デバイス",
+      "space": "空間",
+      "search": "デバイス名・外部ID",
+      "noDevices": "条件に合うデバイスはありません。",
+      "metric": "測定項目",
+      "noMetrics": "この対象には測定項目がありません"
+    },
+    "tool": {
+      "range": "期間",
+      "from": "開始",
+      "to": "終了",
+      "resolution": "集計単位",
+      "fill": "補完",
+      "quality": "品質",
+      "virtual": "仮想データを含める",
+      "timezone": "表示タイムゾーン"
+    },
+    "resolution": {
+      "auto": "自動",
+      "raw": "生データ",
+      "1m": "1分",
+      "1h": "1時間",
+      "1d": "1日"
+    },
+    "fill": {
+      "none": "なし",
+      "previous": "直前の値",
+      "linear": "線形"
+    },
+    "quality": {
+      "normal": "正常のみ",
+      "all": "すべて"
+    },
+    "resolutionInfo": {
+      "AUTO": "自動単位: {{resolution}}で表示します（点の数を適切に調整）。",
+      "REQUESTED": "{{resolution}}単位で表示します。",
+      "CAPPED": "要求した単位は点が多すぎるため{{resolution}}単位で表示します。"
+    },
+    "problem": {
+      "START_AFTER_END": "開始が終了より後です",
+      "END_TOO_LATE": "終了は現在から1日以内にしてください",
+      "RAW_TOO_LONG": "生データは31日まで照会できます",
+      "INVALID": "期間の形式が正しくありません",
+      "useHourly": "1時間集計で表示"
+    },
+    "annotations": {
+      "title": "注釈",
+      "toggles": "注釈の種類",
+      "add": "注釈を追加",
+      "titleLabel": "タイトル",
+      "target": "対象",
+      "spaceScope": "（空間範囲）",
+      "deleteOf": "注釈 {{title}} を削除",
+      "titleInvalid": "タイトルを1～200文字で入力してください",
+      "timeInvalid": "開始が終了より後です"
+    },
+    "annotationType": {
+      "ALARM": "アラーム",
+      "OFFLINE": "オフライン",
+      "SCRIPT_ERROR": "スクリプトエラー",
+      "ANOMALY": "異常",
+      "USER": "ユーザー"
+    }
+  },
+  "errors": {
+    "TSD_RANGE_TOO_LARGE": "照会期間が長すぎます。期間を短くするか集計単位を変更してください。",
+    "TSD_RESOLUTION_UNAVAILABLE": "この期間では選択した集計単位を使えません。",
+    "TSD_INVALID_AGG": "この測定項目には使えない集計関数です。",
+    "TSD_TOO_MANY_SERIES": "一度に比較できるのは50件までです",
+    "TSD_RATE_LIMITED": "照会が多すぎます。{{n}}秒後にもう一度お試しください。",
+    "ANNOTATION_FORBIDDEN": "注釈を追加・削除する権限がありません。"
+  }
+}

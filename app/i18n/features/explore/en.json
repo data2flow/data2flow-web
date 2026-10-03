@@ -1,0 +1,103 @@
+{
+  "explore": {
+    "title": "Data explorer",
+    "crumb": "Analytics",
+    "copyLink": "Copy link",
+    "emptyTitle": "Add a device or space on the left",
+    "emptyBody": "Pick metrics of devices or spaces to compare values over time.",
+    "tooMany": "You can compare up to 50 series at once",
+    "truncated": "Too many points; only part is shown.",
+    "series": {
+      "title": "Series",
+      "empty": "No series yet.",
+      "add": "+ Add series",
+      "hide": "Hide",
+      "show": "Show",
+      "removeOf": "Remove {{name}}",
+      "agg": "{{name}} aggregation"
+    },
+    "agg": {
+      "avg": "Average",
+      "min": "Minimum",
+      "max": "Maximum",
+      "sum": "Sum",
+      "last": "Last",
+      "count": "Count",
+      "twa": "Time-weighted average"
+    },
+    "add": {
+      "title": "Add series",
+      "kind": "Target type",
+      "device": "Device",
+      "space": "Space",
+      "search": "Device name or external ID",
+      "noDevices": "No devices match.",
+      "metric": "Metric",
+      "noMetrics": "This target has no metrics"
+    },
+    "tool": {
+      "range": "Period",
+      "from": "Start",
+      "to": "End",
+      "resolution": "Resolution",
+      "fill": "Fill",
+      "quality": "Quality",
+      "virtual": "Include virtual data",
+      "timezone": "Display time zone"
+    },
+    "resolution": {
+      "auto": "Auto",
+      "raw": "Raw",
+      "1m": "1 minute",
+      "1h": "1 hour",
+      "1d": "1 day"
+    },
+    "fill": {
+      "none": "None",
+      "previous": "Previous value",
+      "linear": "Linear"
+    },
+    "quality": {
+      "normal": "Normal only",
+      "all": "All"
+    },
+    "resolutionInfo": {
+      "AUTO": "Auto resolution: shown at {{resolution}} (to keep a suitable number of points).",
+      "REQUESTED": "Shown at {{resolution}}.",
+      "CAPPED": "The requested resolution has too many points, so {{resolution}} is used."
+    },
+    "problem": {
+      "START_AFTER_END": "The start is later than the end",
+      "END_TOO_LATE": "The end must be within 1 day from now",
+      "RAW_TOO_LONG": "Raw data can be queried for up to 31 days",
+      "INVALID": "The period is not valid",
+      "useHourly": "View hourly aggregates"
+    },
+    "annotations": {
+      "title": "Annotations",
+      "toggles": "Annotation types",
+      "add": "Add annotation",
+      "titleLabel": "Title",
+      "target": "Target",
+      "spaceScope": "(space scope)",
+      "deleteOf": "Delete annotation {{title}}",
+      "titleInvalid": "Enter a title of 1 to 200 characters",
+      "timeInvalid": "The start is later than the end"
+    },
+    "annotationType": {
+      "ALARM": "Alarm",
+      "OFFLINE": "Offline",
+      "SCRIPT_ERROR": "Script error",
+      "ANOMALY": "Anomaly",
+      "USER": "User"
+    }
+  },
+  "errors": {
+    "TSD_RANGE_TOO_LARGE": "The period is too long. Shorten it or change the resolution.",
+    "TSD_RESOLUTION_UNAVAILABLE": "The selected resolution is not available for this period.",
+    "TSD_INVALID_AGG": "This aggregation cannot be used for this metric.",
+    "TSD_TOO_MANY_SERIES": "You can compare up to 50 series at once",
+    "TSD_RATE_LIMITED": "Too many queries. Please try again in {{n}} seconds.",
+    "ANNOTATION_FORBIDDEN": "You do not have permission to add or delete annotations."
+  }
+}

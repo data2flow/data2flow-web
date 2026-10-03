@@ -1,0 +1,103 @@
+{
+  "explore": {
+    "title": "数据探索",
+    "crumb": "分析",
+    "copyLink": "复制链接",
+    "emptyTitle": "请在左侧添加设备或空间",
+    "emptyBody": "选择设备或空间的测量项，按期间比较数值。",
+    "tooMany": "一次最多可比较 50 个序列",
+    "truncated": "点数过多，仅显示部分。",
+    "series": {
+      "title": "时序",
+      "empty": "还没有时序。",
+      "add": "+ 添加时序",
+      "hide": "隐藏",
+      "show": "显示",
+      "removeOf": "移除 {{name}}",
+      "agg": "{{name}} 聚合函数"
+    },
+    "agg": {
+      "avg": "平均",
+      "min": "最小",
+      "max": "最大",
+      "sum": "合计",
+      "last": "最后",
+      "count": "计数",
+      "twa": "时间加权平均"
+    },
+    "add": {
+      "title": "添加时序",
+      "kind": "对象类型",
+      "device": "设备",
+      "space": "空间",
+      "search": "设备名称或外部 ID",
+      "noDevices": "没有符合条件的设备。",
+      "metric": "测量项",
+      "noMetrics": "此对象没有测量项"
+    },
+    "tool": {
+      "range": "期间",
+      "from": "开始",
+      "to": "结束",
+      "resolution": "聚合单位",
+      "fill": "填充",
+      "quality": "质量",
+      "virtual": "包含虚拟数据",
+      "timezone": "显示时区"
+    },
+    "resolution": {
+      "auto": "自动",
+      "raw": "原始",
+      "1m": "1分钟",
+      "1h": "1小时",
+      "1d": "1天"
+    },
+    "fill": {
+      "none": "无",
+      "previous": "前一值",
+      "linear": "线性"
+    },
+    "quality": {
+      "normal": "仅正常",
+      "all": "全部"
+    },
+    "resolutionInfo": {
+      "AUTO": "自动单位：按 {{resolution}} 显示（保持合适的点数）。",
+      "REQUESTED": "按 {{resolution}} 单位显示。",
+      "CAPPED": "请求的单位点数过多，改按 {{resolution}} 单位显示。"
+    },
+    "problem": {
+      "START_AFTER_END": "开始晚于结束",
+      "END_TOO_LATE": "结束时间必须在当前起 1 天以内",
+      "RAW_TOO_LONG": "原始数据最多可查询 31 天",
+      "INVALID": "期间格式不正确",
+      "useHourly": "按 1 小时聚合查看"
+    },
+    "annotations": {
+      "title": "注释",
+      "toggles": "注释类型",
+      "add": "添加注释",
+      "titleLabel": "标题",
+      "target": "对象",
+      "spaceScope": "（空间范围）",
+      "deleteOf": "删除注释 {{title}}",
+      "titleInvalid": "请输入 1～200 个字符的标题",
+      "timeInvalid": "开始晚于结束"
+    },
+    "annotationType": {
+      "ALARM": "告警",
+      "OFFLINE": "离线",
+      "SCRIPT_ERROR": "脚本错误",
+      "ANOMALY": "异常",
+      "USER": "用户"
+    }
+  },
+  "errors": {
+    "TSD_RANGE_TOO_LARGE": "查询期间过长，请缩短期间或更改聚合单位。",
+    "TSD_RESOLUTION_UNAVAILABLE": "此期间无法使用所选的聚合单位。",
+    "TSD_INVALID_AGG": "此测量项不能使用该聚合函数。",
+    "TSD_TOO_MANY_SERIES": "一次最多可比较 50 个序列",
+    "TSD_RATE_LIMITED": "查询过多，请在 {{n}} 秒后重试。",
+    "ANNOTATION_FORBIDDEN": "没有添加或删除注释的权限。"
+  }
+}

@@ -1,0 +1,103 @@
+{
+  "explore": {
+    "title": "데이터 탐색",
+    "crumb": "분석",
+    "copyLink": "링크 복사",
+    "emptyTitle": "왼쪽에서 기기나 공간을 추가하세요",
+    "emptyBody": "기기나 공간의 측정 항목을 골라 기간별 값을 비교합니다.",
+    "tooMany": "한 번에 50개까지 비교할 수 있습니다",
+    "truncated": "점이 너무 많아 일부만 표시합니다.",
+    "series": {
+      "title": "시계열",
+      "empty": "아직 시계열이 없습니다.",
+      "add": "+ 시계열 추가",
+      "hide": "숨기기",
+      "show": "보이기",
+      "removeOf": "{{name}} 제거",
+      "agg": "{{name}} 집계 함수"
+    },
+    "agg": {
+      "avg": "평균",
+      "min": "최소",
+      "max": "최대",
+      "sum": "합계",
+      "last": "마지막",
+      "count": "개수",
+      "twa": "시간 가중 평균"
+    },
+    "add": {
+      "title": "시계열 추가",
+      "kind": "대상 종류",
+      "device": "기기",
+      "space": "공간",
+      "search": "기기 이름·외부 ID",
+      "noDevices": "조건에 맞는 기기가 없습니다.",
+      "metric": "측정 항목",
+      "noMetrics": "이 대상에는 측정 항목이 없습니다"
+    },
+    "tool": {
+      "range": "기간",
+      "from": "시작",
+      "to": "종료",
+      "resolution": "집계 단위",
+      "fill": "채우기",
+      "quality": "품질",
+      "virtual": "가상 데이터 포함",
+      "timezone": "표시 시간대"
+    },
+    "resolution": {
+      "auto": "자동",
+      "raw": "원본",
+      "1m": "1분",
+      "1h": "1시간",
+      "1d": "1일"
+    },
+    "fill": {
+      "none": "없음",
+      "previous": "직전 값",
+      "linear": "선형"
+    },
+    "quality": {
+      "normal": "정상만",
+      "all": "전체"
+    },
+    "resolutionInfo": {
+      "AUTO": "자동 단위: {{resolution}}로 표시합니다(점 수를 알맞게 맞춤).",
+      "REQUESTED": "{{resolution}} 단위로 표시합니다.",
+      "CAPPED": "요청한 단위는 점이 너무 많아 {{resolution}} 단위로 표시합니다."
+    },
+    "problem": {
+      "START_AFTER_END": "시작이 종료보다 늦습니다",
+      "END_TOO_LATE": "종료는 지금부터 1일 이내여야 합니다",
+      "RAW_TOO_LONG": "원본은 31일까지 조회할 수 있습니다",
+      "INVALID": "기간 형식이 올바르지 않습니다",
+      "useHourly": "1시간 집계로 보기"
+    },
+    "annotations": {
+      "title": "주석",
+      "toggles": "주석 종류",
+      "add": "주석 추가",
+      "titleLabel": "제목",
+      "target": "대상",
+      "spaceScope": "(공간 범위)",
+      "deleteOf": "주석 {{title}} 삭제",
+      "titleInvalid": "제목을 1~200자로 입력하세요",
+      "timeInvalid": "시작이 종료보다 늦습니다"
+    },
+    "annotationType": {
+      "ALARM": "알람",
+      "OFFLINE": "오프라인",
+      "SCRIPT_ERROR": "스크립트 오류",
+      "ANOMALY": "이상",
+      "USER": "사용자"
+    }
+  },
+  "errors": {
+    "TSD_RANGE_TOO_LARGE": "조회 기간이 너무 깁니다. 기간을 줄이거나 집계 단위를 바꿔 주세요.",
+    "TSD_RESOLUTION_UNAVAILABLE": "이 기간에는 고른 집계 단위를 쓸 수 없습니다.",
+    "TSD_INVALID_AGG": "이 측정 항목에 쓸 수 없는 집계 함수입니다.",
+    "TSD_TOO_MANY_SERIES": "한 번에 50개까지 비교할 수 있습니다",
+    "TSD_RATE_LIMITED": "조회가 너무 많습니다. {{n}}초 후 다시 시도해 주세요.",
+    "ANNOTATION_FORBIDDEN": "주석을 추가하거나 지울 권한이 없습니다."
+  }
+}
