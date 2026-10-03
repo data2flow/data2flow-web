@@ -2,6 +2,8 @@
  * UI-DEV-08 기기 모델 상세(DEV-03.01, DEV-07.05): 정보·측정 항목·기능·패키지·기기 탭.
  * 기본 제공 모델은 전체 읽기 전용 + [복제](BR-DEV-14). 쓰는 기기가 있으면 삭제 대신 사용 중지(BR-DEV-15).
  * API: 조회 API-DEV-46(`?code=`), 수정 API-DEV-41(baseVersion), 패키지 API-DEV-42, 사용 중지·삭제 API-DEV-43, 복제 API-DEV-47
+ * DEV-03.03 제어 드라이버 연결(M3): 드라이버 목록 API-ACT-30, 연결 API-ACT-31 `PUT /device-models/{id}/driver`(DRIVER_MANAGE).
+ * 모델 기능을 드라이버가 지원하지 않으면 연결 전에 거부하고 "이 드라이버는 {기능}을 지원하지 않습니다"를 보여 준다.
  */
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -45,6 +47,8 @@ export async function loader({ request, context, params }: Route.LoaderArgs) {
     tab === "package" ? callList<ScriptLite>(ctx, request, "/api/v1/core/scripts?kind=TRANSFORM&size=100") : null,
     tab === "devices" ? callList<DeviceLite>(ctx, request, `/api/v1/core/devices?modelId=${encodeURIComponent(model.id)}&size=50`) : null,
   ]);
+  // 드라이버 목록은 DRIVER_MANAGE만 볼 수 있다. 실패(403)면 현재 연결만 읽기 전용으로 보여 준다
+  const drivers = tab === "package" ? await callList<DriverRow>(ctx, request, "/api/v1/core/drivers?size=100") : null;
   return {
     tab,
     model,
@@ -54,6 +58,7 @@ export async function loader({ request, context, params }: Route.LoaderArgs) {
     scriptsUnavailable: tab === "package" && !(decode?.ok && transform?.ok),
     devices: devices?.ok ? devices.list.responses : [],
     devicesTotal: devices?.ok ? (devices.list.totalCount ?? devices.list.responses.length) : 0,
+    drivers: drivers?.ok ? drivers.list.responses : null,
     idempotencyKey: newIdempotencyKey(),
   };
 }
@@ -99,6 +104,19 @@ export async function action({ request, context, params }: Route.ActionArgs) {
       };
       return done(await callApi(ctx, request, `${base}/package`, { method: "PUT", body }));
     }
+    case "driver": {
+      // DEV-03.03: 연결 전에 드라이버가 모델 기능을 모두 지원하는지 확인한다(API-ACT-30 상세의 capabilities)
+      const driverId = field(form, "driverId") || null;
+      if (driverId) {
+        const driver = await callApi<{ capabilities?: string[] }>(ctx, request, `/api/v1/core/drivers/${encodeURIComponent(driverId)}`);
+        if (!driver.ok) return failed(intent, driver);
+        const missing = missingCapabilities(model.capabilities, driver.data.capabilities);
+        if (missing.length) return data<CatalogActionResult>({ intent, error: { code: "DRIVER_CAPABILITY_MISMATCH", message: missing.join(", ") } }, { status: 400 });
+      }
+      const result = await callApi(ctx, request, `${base}/driver`, { method: "PUT", body: { driverId } });
+      if (!result.ok && result.code === "DRIVER_CAPABILITY_MISMATCH") return data<CatalogActionResult>({ intent, error: { code: result.code, message: (result.errors ?? []).map((e) => e.message).join(", ") } }, { status: 400 });
+      return done(result);
+    }
     case "clone": {
       const newCode = field(form, "newCode").trim();
       if (!MODEL_CODE_PATTERN.test(newCode)) return invalid(intent, { newCode: "modelCode" });
@@ -118,6 +136,19 @@ export async function action({ request, context, params }: Route.ActionArgs) {
   }
 }
 
+interface DriverRow {
+  driverId: string;
+  name: string;
+  type: string;
+  status?: string;
+}
+
+/** 모델 기능 중 드라이버가 지원하지 않는 것(DEV-03.03) */
+function missingCapabilities(model: ModelDetail["capabilities"], driver: string[] | undefined): string[] {
+  const supported = new Set(driver ?? []);
+  return (model ?? []).map((c) => c.capability).filter((c) => !supported.has(c));
+}
+
 function Hidden({ intent, version }: { intent: string; version: number }) {
   return (
     <>
@@ -131,7 +162,8 @@ function Hidden({ intent, version }: { intent: string; version: number }) {
 export default function ModelDetailPage({ loaderData, actionData }: Route.ComponentProps) {
   const { t } = useTranslation();
   const root = useRouteLoaderData("root") as RootData | undefined;
-  const { tab, model, metrics, decodeScripts, transformScripts, scriptsUnavailable, devices, devicesTotal, idempotencyKey } = loaderData;
+  const { tab, model, metrics, decodeScripts, transformScripts, scriptsUnavailable, devices, devicesTotal, drivers, idempotencyKey } = loaderData;
+  const currentDriverId = (model.package as { driverId?: string | null } | null | undefined)?.driverId ?? null;
   const admin = can(root?.me?.permissions, "DEV_ADMIN");
   const editable = admin && !model.builtin;
   const result = actionData as CatalogActionResult | undefined;
@@ -332,7 +364,7 @@ export default function ModelDetailPage({ loaderData, actionData }: Route.Compon
                   </option>
                 ))}
               </SelectField>
-              <TextField label={t("catalog.package.driver")} name="driverKey" defaultValue={model.package?.driverKey ?? ""} disabled={!editable} hint={t("catalog.package.driverHint")} />
+              <input type="hidden" name="driverKey" value={model.package?.driverKey ?? ""} />
             </div>
             {(model.package?.decodeScriptId || model.package?.transformScriptId) && (
               <p className="text-[12.5px]">
@@ -358,6 +390,35 @@ export default function ModelDetailPage({ loaderData, actionData }: Route.Compon
               </div>
             )}
           </Form>
+        </Card>
+      )}
+      {tab === "package" && (
+        <Card title={t("catalog.package.driver")} className="mt-4">
+          {result?.intent === "driver" && result.error && (
+            <Alert tone="danger">{result.error.code === "DRIVER_CAPABILITY_MISMATCH" ? t("catalog.package.driverMismatch", { capability: result.error.message ?? "" }) : errorText(t, result.error)}</Alert>
+          )}
+          {result?.intent === "driver" && result.done && <Alert tone="success">{t("catalog.package.driverConnected")}</Alert>}
+          {drivers ? (
+            <Form method="post" className="mt-2 flex flex-wrap items-end gap-2">
+              <Hidden intent="driver" version={model.version} />
+              <SelectField label={t("catalog.package.driver")} name="driverId" defaultValue={currentDriverId ?? ""}>
+                <option value="">{t("common.none")}</option>
+                {drivers.map((d) => (
+                  <option key={d.driverId} value={d.driverId}>
+                    {`${d.name} (${d.type})`}
+                  </option>
+                ))}
+              </SelectField>
+              <Button type="submit" variant="primary">
+                {t("catalog.package.driverConnect")}
+              </Button>
+              <p className="w-full text-[12.5px] text-muted">{t("catalog.package.driverHint")}</p>
+            </Form>
+          ) : (
+            <p className="text-[13px]">
+              {currentDriverId ? t("catalog.package.driverCurrent", { id: currentDriverId }) : t("catalog.package.driverNone")} <span className="text-muted">{t("catalog.package.driverManageOnly")}</span>
+            </p>
+          )}
         </Card>
       )}
       {tab === "devices" && (

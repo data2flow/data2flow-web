@@ -80,7 +80,7 @@
       "decode": "DECODE script",
       "transform": "TRANSFORM script",
       "driver": "Control driver",
-      "driverHint": "Driver binding is validated in M3",
+      "driverHint": "Only a driver that supports every capability of the model can be connected",
       "openEditor": "Open editor",
       "scriptsUnavailable": "Could not load scripts. The current selection is kept.",
       "schema": "Attribute schema (JSON Schema)",
@@ -98,7 +98,13 @@
       },
       "validateHint": "Enter values to validate device input",
       "valid": "Values match the schema",
-      "invalid": "{{n}} values do not match the schema"
+      "invalid": "{{n}} values do not match the schema",
+      "driverMismatch": "This driver does not support {{capability}}",
+      "driverConnected": "Driver connected",
+      "driverConnect": "Connect",
+      "driverCurrent": "Connected driver: {{id}}",
+      "driverNone": "No driver connected",
+      "driverManageOnly": "(Only ADMIN and INTEGRATOR can connect drivers)"
     },
     "metrics": {
       "title": "Metrics",

@@ -80,7 +80,7 @@
       "decode": "DECODEスクリプト",
       "transform": "TRANSFORMスクリプト",
       "driver": "制御ドライバー",
-      "driverHint": "ドライバーの接続はM3で検証します",
+      "driverHint": "モデルのすべての機能(Capability)に対応するドライバーのみ接続できます",
       "openEditor": "エディターを開く",
       "scriptsUnavailable": "スクリプト一覧を読み込めませんでした。現在の設定は維持されます。",
       "schema": "属性スキーマ（JSON Schema）",
@@ -98,7 +98,13 @@
       },
       "validateHint": "値を入力してデバイス入力値を検証してください",
       "valid": "入力値はスキーマに合っています",
-      "invalid": "{{n}}件の値がスキーマに合っていません"
+      "invalid": "{{n}}件の値がスキーマに合っていません",
+      "driverMismatch": "このドライバーは {{capability}} に対応していません",
+      "driverConnected": "ドライバーを接続しました",
+      "driverConnect": "接続",
+      "driverCurrent": "接続中のドライバー: {{id}}",
+      "driverNone": "接続されたドライバーはありません",
+      "driverManageOnly": "(ドライバーの接続は ADMIN・INTEGRATOR のみ可能です)"
     },
     "metrics": {
       "title": "測定項目",

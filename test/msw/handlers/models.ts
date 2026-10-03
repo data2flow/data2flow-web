@@ -182,3 +182,9 @@ export const modelsHandler: CoreHandler = (core, { method, path, url, body, can 
   }
   return undefined;
 };
+
+/** 다른 도메인 가짜(제어 드라이버 연결 API-ACT-31)가 모델 패키지 값을 바꿀 때 쓴다 */
+export function setModelPackage(core: CoreState, modelId: string, patch: Record<string, unknown>) {
+  const packages = extra(core).packages;
+  packages.set(modelId, { ...(packages.get(modelId) ?? {}), ...patch });
+}

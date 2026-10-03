@@ -80,7 +80,7 @@
       "decode": "DECODE 스크립트",
       "transform": "TRANSFORM 스크립트",
       "driver": "제어 드라이버",
-      "driverHint": "드라이버 연결은 M3에서 검증합니다",
+      "driverHint": "모델의 모든 기능(Capability)을 지원하는 드라이버만 연결할 수 있습니다",
       "openEditor": "편집기 열기",
       "scriptsUnavailable": "스크립트 목록을 불러오지 못했습니다. 지금 연결된 값은 유지됩니다.",
       "schema": "속성 스키마(JSON Schema)",
@@ -98,7 +98,13 @@
       },
       "validateHint": "값을 넣어 기기 입력값을 검증해 보세요",
       "valid": "입력값이 스키마에 맞습니다",
-      "invalid": "{{n}}개 값이 스키마에 맞지 않습니다"
+      "invalid": "{{n}}개 값이 스키마에 맞지 않습니다",
+      "driverMismatch": "이 드라이버는 {{capability}}을 지원하지 않습니다",
+      "driverConnected": "드라이버를 연결했습니다",
+      "driverConnect": "연결",
+      "driverCurrent": "연결된 드라이버: {{id}}",
+      "driverNone": "연결된 드라이버가 없습니다",
+      "driverManageOnly": "(드라이버 연결은 ADMIN·INTEGRATOR만 할 수 있습니다)"
     },
     "metrics": {
       "title": "측정 항목",

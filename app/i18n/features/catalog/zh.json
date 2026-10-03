@@ -80,7 +80,7 @@
       "decode": "DECODE 脚本",
       "transform": "TRANSFORM 脚本",
       "driver": "控制驱动",
-      "driverHint": "驱动绑定在 M3 校验",
+      "driverHint": "只能连接支持该型号全部功能(Capability)的驱动",
       "openEditor": "打开编辑器",
       "scriptsUnavailable": "无法加载脚本列表，当前设置保持不变。",
       "schema": "属性模式（JSON Schema）",
@@ -98,7 +98,13 @@
       },
       "validateHint": "输入值以校验设备输入",
       "valid": "输入值符合模式",
-      "invalid": "{{n}} 个值不符合模式"
+      "invalid": "{{n}} 个值不符合模式",
+      "driverMismatch": "此驱动不支持 {{capability}}",
+      "driverConnected": "已连接驱动",
+      "driverConnect": "连接",
+      "driverCurrent": "已连接驱动：{{id}}",
+      "driverNone": "未连接驱动",
+      "driverManageOnly": "(仅 ADMIN、INTEGRATOR 可以连接驱动)"
     },
     "metrics": {
       "title": "测量项",
