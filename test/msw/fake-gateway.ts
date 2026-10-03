@@ -68,6 +68,8 @@ export class FakeGateway {
   readonly received: ReceivedRequest[] = [];
   /** auth가 본문에 sid·refreshToken을 넣는지(auth.md §3.2) 아니면 Set-Cookie만 쓰는지(IAM-api.md) */
   refreshInBody = false;
+  /** 조직 설정 가입 신청 허용(API-IAM-74 공개 조회, IAM-01.08) */
+  signupRequestEnabled = false;
   refreshCalls = 0;
   private seq = 0;
   private readonly mfaTickets = new Map<string, string>();
@@ -225,6 +227,9 @@ export class FakeGateway {
   }
 
   private publicCore(request: Request, path: string, body: unknown): Response {
+    if (path === "/public/signup-settings" && request.method === "GET") {
+      return HttpResponse.json(envelope({ signupRequestEnabled: this.signupRequestEnabled }));
+    }
     if (path === "/password-resets" && request.method === "POST") return new HttpResponse(null, { status: 202 });
     if (/^\/password-resets\/[^/]+\/confirm$/.test(path)) {
       if (path.includes("expired")) return fail(410, "RESET_TOKEN_INVALID");

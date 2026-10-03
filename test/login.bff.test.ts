@@ -162,13 +162,39 @@ describe("IAM-07.11·IAM-01.06·IAM-01.08 로그인 화면 구성", () => {
     expect(page.response.status).toBe(404);
   });
 
-  it("IAM-01.08 가입 신청을 켜면 로그인 화면에 [가입 신청] 링크가 생긴다", async () => {
-    app.reset({ DATA2FLOW_SIGNUP_REQUEST_ENABLED: "true" });
+  it("IAM-01.08 AT-IAM-16.1 조직 설정에서 가입 신청을 켜면(API-IAM-74) 로그인 화면에 [가입 신청] 링크가 생긴다", async () => {
+    app.gateway.signupRequestEnabled = true;
     const browser = new TestBrowser(app);
     const page = await browser.get("/login");
     expect(page.body).toContain('href="/signup"');
+    expect(app.gateway.received.some((r) => r.path === "/api/v1/core/public/signup-settings" && !r.headers.authorization)).toBe(true);
     const signup = await browser.get("/signup");
     expect(signup.response.status).toBe(200);
+  });
+
+  it("IAM-01.08 배포 설정이 켜져 있어도 조직 설정이 꺼져 있으면 링크가 없고 /signup은 404", async () => {
+    app.reset({ DATA2FLOW_SIGNUP_REQUEST_ENABLED: "true" });
+    const browser = new TestBrowser(app);
+    const page = await browser.get("/login");
+    expect(page.body).not.toContain('href="/signup"');
+    expect((await browser.get("/signup")).response.status).toBe(404);
+  });
+
+  it("IAM-01.08 공개 설정 조회가 실패하면 배포 설정(DATA2FLOW_SIGNUP_REQUEST_ENABLED)을 대체값으로 쓴다", async () => {
+    app.server.use(
+      http.get("http://gateway.test/api/v1/core/public/signup-settings", () =>
+        HttpResponse.json({ header: { isSuccessful: false, resultCode: "SERVICE_UNAVAILABLE", resultMessage: "x" } }, { status: 503 }),
+      ),
+    );
+    const off = await new TestBrowser(app).get("/login");
+    expect(off.response.status).toBe(200);
+    expect(off.body).not.toContain('href="/signup"');
+
+    app.reset({ DATA2FLOW_SIGNUP_REQUEST_ENABLED: "true" });
+    app.server.use(http.get("http://gateway.test/api/v1/core/public/signup-settings", () => HttpResponse.error()));
+    const on = await new TestBrowser(app).get("/login");
+    expect(on.response.status).toBe(200);
+    expect(on.body).toContain('href="/signup"');
   });
 });
 

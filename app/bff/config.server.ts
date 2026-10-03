@@ -35,8 +35,8 @@ export interface BffConfig {
   /** Access 캐시용 Redis 주소(선택). 없으면 BFF 메모리에만 둔다(auth.md §9.1) */
   redisUrl?: string;
   /**
-   * 로그인 화면의 [가입 신청] 링크(IAM-01.08). 조직 설정 `signup_request_enabled`를 로그인 전에 읽는 공개 API가
-   * 문서에 없어서 지금은 배포 설정으로 켠다(기본 꺼짐). 꺼져 있으면 /signup은 404.
+   * 로그인 화면의 [가입 신청] 링크(IAM-01.08)는 core 공개 API `GET /api/v1/core/public/signup-settings`(API-IAM-74)로
+   * 조직 설정을 읽어 정한다. 이 값은 그 호출이 실패했을 때만 쓰는 대체값이다(기본 꺼짐).
    */
   signupRequestEnabled: boolean;
   /** CSP 헤더. 운영 빌드에서만 켠다(Vite 개발 서버의 HMR 스크립트에는 nonce가 없다) */

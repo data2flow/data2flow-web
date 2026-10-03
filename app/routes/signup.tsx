@@ -1,11 +1,12 @@
 /**
- * UI-IAM-05 가입 신청(IAM-01.08, API-IAM-67). 조직 설정이 꺼져 있으면 404다(공개 회원가입은 없음, IAM-01.06).
+ * UI-IAM-05 가입 신청(IAM-01.08, API-IAM-67). 조직 설정(API-IAM-74)이 꺼져 있으면 404다(공개 회원가입은 없음, IAM-01.06).
  */
 import { useTranslation } from "react-i18next";
 import { Form, Link, data, useNavigation } from "react-router";
 import { callApi, field } from "~/bff/api.server";
 import { bff } from "~/bff/middleware.server";
 import { checkLangParam } from "~/bff/routing.server";
+import { signupRequestEnabled } from "~/bff/signup-settings.server";
 import { PasswordFields } from "~/components/password-fields";
 import { PublicShell, usePublicPath } from "~/components/public-shell";
 import { Alert, Button, Checkbox, CsrfField, TextArea, TextField } from "~/components/ui";
@@ -21,9 +22,9 @@ function ensureEnabled(enabled: boolean) {
   if (!enabled) throw data({ code: "SIGNUP_DISABLED" }, { status: 404 });
 }
 
-export function loader({ request, context, params }: Route.LoaderArgs) {
+export async function loader({ request, context, params }: Route.LoaderArgs) {
   checkLangParam(params.lang, request);
-  ensureEnabled(bff(context).runtime.config.signupRequestEnabled);
+  ensureEnabled(await signupRequestEnabled(bff(context), request));
   return null;
 }
 
@@ -31,7 +32,7 @@ type FieldErrors = Partial<Record<"email" | "name" | "loginId" | "password" | "m
 
 export async function action({ request, context }: Route.ActionArgs) {
   const ctx = bff(context);
-  ensureEnabled(ctx.runtime.config.signupRequestEnabled);
+  ensureEnabled(await signupRequestEnabled(ctx, request));
   const form = await request.formData();
   const values = {
     email: field(form, "email").trim().toLowerCase(),

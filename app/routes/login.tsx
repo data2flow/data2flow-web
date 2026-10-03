@@ -11,6 +11,7 @@ import { field } from "~/bff/api.server";
 import { UpstreamUnavailableError } from "~/bff/gateway.server";
 import { bff } from "~/bff/middleware.server";
 import { checkLangParam } from "~/bff/routing.server";
+import { signupRequestEnabled } from "~/bff/signup-settings.server";
 import { PublicShell, usePublicPath } from "~/components/public-shell";
 import { Alert, Button, CsrfField, TextField } from "~/components/ui";
 import { errorText } from "~/lib/error-text";
@@ -25,7 +26,8 @@ export function meta() {
 
 export async function loader({ request, context, params }: Route.LoaderArgs) {
   checkLangParam(params.lang, request);
-  const { session, runtime } = bff(context);
+  const ctx = bff(context);
+  const { session } = ctx;
   const url = new URL(request.url);
   const next = safeNextPath(url.searchParams.get("next"));
   if (session.authenticated) throw redirect(session.mustChangePassword ? "/me/security?required=password" : next);
@@ -34,7 +36,7 @@ export async function loader({ request, context, params }: Route.LoaderArgs) {
     next,
     reason: url.searchParams.get("reason"),
     loginId: url.searchParams.get("loginId") ?? "",
-    signupEnabled: runtime.config.signupRequestEnabled,
+    signupEnabled: await signupRequestEnabled(ctx, request),
   };
 }
 
