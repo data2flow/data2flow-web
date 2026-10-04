@@ -70,11 +70,11 @@ describe("FLW-03.01 TC-FLW-065 AT-FLW-04.1 AT-FLW-04.2 실시간 흐름 표시",
     const live = sockets.sockets.find((s) => !s.url.endsWith("/presence"))!;
     act(() => live.open());
     act(() => live.emit({ type: "apply.status", targetVersion: 14, instances: [{ instanceId: "e-1", appliedVersion: 13 }], converged: false }));
-    expect(screen.getByText("v14 적용 중…")).toBeInTheDocument();
+    expect(await screen.findByText("v14 적용 중…")).toBeInTheDocument();
     act(() => live.emit({ type: "apply.status", targetVersion: 14, instances: [{ instanceId: "e-1", appliedVersion: 14 }], converged: true }));
-    expect(screen.getByText("모든 인스턴스 v14 적용됨")).toBeInTheDocument();
+    expect(await screen.findByText("모든 인스턴스 v14 적용됨")).toBeInTheDocument();
     act(() => live.emit({ type: "flow.status", status: "DEGRADED", reason: "DEGRADED" }));
-    expect(screen.getByText("엔진이 플로우 상태를 성능 저하(으)로 바꿨습니다")).toBeInTheDocument();
+    expect(await screen.findByText("엔진이 플로우 상태를 성능 저하(으)로 바꿨습니다")).toBeInTheDocument();
     act(() => live.emit("not json"));
   });
 });

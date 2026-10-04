@@ -2,7 +2,7 @@
 
 data2flow 화면과 BFF입니다. React Router v8 프레임워크 모드(SSR, Vite) + React 19 + TypeScript로 만들고, 브라우저는 토큰 없이 HttpOnly 세션 쿠키(`data2flow_session`)만 갖습니다. Access·Refresh 토큰은 BFF가 서버 쪽에 보관하고, 브라우저의 API 호출은 `/bff/api/{svc}/**`로 받아 내부 gateway에 Bearer로 중계합니다(ADR-024, design/auth.md §9). 화면 문구는 한국어·영어·일본어·중국어 4개 언어입니다(ADR-037).
 
-- 관련 스펙: IAM(로그인·세션·회원·권한·감사), OPS-07(조직·외부 서비스 설정), M2 수집 경로 화면(DSC·DEV·DSH·ING·SCR·TSD), M3 폐루프(가상) 화면(FLW·ACT·SIM·DEV-03.03), RUL 화면 (정본은 비공개 저장소 `data2flow-docs`)
+- 관련 스펙: IAM(로그인·세션·회원·권한·감사), OPS-07(조직·외부 서비스 설정), M2 수집 경로 화면(DSC·DEV·DSH·ING·SCR·TSD), M3 폐루프(가상) 화면(FLW·ACT·SIM·DEV-03.03), M4 자동화 완성 화면(RUL·FLW·ACT·OPS-05·06·DSH·DEV-02.07·02.09) (정본은 비공개 저장소 `data2flow-docs`)
 - 포트: 8080. 프로브는 `/healthz`
 
 ## 구조
@@ -31,6 +31,8 @@ data2flow 화면과 BFF입니다. React Router v8 프레임워크 모드(SSR, Vi
 | `DATA2FLOW_GATEWAY_TIMEOUT_MS` | `12000` | gateway 호출 제한 시간 |
 | `DATA2FLOW_TRUSTED_PROXY_HOPS` | `1` | X-Forwarded-For 끝에서 건너뛸 신뢰 프록시 수(사용자 IP 결정) |
 | `DATA2FLOW_REDIS_URL` | (없음) | 있으면 Access 캐시를 Redis(`data2flow:bff:at:{sid}`)에도 두고 폐기 알림(`data2flow:auth.revocations`)을 구독. data2flow 전용 ACL 사용자일 때만 설정 |
+| `DATA2FLOW_MESSENGER_TELEGRAM_SECRET` | (없음) | `/hooks/messenger/telegram` 비밀 토큰(k8s Secret `data2flow-web`). 없으면 그 채널은 404 |
+| `DATA2FLOW_ACTION_URL` | `http://data2flow-action` | 메신저 콜백 내부 중계 대상(gateway를 거치지 않는 유일한 예외, `X-CALLER-SERVICE: data2flow-web`) |
 | `DATA2FLOW_SIGNUP_REQUEST_ENABLED` | `false` | 대체값만. 로그인 화면 [가입 신청] 링크와 `/signup`은 core 공개 API `GET /api/v1/core/public/signup-settings`(API-IAM-74)의 조직 설정을 따르고, 그 호출이 실패할 때만 이 값을 쓴다 (IAM-01.08) |
 
 ## M2 수집 경로 화면
@@ -66,6 +68,28 @@ data2flow 화면과 BFF입니다. React Router v8 프레임워크 모드(SSR, Vi
 - 플로우 지표: 목록의 `metrics1h`와 엔진 지표(API-FLW-14)를 아직 받을 수 없으면 "지표 없음"으로 보인다.
 - 가상 환경: 공간·프리셋 목록은 `GET /core/sim/spaces`·`/core/sim/presets`(프리셋에 `scenarioId`), 오류 상세는 응답 `errors[]`, 파일 재생은 10MB까지(재생 API는 core M4).
 - 플로우 캔버스는 `@xyflow/react`(MIT, 하위 의존성 MIT·ISC). 라이브 뷰(WebSocket)·시험 실행·서브플로우는 M4에서 만든다.
+
+## M4 자동화 완성 화면
+
+| 경로 | 화면 | 스펙 |
+|---|---|---|
+| `/rules`, `/rules/new`, `/rules/{id}`, `/rules/tuning` | 규칙 목록·편집기(조건 빌더: 임계값·지속·히스테리시스·변화율·무수신·반복·복합, 시간 조건, 적용 범위, 템플릿, 정책)·시뮬레이션(히트맵)·튜닝 제안, 데이터 탐색 차트 기준선에서 만들기 | RUL-01.01~01.13, RUL-06.02~06.04 |
+| `/alarms`, `/alarms/{id}`, `/alarms/stats`, `/notifications/silences` | 알람 목록(실시간·일괄 확인·토폴로지 묶기·360px)·상세(확인·해제·메모·담당자·타임라인·발송 이력)·통계·무음 | RUL-02.01~02.07, RUL-04.01~04.03, RUL-06.01 |
+| `/notifications/policies`, `/notifications/templates`, `/notifications/on-call` | 알림 정책(에스컬레이션·묶기·재알림)·템플릿(변수·미리 보기)·당직 | RUL-03.02~03.06, RUL-05.01·05.03 |
+| `/me/notifications` | 내 정보 알림 수신·텔레그램 계정 연결·방해 금지 | OPS-06.05, RUL-05.02·05.04 |
+| `/admin/maintenance`, `/admin/channels` | 유지보수 일정, 알림 채널(설정 스키마 폼·테스트 발송·발송 이력·재발송) | OPS-05.01~05.02, OPS-06.01·06.03·06.06 |
+| `/automation/flows/{id}` | 라이브 뷰(노드 카운터·상태 배지·샘플)·추적·시험 실행(드라이런)·과거 재생·JS 노드 시험 실행·적용 확인(상태 정책 표시·섀도우)·바이패스·동시 편집 표시·지표·설정·설명서·서브플로우 | FLW-01.04, FLW-03.01~03.06, FLW-05.05, FLW-06.01~06.10, FLW-10.01, FLW-11.01·11.06 |
+| `/automation/sink-connections`, `/automation/snapshots`, `/automation/pipelines`(`?promote={flowId}`), `/automation/packages`, `/settings/git-sync` | Sink 연결(테스트·스키마·실패 보관함)·스냅샷·승격 파이프라인과 대상 매핑·확장 노드·Git 동기화 | FLW-04.01, FLW-09.01~09.03, FLW-11.02~11.05 |
+| `/control/scenes`, `/control/schedules`, `/control/interlocks`, `/control/drivers`, `/control/capabilities`, `/device-jobs` | 장면(미리 보기)·예약·인터락·드라이버·기능 카탈로그·일괄 작업, 기기 목록 일괄 제어 | ACT-01.04, ACT-02.06·02.07, ACT-03.03~03.06, ACT-05.01·05.03, ACT-06.02, DEV-02.09 |
+| `/devices/{id}?tab=control\|operation\|rules\|history` | 표준 컨트롤·수동 우선 남은 시간·LoRaWAN 대기, 가동·효과, 규칙·알람, 변경 이력, 차트 명령 띠, 온보딩 체크리스트 | ACT-04.01·06.05·07.02·08.01·08.02, DEV-02.07, DEV-09.01 |
+| (헤더) ⏻, 전역 띠 | 자동화 비상 정지(빨강)·유지보수(주황) 띠, 해제 권한자만 [해제] | ACT-06.03, OPS-05.01 |
+| `/`, `/spaces/{id}?tab=alarms`, `/sites` | 홈 알람 카드·최근 알람·자동 제어 타임라인, 공간 알람 탭, SVG 사이트 지도 | DSH-01.01·01.03·02.01·05.04·07.01·09.01 |
+| `/sources/{id}?tab=usage`, `/scripts/{id}?tab=usage`, `/sim/catalog?type=new`, `/sim/replay`, `/sim/runs/{id}/report` | 소스·스크립트 사용처, 사용자 정의 가상 기기 유형, 보관 원본 재생(기본, `?mode=file` 파일), 시나리오 기대 결과 | DSC-07.06, SCR-04.04, SIM-04.06·06.01·09.06 |
+
+- 실시간 알람: `EventSource('/bff/stream/alarms')`(API-RUL-14 `alarm.raised`·`alarm.updated`·`alarm.cleared`). 홈·공간은 `/bff/stream/live?topics=home,alarms`(API-DSH-20). `/alarms?state=`는 `status`의 다른 이름이다(홈 알람 카드 링크).
+- 플로우 라이브 뷰·편집 참여는 WebSocket(`/bff/stream/flows/{id}`, `/bff/stream/flows/{id}/presence`)이고 BFF가 세션 쿠키·Origin을 확인한 뒤 gateway `/api/v1/core/stream/flows/**`에 Bearer로 중계합니다(API-FLW-40·42). 그래서 운영 서버는 `server.mjs`(react-router-serve와 같은 정적·SSR 처리 + upgrade, SIGTERM 정리)이고 `pnpm start`·Dockerfile이 이것을 씁니다. `pnpm dev`도 Vite 플러그인으로 같은 중계를 씁니다. 추가 의존성: `express`·`@react-router/express`·`ws`·`compression`(모두 MIT).
+- 메신저 콜백 `POST /hooks/messenger/{channel}`(design/auth.md §9.3, API-RUL-31): 세션·CSRF 대상이 아니고, 허용 채널은 `telegram`뿐입니다. `X-Telegram-Bot-Api-Secret-Token`을 상수 시간 비교(틀리면 본문을 읽지 않고 401), 1MB 초과 413, `update_id` 중복은 Redis `data2flow:hook:msg:telegram:{id}`(10분, Redis가 없으면 메모리)로 200 무시, 원본 본문을 action `/internal/action/notifications/callbacks/telegram`에 넘기고 기다리지 않고 200을 돌려줍니다.
+- 비상 정지·유지보수 띠는 실시간 토픽이 없어 5초마다 조회합니다(API-ACT-21, API-OPS-23).
 
 ## 개발
 
