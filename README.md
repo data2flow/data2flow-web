@@ -123,6 +123,18 @@ data2flow 화면과 BFF입니다. React Router v8 프레임워크 모드(SSR, Vi
 - 큰 파일 중계: `/bff/api/**` 제한 시간(`DATA2FLOW_GATEWAY_TIMEOUT_MS`)은 응답 머리까지만 셉니다. 1년치 CSV처럼 본문이 오래 걸리는 내려받기는 브라우저가 끊을 때까지 흘려보내고, 브라우저가 끊으면 gateway 요청도 끊습니다. 데이터 가져오기 CSV(`POST /bff/api/core/imports`, multipart)는 버퍼에 담지 않고 2GB까지 흘려보냅니다(응답 머리 제한 30분). 그 밖의 요청 본문은 10MB 그대로입니다.
 - 내보내기 다운로드는 core가 준 서명 주소(`/api/v1/core/exports/{id}/file?expires=&signature=`, 1시간)를 `/bff/api/core/…`로 바꿔 엽니다. 완료 알림 SSE(EVT-TSD-01)는 core 실시간 토픽에 아직 없어 목록을 5초마다 다시 읽습니다.
 - 권한: 내보내기 TS_EXPORT, 가져오기 TS_IMPORT, 보관 TS_POLICY(+ 저장은 ADMIN), 데이터 사전 TS_READ, 저장 지표 OPS_MANAGE.
+### 기기·모델(검색식·모델 교환·표준 내보내기·게이트웨이·표시 단위)
+
+| 경로 | 화면 | 스펙 |
+|---|---|---|
+| `/devices?q=…&saved=…` | 검색식 입력(입력 중 문법 검사·오류 열 밑줄·자동완성), 저장된 검색(공유), 결과 수·소요 시간, 선택 기기·공간 [표준 형식 내보내기](DTDL v3·NGSI-LD·Brick, NGSI-LD 주기 전송) | DEV-13.03, DEV-13.04 |
+| `/models`, `/models/{code}` | 모델 [가져오기](미리 보기 → 가져오기, data2flow·DTDL), [내보내기(data2flow)]·[내보내기(DTDL)] | DEV-03.04 |
+| `/gateways`, `/gateways/{id}?period=24h\|7d\|30d` | 게이트웨이 목록(24시간 수신 기기·업링크), 상세(시간대별 업링크·RSSI 분포 차트, 기기별 평균 RSSI·SNR·최적 경로 비율, 이름·공간·오프라인 기준 수정) | DEV-05.02 |
+| `/metrics`(조직 기본), `/me/profile`(본인) | 표시 단위 ℃/℉. 기기 상세 현재값·데이터 차트와 데이터 탐색 차트가 표시 단위로 바뀌고 저장값은 그대로(22.0℃ → 71.6℉) | DEV-04.04 |
+
+- API: 검색식 `GET /core/devices?q=`(API-DEV-133, `counts{total,tookMs}`, 400 `DEVICE_QUERY_INVALID`의 `response.column`), 저장된 검색 API-DEV-134, 모델 API-DEV-44·45(multipart `file`·`format`·`createMissingMetrics`·`dryRun`), 표준 내보내기 API-DEV-135(202 `{jobId}` → `GET /core/export-jobs/{id}`, 끝나지 않았으면 2초마다) · 파일 `/core/export-jobs/{id}/file`, NGSI-LD 주기 전송 API-DEV-136, 게이트웨이 API-DEV-60~62, 조직 단위 API-DEV-57, 사용자 단위 API-DSH-12 `temperatureUnit`(`effectiveTemperatureUnit`).
+- 실패 응답의 `response`는 BFF 화면 도우미에서 `ApiFailure.detail`로 읽는다(검색식 오류 열). 검색식은 서버가 열을 세므로 앞뒤 공백을 그대로 보낸다.
+- 검색식 문법 검사(`app/features/devmodel/model/query.ts`)는 core `DeviceQueryParser`와 같은 문법·열 번호이고, 판정은 서버가 다시 한다.
 
 ## 개발
 

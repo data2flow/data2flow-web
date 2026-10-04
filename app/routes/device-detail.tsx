@@ -18,6 +18,7 @@ import { DEVICE_KINDS, isFavorite, metricChoices, parseTags, toggleFavorite, typ
 import { POINT_TYPES, errorsByField, semanticFromForm, type SemanticDoc } from "~/features/devices/model/semantic";
 import { errorText } from "~/lib/error-text";
 import { formatDateTime } from "~/lib/format";
+import { TemperatureUnitProvider, effectiveTemperatureUnit } from "~/lib/units";
 import { hasAny } from "~/lib/permissions";
 import type { SpaceNode } from "~/lib/spaces";
 import type { RootData } from "~/root";
@@ -62,6 +63,9 @@ interface RawDetail {
 interface Preferences {
   favorites?: { type: string; id: string; name?: string }[];
   version?: number;
+  /** DEV-04.04 표시 단위(API-DSH-12) */
+  temperatureUnit?: string | null;
+  effectiveTemperatureUnit?: string | null;
 }
 
 export async function loader({ request, context, params }: Route.LoaderArgs) {
@@ -243,7 +247,7 @@ export default function DeviceDetailRoute({ loaderData, actionData }: Route.Comp
   const conflict = result?.error?.code === "VERSION_CONFLICT";
 
   return (
-    <>
+    <TemperatureUnitProvider unit={effectiveTemperatureUnit(preferences)}>
       <PageHeader
         crumb={
           <span>
@@ -429,7 +433,7 @@ export default function DeviceDetailRoute({ loaderData, actionData }: Route.Comp
           <input type="hidden" name="baseVersion" value={device.version} />
         </Form>
       </Dialog>
-    </>
+    </TemperatureUnitProvider>
   );
 }
 

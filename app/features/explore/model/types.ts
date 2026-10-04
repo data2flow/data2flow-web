@@ -19,6 +19,8 @@ export interface ExploreData {
   canExport?: boolean;
   timezone: string;
   meId?: string;
+  /** 표시 단위(DEV-04.04). 없으면 ℃ */
+  temperatureUnit?: "C" | "F";
 }
 
 export interface ExploreActionResult {

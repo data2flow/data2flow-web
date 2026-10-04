@@ -18,8 +18,21 @@ import type { Route } from "./+types/me-profile";
 
 type FieldErrors = Partial<Record<"name" | "phone" | "timezone" | "locale", string>>;
 
+/** DEV-04.04 사용자별 표시 단위(API-DSH-12 `temperatureUnit`, 비우면 조직 기본) */
+export async function loader({ request, context }: Route.LoaderArgs) {
+  const prefs = await callApi<{ temperatureUnit?: string | null; effectiveTemperatureUnit?: string | null; version?: number }>(bff(context), request, "/api/v1/core/accounts/me/preferences", { noGuards: true });
+  return { prefs: prefs.ok ? (prefs.data ?? null) : null };
+}
+
 export async function action({ request, context }: Route.ActionArgs) {
   const form = await request.formData();
+  if (field(form, "intent") === "temperatureUnit") {
+    const unit = field(form, "temperatureUnit");
+    if (!["", "C", "F"].includes(unit)) return data({ unitError: true }, { status: 400 });
+    const saved = await callApi(bff(context), request, "/api/v1/core/accounts/me/preferences", { method: "PUT", body: { temperatureUnit: unit || null, baseVersion: Number(field(form, "baseVersion")) } });
+    if (saved.ok) return { unitSaved: true };
+    return data({ error: { code: saved.code, message: saved.message } }, { status: saved.status });
+  }
   const name = field(form, "name").trim();
   const phone = field(form, "phone").trim();
   const locale = field(form, "locale");
@@ -38,12 +51,13 @@ export async function action({ request, context }: Route.ActionArgs) {
   return data({ error: { code: result.code, message: result.message } }, { status: result.status });
 }
 
-export default function MeProfile({ actionData }: Route.ComponentProps) {
+export default function MeProfile({ actionData, loaderData }: Route.ComponentProps) {
   const { t, i18n } = useTranslation();
   const navigation = useNavigation();
   const root = useRouteLoaderData("root") as RootData;
   const me = root.me as Me;
-  const result = actionData as { saved?: boolean; fieldErrors?: FieldErrors; error?: { code: string; message?: string } } | undefined;
+  const result = actionData as { saved?: boolean; unitSaved?: boolean; fieldErrors?: FieldErrors; error?: { code: string; message?: string } } | undefined;
+  const prefs = loaderData?.prefs;
   const fe = result?.fieldErrors ?? {};
   const zones = COMMON_TIMEZONES.includes(root.timezone) ? COMMON_TIMEZONES : [root.timezone, ...COMMON_TIMEZONES];
   return (
@@ -80,6 +94,22 @@ export default function MeProfile({ actionData }: Route.ComponentProps) {
           </Button>
         </div>
       </Form>
+      {prefs && (
+        <Form method="post" className="mt-6 grid max-w-lg gap-3 border-t border-line pt-4">
+          <CsrfField />
+          <input type="hidden" name="intent" value="temperatureUnit" />
+          <input type="hidden" name="baseVersion" value={prefs.version ?? 0} />
+          {result?.unitSaved && <Alert tone="success">{t("common.saved")}</Alert>}
+          <SelectField label={t("devmodel.units.mine")} name="temperatureUnit" defaultValue={prefs.temperatureUnit ?? ""}>
+            <option value="">{t("devmodel.units.followOrg")}</option>
+            <option value="C">{t("devmodel.units.C")}</option>
+            <option value="F">{t("devmodel.units.F")}</option>
+          </SelectField>
+          <div>
+            <Button type="submit">{t("common.save")}</Button>
+          </div>
+        </Form>
+      )}
     </Card>
   );
 }

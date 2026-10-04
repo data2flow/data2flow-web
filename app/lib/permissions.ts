@@ -38,7 +38,7 @@ export interface MenuItem {
 export const MENU: MenuItem[] = [
   { key: "home", path: "/", anyOf: [], group: "main" },
   { key: "spaces", path: "/spaces", anyOf: ["DEV_READ"], group: "main", sections: ["/sites", "/calendar"] },
-  { key: "devices", path: "/devices", anyOf: ["DEV_READ"], group: "main", sections: ["/models", "/metrics", "/device-groups"] },
+  { key: "devices", path: "/devices", anyOf: ["DEV_READ"], group: "main", sections: ["/models", "/metrics", "/device-groups", "/gateways"] },
   { key: "explore", path: "/explore", anyOf: ["TS_READ"], group: "main", sections: ["/exports", "/imports"] },
   { key: "ingest", path: "/ingest/monitor", anyOf: ["INGEST_READ"], group: "main", sections: ["/ingest", "/sources", "/scripts"] },
   // M4 자동화 완성: 규칙·알람(RUL) — 알람 목록은 VIEWER부터, 규칙·알림 설정은 하위 경로 가드로 좁힌다
@@ -68,6 +68,7 @@ export const ROUTE_GUARDS: { prefix: string; anyOf: string[] }[] = [
   { prefix: "/models", anyOf: ["DEV_READ"] },
   { prefix: "/metrics", anyOf: ["DEV_READ"] },
   { prefix: "/device-groups", anyOf: ["DEV_READ"] },
+  { prefix: "/gateways", anyOf: ["DEV_READ"] },
   { prefix: "/devices/new", anyOf: ["DEV_ADMIN"] },
   { prefix: "/ingest", anyOf: ["INGEST_READ"] },
   { prefix: "/sources", anyOf: ["SRC_READ"] },

@@ -8,7 +8,7 @@ import { envelope, fail, list, noContent, ok, type CoreHandler, type CoreState, 
 interface DeviceExtra {
   semantic: Record<string, { equipment: unknown[] }>;
   references: Record<string, { type: string; id: string; name: string }[]>;
-  preferences: Record<string, { favorites: { type: string; id: string; name?: string }[]; recent: { type: string; id: string }[]; version: number }>;
+  preferences: Record<string, { favorites: { type: string; id: string; name?: string }[]; recent: { type: string; id: string }[]; version: number; temperatureUnit?: string | null }>;
 }
 
 /** 테스트가 상황을 바꿀 수 있는 기기 부가 상태(사용처, 시맨틱 …) */
@@ -48,10 +48,14 @@ export const devicesHandler: CoreHandler = (core, { method, path, url, body, can
 
   if (path === "/accounts/me/preferences") {
     const prefs = (extra.preferences[user.id] ??= { favorites: [], recent: [], version: 1 });
-    if (method === "GET") return ok({ theme: "SYSTEM", favorites: prefs.favorites, recent: prefs.recent, version: prefs.version });
+    // DEV-04.04 temperatureUnit(사용자 값, null이면 조직 값 — 조직 값은 devmodel 핸들러의 /settings/units)
+    const orgUnit = ((core.extra.devmodel as { orgTemperatureUnit?: string } | undefined)?.orgTemperatureUnit ?? "C") as string;
+    const unitView = { temperatureUnit: prefs.temperatureUnit ?? null, effectiveTemperatureUnit: prefs.temperatureUnit ?? orgUnit };
+    if (method === "GET") return ok({ theme: "SYSTEM", favorites: prefs.favorites, recent: prefs.recent, version: prefs.version, ...unitView });
     if (method === "PUT") {
       if (b.baseVersion !== prefs.version) return fail(409, "VERSION_CONFLICT");
       if (Array.isArray(b.favorites)) prefs.favorites = b.favorites as typeof prefs.favorites;
+      if ("temperatureUnit" in b) prefs.temperatureUnit = (b.temperatureUnit as string | null) ?? null;
       prefs.version += 1;
       return ok({ favorites: prefs.favorites, version: prefs.version });
     }

@@ -12,6 +12,7 @@ import { annotationTargets, buildTelemetryRequest, mergeAnnotations, toChartSeri
 import { decodeState, encodeState, stateFromShortcut, type ExploreState } from "~/features/explore/model/state";
 import { checkRange, localToUtc, resolveRange } from "~/features/explore/model/time";
 import type { ExploreActionResult, ExploreData } from "~/features/explore/model/types";
+import { loadTemperatureUnit } from "~/features/devmodel/units.server";
 import { resolveTimezone } from "~/lib/format";
 import type { SpaceNode } from "~/lib/spaces";
 import type { Route } from "./+types/explore";
@@ -32,6 +33,7 @@ export async function loader({ request, context }: Route.LoaderArgs): Promise<Ex
   const problem = state.series.length ? checkRange(state, now) : undefined;
 
   const spacesCall = callApi<SpaceNode[]>(ctx, request, "/api/v1/core/spaces");
+  const unitCall = loadTemperatureUnit(ctx, request);
   const base: Omit<ExploreData, "series" | "annotations"> = { state, range, problem, spaces: [], canAnnotate: permissions.includes("DEV_PLACE"), canExport: permissions.includes("TS_EXPORT"), timezone, meId: me.ok ? String(me.data.id) : undefined };
 
   const telemetry = buildTelemetryRequest(state, range, timezone);
@@ -63,6 +65,7 @@ export async function loader({ request, context }: Route.LoaderArgs): Promise<Ex
     series: problem ? [] : toChartSeries(telemetry, failure ? { series: [] } : result),
     annotations: mergeAnnotations(annotationLists, state.annotations),
     failure,
+    temperatureUnit: await unitCall,
   };
 }
 

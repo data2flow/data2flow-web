@@ -36,6 +36,8 @@ export interface ApiFailure {
   message: string;
   errors?: FieldError[];
   retryAfter?: number;
+  /** 실패 응답의 `response`(예: DEVICE_QUERY_INVALID의 `{column, message}`, DEV-13.03) */
+  detail?: unknown;
 }
 
 export type BuiltinRole = "ADMIN" | "INTEGRATOR" | "OPERATOR" | "ANALYST" | "VIEWER";

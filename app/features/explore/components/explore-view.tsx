@@ -13,6 +13,7 @@ import { liveUrl, type StreamEvent } from "~/lib/event-stream";
 import { liveTopics, shouldGoLive } from "../model/query";
 import { addSeries, seriesKey, type ExploreState } from "../model/state";
 import { utcToLocal } from "../model/time";
+import { toDisplaySeriesList } from "~/lib/units";
 import type { ExploreActionResult, ExploreData } from "../model/types";
 import { AddSeriesDialog, type FetchJson } from "./add-series-dialog";
 import { AnnotationForm, AnnotationList, AnnotationToggles } from "./annotations";
@@ -65,8 +66,9 @@ export function ExploreView({ data, onNavigate, loading, actionResult, fetchJson
 
   const visibleSeries = useMemo(() => {
     const visible = new Set(state.series.filter((s) => !s.hidden).map(seriesKey));
-    return series.filter((s) => visible.has(s.key));
-  }, [series, state.series]);
+    // DEV-04.04 표시 단위(℉). 실시간 점은 저장 단위로 이어 붙이고 여기서 바꾼다
+    return toDisplaySeriesList(series.filter((s) => visible.has(s.key)), data.temperatureUnit ?? "C");
+  }, [series, state.series, data.temperatureUnit]);
   // TSD-03.03: 단위가 3개 이상이면 정규화 보기를 권하고, 켜면 0~100%로 그린다
   const canNormalize = suggestNormalize(visibleSeries);
   const normalized = Boolean(state.normalize) && canNormalize;

@@ -1,6 +1,7 @@
 /**
  * 기기 화면 모델(UI-DEV-04~07, DEV-02.01·02.03·02.04·02.10). 화면과 loader/action이 함께 쓰는 순수 함수만 둔다.
  */
+import { looksLikeExpression } from "~/features/devmodel/model/query";
 import { flattenSpaces, type SpaceNode } from "~/lib/spaces";
 
 export const DEVICE_KINDS = ["SENSOR", "ACTUATOR", "GATEWAY", "HYBRID"] as const;
@@ -72,7 +73,8 @@ export const FILTER_KEYS = ["q", "status", "connectivity", "kind", "modelId", "s
 export function deviceQuery(params: URLSearchParams, page: number, size = 50): URLSearchParams {
   const query = new URLSearchParams();
   for (const key of FILTER_KEYS) {
-    for (const value of params.getAll(key)) if (value.trim()) query.append(key, value.trim());
+    // 검색식(q, DEV-13.03)이면 서버가 오류 열을 세므로 앞뒤 공백을 그대로 보낸다
+    for (const value of params.getAll(key)) if (value.trim()) query.append(key, key === "q" && looksLikeExpression(value) ? value : value.trim());
   }
   query.set("page", String(page));
   query.set("size", String(size));
