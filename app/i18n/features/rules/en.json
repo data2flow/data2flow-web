@@ -177,10 +177,11 @@
       "clearAbove": "The clear threshold must be greater than {{value}}",
       "countLimit": "Up to {{n}} conditions",
       "depthLimit": "Groups can be nested up to {{n}} levels",
-      "targetLimit": "Up to {{n}} target devices"
+      "targetLimit": "Up to {{n}} target devices",
+      "conditionUnsupported": "Anomaly conditions cannot be saved yet. They become available once real-time anomaly scores are ready (use threshold, rate-of-change or no-data conditions)."
     },
     "warnings": {
-      "TARGET_EMPTY": "No target devices",
+      "NO_TARGET": "No target devices",
       "TARGET_OFFLINE": "Some target devices are offline"
     },
     "sim": {
@@ -200,7 +201,6 @@
       "heatmap": "Alarms by time (day × hour)",
       "title": "Simulation (last {{days}} days)",
       "days": "{{n}} days",
-      "progress": "Calculating {{processed}}/{{total}}",
       "current": "This run ({{label}})",
       "previous": "Previous ({{label}})",
       "basis": "threshold {{value}}",
@@ -326,7 +326,8 @@
       "value": "value {{value}}",
       "assigned": "→ {{name}}",
       "notified": "{{channel}} · {{recipient}} · {{status}}",
-      "escalated": "step {{step}}"
+      "escalated": "step {{step}}",
+      "unassigned": "Assignee removed"
     },
     "dur": {
       "days": "{{n}} d",

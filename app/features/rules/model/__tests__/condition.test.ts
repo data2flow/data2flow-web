@@ -48,11 +48,11 @@ describe("RUL-01.06 편집 트리 ↔ 저장 본문", () => {
     expect(fromEditor(root)).toEqual(co2);
   });
 
-  it("복합 조건(co2>1000 AND occupancy=1)은 그룹 그대로, 빈 값은 보내지 않는다", () => {
+  it("복합 조건(co2>1000 AND occupancy=1)은 그룹 그대로, 빈 값은 보내지 않고 참·거짓은 1·0(core는 숫자만)", () => {
     const condition = { kind: "group" as const, op: "AND" as const, items: [co2, { kind: "threshold" as const, metric: "occupancy", op: "==" as const, value: true, clear: null }] };
     const root = toEditor(condition);
     expect(leafCount(root)).toBe(2);
-    expect(fromEditor(root)).toEqual({ kind: "group", op: "AND", items: [co2, { kind: "threshold", metric: "occupancy", op: "==", value: true }] });
+    expect(fromEditor(root)).toEqual({ kind: "group", op: "AND", items: [co2, { kind: "threshold", metric: "occupancy", op: "==", value: 1 }] });
     expect(metricsOf(root)).toEqual(["co2", "occupancy"]);
     expect(toEditor(null).items).toHaveLength(1);
   });
@@ -92,7 +92,9 @@ describe("RUL-01.06 편집 트리 ↔ 저장 본문", () => {
   });
 
   it("새 조건 종류의 기본값", () => {
-    expect(newLeaf("rateOfChange", "temperature")).toMatchObject({ kind: "rateOfChange", window: "PT10M", direction: "UP" });
+    expect(newLeaf("rateOfChange", "temperature")).toMatchObject({ kind: "rateOfChange", window: "PT10M", direction: "up" });
+    // core 계약은 소문자 방향(RuleCondition.DIRECTIONS). 예전 대문자 값은 편집 트리로 읽을 때 소문자로
+    expect(toEditor({ kind: "rateOfChange", metric: "t", window: "PT10M", delta: 1, direction: "UP" } as never).items[0]).toMatchObject({ direction: "up" });
     expect(newLeaf("noData")).toMatchObject({ kind: "noData", window: "PT30M" });
     expect(newLeaf("anomaly")).toMatchObject({ kind: "anomaly", minScore: 3 });
     expect(newLeaf("threshold")).toMatchObject({ kind: "threshold", op: ">" });
@@ -130,7 +132,7 @@ describe("RUL-01.01·01.03·01.12 검사(BR-RUL-04·05)", () => {
   });
 
   it("불리언·열거형 값, 변화율·무수신 기간", () => {
-    const root = toEditor({ kind: "group", op: "OR", items: [{ kind: "threshold", metric: "occupancy", op: "==", value: null }, { kind: "threshold", metric: "mode", op: "==", value: "" }, { kind: "rateOfChange", metric: "temperature", window: "bad", delta: 0, direction: "UP" }, { kind: "noData", window: "PT10S" }, { kind: "anomaly", minScore: 3 }] });
+    const root = toEditor({ kind: "group", op: "OR", items: [{ kind: "threshold", metric: "occupancy", op: "==", value: null }, { kind: "threshold", metric: "mode", op: "==", value: "" }, { kind: "rateOfChange", metric: "temperature", window: "bad", delta: 0, direction: "up" }, { kind: "noData", window: "PT10S" }, { kind: "anomaly", minScore: 3 }] });
     const p = validateCondition(root, metrics);
     const id = (i: number) => root.items[i].uid;
     expect(p[`${id(0)}.value`]?.key).toBe("rules.v.valueRequired");
@@ -152,12 +154,12 @@ describe("조건 요약(UI-RUL-01 \"co2 > 1000ppm 5분\")", () => {
   it("임계값·지속·해제·반복, 복합(괄호), 변화율·무수신·이상 점수", () => {
     expect(summarize(co2, metrics, words)).toBe("co2 > 1000ppm 5분 해제 900ppm");
     expect(summarize({ ...co2, for: "PT1H", clear: null, repeat: 3 }, metrics, words)).toBe("co2 > 1000ppm 1시간 반복 3");
-    expect(summarize({ kind: "group", op: "AND", items: [co2, { kind: "group", op: "OR", items: [{ kind: "noData", metric: "co2", window: "PT30M" }, { kind: "rateOfChange", metric: "temperature", window: "PT10M", delta: 3, direction: "UP" }] }] }, metrics, words)).toBe(
+    expect(summarize({ kind: "group", op: "AND", items: [co2, { kind: "group", op: "OR", items: [{ kind: "noData", metric: "co2", window: "PT30M" }, { kind: "rateOfChange", metric: "temperature", window: "PT10M", delta: 3, direction: "up" }] }] }, metrics, words)).toBe(
       "co2 > 1000ppm 5분 해제 900ppm AND (co2 무수신 30분 OR temperature 변화율 +3℃ / 10분)",
     );
     expect(summarize({ kind: "threshold", metric: "co2", op: "outside", range: [400, 1000], for: "PT45S" }, metrics, words)).toBe("co2 outside [400, 1000] 45초");
-    expect(summarize({ kind: "rateOfChange", metric: "x", window: "PT10M", delta: 2, direction: "DOWN" }, metrics, words)).toBe("x 변화율 -2 / 10분");
-    expect(summarize({ kind: "rateOfChange", metric: "x", window: "PT10M", delta: 2, direction: "ANY" }, metrics, words)).toContain("±2");
+    expect(summarize({ kind: "rateOfChange", metric: "x", window: "PT10M", delta: 2, direction: "down" }, metrics, words)).toBe("x 변화율 -2 / 10분");
+    expect(summarize({ kind: "rateOfChange", metric: "x", window: "PT10M", delta: 2, direction: "any" }, metrics, words)).toContain("±2");
     expect(summarize({ kind: "anomaly", minScore: 3 }, metrics, words)).toBe("이상 점수 ≥ 3");
     expect(summarize(null, metrics, words)).toBe("");
   });

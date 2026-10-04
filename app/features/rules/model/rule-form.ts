@@ -151,9 +151,13 @@ export function estimateTargets(form: Pick<RuleFormState, "scopeType" | "scopeId
 export function serverFieldProblems(errors: { field: string; code: string; message?: string }[] | undefined): FormProblems {
   const out: FormProblems = {};
   for (const error of errors ?? []) {
-    const head = error.field.split(/[.[]/)[0];
+    // flow-engine 컴파일(API-FLW-86) 오류는 core가 그대로 중계해 `rule.condition.kind`처럼 `rule.`이 앞에 붙는다
+    const field = error.field.replace(/^rule\./, "");
+    const head = field.split(/[.[]/)[0];
     const key = head === "scope" ? "scope" : head === "timeCondition" ? "time" : head === "condition" ? "condition" : head;
-    out[key] = { key: `errors.${error.code}`, params: { message: error.message ?? "" } };
+    // 이상 탐지(anomaly) 조건은 엔진이 아직 컴파일하지 않는다(RUL-01.08, M7) → 400 RULE_CONDITION_INVALID + UNSUPPORTED
+    if (key === "condition" && error.code === "UNSUPPORTED") out[key] = { key: "rules.v.conditionUnsupported", params: { message: error.message ?? "" } };
+    else out[key] = { key: `errors.${error.code}`, params: { message: error.message ?? "" } };
   }
   return out;
 }

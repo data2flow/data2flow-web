@@ -36,7 +36,7 @@ describe("TC-RUL-039 알람 상세 표시", () => {
     );
     expect(await screen.findByText("MAJOR 중요")).toBeInTheDocument();
     expect(screen.getAllByText("발생").length).toBeGreaterThan(1);
-    expect(screen.getByRole("link", { name: "본관 고CO2" })).toHaveAttribute("href", "/rules/r-co2");
+    expect(screen.getByRole("link", { name: "본관 고CO2" })).toHaveAttribute("href", "/rules/301");
     expect(screen.getByRole("link", { name: "EM500-CO2-152590" })).toHaveAttribute("href", "/devices/1042");
     expect(screen.getByText(/본관 \/ 3층 \/ 실습실/)).toBeInTheDocument();
     expect(screen.getByText("발생 1,050 ppm · 최고 1,180 ppm · 현재 1,120 ppm")).toBeInTheDocument();

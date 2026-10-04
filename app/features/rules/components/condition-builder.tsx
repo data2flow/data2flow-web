@@ -196,7 +196,7 @@ function LeafView({ leaf, root, metrics, problems, onChange, removable }: { leaf
               )}
             </span>
           ) : metric?.valueType === "BOOLEAN" ? (
-            <select className={input} aria-label={t("rules.cond.value")} value={leaf.value === true ? "true" : leaf.value === false ? "false" : ""} onChange={(e) => patch({ value: e.target.value === "" ? null : e.target.value === "true" })}>
+            <select className={input} aria-label={t("rules.cond.value")} value={leaf.value === true || leaf.value === 1 ? "true" : leaf.value === false || leaf.value === 0 ? "false" : ""} onChange={(e) => patch({ value: e.target.value === "" ? null : e.target.value === "true" })}>
               <option value="">{t("rules.cond.chooseValue")}</option>
               <option value="true">true</option>
               <option value="false">false</option>
@@ -215,10 +215,10 @@ function LeafView({ leaf, root, metrics, problems, onChange, removable }: { leaf
       {leaf.kind === "rateOfChange" && (
         <>
           <MetricSelect label={t("rules.cond.metric")} value={leaf.metric} metrics={metrics} onChange={(v) => patch({ metric: v })} error={err("metric")} />
-          <select className={input} aria-label={t("rules.cond.direction")} value={leaf.direction} onChange={(e) => patch({ direction: e.target.value as "UP" | "DOWN" | "ANY" })}>
-            {(["UP", "DOWN", "ANY"] as const).map((d) => (
+          <select className={input} aria-label={t("rules.cond.direction")} value={leaf.direction} onChange={(e) => patch({ direction: e.target.value as "up" | "down" | "any" })}>
+            {(["up", "down", "any"] as const).map((d) => (
               <option key={d} value={d}>
-                {t(`rules.cond.directions.${d}`)}
+                {t(`rules.cond.directions.${d.toUpperCase()}`)}
               </option>
             ))}
           </select>

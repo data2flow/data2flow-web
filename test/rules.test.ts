@@ -69,18 +69,18 @@ describe("UI-RUL-01 규칙 목록(RUL-06.03·06.04)", () => {
     expect(sent.path).toContain("status=ACTIVE");
     expect(sent.path).toContain("severity=MAJOR");
     expect(sent.path).toContain("q=CO2");
-    expect((await browser.post("/rules", { intent: "deactivate", ruleId: "r-co2" })).response.status).toBe(200);
+    expect((await browser.post("/rules", { intent: "deactivate", ruleId: "301" })).response.status).toBe(200);
     expect(state().rules[0].status).toBe("INACTIVE");
-    const again = await browser.post("/rules", { intent: "deactivate", ruleId: "r-co2" });
+    const again = await browser.post("/rules", { intent: "deactivate", ruleId: "301" });
     expect(again.response.status).toBe(409);
     expect(again.body).toContain("지금 상태에서는 할 수 없습니다");
-    await browser.post("/rules", { intent: "activate", ruleId: "r-co2" });
+    await browser.post("/rules", { intent: "activate", ruleId: "301" });
     expect(state().rules[0].status).toBe("ACTIVE");
-    const converted = await browser.post("/rules", { intent: "convert", ruleId: "r-door" });
+    const converted = await browser.post("/rules", { intent: "convert", ruleId: "302" });
     expect(converted.response.status).toBe(302);
-    expect(converted.response.headers.get("location")).toBe("/automation/flows/f-conv-r-door");
+    expect(converted.response.headers.get("location")).toBe("/automation/flows/0d6f2b1e-7c4a-4b8e-9f00-000000000302");
     expect((await browser.get("/rules")).body).not.toContain("야간 문열림");
-    await browser.post("/rules", { intent: "delete", ruleId: "r-co2", clearOpenAlarms: "true" });
+    await browser.post("/rules", { intent: "delete", ruleId: "301", clearOpenAlarms: "true" });
     expect(state().alarms.find((a) => a.id === "9001")?.status).toBe("CLEARED");
     expect((await browser.get("/rules")).body).toContain("규칙이 없습니다. 템플릿으로 시작하세요");
   });
@@ -88,7 +88,7 @@ describe("UI-RUL-01 규칙 목록(RUL-06.03·06.04)", () => {
   it("RUL-06.04 규칙 900개 이상이면 한도 근접 배너", async () => {
     const browser = await operator();
     const base = state().rules[0];
-    for (let i = 0; i < 900; i += 1) state().rules.push({ ...base, ruleId: `r-x${i}`, name: `규칙 ${i}` });
+    for (let i = 0; i < 900; i += 1) state().rules.push({ ...base, ruleId: String(1000 + i), name: `규칙 ${i}` });
     expect((await browser.get("/rules")).body).toContain("규칙이 902개입니다. 조직당 1000개까지 만들 수 있습니다.");
   });
 });
@@ -101,7 +101,7 @@ describe("UI-RUL-02 규칙 만들기·수정(RUL-01.01~10)", () => {
     const saved = await browser.post("/rules/new", { intent: "save", payload: payload() });
     expect(saved.response.status).toBe(302);
     const location = saved.response.headers.get("location")!;
-    expect(location).toMatch(/^\/rules\/r-\d+\?saved=1&warn=TARGET_EMPTY$/);
+    expect(location).toMatch(/^\/rules\/\d+\?saved=1&warn=NO_TARGET$/);
     const detail = await browser.get(location);
     expect(detail.body).toContain("대상 기기가 없습니다");
     expect(detail.body).toContain("규칙 오류: 대상 기기 없음");
@@ -124,19 +124,29 @@ describe("UI-RUL-02 규칙 만들기·수정(RUL-01.01~10)", () => {
     expect(broken.response.status).toBe(400);
   });
 
+  it("RUL-01.08 이상 탐지 조건은 엔진이 거부(400 RULE_CONDITION_INVALID, rule.condition.kind UNSUPPORTED) → 조건 아래 안내", async () => {
+    const browser = await operator();
+    await browser.get("/rules/new");
+    const anomaly = await browser.post("/rules/new", { intent: "save", payload: payload({ name: "이상 탐지", condition: { kind: "anomaly", minScore: 3, metric: "co2" } }) });
+    expect(anomaly.response.status).toBe(400);
+    expect(anomaly.body).toContain("조건이 올바르지 않습니다");
+    expect(anomaly.body).toContain("이상 탐지 조건은 아직 저장할 수 없습니다");
+    expect(state().rules.some((r) => r.name === "이상 탐지")).toBe(false);
+  });
+
   it("수정은 baseVersion으로(낡은 버전이면 409 안내), ANALYST는 읽기 전용", async () => {
     const browser = await operator();
-    const page = await browser.get("/rules/r-co2");
+    const page = await browser.get("/rules/301");
     expect(page.body).toContain("본관 고CO2");
-    const ok = await browser.post("/rules/r-co2", { intent: "save", payload: payload({ name: "본관 고CO2", scope: { type: "SPACE", ids: ["2"], includeChildren: true }, baseVersion: 3 }) });
+    const ok = await browser.post("/rules/301", { intent: "save", payload: payload({ name: "본관 고CO2", scope: { type: "SPACE", ids: ["2"], includeChildren: true }, baseVersion: 3 }) });
     expect(ok.response.status).toBe(302);
-    expect(state().rules.find((r) => r.ruleId === "r-co2")?.version).toBe(4);
-    const stale = await browser.post("/rules/r-co2", { intent: "save", payload: payload({ name: "본관 고CO2", baseVersion: 3 }) });
+    expect(state().rules.find((r) => r.ruleId === "301")?.version).toBe(4);
+    const stale = await browser.post("/rules/301", { intent: "save", payload: payload({ name: "본관 고CO2", baseVersion: 3 }) });
     expect(stale.response.status).toBe(409);
     expect(stale.body).toContain("그 사이 다른 사람이 이 규칙을 바꿨습니다");
-    expect((await browser.get("/rules/nope")).response.status).toBe(404);
+    expect((await browser.get("/rules/99999")).response.status).toBe(404);
     const ana = await analyst();
-    const read = await ana.get("/rules/r-co2");
+    const read = await ana.get("/rules/301");
     expect(read.response.status).toBe(200);
     expect(read.body).not.toContain(">저장<");
   });
@@ -152,23 +162,19 @@ describe("UI-RUL-02 규칙 만들기·수정(RUL-01.01~10)", () => {
     expect(device.response.status).toBe(200);
     expect(app.gateway.received.filter((r) => r.path === "/api/v1/core/rules/draft-from-chart").at(-1)!.body).toMatchObject({ target: { deviceIds: ["1042"] } });
     // 복제: 원본 값으로 채우고 이름 뒤에 (2)
-    expect((await browser.get("/rules/new?copy=r-co2")).body).toContain('value="본관 고CO2 (2)"');
+    expect((await browser.get("/rules/new?copy=301")).body).toContain('value="본관 고CO2 (2)"');
   });
 
-  it("RUL-01.11 시뮬레이션 BFF 중계(30일 넘으면 400), 비동기 작업 조회", async () => {
+  it("RUL-01.11 시뮬레이션 BFF 중계(동기 200, 30일 넘으면 400)", async () => {
     const browser = await operator();
-    await browser.get("/rules/r-co2");
+    await browser.get("/rules/301");
     const body = { rule: JSON.parse(payload()), from: "2026-09-27T00:00:00Z", to: "2026-10-04T00:00:00Z" };
     const sync = await browser.request("/bff/api/core/rules/simulate", { method: "POST", headers: { "Content-Type": "application/json", "X-CSRF-TOKEN": browser.csrf }, body: JSON.stringify(body) });
     expect(JSON.parse(sync.body).response.alarms).toBe(14);
-    const tooLong = await browser.request("/bff/api/core/rules/r-co2/simulate", { method: "POST", headers: { "Content-Type": "application/json", "X-CSRF-TOKEN": browser.csrf }, body: JSON.stringify({ ...body, from: "2026-08-01T00:00:00Z" }) });
+    const tooLong = await browser.request("/bff/api/core/rules/301/simulate", { method: "POST", headers: { "Content-Type": "application/json", "X-CSRF-TOKEN": browser.csrf }, body: JSON.stringify({ ...body, from: "2026-08-01T00:00:00Z" }) });
     expect(tooLong.response.status).toBe(400);
     expect(JSON.parse(tooLong.body).header.resultCode).toBe("RULE_SIMULATION_RANGE_INVALID");
-    state().simAsync = true;
-    const job = JSON.parse((await browser.request("/bff/api/core/rules/simulate", { method: "POST", headers: { "Content-Type": "application/json", "X-CSRF-TOKEN": browser.csrf }, body: JSON.stringify(body) })).body).response.jobId;
-    expect(JSON.parse((await browser.get(`/bff/api/core/rule-simulations/${job}`)).body).response.status).toBe("RUNNING");
-    expect(JSON.parse((await browser.get(`/bff/api/core/rule-simulations/${job}`)).body).response.result.alarms).toBe(14);
-    expect((await browser.get("/rules/r-co2?simulate=1")).response.status).toBe(200);
+    expect((await browser.get("/rules/301?simulate=1")).response.status).toBe(200);
   });
 });
 
@@ -179,10 +185,10 @@ describe("UI-RUL-10 튜닝 제안(RUL-06.02, BR-RUL-22, AT-RUL-14.2)", () => {
     expect(page.body).toContain("과다 발생");
     expect(page.body).toContain("예상 알람 40건 → 6건");
     expect(page.body).toContain("co2 &gt; 1000ppm 15분");
-    const applied = await browser.post("/rules/tuning", { intent: "apply", id: "t-1" });
+    const applied = await browser.post("/rules/tuning", { intent: "apply", id: "41" });
     expect(applied.body).toContain("제안을 적용했습니다(규칙 버전 4)");
     expect((await browser.get("/rules/tuning")).body).toContain("열린 튜닝 제안이 없습니다");
-    expect((await browser.post("/rules/tuning", { intent: "nope", id: "t-1" })).response.status).toBe(400);
+    expect((await browser.post("/rules/tuning", { intent: "nope", id: "41" })).response.status).toBe(400);
     const ana = await analyst();
     expect((await ana.get("/rules/tuning")).body).not.toContain(">적용<");
   });

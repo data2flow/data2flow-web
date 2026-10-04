@@ -52,6 +52,8 @@ export async function loader({ request, context, params }: Route.LoaderArgs) {
     hasAny(permissions, ["IAM_MANAGE"]) ? callList<{ id: string; name: string }>(ctx, request, "/api/v1/core/users?status=ACTIVE&size=100") : Promise.resolve(null),
   ]);
   const first = chart?.ok ? chart.data.series?.[0] : undefined;
+  // core Alarm(API-RUL-10)에는 단위가 없다 → 값 표시는 차트 시계열의 단위를 쓴다
+  if (!alarm.unit && first?.unit) alarm.unit = first.unit;
   const series: ChartSeries[] = first ? [{ key: `alarm-${alarm.id}`, label: metric ?? "", unit: first.unit ?? alarm.unit ?? null, points: first.points ?? [], gaps: first.gaps ?? [], raw: chart?.ok ? chart.data.resolutionUsed === "raw" : false }] : [];
   const candidates = new Map<string, { userId: string; name: string }>();
   if (me.ok) candidates.set(String(me.data.id), { userId: String(me.data.id), name: me.data.name ?? me.data.loginId });

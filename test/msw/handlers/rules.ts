@@ -47,9 +47,6 @@ export interface RulesState {
   silences: Json[];
   tuning: Json[];
   deliveries: Json[];
-  /** true면 시뮬레이션이 202 + 작업 조회(첫 조회 RUNNING, 두 번째 SUCCEEDED) */
-  simAsync: boolean;
-  jobs: Record<string, { polls: number; result: Json }>;
   /** 받은 시뮬레이션 요청(본문) */
   simulations: Json[];
 }
@@ -63,9 +60,9 @@ function alarm(id: string, extra: Partial<FakeAlarm> & Json): FakeAlarm {
     status: "ACTIVE",
     flapping: false,
     title: "고CO2 · 실습실",
-    source: { type: "RULE", ruleId: "r-co2" },
+    source: { type: "RULE", ruleId: "301" },
     device: { id: "1042", name: "AM107-067999" },
-    space: { id: "31", path: ["광주캠퍼스", "본관", "3층", "실습실"] },
+    space: { id: "31", name: "실습실", path: "광주캠퍼스 / 본관 / 3층 / 실습실" },
     metric: "co2",
     triggerValue: 1050,
     peakValue: 1180,
@@ -89,12 +86,10 @@ export function rulesState(core: CoreState): RulesState {
   if (!core.extra.rules) {
     const state: RulesState = {
       seq: 500,
-      simAsync: false,
-      jobs: {},
       simulations: [],
       rules: [
         {
-          ruleId: "r-co2",
+          ruleId: "301",
           name: "본관 고CO2",
           templateKey: "high-co2",
           status: "ACTIVE",
@@ -106,7 +101,7 @@ export function rulesState(core: CoreState): RulesState {
           titleTemplate: "고CO2 · {{space.path}}",
           autoClear: true,
           policyId: null,
-          flowId: "f-rule-co2",
+          flowId: "0d6f2b1e-7c4a-4b8e-9f00-000000000301",
           version: 3,
           stats7d: { raised: 14 },
           openAlarms: 2,
@@ -115,7 +110,7 @@ export function rulesState(core: CoreState): RulesState {
           updatedAt: "2026-10-02T01:00:00Z",
         },
         {
-          ruleId: "r-door",
+          ruleId: "302",
           name: "야간 문열림",
           templateKey: "door-open-off-hours",
           status: "ERROR",
@@ -127,7 +122,7 @@ export function rulesState(core: CoreState): RulesState {
           titleTemplate: "운영 시간 외 문 열림",
           autoClear: true,
           policyId: null,
-          flowId: "f-rule-door",
+          flowId: "0d6f2b1e-7c4a-4b8e-9f00-000000000302",
           version: 1,
           stats7d: { raised: 0 },
           openAlarms: 0,
@@ -144,16 +139,16 @@ export function rulesState(core: CoreState): RulesState {
       ],
       events: {
         "9001": [
-          { type: "RAISED", at: "2026-10-03T23:05:00Z", actor: { type: "FLOW" }, data: { value: 1050 } },
-          { type: "NOTIFIED", at: "2026-10-03T23:05:02Z", actor: { type: "SYSTEM" }, data: { channel: "TELEGRAM", recipient: "시설팀", status: "SENT" } },
-          { type: "RERAISED", at: "2026-10-03T23:09:00Z", actor: { type: "FLOW" }, data: { value: 1180 } },
+          { eventId: "70001", type: "RAISED", at: "2026-10-03T23:05:00Z", actor: { type: "FLOW" }, data: { value: 1050 } },
+          { eventId: "70002", type: "NOTIFIED", at: "2026-10-03T23:05:02Z", actor: { type: "SYSTEM" }, data: { channel: "TELEGRAM", recipient: "시설팀", status: "SENT" } },
+          { eventId: "70003", type: "RERAISED", at: "2026-10-03T23:09:00Z", actor: { type: "FLOW" }, data: { value: 1180 } },
         ],
       },
       silences: [],
       tuning: [
         {
-          tuningSuggestionId: "t-1",
-          ruleId: "r-co2",
+          tuningSuggestionId: "41",
+          ruleId: "301",
           ruleName: "본관 고CO2",
           problem: "TOO_FREQUENT",
           current: { kind: "threshold", metric: "co2", op: ">", value: 1000, for: "PT5M" },
@@ -173,10 +168,11 @@ export function rulesState(core: CoreState): RulesState {
   return core.extra.rules as RulesState;
 }
 
+/** API-RUL-05 모양(core RuleDtos.RuleTemplate, 기본 제목은 템플릿 이름) — core 시드(V202610071000) 중 셋 */
 const TEMPLATES = [
-  { key: "high-co2", name: "고CO2", defaults: { condition: { kind: "threshold", metric: "co2", op: ">", value: 1000, for: "PT5M", clear: 900 }, severity: "MAJOR", titleTemplate: "고CO2 · {{space.path}}" }, requiredMetrics: ["co2"] },
-  { key: "high-temp", name: "고온", defaults: { condition: { kind: "threshold", metric: "temperature", op: ">", value: 28, for: "PT10M", clear: 27 }, severity: "MINOR", titleTemplate: "고온 · {{space.path}}" }, requiredMetrics: ["temperature"] },
-  { key: "no-data-30m", name: "무수신 30분", defaults: { condition: { kind: "noData", window: "PT30M" }, severity: "WARNING", titleTemplate: "무수신 · {{device.name}}" }, requiredMetrics: [] },
+  { key: "high-co2", name: "고CO2", description: "CO2가 1,000ppm을 넘은 상태가 5분 이어지면 발생, 900ppm 아래에서 해제", category: "COMFORT", defaults: { condition: { kind: "threshold", metric: "co2", op: ">", value: 1000, for: "PT5M", clear: 900 }, severity: "MAJOR", titleTemplate: "고CO2 · {{space.path}}" }, paramsSchema: { type: "object" }, requiredMetrics: ["co2"], builtin: true },
+  { key: "high-temp", name: "고온", description: "온도가 28℃를 넘은 상태가 10분 이어지면 발생", category: "COMFORT", defaults: { condition: { kind: "threshold", metric: "temperature", op: ">", value: 28, for: "PT10M", clear: 27 }, severity: "MINOR", titleTemplate: "고온 · {{space.path}}" }, paramsSchema: { type: "object" }, requiredMetrics: ["temperature"], builtin: true },
+  { key: "no-data-30m", name: "무수신 30분", description: "30분 동안 데이터가 없으면 발생", category: "EQUIPMENT", defaults: { condition: { kind: "noData", window: "PT30M" }, severity: "WARNING", titleTemplate: "무수신 · {{device.name}}" }, paramsSchema: { type: "object" }, requiredMetrics: [], builtin: true },
 ];
 
 function descendants(core: CoreState, id: string): string[] {
@@ -239,32 +235,46 @@ function rulePayloadErrors(body: Json): { field: string; code: string; message: 
   return errors;
 }
 
+/** API-RUL-10: core AlarmQueryService.list와 같게 — counts.byStatus는 상태 조건을 빼고 센 수, bySeverity는 고른 상태 안에서 센 수 */
 function listAlarms(core: CoreState, state: RulesState, url: URL) {
-  const statuses = (url.searchParams.get("status") ?? "ACTIVE,ACKNOWLEDGED,SUPPRESSED").split(",");
+  const statuses = (url.searchParams.get("status") || "ACTIVE,ACKNOWLEDGED,SUPPRESSED").split(",");
   const severity = url.searchParams.get("severity")?.split(",").filter(Boolean) ?? [];
   const ruleId = url.searchParams.get("ruleId");
+  const deviceId = url.searchParams.get("deviceId");
   const sourceType = url.searchParams.get("sourceType");
   const spaceId = url.searchParams.get("spaceId");
+  const from = url.searchParams.get("from");
+  const to = url.searchParams.get("to");
   const spaces = spaceId ? new Set(descendants(core, spaceId)) : null;
-  const matched = state.alarms.filter(
+  const base = state.alarms.filter(
     (a) =>
-      statuses.includes(a.status) &&
-      (severity.length === 0 || severity.includes(a.severity)) &&
       (!ruleId || (a.source as Json).ruleId === ruleId) &&
+      (!deviceId || String((a.device as Json | null)?.id ?? "") === deviceId) &&
       (!sourceType || (a.source as Json).type === sourceType) &&
+      (!from || Date.parse(a.raisedAt) >= Date.parse(from)) &&
+      (!to || Date.parse(a.raisedAt) < Date.parse(to)) &&
       (!spaces || spaces.has(String((a.space as Json | null)?.id ?? ""))),
   );
   const byStatus: Record<string, number> = {};
   const bySeverity: Record<string, number> = {};
-  for (const a of matched) {
+  for (const a of base) {
     byStatus[a.status] = (byStatus[a.status] ?? 0) + 1;
-    bySeverity[a.severity] = (bySeverity[a.severity] ?? 0) + 1;
+    if (statuses.includes(a.status)) bySeverity[a.severity] = (bySeverity[a.severity] ?? 0) + 1;
   }
+  const matched = base.filter((a) => statuses.includes(a.status) && (severity.length === 0 || severity.includes(a.severity)));
   return list(matched, url, { counts: { byStatus, bySeverity } });
 }
 
+/** flow-engine 규칙 컴파일(API-FLW-86)은 이상 탐지 조건을 아직 거부한다 → core가 400을 그대로 중계 */
+function hasAnomaly(condition: Json | undefined): boolean {
+  if (!condition) return false;
+  if (condition.kind === "group") return ((condition.items as Json[]) ?? []).some(hasAnomaly);
+  return condition.kind === "anomaly";
+}
+const ANOMALY_REJECTED = { errors: [{ field: "rule.condition.kind", code: "UNSUPPORTED", message: "이상 탐지 조건은 ANA 실시간 이상 점수가 필요합니다(RUL-01.08, M7)" }] };
+
 function event(state: RulesState, id: string, type: string, req: CoreRequest, data: Json = {}) {
-  (state.events[id] ??= []).push({ type, at: "2026-10-04T00:00:00Z", actor: { type: "USER", id: req.user.id, name: req.user.name }, data });
+  (state.events[id] ??= []).push({ eventId: String((state.seq += 1)), type, at: "2026-10-04T00:00:00Z", actor: { type: "USER", id: req.user.id, name: req.user.name }, data });
 }
 
 export const rulesHandler: CoreHandler = (core, req) => {
@@ -274,7 +284,8 @@ export const rulesHandler: CoreHandler = (core, req) => {
   const state = rulesState(core);
 
   // ── 규칙 ──
-  if (path === "/rule-templates" && method === "GET") return list(TEMPLATES, url);
+  // ItemsResponse(페이징 없음): {header, responses, totalCount}
+  if (path === "/rule-templates" && method === "GET") return req.can("RULE_READ") ? HttpResponse.json({ header: { isSuccessful: true, resultCode: "SUCCESS", resultMessage: "SUCCESS" }, responses: TEMPLATES, totalCount: TEMPLATES.length }) : fail(403, "PERMISSION_DENIED");
   if (path === "/rules" && method === "GET") {
     if (!req.can("RULE_READ")) return fail(403, "PERMISSION_DENIED");
     const q = url.searchParams.get("q")?.toLowerCase();
@@ -288,10 +299,11 @@ export const rulesHandler: CoreHandler = (core, req) => {
     const errors = rulePayloadErrors(body);
     if (errors.length) return fail(400, "INVALID_REQUEST", { errors });
     if (state.rules.some((r) => r.name === body.name && r.status !== "DELETED")) return fail(409, "RULE_NAME_DUPLICATED");
+    if (hasAnomaly(body.condition as Json)) return fail(400, "RULE_CONDITION_INVALID", ANOMALY_REJECTED);
     const scope = body.scope as FakeRule["scope"];
     const count = targetCount(core, scope, body.condition as Json);
     const rule: FakeRule = {
-      ruleId: `r-${(state.seq += 1)}`,
+      ruleId: String((state.seq += 1)),
       name: String(body.name),
       templateKey: (body.templateKey as string) ?? null,
       status: count === 0 ? "ERROR" : "ACTIVE",
@@ -303,7 +315,7 @@ export const rulesHandler: CoreHandler = (core, req) => {
       titleTemplate: String(body.titleTemplate),
       autoClear: body.autoClear !== false,
       policyId: (body.policyId as string) ?? null,
-      flowId: `f-rule-${state.seq}`,
+      flowId: `0d6f2b1e-7c4a-4b8e-9f00-${String(state.seq).padStart(12, "0")}`,
       version: 1,
       stats7d: { raised: 0 },
       openAlarms: 0,
@@ -313,7 +325,7 @@ export const rulesHandler: CoreHandler = (core, req) => {
     };
     state.rules.unshift(rule);
     return HttpResponse.json(
-      { header: { isSuccessful: true, resultCode: "SUCCESS", resultMessage: "" }, response: { ruleId: rule.ruleId, version: 1, status: rule.status, targetCount: count, flowId: rule.flowId, warnings: count === 0 ? ["TARGET_EMPTY"] : [] } },
+      { header: { isSuccessful: true, resultCode: "SUCCESS", resultMessage: "" }, response: { ruleId: rule.ruleId, version: 1, status: rule.status, targetCount: count, flowId: rule.flowId, warnings: count === 0 ? [{ code: "NO_TARGET", field: "scope", message: "범위에 조건의 측정 항목을 내는 기기가 없습니다" }] : [] } },
       { status: 201, headers: { Location: `/api/v1/core/rules/${rule.ruleId}` } },
     );
   }
@@ -337,19 +349,7 @@ export const rulesHandler: CoreHandler = (core, req) => {
     const span = Date.parse(String(body.to)) - Date.parse(String(body.from));
     if (!(span > 0) || span > 30 * 86_400_000) return fail(400, "RULE_SIMULATION_RANGE_INVALID");
     const result = simulate((body.rule as Json) ?? {});
-    if (state.simAsync) {
-      const jobId = `sim-${(state.seq += 1)}`;
-      state.jobs[jobId] = { polls: 0, result };
-      return ok({ jobId }, 202);
-    }
     return ok(result);
-  }
-  const job = /^\/rule-simulations\/([^/]+)$/.exec(path);
-  if (job && method === "GET") {
-    const entry = state.jobs[job[1]];
-    if (!entry) return fail(404, "RESOURCE_NOT_FOUND");
-    entry.polls += 1;
-    return ok(entry.polls < 2 ? { jobId: job[1], status: "RUNNING", progress: { processed: 3, total: 7 } } : { jobId: job[1], status: "SUCCEEDED", progress: { processed: 7, total: 7 }, result: entry.result });
   }
   if (path === "/rule-tuning-suggestions" && method === "GET") {
     if (!req.can("RULE_READ")) return fail(403, "PERMISSION_DENIED");
@@ -373,7 +373,10 @@ export const rulesHandler: CoreHandler = (core, req) => {
     }
     return ok({ tuningSuggestionId: item.tuningSuggestionId, status: "APPLIED", ruleId: item.ruleId, ruleVersion: rule?.version ?? 1 });
   }
-  const ruleMatch = /^\/rules\/([^/]+)(?:\/(activate|deactivate|convert-to-flow))?$/.exec(path);
+  // core 경로 변수는 long(`/core/rules/{rule-id}`)이라 숫자가 아니면 400
+  const ruleSegment = /^\/rules\/([^/]+)/.exec(path)?.[1];
+  if (ruleSegment && !/^\d+$/.test(ruleSegment) && ruleSegment !== "simulate" && ruleSegment !== "draft-from-chart") return fail(400, "INVALID_REQUEST");
+  const ruleMatch = /^\/rules\/(\d+)(?:\/(activate|deactivate|convert-to-flow))?$/.exec(path);
   if (ruleMatch) {
     const rule = state.rules.find((r) => r.ruleId === ruleMatch[1] && r.status !== "DELETED");
     if (!rule) return fail(404, "RULE_NOT_FOUND");
@@ -385,10 +388,11 @@ export const rulesHandler: CoreHandler = (core, req) => {
       if (body.baseVersion !== rule.version) return fail(409, "VERSION_CONFLICT");
       const errors = rulePayloadErrors(body);
       if (errors.length) return fail(400, "INVALID_REQUEST", { errors });
+      if (hasAnomaly(body.condition as Json)) return fail(400, "RULE_CONDITION_INVALID", ANOMALY_REJECTED);
       const scope = body.scope as FakeRule["scope"];
       const count = targetCount(core, scope, body.condition as Json);
       Object.assign(rule, { name: body.name, scope: { ...scope, targetCount: count }, condition: body.condition, timeCondition: body.timeCondition ?? null, severity: body.severity, titleTemplate: body.titleTemplate, autoClear: body.autoClear, policyId: body.policyId ?? null, version: rule.version + 1, status: count === 0 ? "ERROR" : "ACTIVE", errorReason: count === 0 ? "NO_TARGET" : null });
-      return ok({ ruleId: rule.ruleId, version: rule.version, status: rule.status, targetCount: count, flowId: rule.flowId, warnings: [] });
+      return ok({ ruleId: rule.ruleId, version: rule.version, status: rule.status, errorReason: rule.errorReason, targetCount: count, flowId: rule.flowId, warnings: count === 0 ? [{ code: "NO_TARGET", field: "scope", message: "범위에 조건의 측정 항목을 내는 기기가 없습니다" }] : [] });
     }
     if (method === "DELETE" && !action) {
       rule.status = "DELETED";
@@ -398,16 +402,16 @@ export const rulesHandler: CoreHandler = (core, req) => {
     if (method === "POST" && action === "activate") {
       if (rule.status === "CONVERTED") return fail(409, "RULE_STATE_CONFLICT");
       rule.status = "ACTIVE";
-      return ok({ ruleId: rule.ruleId, status: rule.status });
+      return ok({ ruleId: rule.ruleId, status: rule.status, errorReason: null });
     }
     if (method === "POST" && action === "deactivate") {
       if (rule.status === "INACTIVE") return fail(409, "RULE_STATE_CONFLICT");
       rule.status = "INACTIVE";
-      return ok({ ruleId: rule.ruleId, status: rule.status });
+      return ok({ ruleId: rule.ruleId, status: rule.status, errorReason: null });
     }
     if (method === "POST" && action === "convert-to-flow") {
       rule.status = "CONVERTED";
-      return ok({ flowId: `f-conv-${rule.ruleId}` });
+      return ok({ flowId: rule.flowId });
     }
     return fail(405, "INVALID_REQUEST");
   }
@@ -421,9 +425,9 @@ export const rulesHandler: CoreHandler = (core, req) => {
       mttaSec: 720,
       mttrSec: 3600,
       unackedRatio: 0.12,
-      topRules: [{ ruleId: "r-co2", name: "본관 고CO2", count: 40 }],
-      topSpaces: [{ spaceId: "31", name: "실습실", count: 55 }],
-      topDevices: [{ deviceId: "1042", name: "AM107-067999", count: 52 }],
+      topRules: [{ id: "301", name: "본관 고CO2", count: 40 }],
+      topSpaces: [{ id: "31", name: "실습실", count: 55 }],
+      topDevices: [{ id: "1042", name: "AM107-067999", count: 52 }],
       daily: [
         { date: "2026-10-02", raised: 12 },
         { date: "2026-10-03", raised: 18 },
@@ -446,24 +450,26 @@ export const rulesHandler: CoreHandler = (core, req) => {
     });
     return ok({ results });
   }
-  const alarmMatch = /^\/alarms\/([^/]+)(?:\/(ack|clear|notes|assignee))?$/.exec(path);
+  // core 경로는 `{alarm-id:\\d+}`라 숫자만
+  const alarmMatch = /^\/alarms\/(\d+)(?:\/(ack|clear|notes|assignee))?$/.exec(path);
   if (alarmMatch) {
     const a = state.alarms.find((x) => x.id === alarmMatch[1]);
     if (!a || !req.can("ALARM_READ")) return fail(404, "ALARM_NOT_FOUND");
     const action = alarmMatch[2];
     if (method === "GET" && !action) {
       const children = state.alarms.filter((x) => x.parentAlarmId === a.id);
-      const threshold = (a.source as Json).ruleId === "r-co2" ? { raise: 1000, clear: 900 } : null;
-      return ok({ alarm: { ...a, threshold, unit: a.metric === "co2" ? "ppm" : null, source: { ...(a.source as Json), ruleName: (a.source as Json).ruleId === "r-co2" ? "본관 고CO2" : undefined } }, events: state.events[a.id] ?? [], children, chart: { metric: a.metric, from: "2026-10-03T21:05:00Z", to: "2026-10-04T00:00:00Z" } });
+      const threshold = (a.source as Json).ruleId === "301" ? { raise: 1000, clear: 900 } : null;
+      return ok({ alarm: { ...a, threshold, source: { ...(a.source as Json), ruleName: (a.source as Json).ruleId === "301" ? "본관 고CO2" : undefined } }, events: state.events[a.id] ?? [], children, chart: { metric: a.metric, from: "2026-10-03T21:05:00Z", to: "2026-10-04T00:00:00Z" } });
     }
     if (!req.can("ALARM_HANDLE")) return fail(403, "PERMISSION_DENIED");
     if (method === "POST" && action === "ack") {
-      if (a.ackedAt) return ok({ ok: true, alreadyAcked: true });
+      // 단건 재확인은 409(일괄 확인만 alreadyAcked, AlarmHandlingService)
+      if (a.ackedAt) return fail(409, "ALARM_STATE_CONFLICT");
       a.ackedAt = "2026-10-04T00:00:00Z";
       a.ackedBy = { userId: req.user.id, name: req.user.name };
       if (a.status === "ACTIVE") a.status = "ACKNOWLEDGED";
       event(state, a.id, "ACKED", req);
-      return ok({ ok: true, alarmId: a.id, status: a.status });
+      return ok({ ok: true, alarmId: a.id, status: a.status, ackedAt: a.ackedAt });
     }
     if (method === "POST" && action === "clear") {
       if (a.status === "CLEARED") return fail(409, "ALARM_STATE_CONFLICT");
@@ -478,13 +484,14 @@ export const rulesHandler: CoreHandler = (core, req) => {
       if (!text || text.length > 2000) return fail(400, "INVALID_REQUEST", { errors: [{ field: "text", code: "INVALID_REQUEST", message: "text" }] });
       const type = body.actionType ? "ACTION" : "NOTE";
       event(state, a.id, type, req, { text, actionType: body.actionType ?? null });
-      return ok({ eventId: `e-${(state.seq += 1)}`, alarmId: a.id, type, text, actionType: body.actionType ?? null, actor: { userId: req.user.id, name: req.user.name }, at: "2026-10-04T00:00:00Z" }, 201);
+      return ok({ eventId: String((state.seq += 1)), alarmId: a.id, type, text, actionType: body.actionType ?? null, actor: { userId: req.user.id, name: req.user.name }, at: "2026-10-04T00:00:00Z" }, 201);
     }
     if (method === "PUT" && action === "assignee") {
       const userId = String(body.userId ?? "");
       const name = userId === req.user.id ? req.user.name : `사용자 ${userId}`;
+      if (!/^\d+$/.test(userId)) return fail(400, "INVALID_REQUEST", { errors: [{ field: "userId", code: "Pattern", message: "userId" }] });
       a.assignee = { userId, name };
-      event(state, a.id, "ASSIGNED", req, { assignee: { userId, name } });
+      event(state, a.id, "ASSIGNED", req, { assigneeId: userId });
       return ok({ alarmId: a.id, assignee: a.assignee, version: 2, updatedAt: "2026-10-04T00:00:00Z" });
     }
     return fail(405, "INVALID_REQUEST");
@@ -498,7 +505,7 @@ export const rulesHandler: CoreHandler = (core, req) => {
       const kind = body.kind;
       if (kind === "ONE_TIME" && !(Date.parse(String(body.endsAt)) > Date.parse(String(body.startsAt)))) return fail(400, "SILENCE_RANGE_INVALID");
       const target = body.target as Json;
-      const silence = { silenceId: `s-${(state.seq += 1)}`, kind, target: { ...target, name: target.type === "RULE" ? state.rules.find((r) => r.ruleId === target.id)?.name : null }, startsAt: body.startsAt ?? null, endsAt: body.endsAt ?? null, recurrence: body.recurrence ?? null, reason: body.reason ?? null, active: true, createdBy: { userId: req.user.id, name: req.user.name }, createdAt: "2026-10-04T00:00:00Z" };
+      const silence = { silenceId: String((state.seq += 1)), kind, target: { ...target, name: target.type === "RULE" ? state.rules.find((r) => r.ruleId === target.id)?.name : null }, startsAt: body.startsAt ?? null, endsAt: body.endsAt ?? null, recurrence: body.recurrence ?? null, reason: body.reason ?? null, active: true, createdBy: { userId: req.user.id, name: req.user.name }, createdAt: "2026-10-04T00:00:00Z" };
       state.silences.push(silence);
       if (target.type === "ALARM") event(state, String(target.id), "SILENCED", req);
       return ok(silence, 201);

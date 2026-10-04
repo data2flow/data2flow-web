@@ -3,28 +3,26 @@ import { screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { meOf, renderRoute } from "../../../../test/render";
 import { alarmsApi } from "../../alarms/api";
-import { isJob, rulesApi } from "../api";
+import { rulesApi } from "../api";
 import { RuleStatusBadge } from "../components/rule-status";
 
 afterEach(() => vi.unstubAllGlobals());
 
 describe("BFF 경로", () => {
-  it("시뮬레이션(저장 전·저장 후)·작업 조회·일괄 확인·무음", async () => {
+  it("시뮬레이션(저장 전·저장 후)·일괄 확인·무음", async () => {
     const calls: { url: string; method: string; body?: string; key?: string | null }[] = [];
     vi.stubGlobal("fetch", vi.fn(async (url: string, init: RequestInit) => {
       calls.push({ url, method: String(init.method), body: init.body as string | undefined, key: new Headers(init.headers).get("Idempotency-Key") });
-      return new Response(JSON.stringify({ header: { isSuccessful: true }, response: { jobId: "j" } }), { status: 202, headers: { "Content-Type": "application/json" } });
+      return new Response(JSON.stringify({ header: { isSuccessful: true }, response: { alarms: 0 } }), { status: 200, headers: { "Content-Type": "application/json" } });
     }));
     const body = { rule: {} as never, from: "a", to: "b" };
-    const job = await rulesApi.simulate(body);
-    expect(job.ok && isJob(job.data)).toBe(true);
+    const sim = await rulesApi.simulate(body);
+    expect(sim.ok && sim.data.alarms).toBe(0);
     await rulesApi.simulate(body, "r 1");
-    await rulesApi.simulationJob("j");
     await alarmsApi.bulkAck(["1"]);
     await alarmsApi.silence({ kind: "ONE_TIME" });
-    expect(calls.map((c) => `${c.method} ${c.url}`)).toEqual(["POST /bff/api/core/rules/simulate", "POST /bff/api/core/rules/r%201/simulate", "GET /bff/api/core/rule-simulations/j", "POST /bff/api/core/alarms/bulk-ack", "POST /bff/api/core/silences"]);
-    expect(calls[3].key).toBeTruthy();
-    expect(isJob(undefined)).toBe(false);
+    expect(calls.map((c) => `${c.method} ${c.url}`)).toEqual(["POST /bff/api/core/rules/simulate", "POST /bff/api/core/rules/r%201/simulate", "POST /bff/api/core/alarms/bulk-ack", "POST /bff/api/core/silences"]);
+    expect(calls[2].key).toBeTruthy();
   });
 });
 

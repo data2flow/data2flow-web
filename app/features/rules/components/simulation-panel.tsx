@@ -1,6 +1,6 @@
 /**
  * UI-RUL-03 규칙 시뮬레이션 결과(RUL-01.11, BR-RUL-23, TC-RUL-029 AT-RUL-03.1·03.2).
- * 기간(기본 7일, 최대 30일)을 골라 API-RUL-06을 부른다. 202면 작업을 2초마다 조회하며 진행률을 보여 준다.
+ * 기간(기본 7일, 최대 30일)을 골라 API-RUL-06을 부른다(core는 동기 200으로 결과를 준다. 작업 조회 API는 없다).
  * 다시 실행하면 직전 결과를 "이전" 열로 나란히 비교한다. 데이터가 기간의 10% 미만이면 안내한다.
  */
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -8,13 +8,11 @@ import { useTranslation } from "react-i18next";
 import type { ChartFactory } from "~/components/charts/timeseries-chart";
 import { Alert, Button, Card, Table } from "~/components/ui";
 import { errorText } from "~/lib/error-text";
-import { isJob, type RulesApi } from "../api";
+import type { RulesApi } from "../api";
 import { firstThreshold } from "../model/condition";
 import { SIM_PERIODS, compareRows, heatmapOption, lowCoverage, simulationRange, sortedDevices, validRange } from "../model/simulation";
 import type { RulePayload, SimulationResult } from "../model/types";
 import { EChart } from "./echart";
-
-export const POLL_MS = 2000;
 
 interface Run {
   result: SimulationResult;
@@ -47,11 +45,9 @@ export function SimulationPanel({
   const { t } = useTranslation();
   const [days, setDays] = useState(7);
   const [running, setRunning] = useState(false);
-  const [progress, setProgress] = useState<{ processed: number; total: number } | null>(null);
   const [current, setCurrent] = useState<Run | null>(null);
   const [previous, setPrevious] = useState<Run | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const currentRef = useRef<Run | null>(null);
   const alive = useRef(true);
 
@@ -59,37 +55,15 @@ export function SimulationPanel({
     alive.current = true;
     return () => {
       alive.current = false;
-      if (timer.current) clearTimeout(timer.current);
     };
   }, []);
 
   const finish = (result: SimulationResult, label: string) => {
     setRunning(false);
-    setProgress(null);
     const next = { result, label };
     setPrevious(currentRef.current);
     currentRef.current = next;
     setCurrent(next);
-  };
-
-  const poll = (jobId: string, label: string) => {
-    timer.current = setTimeout(async () => {
-      const job = await api.simulationJob(jobId);
-      if (!alive.current) return;
-      if (!job.ok) {
-        setRunning(false);
-        setError(errorText(t, job) ?? null);
-        return;
-      }
-      if (job.data.status === "SUCCEEDED" && job.data.result) return finish(job.data.result, label);
-      if (job.data.status === "FAILED" || job.data.status === "CANCELLED") {
-        setRunning(false);
-        setError(errorText(t, job.data.error ?? { code: "UNKNOWN" }) ?? null);
-        return;
-      }
-      setProgress(job.data.progress ?? null);
-      poll(jobId, label);
-    }, POLL_MS);
   };
 
   const run = async () => {
@@ -112,11 +86,6 @@ export function SimulationPanel({
     if (!response.ok) {
       setRunning(false);
       setError(errorText(t, response) ?? null);
-      return;
-    }
-    if (isJob(response.data)) {
-      setProgress({ processed: 0, total: 0 });
-      poll(response.data.jobId, label);
       return;
     }
     finish(response.data, label);
@@ -155,7 +124,7 @@ export function SimulationPanel({
         </div>
         {running && (
           <p role="status" className="text-[13px] text-muted">
-            {progress && progress.total > 0 ? t("rules.sim.progress", { processed: progress.processed, total: progress.total }) : t("rules.sim.running")}
+            {t("rules.sim.running")}
           </p>
         )}
         {error && <Alert tone="danger">{error}</Alert>}

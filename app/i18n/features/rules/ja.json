@@ -177,10 +177,11 @@
       "clearAbove": "解除基準は {{value}} より大きくしてください",
       "countLimit": "条件は {{n}} 個までです",
       "depthLimit": "グループは {{n}} 段まで入れ子にできます",
-      "targetLimit": "対象デバイスは {{n}}台までです"
+      "targetLimit": "対象デバイスは {{n}}台までです",
+      "conditionUnsupported": "異常検知条件はまだ保存できません。リアルタイム異常スコアの準備後に使えます（しきい値・変化率・無受信条件を使ってください）。"
     },
     "warnings": {
-      "TARGET_EMPTY": "対象デバイスがありません",
+      "NO_TARGET": "対象デバイスがありません",
       "TARGET_OFFLINE": "一部の対象デバイスがオフラインです"
     },
     "sim": {
@@ -200,7 +201,6 @@
       "heatmap": "時間帯別の発生(曜日×時)",
       "title": "シミュレーション(直近{{days}}日)",
       "days": "{{n}}日",
-      "progress": "計算中 {{processed}}/{{total}}",
       "current": "今回({{label}})",
       "previous": "前回({{label}})",
       "basis": "基準 {{value}}",
@@ -326,7 +326,8 @@
       "value": "値 {{value}}",
       "assigned": "→ {{name}}",
       "notified": "{{channel}} · {{recipient}} · {{status}}",
-      "escalated": "{{step}}段階"
+      "escalated": "{{step}}段階",
+      "unassigned": "担当者解除"
     },
     "dur": {
       "days": "{{n}}日",

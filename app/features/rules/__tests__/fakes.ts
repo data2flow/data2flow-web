@@ -18,7 +18,6 @@ export const result = (alarms: number, extra: Partial<SimulationResult> = {}): S
 export function fakeRulesApi(overrides: Partial<RulesApi> = {}): RulesApi & Record<string, ReturnType<typeof vi.fn>> {
   return {
     simulate: vi.fn(async (body: { rule: { condition: { value?: number } } }) => ({ ok: true as const, status: 200, data: result((body.rule.condition.value ?? 1000) >= 1200 ? 5 : 14) })),
-    simulationJob: vi.fn(async () => ({ ok: true as const, status: 200, data: { status: "SUCCEEDED" as const, result: result(3) } })),
     ...overrides,
   } as RulesApi & Record<string, ReturnType<typeof vi.fn>>;
 }

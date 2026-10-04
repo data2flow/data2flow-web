@@ -2,7 +2,7 @@
  * 알람 모델(UI-RUL-04·05, RUL-02.06, RUL-04.01·04.03) — 필터 ↔ URL·API 쿼리, 정렬, 묶기, 실시간 반영, 일괄 결과.
  */
 import { describe, expect, it } from "vitest";
-import { apiQuery, applyAlarmEvent, bulkSummary, canAck, canClear, chunk, durationSec, filterFromParams, filterToParams, groupAlarms, matchesFilter, sortAlarms, sortEvents, sourceLink, spacePathText, type Alarm } from "../alarms";
+import { apiQuery, applyAlarmEvent, normalizeStreamAlarm, bulkSummary, canAck, canClear, chunk, durationSec, filterFromParams, filterToParams, groupAlarms, matchesFilter, sortAlarms, sortEvents, sourceLink, spacePathText, type Alarm } from "../alarms";
 
 const base: Alarm = { id: "1", severity: "MAJOR", status: "ACTIVE", title: "고CO2", source: { type: "RULE", ruleId: "r-1" }, space: { id: "31", path: ["본관", "실습실"] }, raisedAt: "2026-10-03T23:00:00Z" };
 const a = (extra: Partial<Alarm>): Alarm => ({ ...base, ...extra });
@@ -24,7 +24,7 @@ describe("TC-RUL-058 필터 ↔ URL 검색 매개변수", () => {
   it("API-RUL-10 쿼리: 기간을 from·to로, 전체 기간은 생략", () => {
     const now = Date.parse("2026-10-04T00:00:00Z");
     const q = apiQuery(filterFromParams(new URLSearchParams("severity=MAJOR&ruleId=r-1&sourceType=RULE&spaceId=31&groupBySpaceEvent=true")), now, 50);
-    expect(Object.fromEntries(q)).toEqual({ status: "ACTIVE,ACKNOWLEDGED,SUPPRESSED", page: "1", size: "50", severity: "MAJOR", spaceId: "31", ruleId: "r-1", sourceType: "RULE", from: "2026-10-03T00:00:00.000Z", to: "2026-10-04T00:00:00.000Z", groupBySpaceEvent: "true" });
+    expect(Object.fromEntries(q)).toEqual({ status: "ACTIVE,ACKNOWLEDGED,SUPPRESSED", page: "1", size: "50", severity: "MAJOR", spaceId: "31", ruleId: "r-1", sourceType: "RULE", from: "2026-10-03T00:00:00.000Z", to: "2026-10-04T00:00:00.000Z" });
     expect(apiQuery(filterFromParams(new URLSearchParams("range=all")), now).has("from")).toBe(false);
   });
 });
@@ -61,6 +61,17 @@ describe("실시간 반영(API-RUL-14 alarm.raised·updated·cleared)", () => {
     expect(cleared.counts.byStatus.ACKNOWLEDGED).toBe(0);
     const unknown = applyAlarmEvent(cleared, "alarm.updated", a({ id: "77" }), filter);
     expect(unknown.alarms).toHaveLength(1);
+  });
+
+  it("core SSE 데이터(EVT-RUL-02 AlarmSnapshot: ID는 숫자, 공간 path는 ID 경로)를 목록 모양으로 맞춘다", () => {
+    const snapshot = { id: 1, alarmKey: "rule:301:1042", severity: "MAJOR", status: "ACKNOWLEDGED", flapping: false, title: "고CO2", source: { type: "RULE", ruleId: 301, flowId: "f" }, device: { id: 1042 }, space: { id: 31, path: "/1/7/31" }, occurrenceCount: 2, raisedAt: "2026-10-03T23:00:00Z", ackedBy: { userId: 7, name: "김운영" }, parentAlarmId: 9, spaceEventId: 5 };
+    const n = normalizeStreamAlarm(snapshot);
+    expect(n).toMatchObject({ id: "1", source: { ruleId: "301" }, device: { id: "1042" }, space: { id: "31" }, ackedBy: { userId: "7" }, parentAlarmId: "9", spaceEventId: "5" });
+    expect(n.space?.path).toBeUndefined();
+    // 기존 행의 이름 경로는 지키고, 숫자 규칙 ID로도 규칙 필터에 맞는다
+    const existing = a({ id: "1", source: { type: "RULE", ruleId: "301" } });
+    const next = applyAlarmEvent({ alarms: [existing], counts }, "alarm.updated", snapshot as unknown as Alarm, filterFromParams(new URLSearchParams("ruleId=301")));
+    expect(next.alarms[0]).toMatchObject({ id: "1", status: "ACKNOWLEDGED", space: { id: "31", path: ["본관", "실습실"] } });
   });
 
   it("필터에 맞지 않는 새 알람은 넣지 않는다(심각도·규칙·출처·공간)", () => {

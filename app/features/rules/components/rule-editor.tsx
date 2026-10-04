@@ -59,7 +59,7 @@ export function RuleEditor(props: RuleEditorProps) {
   const shown = touched ? problems : { fields: {}, condition: {} };
   const fieldError = (key: string) => {
     const problem: FieldProblem | undefined = shown.fields[key] ?? props.serverProblems?.[key];
-    return problem ? t(problem.key, { defaultValue: t("errors.INVALID_REQUEST"), ...(problem.params ?? {}) }) : undefined;
+    return problem ? t(problem.key, { defaultValue: problem.params?.message || t("errors.INVALID_REQUEST"), ...(problem.params ?? {}) }) : undefined;
   };
   const set = <K extends keyof RuleFormState>(key: K, value: RuleFormState[K]) => setForm((f) => ({ ...f, [key]: value }));
 

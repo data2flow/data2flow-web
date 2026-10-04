@@ -177,10 +177,11 @@
       "clearAbove": "解除阈值必须大于 {{value}}",
       "countLimit": "最多 {{n}} 个条件",
       "depthLimit": "分组最多嵌套 {{n}} 层",
-      "targetLimit": "目标设备最多 {{n}} 台"
+      "targetLimit": "目标设备最多 {{n}} 台",
+      "conditionUnsupported": "暂时无法保存异常检测条件。实时异常分数就绪后即可使用（请使用阈值、变化率或无数据条件）。"
     },
     "warnings": {
-      "TARGET_EMPTY": "没有目标设备",
+      "NO_TARGET": "没有目标设备",
       "TARGET_OFFLINE": "部分目标设备离线"
     },
     "sim": {
@@ -200,7 +201,6 @@
       "heatmap": "按时段的触发(星期×小时)",
       "title": "模拟(最近 {{days}} 天)",
       "days": "{{n}} 天",
-      "progress": "计算中 {{processed}}/{{total}}",
       "current": "本次({{label}})",
       "previous": "上次({{label}})",
       "basis": "阈值 {{value}}",
@@ -326,7 +326,8 @@
       "value": "值 {{value}}",
       "assigned": "→ {{name}}",
       "notified": "{{channel}} · {{recipient}} · {{status}}",
-      "escalated": "第 {{step}} 级"
+      "escalated": "第 {{step}} 级",
+      "unassigned": "已取消负责人"
     },
     "dur": {
       "days": "{{n}} 天",

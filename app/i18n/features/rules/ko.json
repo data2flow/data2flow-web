@@ -177,10 +177,11 @@
       "clearAbove": "해제 기준은 {{value}}보다 커야 합니다",
       "countLimit": "조건은 {{n}}개까지입니다",
       "depthLimit": "그룹은 {{n}}단계까지 중첩할 수 있습니다",
-      "targetLimit": "대상 기기는 {{n}}대까지입니다"
+      "targetLimit": "대상 기기는 {{n}}대까지입니다",
+      "conditionUnsupported": "이상 탐지 조건은 아직 저장할 수 없습니다. 실시간 이상 점수가 준비되면 쓸 수 있습니다(임계값·변화율·무수신 조건을 쓰세요)."
     },
     "warnings": {
-      "TARGET_EMPTY": "대상 기기가 없습니다",
+      "NO_TARGET": "대상 기기가 없습니다",
       "TARGET_OFFLINE": "일부 대상 기기가 오프라인입니다"
     },
     "sim": {
@@ -200,7 +201,6 @@
       "heatmap": "시간대별 발생(요일 × 시)",
       "title": "시뮬레이션 (최근 {{days}}일)",
       "days": "{{n}}일",
-      "progress": "계산 중 {{processed}}/{{total}}",
       "current": "이번 ({{label}})",
       "previous": "이전 ({{label}})",
       "basis": "기준 {{value}}",
@@ -326,7 +326,8 @@
       "value": "값 {{value}}",
       "assigned": "→ {{name}}",
       "notified": "{{channel}} · {{recipient}} · {{status}}",
-      "escalated": "{{step}}단계"
+      "escalated": "{{step}}단계",
+      "unassigned": "담당자 해제"
     },
     "dur": {
       "days": "{{n}}일",

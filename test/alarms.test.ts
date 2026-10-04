@@ -60,7 +60,8 @@ describe("UI-RUL-04 알람 목록(RUL-02.06, RUL-04.01)", () => {
     const browser = await operator();
     const page = await browser.get("/alarms?status=CLEARED&severity=MINOR&spaceId=31&range=7d&sourceType=RULE&groupBySpaceEvent=true");
     const sent = app.gateway.received.filter((r) => r.path.startsWith("/api/v1/core/alarms?")).at(-1)!;
-    for (const part of ["status=CLEARED", "severity=MINOR", "spaceId=31", "sourceType=RULE", "groupBySpaceEvent=true", "from=2026-09-27"]) expect(sent.path).toContain(part);
+    for (const part of ["status=CLEARED", "severity=MINOR", "spaceId=31", "sourceType=RULE", "from=2026-09-27"]) expect(sent.path).toContain(part);
+    expect(sent.path).not.toContain("groupBySpaceEvent");
     expect(page.body).toContain("현재 열린 알람이 없습니다 ✓");
     // 홈 알람 카드(TC-DSH-004) 링크 `/alarms?state=ACTIVE` → API-RUL-10 status=ACTIVE
     await browser.get("/alarms?state=ACTIVE");
@@ -88,7 +89,7 @@ describe("UI-RUL-05 알람 상세(RUL-02.01·02.02·02.04, TC-RUL-039·054·066)
   it("TC-RUL-039 출처 링크(규칙 → 규칙 편집), 대상 경로, 발생·최고·현재 값, 횟수, 기준선 안내, 발송 이력 2건 SENT", async () => {
     const browser = await operator();
     const page = await browser.get("/alarms/9001");
-    expect(page.body).toContain('href="/rules/r-co2"');
+    expect(page.body).toContain('href="/rules/301"');
     expect(page.body).toContain("본관 고CO2");
     expect(page.body).toContain("광주캠퍼스 / 본관 / 3층 / 실습실");
     expect(page.body).toContain("발생 1,050 ppm · 최고 1,180 ppm · 현재 1,120 ppm");
@@ -143,13 +144,13 @@ describe("UI-RUL-05 알람 상세(RUL-02.01·02.02·02.04, TC-RUL-039·054·066)
 describe("UI-RUL-08 무음 일정(RUL-02.07)", () => {
   it("일시 무음: 끝이 시작보다 앞이면 오류, 맞으면 만들고 목록에, 해제. 규칙 목록 [무음]으로 대상 미리 채움", async () => {
     const browser = await operator();
-    const page = await browser.get("/notifications/silences?targetType=RULE&targetId=r-co2");
+    const page = await browser.get("/notifications/silences?targetType=RULE&targetId=301");
     expect(page.body).toContain("무음이 없습니다");
-    expect(page.body).toMatch(/<option value="r-co2" selected="">본관 고CO2<\/option>/);
-    const bad = await browser.post("/notifications/silences", { intent: "create", kind: "ONE_TIME", targetType: "RULE", targetId: "r-co2", startsAt: "2026-10-04T10:00", endsAt: "2026-10-04T09:00" });
+    expect(page.body).toMatch(/<option value="301" selected="">본관 고CO2<\/option>/);
+    const bad = await browser.post("/notifications/silences", { intent: "create", kind: "ONE_TIME", targetType: "RULE", targetId: "301", startsAt: "2026-10-04T10:00", endsAt: "2026-10-04T09:00" });
     expect(bad.response.status).toBe(400);
     expect(bad.body).toContain("무음 기간이 올바르지 않습니다");
-    const ok = await browser.post("/notifications/silences", { intent: "create", kind: "ONE_TIME", targetType: "RULE", targetId: "r-co2", startsAt: "2026-10-04T09:00", endsAt: "2026-10-04T10:00", reason: "점검" });
+    const ok = await browser.post("/notifications/silences", { intent: "create", kind: "ONE_TIME", targetType: "RULE", targetId: "301", startsAt: "2026-10-04T09:00", endsAt: "2026-10-04T10:00", reason: "점검" });
     expect(ok.response.status).toBe(200);
     expect(state().silences[0]).toMatchObject({ startsAt: "2026-10-04T00:00:00Z", endsAt: "2026-10-04T01:00:00Z" });
     const recurring = await browser.post("/notifications/silences", { intent: "create", kind: "RECURRING", repeat: "WEEKLY", targetType: "SPACE", targetId: "31", days: ["7"], from: "00:00", to: "23:59" });
@@ -177,7 +178,7 @@ describe("UI-RUL-10 알람 통계(RUL-06.01, AT-RUL-14.1)", () => {
     expect(page.response.status).toBe(200);
     expect(page.body).toContain("12분");
     expect(page.body).toContain("12%");
-    expect(page.body).toContain('href="/rules/r-co2"');
+    expect(page.body).toContain('href="/rules/301"');
     expect(page.body).toContain("2026-10-03");
     const sent = app.gateway.received.find((r) => r.path.startsWith("/api/v1/core/alarms/stats?"))!;
     expect(sent.path).toContain("spaceId=31");

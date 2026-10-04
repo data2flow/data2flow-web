@@ -8,7 +8,7 @@ export function detail(extra: Partial<AlarmDetailData["alarm"]> = {}): AlarmDeta
       severity: "MAJOR",
       status: "ACTIVE",
       title: "고CO2 · 실습실 / 전방 좌측",
-      source: { type: "RULE", ruleId: "r-co2", ruleName: "본관 고CO2" },
+      source: { type: "RULE", ruleId: "301", ruleName: "본관 고CO2" },
       device: { id: "1042", name: "EM500-CO2-152590" },
       space: { id: "31", path: ["본관", "3층", "실습실"] },
       metric: "co2",

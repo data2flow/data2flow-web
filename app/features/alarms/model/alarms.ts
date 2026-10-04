@@ -50,6 +50,7 @@ export interface Alarm {
   suppressedReason?: "MAINTENANCE" | "PARENT" | "DEVICE_OFFLINE" | null;
   /** 발생·해제 기준(EVT-RUL-01 threshold 스냅숏). 목록 모양에는 없고 상세에 있을 때만 */
   threshold?: { raise?: number | null; clear?: number | null } | null;
+  /** core Alarm에는 없다. 상세 loader가 차트 시계열 단위로 채운다 */
   unit?: string | null;
 }
 
@@ -104,7 +105,7 @@ export function filterToParams(filter: AlarmFilter): URLSearchParams {
 
 const RANGE_MS: Record<Exclude<RangeKey, "all">, number> = { "24h": 86_400_000, "7d": 7 * 86_400_000, "30d": 30 * 86_400_000 };
 
-/** API-RUL-10 쿼리 */
+/** API-RUL-10 쿼리(core AlarmController: status·severity·spaceId·ruleId·sourceType·deviceId·from·to·page·size) */
 export function apiQuery(filter: AlarmFilter, nowMs: number, size = 50): URLSearchParams {
   const query = new URLSearchParams({ status: filter.status.join(","), page: String(filter.page), size: String(size) });
   if (filter.severity.length) query.set("severity", filter.severity.join(","));
@@ -115,7 +116,7 @@ export function apiQuery(filter: AlarmFilter, nowMs: number, size = 50): URLSear
     query.set("from", new Date(nowMs - RANGE_MS[filter.range]).toISOString());
     query.set("to", new Date(nowMs).toISOString());
   }
-  if (filter.groupBySpaceEvent) query.set("groupBySpaceEvent", "true");
+  // 공간 이벤트 묶기는 화면이 한다(core API-RUL-10에는 묶기 매개변수가 없다)
   return query;
 }
 
@@ -196,14 +197,49 @@ function bump(counts: AlarmCounts, alarm: Alarm, delta: number): AlarmCounts {
   return { byStatus, bySeverity };
 }
 
+const idText = (value: unknown): string | undefined => (value === null || value === undefined || value === "" ? undefined : String(value));
+
+/**
+ * SSE `alarm.*` 데이터(core는 EVT-RUL-02 AlarmSnapshot을 그대로 보낸다)를 목록 모양(API-RUL-10 Alarm)으로 맞춘다.
+ * - ID(알람·규칙·기기·공간·상위·공간 이벤트)가 JSON 숫자로 오므로 문자열로 바꾼다
+ * - 공간 `path`는 이름 경로가 아니라 ID 경로(`/1/7/31`)라 버린다(이미 보이는 행의 이름 경로를 지킨다)
+ * - 이벤트에 없는 칸(기기 이름 등)은 키를 두지 않아, 병합할 때 기존 값을 지우지 않는다
+ */
+export function normalizeStreamAlarm(raw: Record<string, unknown>): Alarm {
+  const out: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(raw)) if (value !== undefined && value !== null) out[key] = value;
+  out.id = String(raw.id);
+  const source = raw.source as Record<string, unknown> | undefined;
+  if (source) out.source = { ...source, ...(source.ruleId != null ? { ruleId: String(source.ruleId) } : {}) };
+  const device = raw.device as Record<string, unknown> | undefined;
+  if (device && device.id != null) out.device = { ...device, id: String(device.id) };
+  const space = raw.space as Record<string, unknown> | undefined;
+  if (space && space.id != null) {
+    const next: Record<string, unknown> = { ...space, id: String(space.id) };
+    if (next.path == null || (typeof next.path === "string" && /^(\/\d+)+\/?$/.test(next.path))) delete next.path;
+    out.space = next;
+  }
+  for (const key of ["ackedBy", "assignee"] as const) {
+    const user = raw[key] as Record<string, unknown> | undefined;
+    if (user && user.userId != null) out[key] = { ...user, userId: String(user.userId) };
+  }
+  for (const key of ["parentAlarmId", "spaceEventId"] as const) {
+    const text = idText(raw[key]);
+    if (text) out[key] = text;
+  }
+  return out as unknown as Alarm;
+}
+
 /**
  * SSE 이벤트 하나를 목록에 반영한다. 새 알람은 맨 위(필터에 맞을 때만), 상태 변경은 그 자리에서, 필터에서 벗어나면 뺀다.
  * 돌려주는 `added`는 강조할 알람 ID
  */
 export function applyAlarmEvent(state: LiveState, type: string, incoming: Alarm, filter: AlarmFilter, spaceIds?: Set<string>): LiveState & { added?: string } {
-  const alarm = { ...incoming, id: String(incoming.id) };
-  const index = state.alarms.findIndex((a) => a.id === alarm.id);
+  const normalized = normalizeStreamAlarm(incoming as unknown as Record<string, unknown>);
+  const index = state.alarms.findIndex((a) => a.id === normalized.id);
   const previous = index >= 0 ? state.alarms[index] : undefined;
+  // 이름 경로가 없는 이벤트는 기존 행의 공간(이름 경로)을 이어 받는다
+  const alarm: Alarm = previous?.space && normalized.space && !normalized.space.path && previous.space.id === normalized.space.id ? { ...normalized, space: previous.space } : normalized;
   const fits = matchesFilter(alarm, filter, spaceIds);
   let counts = previous ? bump(state.counts, previous, -1) : state.counts;
   if (fits && (previous || type === "alarm.raised")) counts = bump(counts, alarm, 1);

@@ -227,7 +227,7 @@ export function AlarmDetailView({
               <li key={`${e.type}-${e.at}-${i}`} className="flex flex-wrap gap-2">
                 <span className="font-mono text-muted">{formatDateTime(e.at, timezone, lang, true)}</span>
                 <Badge tone="neutral">{t(`alarms.event.${e.type}`, { defaultValue: e.type })}</Badge>
-                <span>{eventText(e, t)}</span>
+                <span>{eventText(e, t, (id) => users.find((u) => u.userId === id)?.name ?? (alarm.assignee?.userId === id ? alarm.assignee.name : undefined))}</span>
                 {e.actor?.name && <span className="text-muted">{e.actor.name}</span>}
               </li>
             ))}
@@ -306,7 +306,7 @@ export function AlarmDetailView({
   );
 }
 
-function eventText(event: AlarmEvent, t: (key: string, o?: Record<string, unknown>) => string): string {
+function eventText(event: AlarmEvent, t: (key: string, o?: Record<string, unknown>) => string, userName: (id: string) => string | undefined = () => undefined): string {
   const data = event.data ?? {};
   switch (event.type) {
     case "RAISED":
@@ -317,7 +317,9 @@ function eventText(event: AlarmEvent, t: (key: string, o?: Record<string, unknow
     case "ACTION":
       return `${t(`alarms.actionType.${String(data.actionType ?? "OTHER")}`, { defaultValue: String(data.actionType ?? "") })} ${String(data.text ?? "")}`.trim();
     case "ASSIGNED":
-      return t("alarms.eventText.assigned", { name: String((data.assignee as { name?: string } | undefined)?.name ?? data.name ?? "") });
+      // core 타임라인은 {assigneeId}만 남긴다(AlarmHandlingService.assign). 이름은 담당자 후보·지금 담당자에서 찾는다
+      if (data.assigneeId === null) return t("alarms.eventText.unassigned");
+      return t("alarms.eventText.assigned", { name: String((data.assignee as { name?: string } | undefined)?.name ?? data.name ?? (data.assigneeId != null ? (userName(String(data.assigneeId)) ?? `#${String(data.assigneeId)}`) : "")) });
     case "NOTIFIED":
       return t("alarms.eventText.notified", { channel: String(data.channel ?? ""), recipient: String(data.recipient ?? ""), status: String(data.status ?? "") });
     case "ESCALATED":

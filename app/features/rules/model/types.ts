@@ -43,7 +43,8 @@ export interface RateOfChangeCondition {
   metric: string;
   window: string;
   delta: number;
-  direction: "UP" | "DOWN" | "ANY";
+  /** core 계약은 소문자(RuleCondition.DIRECTIONS) */
+  direction: "up" | "down" | "any";
   aggregate?: Aggregate;
 }
 
@@ -145,15 +146,6 @@ export interface SimulationResult {
   byDevice: { deviceId: string; name: string; count: number; longestSec: number | null }[];
   heatmap: { dow: number; hour: number; count: number }[];
   coverage?: { dataRatio: number } | null;
-}
-
-/** API-RUL-06 202 이후 작업 조회(GET /rule-simulations/{job-id}). 문서에 모양이 없어 플로우 재생(API-FLW-13)과 같은 꼴로 받는다 */
-export interface SimulationJob {
-  jobId?: string;
-  status: "QUEUED" | "RUNNING" | "SUCCEEDED" | "FAILED" | "CANCELLED";
-  progress?: { processed: number; total: number } | null;
-  result?: SimulationResult | null;
-  error?: { code: string; message?: string } | null;
 }
 
 /** API-RUL-08 */

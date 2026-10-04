@@ -36,6 +36,8 @@ function attach(condition: RuleCondition): EditorNode {
   if (condition.kind === "group") {
     return { kind: "group", uid: nextUid(), op: condition.op === "OR" ? "OR" : "AND", items: (condition.items ?? []).map(attach) };
   }
+  // 변화율 방향은 core 계약이 소문자(up·down·any, RuleCondition.DIRECTIONS). 예전 대문자 값도 받아 소문자로
+  if (condition.kind === "rateOfChange" && typeof condition.direction === "string") return { ...condition, direction: condition.direction.toLowerCase(), uid: nextUid() } as EditorLeaf;
   return { ...condition, uid: nextUid() } as EditorLeaf;
 }
 
@@ -52,6 +54,8 @@ function detach(node: EditorNode): RuleCondition {
   void _uid;
   const clean: Record<string, unknown> = {};
   for (const [key, value] of Object.entries(rest)) if (value !== undefined && value !== null && value !== "") clean[key] = value;
+  // core는 임계값 value를 숫자로만 받는다(RuleCondition.threshold). 참·거짓 측정 항목은 1·0으로 보낸다
+  if (clean.kind === "threshold" && typeof clean.value === "boolean") clean.value = clean.value ? 1 : 0;
   return clean as unknown as LeafCondition;
 }
 
@@ -66,7 +70,7 @@ export function newThreshold(metric = ""): EditorLeaf {
 }
 
 export function newLeaf(kind: LeafCondition["kind"], metric = ""): EditorLeaf {
-  if (kind === "rateOfChange") return { kind, uid: nextUid(), metric, window: "PT10M", delta: 0, direction: "UP", aggregate: "perDevice" } as EditorLeaf;
+  if (kind === "rateOfChange") return { kind, uid: nextUid(), metric, window: "PT10M", delta: 0, direction: "up", aggregate: "perDevice" } as EditorLeaf;
   if (kind === "noData") return { kind, uid: nextUid(), metric, window: "PT30M" } as EditorLeaf;
   if (kind === "anomaly") return { kind, uid: nextUid(), minScore: 3, metric } as EditorLeaf;
   return newThreshold(metric);
@@ -195,7 +199,7 @@ function checkLeaf(leaf: EditorLeaf, metrics: MetricInfo[], problems: ConditionP
       if (out) problems[`${leaf.uid}.range`] = out;
     }
   } else if (metric?.valueType === "BOOLEAN") {
-    if (typeof leaf.value !== "boolean") problems[`${leaf.uid}.value`] = { key: "rules.v.valueRequired" };
+    if (typeof leaf.value !== "boolean" && leaf.value !== 0 && leaf.value !== 1) problems[`${leaf.uid}.value`] = { key: "rules.v.valueRequired" };
   } else if (metric?.valueType === "ENUM") {
     if (leaf.value === null || leaf.value === undefined || leaf.value === "") problems[`${leaf.uid}.value`] = { key: "rules.v.valueRequired" };
   } else {
@@ -274,7 +278,8 @@ export function summarize(
   const unit = metricOf(metrics, condition.metric)?.unit ?? "";
   if (condition.kind === "noData") return `${condition.metric ?? ""} ${words.noData} ${formatDuration(condition.window, words)}`.trim();
   if (condition.kind === "rateOfChange") {
-    const sign = condition.direction === "DOWN" ? "-" : condition.direction === "UP" ? "+" : "±";
+    const direction = String(condition.direction ?? "any").toLowerCase();
+    const sign = direction === "down" ? "-" : direction === "up" ? "+" : "±";
     return `${condition.metric} ${words.rate} ${sign}${condition.delta}${unit} / ${formatDuration(condition.window, words)}`;
   }
   if (condition.kind === "anomaly") return `${words.anomaly} ≥ ${condition.minScore}`;

@@ -1,19 +1,17 @@
 /**
  * TC-RUL-029 AT-RUL-03.2 규칙 시뮬레이션(UI-RUL-03, RUL-01.11): 기준 1200으로 다시 실행하면 이전 결과(1000)와 나란히 비교.
- * 202 작업은 2초마다 조회(가짜 타이머), 데이터 10% 미만 안내, 폼 오류·30일 초과·실패 문구, 히트맵 옵션.
+ * core는 동기 200으로 결과를 준다(작업 조회 없음). 데이터 10% 미만 안내, 폼 오류·30일 초과·실패 문구, 히트맵 옵션.
  */
-import { act, screen, waitFor, within } from "@testing-library/react";
+import { screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { meOf, renderRoute } from "../../../../test/render";
 import { fakeChart, fakeRulesApi, result } from "../../rules/__tests__/fakes";
-import { POLL_MS, SimulationPanel, formatSeconds } from "../../rules/components/simulation-panel";
+import { SimulationPanel, formatSeconds } from "../../rules/components/simulation-panel";
 import type { RulePayload } from "../../rules/model/types";
 
 const rule = (value: number): RulePayload => ({ name: "고CO2", scope: { type: "SPACE", ids: ["2"], includeChildren: true }, condition: { kind: "threshold", metric: "co2", op: ">", value, for: "PT5M" }, severity: "MAJOR", titleTemplate: "t", autoClear: true });
 const NOW = Date.parse("2026-10-04T00:00:00Z");
-
-afterEach(() => vi.useRealTimers());
 
 describe("TC-RUL-029 AT-RUL-03.1·03.2 시뮬레이션", () => {
   it("기준 1000 → 14건, 1200으로 다시 실행 → 이번 5건 · 이전 14건 나란히, 기기별 표와 히트맵", async () => {
@@ -38,27 +36,18 @@ describe("TC-RUL-029 AT-RUL-03.1·03.2 시뮬레이션", () => {
     expect(api.simulate).toHaveBeenLastCalledWith(expect.objectContaining({ from: "2026-09-04T00:00:00.000Z" }), undefined);
   });
 
-  it("202면 2초마다 작업을 조회해 진행률을 보이고 끝나면 결과(가짜 타이머)", async () => {
-    vi.useFakeTimers({ shouldAdvanceTime: true });
-    const simulationJob = vi
-      .fn()
-      .mockResolvedValueOnce({ ok: true, status: 200, data: { status: "RUNNING", progress: { processed: 3, total: 7 } } })
-      .mockResolvedValueOnce({ ok: true, status: 200, data: { status: "SUCCEEDED", result: result(7, { coverage: { dataRatio: 0.05 } }) } });
-    const api = fakeRulesApi({ simulate: vi.fn(async () => ({ ok: true as const, status: 202, data: { jobId: "sim-1" } })), simulationJob });
-    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+  it("저장된 규칙은 규칙 ID 경로로, 실행 중 문구 뒤 결과와 데이터 10% 미만 안내", async () => {
+    let resolve: (v: unknown) => void = () => undefined;
+    const pending = new Promise((r) => (resolve = r));
+    const api = fakeRulesApi({ simulate: vi.fn(async () => (await pending) as never) });
+    const user = userEvent.setup();
     renderRoute(<SimulationPanel api={api} payload={() => rule(1000)} ruleId="r-1" now={() => NOW} chartFactory={fakeChart().factory} />, { session: meOf("OPERATOR") });
     await user.click(await screen.findByRole("button", { name: "실행" }));
     expect(api.simulate).toHaveBeenCalledWith(expect.anything(), "r-1");
     expect(screen.getByText("계산 중…")).toBeInTheDocument();
-    await act(async () => {
-      await vi.advanceTimersByTimeAsync(POLL_MS);
-    });
-    expect(await screen.findByText("계산 중 3/7")).toBeInTheDocument();
-    await act(async () => {
-      await vi.advanceTimersByTimeAsync(POLL_MS);
-    });
+    resolve({ ok: true, status: 200, data: result(7, { coverage: { dataRatio: 0.05 } }) });
     expect(await screen.findByText("기간 중 데이터가 10% 미만입니다")).toBeInTheDocument();
-    expect(simulationJob).toHaveBeenCalledTimes(2);
+    expect(screen.queryByText("계산 중…")).not.toBeInTheDocument();
   });
 
   it("폼 오류면 실행하지 않고 안내, 실패·작업 실패 문구, 기기 없음", async () => {
@@ -74,32 +63,16 @@ describe("TC-RUL-029 AT-RUL-03.1·03.2 시뮬레이션", () => {
     expect(await screen.findByText("시뮬레이션 기간은 30일까지입니다")).toBeInTheDocument();
   });
 
-  it("작업이 실패하면 사유, 결과가 비면 \"예상 알람이 없습니다\", 자동 실행(목록 [시뮬레이션])", async () => {
-    vi.useFakeTimers({ shouldAdvanceTime: true });
-    const api = fakeRulesApi({
-      simulate: vi.fn(async () => ({ ok: true as const, status: 202, data: { jobId: "j" } })),
-      simulationJob: vi.fn(async () => ({ ok: true as const, status: 200, data: { status: "FAILED" as const, error: { code: "RULE_SIMULATION_RANGE_INVALID" } } })),
-    });
-    renderRoute(<SimulationPanel api={api} payload={() => rule(1000)} now={() => NOW} autoRun />, { session: meOf("OPERATOR") });
-    await waitFor(() => expect(api.simulate).toHaveBeenCalled());
-    await act(async () => {
-      await vi.advanceTimersByTimeAsync(POLL_MS);
-    });
-    expect(await screen.findByText("시뮬레이션 기간은 30일까지입니다")).toBeInTheDocument();
-    vi.useRealTimers();
+  it("결과가 비면 \"예상 알람이 없습니다\", 자동 실행(목록 [시뮬레이션])", async () => {
     const empty = fakeRulesApi({ simulate: vi.fn(async () => ({ ok: true as const, status: 200, data: { ...result(0), byDevice: [], heatmap: [], avgDurationSec: null } })) });
     renderRoute(<SimulationPanel api={empty} payload={() => rule(1000)} now={() => NOW} autoRun />, { session: meOf("OPERATOR") });
     expect(await screen.findByText("예상 알람이 없습니다")).toBeInTheDocument();
   });
 
-  it("작업 조회 자체가 실패하면 오류 문구, 초·분·시간 표시", async () => {
-    vi.useFakeTimers({ shouldAdvanceTime: true });
-    const api = fakeRulesApi({ simulate: vi.fn(async () => ({ ok: true as const, status: 202, data: { jobId: "j" } })), simulationJob: vi.fn(async () => ({ ok: false as const, status: 503, code: "SERVICE_UNAVAILABLE", message: "" })) });
+  it("엔진·core가 실패하면 오류 문구, 초·분·시간 표시", async () => {
+    const api = fakeRulesApi({ simulate: vi.fn(async () => ({ ok: false as const, status: 503, code: "SERVICE_UNAVAILABLE", message: "" })) });
     renderRoute(<SimulationPanel api={api} payload={() => rule(1000)} now={() => NOW} autoRun />, { session: meOf("OPERATOR") });
     await waitFor(() => expect(api.simulate).toHaveBeenCalled());
-    await act(async () => {
-      await vi.advanceTimersByTimeAsync(POLL_MS);
-    });
     expect(await screen.findByRole("alert")).toBeInTheDocument();
     const t = (key: string, o?: Record<string, unknown>) => `${key}:${String(o?.n)}`;
     expect(formatSeconds(null, t)).toBe("–");
