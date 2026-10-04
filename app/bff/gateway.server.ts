@@ -58,6 +58,8 @@ export async function rawFetch(runtime: BffRuntime, path: string, init: RequestI
   try {
     return await runtime.fetch(`${runtime.config.gatewayUrl}${path}`, {
       ...init,
+      // 흘려보내는 요청 본문(데이터 가져오기 업로드)은 duplex가 필요하다
+      ...(init.body instanceof ReadableStream ? { duplex: "half" } : {}),
       redirect: "manual",
       signal: init.signal ?? AbortSignal.timeout(runtime.config.gatewayTimeoutMs),
     });
@@ -235,5 +237,5 @@ export async function sessionFetch(session: BffSession, path: string, init: Gate
 
 /** 세션 없이(공개 경로) gateway를 부른다 */
 export async function publicFetch(runtime: BffRuntime, meta: RequestMeta, path: string, init: GatewayInit = {}): Promise<Response> {
-  return rawFetch(runtime, path, { method: init.method ?? "GET", headers: baseHeaders(meta, init.headers), body: init.body ?? undefined });
+  return rawFetch(runtime, path, { method: init.method ?? "GET", headers: baseHeaders(meta, init.headers), body: init.body ?? undefined, signal: init.signal });
 }
