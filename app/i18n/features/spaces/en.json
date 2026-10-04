@@ -188,7 +188,23 @@
     "goSpaces": "Create a site in Spaces",
     "stats": "Devices {{devices}} · Offline {{offline}} · Alarms {{alarms}}",
     "comfort": "Comfort {{score}}",
-    "noLocation": "No location"
+    "noLocation": "No location",
+    "enter": "Open",
+    "mapStats": "Offline {{offline}} · Alarms {{alarms}}",
+    "comfortSummary": "Space comfort: {{summary}}",
+    "status": {
+      "ALARM": "Open alarms",
+      "OFFLINE": "Offline devices",
+      "OK": "Normal"
+    },
+    "mapLabel": "Site map",
+    "noLocations": "No site has a location, so sites are shown as a list.",
+    "missingLocation": "{{n}} without location (list only)",
+    "viewToggle": "View",
+    "view": {
+      "map": "Map",
+      "list": "List"
+    }
   },
   "errors": {
     "SPACE_DEPTH_EXCEEDED": "Spaces can be nested up to 6 levels.",

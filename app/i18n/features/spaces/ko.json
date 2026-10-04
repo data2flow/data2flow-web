@@ -188,7 +188,23 @@
     "goSpaces": "공간 화면에서 사이트 만들기",
     "stats": "기기 {{devices}} · 오프라인 {{offline}} · 알람 {{alarms}}",
     "comfort": "쾌적 {{score}}",
-    "noLocation": "위치 정보 없음"
+    "noLocation": "위치 정보 없음",
+    "enter": "들어가기",
+    "mapStats": "오프라인 {{offline}} · 알람 {{alarms}}",
+    "comfortSummary": "공간 쾌적도: {{summary}}",
+    "status": {
+      "ALARM": "열린 알람 있음",
+      "OFFLINE": "오프라인 기기 있음",
+      "OK": "정상"
+    },
+    "mapLabel": "사이트 지도",
+    "noLocations": "위치 정보가 있는 사이트가 없어 목록으로 보여 줍니다.",
+    "missingLocation": "위치 없음 {{n}}곳(목록에만 표시)",
+    "viewToggle": "보기 방식",
+    "view": {
+      "map": "지도",
+      "list": "목록"
+    }
   },
   "errors": {
     "SPACE_DEPTH_EXCEEDED": "공간 계층은 6단계까지 만들 수 있습니다.",

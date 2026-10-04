@@ -188,7 +188,23 @@
     "goSpaces": "空間画面でサイトを作成",
     "stats": "デバイス {{devices}} ・ オフライン {{offline}} ・ アラーム {{alarms}}",
     "comfort": "快適度 {{score}}",
-    "noLocation": "位置情報なし"
+    "noLocation": "位置情報なし",
+    "enter": "開く",
+    "mapStats": "オフライン {{offline}} · アラーム {{alarms}}",
+    "comfortSummary": "空間の快適度: {{summary}}",
+    "status": {
+      "ALARM": "未解決のアラームあり",
+      "OFFLINE": "オフラインのデバイスあり",
+      "OK": "正常"
+    },
+    "mapLabel": "サイトマップ",
+    "noLocations": "位置情報のあるサイトがないため一覧で表示します。",
+    "missingLocation": "位置なし {{n}} 件(一覧のみ)",
+    "viewToggle": "表示方法",
+    "view": {
+      "map": "地図",
+      "list": "一覧"
+    }
   },
   "errors": {
     "SPACE_DEPTH_EXCEEDED": "空間階層は6段階まで作成できます。",

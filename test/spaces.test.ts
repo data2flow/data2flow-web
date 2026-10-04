@@ -266,4 +266,24 @@ describe("DEV-10.01 사이트(UI-DEV-15)", () => {
     app.gateway.m2.spaces = [];
     expect((await (await viewer()).get("/sites")).body).toContain("아직 사이트가 없습니다");
   });
+
+  it("[DSH-09.01][AT-DSH-09.1] TC-DSH-087 지도 마커 상태 색(알람)·카드 요약·[지도/목록] 토글, 지도 API 실패면 요약만으로", async () => {
+    app.gateway.m2.extra.siteAlarms = { "1": 2 };
+    const browser = await viewer();
+    const page = await browser.get("/sites");
+    expect(sent("GET", "/api/v1/core/sites/map")).toHaveLength(1);
+    expect(page.body).toContain('aria-label="사이트 지도"');
+    expect(page.body).toContain('data-marker="1"');
+    expect(page.body).toContain('data-site-status="ALARM"');
+    expect(page.body).toContain("열린 알람 있음");
+    expect(page.body).toContain("공간 쾌적도: NORMAL 1 · WARNING 0");
+    expect(page.body).toContain('href="/sites?view=list"');
+    const list = await browser.get("/sites?view=list");
+    expect(list.body).not.toContain('aria-label="사이트 지도"');
+    expect(list.body).toContain("기기 1 · 오프라인 0 · 알람 2");
+    app.gateway.m2.extra.siteMapFails = true;
+    const fallback = await browser.get("/sites");
+    expect(fallback.response.status).toBe(200);
+    expect(fallback.body).toContain("기기 1 · 오프라인 0 · 알람 0");
+  });
 });

@@ -188,7 +188,23 @@
     "goSpaces": "在空间页面创建站点",
     "stats": "设备 {{devices}} · 离线 {{offline}} · 告警 {{alarms}}",
     "comfort": "舒适度 {{score}}",
-    "noLocation": "无位置信息"
+    "noLocation": "无位置信息",
+    "enter": "进入",
+    "mapStats": "离线 {{offline}} · 告警 {{alarms}}",
+    "comfortSummary": "空间舒适度: {{summary}}",
+    "status": {
+      "ALARM": "有未关闭告警",
+      "OFFLINE": "有离线设备",
+      "OK": "正常"
+    },
+    "mapLabel": "站点地图",
+    "noLocations": "没有带位置信息的站点，以列表显示。",
+    "missingLocation": "{{n}} 个无位置(仅列表)",
+    "viewToggle": "视图",
+    "view": {
+      "map": "地图",
+      "list": "列表"
+    }
   },
   "errors": {
     "SPACE_DEPTH_EXCEEDED": "空间层级最多 6 级。",

@@ -91,6 +91,12 @@ export const spacesHandler: CoreHandler = (core, { method, path, url, body, can 
   if (path === "/sites/summary" && method === "GET") {
     return ok(core.spaces.filter((s) => s.type === "SITE").map((s) => ({ siteId: s.id, name: s.name, lat: s.latitude ?? null, lng: s.longitude ?? null, devices: core.devices.filter((d) => d.status !== "PENDING").length, offline: core.devices.filter((d) => d.connectivity === "OFFLINE").length, openAlarms: 0, comfortScore: 82 })));
   }
+  if (path === "/sites/map" && method === "GET") {
+    // API-DSH-17: 사이트 상태(알람·오프라인·쾌적도 요약). core.extra.siteMapFails면 실패
+    if (core.extra.siteMapFails) return fail(503, "SERVICE_UNAVAILABLE");
+    const alarms = (core.extra.siteAlarms as Record<string, number> | undefined) ?? {};
+    return ok({ sites: core.spaces.filter((s) => s.type === "SITE").map((s) => ({ id: s.id, name: s.name, lat: s.latitude ?? null, lng: s.longitude ?? null, alarms: alarms[s.id] ?? 0, offlineDevices: core.devices.filter((d) => d.connectivity === "OFFLINE").length, comfortSummary: { NORMAL: 1, WARNING: 0 } })) });
+  }
   if (!path.startsWith("/spaces")) return undefined;
   const extra = spaceExtra(core);
   const writeDenied = () => fail(403, "PERMISSION_DENIED");
