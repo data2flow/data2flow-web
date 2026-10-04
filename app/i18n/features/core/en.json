@@ -6,7 +6,10 @@
     "ingest": "Ingestion",
     "automation": "Automation",
     "control": "Control",
-    "sim": "Virtual environment"
+    "sim": "Virtual environment",
+    "alarms": "Rules & alarms",
+    "channels": "Notification channels",
+    "maintenance": "Maintenance"
   },
   "common": {
     "cancel": "Cancel",

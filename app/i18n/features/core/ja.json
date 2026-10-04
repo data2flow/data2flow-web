@@ -6,7 +6,10 @@
     "ingest": "収集",
     "automation": "自動化",
     "control": "制御",
-    "sim": "仮想環境"
+    "sim": "仮想環境",
+    "alarms": "ルール・アラーム",
+    "channels": "通知チャネル",
+    "maintenance": "メンテナンス予定"
   },
   "common": {
     "cancel": "キャンセル",

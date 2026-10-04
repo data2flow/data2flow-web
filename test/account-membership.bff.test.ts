@@ -89,7 +89,8 @@ describe("IAM-04.05 메뉴 숨김(보조)과 서버 거부", () => {
     const home = await browser.get("/");
     const nav = navOf(home.body);
     expect(nav).toContain("홈");
-    expect(nav).not.toContain("/admin/");
+    // 관리 메뉴 중 유지보수 일정(UI-OPS-05)만 OPERATOR에게 보인다(00-navigation.md §2, M4)
+    expect(nav.replace('href="/admin/maintenance"', "")).not.toContain("/admin/");
     for (const path of ["/admin/members", "/admin/audit", "/admin/settings", "/admin/roles", "/admin/security"]) {
       const page = await browser.get(path);
       expect(page.response.status, path).toBe(403);

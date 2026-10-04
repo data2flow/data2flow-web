@@ -145,6 +145,8 @@ describe("streamTarget 허용 목록", () => {
     expect(streamTarget("live", "?topics=a")).toBe("/api/v1/core/stream/live?topics=a");
     expect(streamTarget("ingest", "")).toBeUndefined();
     expect(streamTarget("sources/7/live", "")).toBe("/api/v1/core/stream/sources/7/live");
+    // API-RUL-14 알람 실시간(M4)
+    expect(streamTarget("alarms", "")).toBe("/api/v1/core/stream/alarms");
     expect(streamTarget("sources/abc/live", "")).toBeUndefined();
     expect(streamTarget("../auth/login", "")).toBeUndefined();
     expect(streamTarget("live/../x", "")).toBeUndefined();

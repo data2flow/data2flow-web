@@ -6,7 +6,10 @@
     "ingest": "采集",
     "automation": "自动化",
     "control": "控制",
-    "sim": "虚拟环境"
+    "sim": "虚拟环境",
+    "alarms": "规则与告警",
+    "channels": "通知渠道",
+    "maintenance": "维护计划"
   },
   "common": {
     "cancel": "取消",
