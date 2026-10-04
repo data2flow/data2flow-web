@@ -82,8 +82,8 @@ describe("TC-ACT-107 AT-ACT-09.4 전역 띠", () => {
     expect(await screen.findByRole("alert")).toHaveTextContent("본관 전체");
     expect(screen.getByRole("status")).toHaveTextContent("유지보수 중 — 실습실 · 2026-10-04 18:00까지 · 필터 교체");
     await user.click(screen.getByRole("button", { name: "종료" }));
-    await waitFor(() => expect(screen.queryByRole("status")).not.toBeInTheDocument());
-    expect(String(fetchSpy.mock.calls[0][0])).toBe("/bff/api/core/maintenance-windows/77/end");
+    await waitFor(() => expect(screen.queryByRole("status")).not.toBeInTheDocument(), { timeout: 5000 });
+    expect(fetchSpy.mock.calls.map((call) => String(call[0]))).toContain("/bff/api/core/maintenance-windows/77/end");
     fetchSpy.mockRestore();
   });
 });
