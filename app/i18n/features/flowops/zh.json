@@ -1,0 +1,402 @@
+{
+  "flowops": {
+    "areas": {
+      "flows": "流程",
+      "snapshots": "快照",
+      "pipelines": "晋升流水线",
+      "packages": "扩展节点",
+      "sinks": "Sink 连接"
+    },
+    "checks": {
+      "passed": "通过",
+      "failed": "未通过",
+      "names": {
+        "testRun": "试运行",
+        "replayCommands": "回放控制次数",
+        "replayNotifications": "回放通知次数",
+        "scenario": "场景预期结果"
+      }
+    },
+    "mapping": {
+      "kind": "类型",
+      "source": "源",
+      "target": "目标",
+      "status": "状态",
+      "choose": "请选择",
+      "derived": "跟随空间映射",
+      "ok": "✓ 已映射",
+      "missing": "✗ 未映射",
+      "none": "没有需要映射的引用",
+      "targetOf": "{{name}} 的目标",
+      "unmapped": "{{count}} 个目标未映射",
+      "referencesFailed": "无法读取 {{count}} 个流程的引用",
+      "kinds": {
+        "SPACE": "空间",
+        "DEVICE": "设备",
+        "RELATION": "关系",
+        "SINK_CONNECTION": "Sink 连接",
+        "NOTIFICATION_CHANNEL": "通知渠道",
+        "SCRIPT": "脚本"
+      }
+    },
+    "sinks": {
+      "title": "Sink 存储连接",
+      "new": "新建连接",
+      "newTitle": "新建 Sink 连接",
+      "editTitle": "编辑连接：{{name}}",
+      "name": "名称",
+      "type": "类型",
+      "types": {
+        "POSTGRESQL": "PostgreSQL",
+        "MYSQL": "MySQL",
+        "INFLUXDB": "InfluxDB"
+      },
+      "host": "主机",
+      "port": "端口",
+      "database": "数据库",
+      "bucket": "存储桶",
+      "org": "组织 (org)",
+      "username": "用户名",
+      "password": "密码",
+      "token": "令牌",
+      "tls": "使用 TLS",
+      "secretKept": "留空则保留已保存的值",
+      "passwordHint": "保存后不再显示",
+      "test": "测试连接",
+      "testOk": "已连接（{{ms}} 毫秒）",
+      "testFailed": "无法连接：{{reason}}",
+      "kinds": {
+        "AUTH": "认证失败",
+        "DNS": "找不到主机（DNS）",
+        "TLS": "TLS 错误",
+        "TIMEOUT": "超时",
+        "OTHER": "其他错误"
+      },
+      "errors": {
+        "required": "此项为必填",
+        "invalid": "格式不正确",
+        "range": "请输入 1~65535 之间的值"
+      },
+      "saved": "已保存连接",
+      "deleted": "已删除连接",
+      "status": "状态",
+      "statuses": {
+        "OK": "正常",
+        "ERROR": "错误",
+        "UNTESTED": "未测试"
+      },
+      "lastError": "最近错误",
+      "usedFlows": "使用的流程",
+      "updatedAt": "更新时间",
+      "empty": "尚无 Sink 连接",
+      "emptyBody": "要让流程的 Sink 节点写入外部数据库（PostgreSQL、MySQL、InfluxDB），请先注册连接。",
+      "target": "目标表或测量",
+      "targetHint": "例如：room_temp",
+      "checkSchema": "检查结构",
+      "schemaExists": "{{target}}：{{count}} 列",
+      "schemaMissing": "{{target}} 不存在。应用前验证会给出警告（SINK_SCHEMA_MISSING）",
+      "deadLetters": "死信",
+      "deadLettersOf": "死信：{{name}}",
+      "deadLettersEmpty": "没有死信",
+      "dlTarget": "目标",
+      "dlError": "错误",
+      "dlAttempts": "尝试",
+      "dlFailedAt": "失败时间",
+      "dlRecord": "记录",
+      "dlSelect": "选择 {{id}}",
+      "resendSelected": "重发所选",
+      "resendAll": "全部重发",
+      "resendResult": "请求重发 {{requested}} 条：成功 {{resent}}，失败 {{failed}}"
+    },
+    "snapshots": {
+      "title": "快照",
+      "new": "新建快照",
+      "newTitle": "新建快照",
+      "name": "名称",
+      "memo": "备注",
+      "flows": "流程",
+      "flowCount": "流程",
+      "createdBy": "创建人",
+      "createdAt": "创建时间",
+      "compare": "比较",
+      "compareRun": "比较所选两个",
+      "compareSelect": "将 {{name}} 加入比较",
+      "compareTitle": "比较：{{a}} → {{b}}",
+      "compareSummary": "新增节点 {{added}}，删除 {{removed}}，设置变更 {{changed}}，脚本版本差异 {{scripts}}",
+      "noDiff": "没有差异",
+      "nodeAdded": "新增节点：{{node}}",
+      "nodeRemoved": "删除节点：{{node}}",
+      "nodeChanged": "{{node}} {{field}}：{{from}} → {{to}}",
+      "scriptVersion": "脚本 {{id}}：{{from}} → {{to}}",
+      "subflowVersion": "子流程 {{id}}：{{from}} → {{to}}",
+      "pickTwo": "请选择两个快照进行比较",
+      "restore": "恢复",
+      "restoreTitle": "确认恢复：{{name}}",
+      "restoreFlows": "将变更 {{count}} 个流程",
+      "restoreFlowLine": "{{name}}：v{{from}} → v{{to}}",
+      "restoreReset": "将重置 {{count}} 个节点状态：{{nodes}}",
+      "restoreNoReset": "没有需要重置的节点状态",
+      "restoreLive": "每个流程以快照定义创建新版本并实时应用（不停机）。",
+      "restoreConfirm": "应用恢复",
+      "restored": "已恢复：{{versions}}",
+      "approvalRequired": "包含控制节点，已提交审批",
+      "created": "已创建快照：流程 {{flows}}，脚本 {{scripts}}，Sink 连接 {{sinks}}",
+      "create": "创建",
+      "noActiveFlows": "没有已应用的流程",
+      "bundleHint": "流程引用的脚本与子流程版本、变量值、Sink 连接（不含密钥）会一并打包。",
+      "empty": "没有已保存的快照",
+      "scripts": "脚本",
+      "subflows": "子流程",
+      "variables": "变量",
+      "sinkConnections": "Sink 连接",
+      "errors": {
+        "name": {
+          "required": "请输入名称",
+          "tooLong": "请输入不超过 80 个字符",
+          "duplicated": "已存在同名快照"
+        },
+        "memo": "请输入不超过 500 个字符",
+        "flowIds": {
+          "required": "请至少选择一个流程",
+          "tooMany": "最多可选择 50 个流程"
+        }
+      }
+    },
+    "pipelines": {
+      "title": "晋升流水线",
+      "titleOf": "晋升流水线：{{name}}",
+      "list": "流水线列表",
+      "create": "创建流水线",
+      "edit": "编辑定义",
+      "editTitle": "流水线定义：{{name}}",
+      "newTitle": "新建流水线",
+      "name": "名称",
+      "stages": "阶段",
+      "stageKey": "阶段键",
+      "stageKeyOf": "第 {{n}} 阶段键",
+      "env": "环境",
+      "envOf": "第 {{n}} 阶段环境",
+      "envs": {
+        "TEST": "测试",
+        "VERIFY": "验证",
+        "PROD": "生产"
+      },
+      "approverRoles": "审批角色",
+      "approverUsers": "审批用户 ID",
+      "approverUsersOf": "第 {{n}} 阶段审批用户 ID",
+      "approvers": "审批：{{list}}",
+      "noApproval": "无需审批",
+      "checks": "自动检查",
+      "checkTestRun": "试运行通过",
+      "checkCommands": "回放控制 ≤ {{n}}",
+      "checkNotifications": "回放通知 ≤ {{n}}",
+      "replayDays": "回放天数",
+      "maxCommands": "控制上限",
+      "maxNotifications": "通知上限",
+      "stageHint": "阶段数为 2~5 个。键为空的行不会保存。",
+      "errors": {
+        "name": {
+          "required": "请输入名称",
+          "tooLong": "请输入不超过 80 个字符"
+        },
+        "stages": "流水线需要 2~5 个阶段",
+        "key": {
+          "required": "请输入键",
+          "invalid": "以小写字母开头，最多 30 个字符（小写字母、数字、-）",
+          "duplicated": "键重复"
+        },
+        "checks": "检查值须为非负整数（回放天数 ≤ 7）"
+      },
+      "saved": "已保存流水线",
+      "empty": "没有流水线",
+      "emptyAdmin": "使用 [创建流水线] 定义 测试 → 验证 → 生产 阶段。",
+      "emptyOther": "管理员定义流水线后即可申请晋升。",
+      "request": "申请晋升",
+      "requestTitle": "申请晋升",
+      "snapshot": "快照",
+      "loadMapping": "加载目标映射",
+      "fromStage": "当前阶段",
+      "toStage": "下一阶段",
+      "requestSubmit": "提交申请",
+      "requested": "已提交晋升申请",
+      "requestCheckFailed": "自动检查未通过，无法审批（CHECK_FAILED）",
+      "requests": "晋升申请",
+      "noRequests": "没有晋升申请",
+      "stageMove": "阶段",
+      "status": "状态",
+      "statuses": {
+        "PENDING": "待审批",
+        "CHECK_FAILED": "检查未通过",
+        "APPROVED": "已批准",
+        "REJECTED": "已驳回",
+        "APPLIED": "已应用"
+      },
+      "requestedBy": "申请人",
+      "detail": "详情",
+      "requestDetail": "申请详情：{{name}}",
+      "decided": "{{name}} · {{at}}",
+      "checkFailedBlock": "未通过自动检查的申请无法审批",
+      "approve": "批准",
+      "reject": "驳回",
+      "reason": "驳回原因",
+      "reasonRequired": "请输入驳回原因（不超过 500 个字符）",
+      "approved": "已批准晋升",
+      "rejected": "已驳回晋升"
+    },
+    "promote": {
+      "sectionTitle": "将测试流程晋升到生产",
+      "sectionBody": "将连接到虚拟空间的测试（TEST）流程映射到真实目标并晋升为生产流程。",
+      "noTestFlows": "没有测试环境流程",
+      "flow": "流程",
+      "version": "版本",
+      "control": "控制节点",
+      "open": "晋升到生产",
+      "title": "晋升到生产：{{name}}（测试 v{{version}}）",
+      "scenario": "晋升条件（场景）",
+      "noScenario": "无条件",
+      "scenarioLast": "{{name}} — 上次结果 {{status}}",
+      "runStatus": {
+        "PASSED": "通过",
+        "FAILED": "未通过",
+        "RUNNING": "运行中",
+        "COMPLETED": "已完成"
+      },
+      "controlApproval": "包含控制节点 → 需要 ADMIN 审批",
+      "submit": "申请晋升",
+      "pendingApproval": "已提交审批",
+      "done": "已晋升为生产流程",
+      "openTarget": "打开生产流程",
+      "notTestFlow": "不是测试流程或没有版本"
+    },
+    "packages": {
+      "title": "扩展节点包",
+      "installTitle": "安装扩展包",
+      "file": "包文件（.d2fpkg）",
+      "fileOf": "{{name}} 新版本文件",
+      "registryUrl": "或注册表 URL",
+      "install": "安装",
+      "upgrade": "安装新版本",
+      "installHint": "会检查签名（受信任签名者）、许可证（允许列表）与清单结构。新版本与旧版本并行安装，流程只有在编辑器中应用新版本后才会变化。",
+      "readOnly": "只有管理员（ADMIN）可以安装、升级或停用。",
+      "installed": "已安装 {{name}}@{{version}} — 签名 {{signer}}，{{license}}，{{runtime}}",
+      "nodeTypes": "节点：{{list}}",
+      "sideBySide": "使用旧版本的流程会继续运行（编辑器显示“有新版本”）。",
+      "disabledDone": "已停用 {{name}}。正在使用的 {{count}} 个流程会继续以当前版本运行",
+      "enabledDone": "已启用 {{name}}（{{count}} 个流程）",
+      "disableHint": "{{count}} 个流程在用：停用后运行中的版本继续工作，重新应用时会警告",
+      "empty": "没有已安装的扩展包",
+      "name": "包",
+      "version": "版本",
+      "versionsInstalled": "已安装版本：{{list}}",
+      "signer": "签名者",
+      "signed": "{{signer}}（已验证）",
+      "license": "许可证",
+      "runtime": "运行方式",
+      "runtimes": {
+        "JS_SANDBOX": "JS 沙箱",
+        "SERVER_PLUGIN": "服务器插件"
+      },
+      "status": "状态",
+      "statuses": {
+        "ACTIVE": "启用",
+        "DISABLED": "已停用"
+      },
+      "usedFlows": "使用的流程",
+      "disable": "停用",
+      "enable": "启用",
+      "inputErrors": {
+        "required": "请提供文件或注册表 URL",
+        "both": "文件和 URL 只能二选一",
+        "extension": "只能安装 .d2fpkg 文件",
+        "tooLarge": "文件不能超过 10MB",
+        "url": "请输入 https:// 地址"
+      }
+    },
+    "git": {
+      "crumb": "设置",
+      "title": "Git 同步",
+      "connection": "连接",
+      "repoUrl": "仓库 URL",
+      "branch": "分支",
+      "path": "路径",
+      "authType": "认证",
+      "authTypes": {
+        "SSH_KEY": "部署密钥（SSH）",
+        "HTTPS_TOKEN": "令牌（HTTPS）"
+      },
+      "credentialRef": "凭据引用",
+      "credentialHint": "请勿在此输入密钥，只填写已登记密钥的引用名",
+      "targets": "目标",
+      "targetNames": {
+        "FLOW": "流程",
+        "SOURCE": "数据源",
+        "SCRIPT": "脚本",
+        "RULE": "规则"
+      },
+      "test": "测试连接",
+      "testOk": "已连接（{{ms}} 毫秒，HEAD {{commit}}）",
+      "testFailed": "无法连接仓库：{{reason}}",
+      "saved": "已保存 Git 同步设置",
+      "updated": "最后修改：{{name}} · {{at}}",
+      "operations": "操作",
+      "commitMessage": "提交信息",
+      "export": "导出提交",
+      "exported": "提交 {{commit}}：{{count}} 个文件",
+      "preview": "预览导入",
+      "previewSummary": "变更 {{changes}} 项，冲突 {{conflicts}} 项，错误 {{errors}} 项",
+      "changeKinds": {
+        "CREATE": "新建",
+        "UPDATE": "更新"
+      },
+      "fileError": "{{file}}:{{line}} {{code}}",
+      "errorCodes": {
+        "FLOW_VALIDATION_FAILED": "验证失败（未导入）"
+      },
+      "conflictObject": "冲突对象",
+      "conflictChoose": "保留哪一方",
+      "conflictDetail": "平台修改 {{at}} · Git 提交 {{commit}}",
+      "sides": {
+        "PLATFORM": "平台",
+        "GIT": "Git"
+      },
+      "draftOnly": "导入只会创建草稿（DRAFT）版本，请在流程页面单独应用。",
+      "apply": "应用导入",
+      "applied": "已创建 {{count}} 个草稿",
+      "resolveAll": "请先解决 {{count}} 个冲突",
+      "errors": {
+        "repoUrl": {
+          "required": "请输入仓库地址",
+          "invalid": "仓库地址格式不正确"
+        },
+        "branch": {
+          "required": "请输入分支",
+          "tooLong": "分支不能超过 100 个字符"
+        },
+        "path": {
+          "tooLong": "路径不能超过 200 个字符"
+        },
+        "credentialRef": {
+          "required": "请输入凭据引用"
+        },
+        "message": {
+          "required": "请输入提交信息",
+          "tooLong": "提交信息不能超过 200 个字符"
+        }
+      }
+    }
+  },
+  "errors": {
+    "SINK_CONNECTION_IN_USE": "该连接正在使用中",
+    "SINK_CONNECTION_TEST_FAILED": "无法连接",
+    "SNAPSHOT_NAME_DUPLICATED": "已存在同名快照",
+    "SNAPSHOT_DEPENDENCY_MISSING": "快照所需的项目缺失，无法恢复",
+    "FLOW_PROMOTION_BLOCKED": "不满足晋升条件",
+    "FLOW_PROMOTION_SELF_APPROVAL": "不能审批自己提交的晋升",
+    "GIT_SYNC_CONFLICT": "请先解决冲突",
+    "GIT_SYNC_REPO_UNREACHABLE": "无法连接仓库",
+    "NODE_PACKAGE_SIGNATURE_INVALID": "无法验证该包的签名",
+    "NODE_PACKAGE_LICENSE_REJECTED": "该包的许可证不符合策略",
+    "NODE_PACKAGE_INVALID": "包格式不正确",
+    "FLOWOPS_SELECT_REQUIRED": "请至少选择一项"
+  }
+}
