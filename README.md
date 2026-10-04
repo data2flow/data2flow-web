@@ -56,12 +56,15 @@ data2flow 화면과 BFF입니다. React Router v8 프레임워크 모드(SSR, Vi
 | 경로 | 화면 | 스펙 |
 |---|---|---|
 | `/automation/flows`, `/automation/flows/new`, `/automation/flows/{id}` | 플로우 목록, 편집기(React Flow 캔버스·팔레트·설정 패널·JS 노드 Monaco·적용 확인·버전 비교·롤백·오류 탭) | FLW-01.01·01.02·01.05·01.06·03.07·05.03·05.06 |
-| `/automation/templates`, `/automation/approvals` | 템플릿 갤러리("고온이면 냉방" 등, `?template=&spaceId=` 미리 채움), 제어 노드 적용 승인 | FLW-01.05, FLW-05.06 |
+| `/automation/templates`, `/automation/approvals` | 템플릿 갤러리(core 템플릿 `hot-then-cool` "고온이면 냉방"·`co2-then-ventilate` "CO2 높으면 환기", `?template=&spaceId=` 미리 채움, FLOW_WRITE만), 제어 노드 적용 승인 | FLW-01.05, FLW-05.06 |
 | `/devices/{id}?tab=control`, `?tab=commands`, `/control/commands` | 기기 제어 패널(desired/reported/delta, 명령 진행 실시간), 명령 이력 | ACT-02.04·04.02·04.03 |
-| `/devices/{id}?tab=virtual`, `/models/{code}?tab=package` | 가상 기기 설정, 모델 제어 드라이버 연결 | SIM-09.02, DEV-03.03 |
+| `/devices/{id}?tab=virtual`, `/models/{code}?tab=package` | 가상 기기 설정, 모델 제어 드라이버 연결(DRIVER_MANAGE만) | SIM-09.02, DEV-03.03 |
 | `/sim`, `/sim/catalog`, `/sim/profiles`, `/sim/spaces`, `/sim/scenarios`, `/sim/runs/{id}`, `/sim/replay` | 가상 환경 홈·카탈로그·키트·프로필·가상 공간 물리·시나리오 타임라인·실행 제어(x1~x60)·장애 주입·결과·파일 재생 | SIM-01.01·01.02·04.01·04.02·05.03·06.03·09.01~03 |
 
-- 실시간: 명령 상태 `/bff/stream/live?topics=commands:{deviceId},space:{spaceId}`(`command-status`·`device-update`), 시뮬레이션 실행 `/bff/stream/sim/runs/{id}`(API-SIM-31: `sim.tick`·`sim.event`·`sim.status`·`sim.throttle`).
+- 실시간: 명령 상태 `/bff/stream/live?topics=commands:{deviceId},space:{spaceId}`(`command-status` {commandId, deviceId, capability, command, status, reason, message, source{…flowName·userName}}, `device-update` {deviceId, connection, state{reported, delta, reportedVersion, origin, at}}), 시뮬레이션 실행 `/bff/stream/sim/runs/{id}`(API-SIM-31: `sim.tick`·`sim.event`·`sim.status`·`sim.throttle`).
+- 플로우 저장·적용(API-FLW-03·07): 초안을 저장할 때마다 새 번호를 받고 응답 `draftVersion`이 다음 저장의 `baseVersion`이다(다르면 409). 적용의 `baseVersion`은 지금 ACTIVE 번호(없으면 0)이고, 제어 노드·실행 모드가 바뀌면 `acknowledgedRisks: true`가 필요하다(없으면 400). 승인 필요 설정이면 202 `{approvalId, version}`. 검증 문제는 `{field, code, message}`이고 `field`의 `nodes[<id>]`·`wires[<i>]`로 노드를 찾는다(ADR-044). 모든 노드(트리거 포함)에 `error` 출력 포트가 있다.
+- 플로우 지표: 목록의 `metrics1h`와 엔진 지표(API-FLW-14)를 아직 받을 수 없으면 "지표 없음"으로 보인다.
+- 가상 환경: 공간·프리셋 목록은 `GET /core/sim/spaces`·`/core/sim/presets`(프리셋에 `scenarioId`), 오류 상세는 응답 `errors[]`, 파일 재생은 10MB까지(재생 API는 core M4).
 - 플로우 캔버스는 `@xyflow/react`(MIT, 하위 의존성 MIT·ISC). 라이브 뷰(WebSocket)·시험 실행·서브플로우는 M4에서 만든다.
 
 ## 개발
