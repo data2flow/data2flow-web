@@ -15,6 +15,9 @@ import { NonceContext } from "./lib/nonce";
 
 export const streamTimeout = 5_000;
 
+// 플로우 라이브 뷰 WebSocket 중계(API-FLW-40·42). 서버 진입점(server.mjs)이 빌드의 `entry.module`에서 꺼내 upgrade 사건에 연결한다
+export { handleFlowSocketUpgrade } from "./bff/flow-socket.server";
+
 // 운영에서 필수 설정(세션 키 등)이 없으면 첫 요청이 아니라 기동할 때 실패한다(auth.md §11 #8)
 if (process.env.NODE_ENV === "production") getConfig();
 

@@ -46,7 +46,10 @@
       "confirmName": "Flow name",
       "confirmMismatch": "The name does not match",
       "deleted": "Flow deleted.",
-      "metricsNone": "No metrics"
+      "metricsNone": "No metrics",
+      "owner": "Owner",
+      "ownerMe": "Me",
+      "noOwner": "No owner"
     },
     "editor": {
       "name": "Flow name",
@@ -66,7 +69,8 @@
       "emergencyStop": "Automatic control emergency stop — control nodes are skipped",
       "virtualBadge": "Virtual",
       "virtualTargets": "This flow targets a virtual space. Run a scenario in the virtual environment to check it.",
-      "runScenario": "Run in virtual environment"
+      "runScenario": "Run in virtual environment",
+      "testRun": "Test run"
     },
     "applyBlock": {
       "readOnly": "View only; you cannot apply",
@@ -247,7 +251,13 @@
       "label": "Bottom panel",
       "validation": "Validation ({{n}})",
       "versions": "Versions",
-      "errors": "Errors"
+      "errors": "Errors",
+      "debug": "Debug",
+      "traces": "Trace",
+      "test": "Test run",
+      "metrics": "Metrics",
+      "shadow": "Shadow",
+      "settings": "Settings"
     },
     "validation": {
       "ok": "No validation problems",
@@ -281,7 +291,8 @@
       "approvalSent": "Approval request sent",
       "applied": "Applied v{{v}}",
       "noControlPermission": "You do not have permission to apply flows with control nodes",
-      "ackRequired": "This change is risky. Review it, select \"I understand\", and apply again"
+      "ackRequired": "This change is risky. Review it, select \"I understand\", and apply again",
+      "policyRule": "State handling is decided by each node type's rule (BR-FLW-07)"
     },
     "statePolicy": {
       "KEEP": "Keep (KEEP)",
@@ -356,6 +367,306 @@
       "reasonRequired": "Enter a reason (1-500 characters)",
       "approved": "Approved. It is applied atomically.",
       "rejected": "Rejected"
+    },
+    "live": {
+      "health": {
+        "OK": "Healthy",
+        "WARN": "Warning",
+        "ERROR": "Error"
+      },
+      "healthLabel": "Status: {{status}}",
+      "lastError": "Last error: {{message}}",
+      "lastAt": "Last processed {{at}}",
+      "counter": "In {{in}} · errors {{errors}}",
+      "reconnecting": "Live connection lost. Reconnecting…",
+      "denied": "You don't have permission to view the live view",
+      "ended": "Your session ended, so the live view was closed. Please sign in again.",
+      "version": "Engine version v{{v}}",
+      "on": "Live",
+      "state": {
+        "idle": "Live off",
+        "connecting": "Connecting",
+        "open": "Live",
+        "reconnecting": "Reconnecting",
+        "denied": "No permission",
+        "ended": "Session ended"
+      },
+      "statusChanged": "The engine changed the flow status to {{status}}",
+      "notApplied": "Apply a version first to see the live flow"
+    },
+    "overlay": {
+      "bypassed": "Bypassed",
+      "debugOn": "Debug",
+      "bypass": "Bypass (temporarily skip)",
+      "debug": "Debug",
+      "hint": "Takes effect on the running flow within 1 second without a new version",
+      "noControlPermission": "Bypassing a control node requires control deployment permission",
+      "conflict": "Someone else changed bypass/debug first. Reloaded.",
+      "bypassOnDone": "Bypassed node {{name}}",
+      "bypassOffDone": "Removed bypass from node {{name}}",
+      "debugOnDone": "Turned on debug for node {{name}}",
+      "debugOffDone": "Turned off debug for node {{name}}"
+    },
+    "presence": {
+      "editing": "{{name}} editing",
+      "locked": "{{name}} is editing this node (read-only)",
+      "label": "People viewing",
+      "viewer": "{{name}} (view only)",
+      "readOnly": "viewing",
+      "reconnecting": "Collaboration connection lost. Reconnecting…",
+      "updated": "{{name}} saved v{{v}}.",
+      "reload": "Reload"
+    },
+    "inspector": {
+      "masked": "Data outside your permission",
+      "label": "Recent messages of {{name}}",
+      "title": "{{name}} · recent messages",
+      "sampling": "Too many messages: the server is dropping {{n}} per second",
+      "skipped": "{{n}} skipped by the display limit (5 per second)",
+      "empty": "No messages have passed yet",
+      "trace": "View trace",
+      "input": "Input",
+      "output": "Output",
+      "pickNode": "Select a node to see the recent messages that passed through it"
+    },
+    "trace": {
+      "kind": {
+        "COMMAND": "Control",
+        "NOTIFY": "Notification",
+        "SINK": "Sink"
+      },
+      "skipped": "{{kind}} skipped ({{reason}})",
+      "dryRun": "Dry run (not executed): {{kind}} {{summary}}",
+      "recorded": "{{kind}} written to outbox ({{key}}…)",
+      "label": "Execution trace",
+      "message": "Message {{id}}",
+      "result": {
+        "COMPLETED": "Completed",
+        "FAILED": "Failed",
+        "DROPPED": "Dropped"
+      },
+      "noSteps": "No nodes were visited",
+      "ms": "{{ms}} ms",
+      "error": "Error {{code}}: {{message}}",
+      "line": "(line {{line}})",
+      "details": "Show input and output",
+      "notFound": "No trace. Traces are kept for 1 hour only for debug-enabled or sampled messages.",
+      "messageId": "Message ID",
+      "hint": "You can also open it from [View trace] in the Debug tab",
+      "load": "Load"
+    },
+    "test": {
+      "title": "Test run (dry run)",
+      "inputMode": "Input",
+      "mode": {
+        "recent": "Recent raw message",
+        "custom": "Enter manually"
+      },
+      "noRecent": "No raw messages in the last 24 hours. Enter one manually.",
+      "recent": "Raw message",
+      "message": "Canonical message (JSON)",
+      "pickMessage": "Select a raw message",
+      "invalidJson": "Invalid JSON",
+      "invalidSchema": "Not a canonical message: {{field}}",
+      "usesEdits": "Runs with your unsaved edits. Control, notification and sink nodes are not executed.",
+      "dryRunNote": "Control, notification and sink nodes are only recorded, not executed",
+      "run": "Run"
+    },
+    "jsTest": {
+      "title": "Node test run",
+      "message": "Sample message (JSON)",
+      "saveFirst": "Save the flow once to test this node",
+      "tooLarge": "The code is larger than {{max}} bytes and cannot run",
+      "run": "Test this node",
+      "outputs": "Outputs",
+      "noOutput": "No output (returned null or undefined)"
+    },
+    "replay": {
+      "portCount": "Replay count",
+      "title": "Replay past data",
+      "from": "Start date",
+      "to": "End date",
+      "device": "Device",
+      "allDevices": "All devices",
+      "range": {
+        "required": "Enter the period",
+        "order": "The end date cannot be before the start date",
+        "tooLong": "The period can be at most {{days}} days"
+      },
+      "notSaved": "Save a version before replaying",
+      "tooLarge": "Too much data to replay. Please shorten the period.",
+      "savedOnly": "Replay uses the saved version (v{{v}})",
+      "start": "Start replay",
+      "status": {
+        "QUEUED": "Queued",
+        "RUNNING": "Replaying",
+        "SUCCEEDED": "Done",
+        "FAILED": "Failed",
+        "CANCELLED": "Cancelled"
+      },
+      "progress": "Replay progress",
+      "processed": "{{processed}} / {{total}}",
+      "summary": "{{executions}} runs · {{command}} controls · {{notify}} notifications · {{sink}} sink writes · {{errors}} errors",
+      "noRealActions": "Dry run: no real commands or notifications were sent",
+      "overlayShown": "Replay branch counts are shown on the canvas.",
+      "overlayClear": "Clear"
+    },
+    "metrics": {
+      "title": "Flow metrics",
+      "window": "Period",
+      "windows": {
+        "1h": "1 hour",
+        "24h": "24 hours",
+        "7d": "7 days"
+      },
+      "unavailable": "No metrics (engine metrics are not available yet)",
+      "errorsValue": "{{n}} ({{rate}}%)",
+      "latencyValue": "avg {{avg}} ms · p95 {{p95}} ms",
+      "actionsValue": "control {{command}} · notify {{notify}} · sink {{sink}}",
+      "card": {
+        "executions": "Runs",
+        "errors": "Errors (rate)",
+        "latency": "Duration",
+        "actions": "Actions",
+        "dropped": "Dropped triggers"
+      },
+      "series": "Runs over time",
+      "avgMs": "Avg ms"
+    },
+    "shadow": {
+      "title": "Shadow comparison",
+      "heading": "Shadow comparison v{{active}} (running) vs v{{shadow}} (shadow)",
+      "progress": "{{elapsed}} min elapsed / {{total}} min",
+      "status": {
+        "RUNNING": "Running",
+        "COMPLETED": "Period ended",
+        "PROMOTED": "Promoted",
+        "CANCELLED": "Cancelled"
+      },
+      "item": "Item",
+      "activeCol": "v{{v}}",
+      "shadowCol": "v{{v}}",
+      "delta": "Difference",
+      "branch": "Branch {{name}} {{port}}",
+      "action": {
+        "command": "Control",
+        "notify": "Notification",
+        "sink": "Sink"
+      },
+      "wouldControl": "With v{{v}}: control {{delta}} times",
+      "errors": "{{n}} shadow errors",
+      "diffs": "{{n}} messages with different results",
+      "cancel": "Stop",
+      "promote": "Switch to v{{v}}",
+      "start": "Start shadow",
+      "option": "Run as shadow first (compare without real actions)",
+      "minutes": "Shadow duration (minutes)",
+      "minutesRule": "Duration must be {{min}}–{{max}} minutes",
+      "inProgress": "Apply after the shadow comparison ends",
+      "started": "Running v{{v}} as shadow for {{minutes}} minutes",
+      "promoted": "Switched to v{{v}}",
+      "cancelled": "Stopped the shadow run",
+      "banner": "Shadow run of v{{v}} in progress.",
+      "view": "View comparison"
+    },
+    "statePolicyHelp": {
+      "KEEP": "Running timers and aggregation windows carry over",
+      "RESET": "State is cleared and starts fresh",
+      "MIGRATE": "State is converted to the new settings and carried over"
+    },
+    "limit": {
+      "nodes": "A flow can have at most {{max}} nodes (currently {{n}})"
+    },
+    "conflict": {
+      "diffLabel": "running v{{active}} → my draft v{{draft}}",
+      "applied": "Someone else applied first. Your changes were not overwritten.",
+      "showDiff": "Show differences"
+    },
+    "settings": {
+      "saved": "Settings saved",
+      "variableReset": "Reset the value of variable {{name}}",
+      "rule": {
+        "purpose": "Enter a purpose of 1–{{purposeMax}} characters",
+        "description": "The description can be at most {{descriptionMax}} characters",
+        "errorRate": "The error-rate threshold must be 1–100%",
+        "catchSelf": "A flow cannot be its own catch flow",
+        "max": "Max concurrency must be 1–50",
+        "var": {
+          "name": "Names use letters, digits and _ (1–40 characters)",
+          "duplicate": "A variable with this name already exists",
+          "limit": "A flow can have at most {{limit}} variables"
+        }
+      },
+      "docs": "Documentation",
+      "purpose": "Purpose",
+      "owner": "Owner",
+      "noOwner": "No owner",
+      "assignMe": "Assign to me",
+      "relatedSpaces": "Related spaces",
+      "description": "Description (Markdown)",
+      "count": "{{n}} / {{max}} characters",
+      "tags": "Tags",
+      "errorHandling": "Error handling",
+      "catchFlow": "Catch flow ID",
+      "autoPause": "Pause automatically when DEGRADED",
+      "errorRate": "Error-rate threshold (%/5 min)",
+      "pauseMode": "When paused",
+      "pause": {
+        "DROP": "Drop triggers",
+        "BUFFER": "Keep and process on resume (up to 1 hour)"
+      },
+      "save": "Save settings",
+      "execution": "Execution mode & variables",
+      "versioned": "Execution mode and variable definitions are part of the version and take effect on [Save] and [Apply]",
+      "mode": "Execution mode",
+      "concurrency": {
+        "queued": "queued (in order)",
+        "single": "single (ignore while running)",
+        "restart": "restart (cancel and start over)",
+        "parallel": "parallel (concurrent)"
+      },
+      "keyBy": "Key",
+      "key": {
+        "deviceId": "Device",
+        "spaceId": "Space",
+        "flow": "Flow"
+      },
+      "max": "Max concurrency",
+      "variables": "Flow variables",
+      "varName": "Name",
+      "varType": "Type",
+      "varInitial": "Initial value",
+      "varValue": "Current value",
+      "resetValue": "Reset value",
+      "removeVar": "Delete",
+      "noVariables": "No variables",
+      "addVar": "Add variable"
+    },
+    "subflow": {
+      "title": "Make a subflow",
+      "make": "Make subflow",
+      "create": "Create",
+      "name": "Name",
+      "nameRule": "Enter a name of 1–100 characters",
+      "description": "Description",
+      "ports": "{{inputs}} inputs · {{nodes}} nodes",
+      "outputs": "Output ports",
+      "output": "Output {{n}} ({{port}})",
+      "params": "Exposed parameters",
+      "paramLabel": "Display name",
+      "reason": {
+        "empty": "Select the nodes to turn into a subflow",
+        "trigger": "Trigger nodes cannot be part of a subflow",
+        "noInput": "There must be a connection coming in from outside",
+        "tooManyInputs": "A subflow can have at most {{max}} input ports",
+        "noOutput": "There must be a connection going out",
+        "tooManyOutputs": "A subflow can have at most {{max}} output ports"
+      },
+      "saveFirst": "Save first",
+      "created": "Created subflow {{name}} v{{v}}",
+      "newer": "New version available (v{{v}})",
+      "newerDetail": "Using v{{current}} · v{{v}} is available",
+      "upgrade": "Upgrade version"
     }
   },
   "errors": {
@@ -369,6 +680,10 @@
     "FLOW_DEFINITION_TOO_LARGE": "The flow definition is too large",
     "FLOW_LIMIT_EXCEEDED": "Flow limit exceeded",
     "FLOW_SHADOW_IN_PROGRESS": "Cannot apply during a shadow run",
-    "CAPABILITY_NOT_FOUND": "Capability not found"
+    "CAPABILITY_NOT_FOUND": "Capability not found",
+    "FLOW_TEST_INPUT_INVALID": "The input format is invalid",
+    "FLOW_REPLAY_TOO_LARGE": "Please shorten the period",
+    "FLOW_METRICS_UNAVAILABLE": "Metrics are not available yet",
+    "SUBFLOW_IN_USE": "This subflow is in use"
   }
 }

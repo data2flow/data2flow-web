@@ -10,6 +10,8 @@ import { isTrigger, type Catalog } from "./flow-graph";
 import type { ConfigSchema, FlowGraph, FlowNode, ValidationIssue, ValidationResult } from "./types";
 
 export const JS_CODE_LIMIT_BYTES = 64 * 1024;
+/** 플로우당 노드 수 한도(FLW-10.01, BR-FLW-16). 넘으면 저장은 서버가 FLOW_NODE_LIMIT_EXCEEDED로 거절한다 */
+export const FLOW_NODE_LIMIT = 200;
 export const NODE_NAME_MAX = 60;
 
 export interface ConfigProblem {
@@ -118,6 +120,7 @@ function findCycleNodes(graph: FlowGraph): string[] {
 export function validateGraph(graph: FlowGraph, catalog: Catalog): ValidationResult {
   const errors: ValidationIssue[] = [];
   if (graph.nodes.length > 0 && !graph.nodes.some((n) => isTrigger(n.type, catalog))) errors.push({ code: "NO_TRIGGER" });
+  if (graph.nodes.length > FLOW_NODE_LIMIT) errors.push({ code: "LIMIT", field: "nodes", message: `${graph.nodes.length}/${FLOW_NODE_LIMIT}` });
   const hasInput = new Set(graph.wires.map((w) => w.to));
   for (const n of graph.nodes) {
     if (!isTrigger(n.type, catalog) && !hasInput.has(n.id)) errors.push({ code: "UNCONNECTED", nodeId: n.id });

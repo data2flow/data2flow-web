@@ -119,6 +119,13 @@ export type FlowStatus = "DRAFT" | "ACTIVE" | "PAUSED" | "DEGRADED" | "DISABLED"
 export interface FlowDetail {
   flow: {
     flowId: string;
+    purpose?: string | null;
+    ownerUserId?: string | null;
+    tags?: string[];
+    pauseMode?: "DROP" | "BUFFER";
+    autoPauseOnDegraded?: boolean;
+    errorRateThreshold?: number;
+    catchFlowId?: string | null;
     name: string;
     description?: string | null;
     kind?: string;
@@ -177,4 +184,81 @@ export interface FlowMetrics {
   summary: { executions: number; errors: number; errorRate: number; avgMs?: number; p95Ms?: number; actions?: { command: number; notify: number; sink: number }; droppedTriggers?: number };
   nodes: { nodeId: string; processed: number; errors: number; avgMs?: number }[];
   series?: { t: string; executions: number; errors: number }[];
+}
+
+/** API-FLW-41 실행 추적(Trace, contracts `FlowTrace`) */
+export interface TraceStep {
+  nodeId: string;
+  type: string;
+  inMs?: number;
+  durationMs?: number;
+  input?: unknown;
+  outputs?: { port: string; payload?: unknown }[];
+  action?: { kind: "COMMAND" | "NOTIFY" | "SINK"; idempotencyKey?: string; dryRun?: boolean; skipped?: string | null; summary?: string } | null;
+  error?: { code?: string; errorType?: string; message?: string; line?: number } | null;
+}
+
+export interface Trace {
+  messageId: string;
+  flowId?: string;
+  version?: number;
+  startedAt?: string;
+  steps: TraceStep[];
+  result?: string;
+  error?: { code?: string; errorType?: string; message?: string; nodeId?: string; line?: number } | null;
+}
+
+/** API-FLW-13 과거 재생 작업 */
+export interface ReplayJob {
+  status: "QUEUED" | "RUNNING" | "SUCCEEDED" | "FAILED" | "CANCELLED";
+  progress?: { processed: number; total: number };
+  result?: { executions: number; branchCounts: Record<string, Record<string, number>>; actions: { command: number; notify: number; sink: number }; errors: number } | null;
+}
+
+/** API-FLW-18 섀도우 실행 */
+export interface ShadowStatus {
+  status: string;
+  version?: number;
+  startedAt?: string;
+  endsAt?: string;
+  stats?: {
+    branches?: { nodeId: string; port: string; active: number; shadow: number }[];
+    actions?: { active?: Partial<Record<"command" | "notify" | "sink", number>>; shadow?: Partial<Record<"command" | "notify" | "sink", number>> };
+    errors?: { shadow?: number };
+  };
+  diffs?: { messageId: string; at: string; active: unknown; shadow: unknown }[];
+}
+
+/** API-FLW-10 응답(플로우 설정·설명서) */
+export interface FlowSettings {
+  flowId: string;
+  name?: string;
+  purpose?: string | null;
+  description?: string | null;
+  ownerUserId?: string | null;
+  relatedSpaceIds?: string[];
+  tags?: string[];
+  pauseMode?: "DROP" | "BUFFER";
+  autoPauseOnDegraded?: boolean;
+  errorRateThreshold?: number;
+  catchFlowId?: string | null;
+  version?: number;
+}
+
+export interface FlowVariable {
+  name: string;
+  type: string;
+  value: unknown;
+  updatedAt?: string;
+}
+
+/** API-ING-05 원본 메시지(시험 실행 입력 고르기) */
+export interface RawMessageRow {
+  id: string;
+  receivedAt: string;
+  deviceId?: string | null;
+  deviceName?: string | null;
+  topic?: string;
+  status?: string;
+  virtual?: boolean;
 }

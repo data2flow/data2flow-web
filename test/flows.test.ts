@@ -294,3 +294,102 @@ describe("UI-FLW-02 편집기·버전 배포(FLW-01.01·01.06)", () => {
     expect(renamed.response.status).toBe(409);
   });
 });
+
+describe("M4 라이브 편집·시험(FLW-03.05·03.06·03.04·05.05·06.04·06.08·11.06) — BFF 중계", () => {
+  it("편집기 SSR에 라이브 표시(적용된 플로우)와 M4 하단 탭, 지표 503 FLOW_METRICS_UNAVAILABLE이면 '지표 없음'", async () => {
+    const browser = await operator();
+    state().metricsUnavailable = true;
+    const page = await browser.get("/automation/flows/f-7f3a");
+    expect(page.response.status).toBe(200);
+    for (const tab of ["디버그", "추적", "시험 실행", "지표", "설정"]) expect(page.body).toContain(`>${tab}<`);
+    expect(page.body).toContain("라이브 꺼짐");
+    const metrics = await browser.get("/bff/api/core/flows/f-7f3a/metrics?window=24h&step=1h");
+    expect(metrics.response.status).toBe(503);
+    expect(parse(metrics.body).header.resultCode).toBe("FLOW_METRICS_UNAVAILABLE");
+  });
+
+  it("TC-FLW-073·075 시험 실행: 행동 노드는 dryRun, 표준 메시지가 아니면 400 FLOW_TEST_INPUT_INVALID(현지화 문구)", async () => {
+    const browser = await operator();
+    await browser.get("/automation/flows/f-7f3a");
+    const detail = parse((await browser.get("/bff/api/core/flows/f-7f3a")).body).response as { version: { definition: unknown } };
+    const run = await json(browser, "/bff/api/core/flows/f-7f3a/test-run", "POST", { definition: detail.version.definition, input: { message: { deviceId: 1042, measuredAt: "2026-10-04T00:00:00Z", metrics: [{ key: "temperature", value: 28.1 }] } } });
+    expect(run.response.status).toBe(200);
+    const trace = parse(run.body).response.trace as { steps: { nodeId: string; action?: { dryRun: boolean } }[] };
+    expect(trace.steps.map((s) => s.nodeId)).toEqual(["n-trg00001", "n-agg00001", "n-thr00001", "n-act00001"]);
+    expect(trace.steps[3].action?.dryRun).toBe(true);
+    const bad = await json(browser, "/bff/api/core/flows/f-7f3a/test-run", "POST", { definition: detail.version.definition, input: { message: { foo: 1 } } });
+    expect(bad.response.status).toBe(400);
+    expect(parse(bad.body).header.resultCode).toBe("FLOW_TEST_INPUT_INVALID");
+  });
+
+  it("TC-FLW-076·077 과거 재생: 7일 넘으면 400 FLOW_REPLAY_TOO_LARGE, 정상은 202 jobId → 작업 결과", async () => {
+    const browser = await operator();
+    await browser.get("/automation/flows/f-7f3a");
+    const tooLong = await json(browser, "/bff/api/core/flows/f-7f3a/replay", "POST", { version: 13, from: "2026-09-01T00:00:00Z", to: "2026-09-20T00:00:00Z" });
+    expect(tooLong.response.status).toBe(400);
+    expect(parse(tooLong.body).header.resultCode).toBe("FLOW_REPLAY_TOO_LARGE");
+    const started = await json(browser, "/bff/api/core/flows/f-7f3a/replay", "POST", { version: 13, from: "2026-09-27T15:00:00Z", to: "2026-10-04T15:00:00Z" }, { "Idempotency-Key": "rp-1" });
+    expect(started.response.status).toBe(202);
+    const jobId = parse(started.body).response.jobId as string;
+    const job = parse((await browser.get(`/bff/api/core/flow-replays/${jobId}`)).body).response;
+    expect(job).toMatchObject({ status: "SUCCEEDED", result: { actions: { command: 12, notify: 3 } } });
+  });
+
+  it("TC-FLW-146 바이패스(overlay): revision 불일치 409, 제어 노드 바이패스는 OPERATOR 403, INTEGRATOR는 버전 그대로 반영", async () => {
+    const op = await operator();
+    await op.get("/automation/flows/f-7f3a");
+    expect((await json(op, "/bff/api/core/flows/f-7f3a/overlay", "PUT", { bypass: ["n-act00001"], debug: [], revision: 1 })).response.status).toBe(403);
+    expect((await json(op, "/bff/api/core/flows/f-7f3a/overlay", "PUT", { bypass: [], debug: ["n-thr00001"], revision: 9 })).response.status).toBe(409);
+    const integ = await integrator();
+    await integ.get("/automation/flows/f-7f3a");
+    const done = await json(integ, "/bff/api/core/flows/f-7f3a/overlay", "PUT", { bypass: ["n-act00001"], debug: [], revision: 1 });
+    expect(parse(done.body).response).toEqual({ revision: 2 });
+    expect(state().flows[0].activeVersion).toBe(13);
+    const detail = parse((await integ.get("/bff/api/core/flows/f-7f3a")).body).response as { overlay: unknown };
+    expect(detail.overlay).toEqual({ bypass: ["n-act00001"], debug: [], revision: 2 });
+  });
+
+  it("TC-FLW-156·157 섀도우: apply에 shadow → 진행 중 다른 적용 409 FLOW_SHADOW_IN_PROGRESS → 전환하면 ACTIVE", async () => {
+    const browser = await integrator();
+    await browser.get("/automation/flows/f-7f3a");
+    const detail = parse((await browser.get("/bff/api/core/flows/f-7f3a")).body).response as { version: { definition: { nodes: { config: Record<string, unknown> }[] } } };
+    detail.version.definition.nodes[2].config.value = 26;
+    await json(browser, "/bff/api/core/flows/f-7f3a/draft", "PUT", { baseVersion: 13, definition: detail.version.definition });
+    const shadow = await json(browser, "/bff/api/core/flows/f-7f3a/apply", "POST", { version: 14, baseVersion: 13, acknowledgedRisks: false, shadow: { durationMinutes: 60 } });
+    expect(shadow.response.status).toBe(200);
+    expect(parse((await browser.get("/bff/api/core/flows/f-7f3a/shadow")).body).response).toMatchObject({ status: "RUNNING", version: 14 });
+    const blocked = await json(browser, "/bff/api/core/flows/f-7f3a/apply", "POST", { version: 14, baseVersion: 13, acknowledgedRisks: false });
+    expect(parse(blocked.body).header.resultCode).toBe("FLOW_SHADOW_IN_PROGRESS");
+    expect((await json(browser, "/bff/api/core/flows/f-7f3a/shadow/promote", "POST", {})).response.status).toBe(204);
+    expect(state().flows[0].activeVersion).toBe(14);
+  });
+
+  it("FLW-11.06 설명서·설정 PATCH(온 키만)과 실행 추적 404", async () => {
+    const browser = await operator();
+    await browser.get("/automation/flows/f-7f3a");
+    const empty = await json(browser, "/bff/api/core/flows/f-7f3a", "PATCH", { purpose: " " });
+    expect(empty.response.status).toBe(400);
+    const saved = await json(browser, "/bff/api/core/flows/f-7f3a", "PATCH", { purpose: "실습실 냉방", ownerUserId: "7", pauseMode: "BUFFER" });
+    expect(parse(saved.body).response).toMatchObject({ purpose: "실습실 냉방", ownerUserId: "7", pauseMode: "BUFFER" });
+    const detail = parse((await browser.get("/bff/api/core/flows/f-7f3a")).body).response as { flow: Record<string, unknown> };
+    expect(detail.flow).toMatchObject({ purpose: "실습실 냉방", pauseMode: "BUFFER", errorRateThreshold: 0.1 });
+    expect((await browser.get("/bff/api/core/flows/f-7f3a/traces/m-old")).response.status).toBe(404);
+    expect(parse((await browser.get("/bff/api/core/flows/f-7f3a/variables")).body)).toMatchObject({ responses: [] });
+  });
+});
+
+describe("FLW-11.06 TC-FLW-273·276 AT-FLW-30.1·30.3 목록의 책임자 검색·책임자 없음", () => {
+  it("책임자 '나'로 거르면 내가 책임자인 플로우만, 책임자를 비운 플로우에는 '책임자 없음' 배지", async () => {
+    const browser = await operator();
+    await browser.get("/automation/flows");
+    await json(browser, "/bff/api/core/flows/f-7f3a", "PATCH", { purpose: "실습실 냉방", ownerUserId: "7" });
+    await json(browser, "/bff/api/core/flows/f-co2", "PATCH", { purpose: "CO2 환기", ownerUserId: null });
+    const mine = await browser.get("/automation/flows?owner=7");
+    expect(mine.body).toContain("고온이면 냉방");
+    expect(mine.body).toContain("실습실 냉방");
+    expect(mine.body).not.toContain("CO2 환기 자동화");
+    const all = await browser.get("/automation/flows");
+    expect(all.body).toContain("책임자 없음");
+    expect(app.gateway.received.filter((r) => r.path.startsWith("/api/v1/core/flows?")).some((r) => r.path.includes("owner=7"))).toBe(true);
+  });
+});

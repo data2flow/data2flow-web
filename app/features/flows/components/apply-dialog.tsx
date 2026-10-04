@@ -4,11 +4,13 @@
  */
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Alert, Button, Checkbox, Dialog, TextArea } from "~/components/ui";
+import { Alert, Button, Checkbox, Dialog, TextArea, TextField } from "~/components/ui";
 import type { ValidateResponse, ValidationIssue } from "../model/types";
 import { issueNodeIds } from "../model/validation";
 
 export const MEMO_MAX = 500;
+const SHADOW_MIN = 10;
+const SHADOW_MAX = 1440;
 
 export function issueText(t: (key: string, options?: Record<string, unknown>) => string, issue: ValidationIssue, nameOf: (id: string) => string): string {
   const nodes = issueNodeIds(issue).map(nameOf).join(", ");
@@ -27,6 +29,7 @@ export function ApplyDialog({
   onCancel,
   onApply,
   onFocusNode,
+  canShadow,
 }: {
   open: boolean;
   title: string;
@@ -35,16 +38,22 @@ export function ApplyDialog({
   error?: string;
   nameOf: (id: string) => string;
   onCancel: () => void;
-  onApply: (memo: string, acknowledgedRisks: boolean) => void;
+  onApply: (memo: string, acknowledgedRisks: boolean, shadowMinutes?: number) => void;
   onFocusNode: (id: string) => void;
+  /** 섀도우로 먼저 실행(FLW-06.08)을 고를 수 있는지(이미 적용된 플로우) */
+  canShadow?: boolean;
 }) {
   const { t } = useTranslation();
   const [memo, setMemo] = useState("");
   const [ack, setAck] = useState(false);
+  const [shadow, setShadow] = useState(false);
+  const [minutes, setMinutes] = useState("60");
   if (!result) return null;
+  const shadowMinutes = Number(minutes);
+  const shadowInvalid = shadow && (!Number.isInteger(shadowMinutes) || shadowMinutes < SHADOW_MIN || shadowMinutes > SHADOW_MAX);
   const risky = Boolean(result.risky?.controlNodesChanged || result.risky?.executionModeChanged);
   const memoTooLong = memo.length > MEMO_MAX;
-  const blocked = result.errors.length > 0 || (risky && !ack) || memoTooLong || busy;
+  const blocked = result.errors.length > 0 || (risky && !ack) || memoTooLong || busy || shadowInvalid;
   const summary = result.changeSummary;
   return (
     <Dialog
@@ -54,8 +63,8 @@ export function ApplyDialog({
       footer={
         <>
           <Button onClick={onCancel}>{t("common.cancel")}</Button>
-          <Button variant="primary" disabled={blocked} onClick={() => onApply(memo.trim(), ack)}>
-            {busy ? t("common.processing") : t("flows.apply.confirm")}
+          <Button variant="primary" disabled={blocked} onClick={() => onApply(memo.trim(), ack, shadow ? shadowMinutes : undefined)}>
+            {busy ? t("common.processing") : shadow ? t("flows.shadow.start") : t("flows.apply.confirm")}
           </Button>
         </>
       }
@@ -87,13 +96,25 @@ export function ApplyDialog({
               <li key={`a${id}`}>{t("flows.apply.added", { name: nameOf(id) })}</li>
             ))}
             {(summary.changed ?? []).map((c) => (
-              <li key={`c${c.nodeId}`}>{t("flows.apply.changed", { name: nameOf(c.nodeId), policy: t(`flows.statePolicy.${c.statePolicy}`, { defaultValue: c.statePolicy }) })}</li>
+              <li key={`c${c.nodeId}`} title={t(`flows.statePolicyHelp.${c.statePolicy}`, { defaultValue: "" })}>
+                {t("flows.apply.changed", { name: nameOf(c.nodeId), policy: t(`flows.statePolicy.${c.statePolicy}`, { defaultValue: c.statePolicy }) })}
+              </li>
             ))}
             {(summary.removed ?? []).map((r) => (
               <li key={`r${r.nodeId}`}>{t(r.retainedState ? "flows.apply.removedRetained" : "flows.apply.removed", { name: nameOf(r.nodeId) })}</li>
             ))}
             {!summary.added?.length && !summary.changed?.length && !summary.removed?.length && <li>{t("flows.apply.noChanges")}</li>}
           </ul>
+          {(summary.changed?.length ?? 0) > 0 && (
+            <ul aria-label={t("flows.apply.policyRule")} className="mt-1 text-[11.5px] text-muted">
+              <li>{t("flows.apply.policyRule")}</li>
+              {[...new Set(summary.changed!.map((c) => c.statePolicy))].map((p) => (
+                <li key={p}>
+                  {t(`flows.statePolicy.${p}`, { defaultValue: p })}: {t(`flows.statePolicyHelp.${p}`, { defaultValue: "" })}
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       )}
       {result.approvalRequired && <Alert tone="info">{t("flows.apply.approvalRequired")}</Alert>}
@@ -101,6 +122,22 @@ export function ApplyDialog({
         <div className="flex flex-col gap-1 rounded-md border border-warn/40 p-2">
           <p className="text-[12.5px] text-warn">{result.risky?.controlNodesChanged ? t("flows.apply.riskControl") : t("flows.apply.riskMode")}</p>
           <Checkbox label={t("flows.apply.acknowledge")} checked={ack} onChange={(e) => setAck(e.target.checked)} />
+        </div>
+      )}
+      {canShadow && (
+        <div className="flex flex-col gap-1 rounded-md border border-line p-2">
+          <Checkbox label={t("flows.shadow.option")} checked={shadow} onChange={(e) => setShadow(e.target.checked)} />
+          {shadow && (
+            <TextField
+              label={t("flows.shadow.minutes")}
+              type="number"
+              min={SHADOW_MIN}
+              max={SHADOW_MAX}
+              value={minutes}
+              onChange={(e) => setMinutes(e.target.value)}
+              error={shadowInvalid ? t("flows.shadow.minutesRule", { min: SHADOW_MIN, max: SHADOW_MAX }) : undefined}
+            />
+          )}
         </div>
       )}
       <TextArea label={t("flows.apply.memo")} rows={2} value={memo} onChange={(e) => setMemo(e.target.value)} error={memoTooLong ? t("flows.apply.memoTooLong", { max: MEMO_MAX }) : undefined} />
