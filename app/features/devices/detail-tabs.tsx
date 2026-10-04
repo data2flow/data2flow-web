@@ -70,7 +70,11 @@ export function DeviceRulesTab({
       {canReadRules && (
         <Card
           title={t("devices.rules.applied", { n: rules.length })}
-          actions={canWriteRules && <ButtonLink to={`/rules/new?deviceId=${encodeURIComponent(deviceId)}${spaceId ? `&spaceId=${encodeURIComponent(spaceId)}` : ""}`}>{t("devices.rules.applyTemplate")}</ButtonLink>}
+          actions={
+            canWriteRules && (
+              <ButtonLink to={`/rules/new?deviceId=${encodeURIComponent(deviceId)}${spaceId ? `&spaceId=${encodeURIComponent(spaceId)}` : ""}`}>{t("devices.rules.applyTemplate")}</ButtonLink>
+            )
+          }
         >
           {rulesFailed && <Alert tone="warning">{t("devices.rules.rulesUnavailable")}</Alert>}
           {rules.length === 0 && !rulesFailed ? (

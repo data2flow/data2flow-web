@@ -333,7 +333,7 @@ export default function DeviceDetailRoute({ loaderData, actionData }: Route.Comp
 
       <Tabs items={tabItems} current={tab} />
       {tab === "virtual" && loaderData.virtualConfig && <VirtualDeviceTab deviceId={device.id} initial={loaderData.virtualConfig.config} failed={loaderData.virtualConfig.failed} canManage={hasAny(permissions, ["SIM_MANAGE"])} api={simApi} />}
-      {tab === "overview" && <DeviceOverview device={device} timezone={timezone} lang={i18n.language} now={now} onboardingLinks={(item) => onboardingLink(item, device)} />}
+      {tab === "overview" && <DeviceOverview device={device} timezone={timezone} lang={i18n.language} now={now} onboardingLinks={(item) => onboardingLink(item, device, permissions ?? [])} />}
       {tab === "data" && <DeviceDataPanel deviceId={device.id} metrics={metricChoices(device.latest, modelMetrics)} latest={device.latest} expectedIntervalSec={device.effective?.expectedIntervalSec} timezone={timezone} now={Date.now} showCommands={actuator} />}
       {tab === "operation" && actuator && <OperationTab deviceId={device.id} timezone={timezone} lang={i18n.language} />}
       {tab === "rules" && rulesTab && (

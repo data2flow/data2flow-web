@@ -36,7 +36,14 @@ export async function loader({ request, context }: Route.LoaderArgs) {
     totalPages: jobs.ok ? jobs.list.totalPages : 1,
     page,
     failed: !jobs.ok,
-    wizard: wizard ? { deviceIds: parseDeviceIds(url.searchParams.get("deviceIds")), groups: groups?.ok ? groups.list.responses.map((g) => ({ id: String(g.id), name: g.name })) : [], models: models?.ok ? models.list.responses.map((m) => ({ id: String(m.id), name: m.name })) : [], spaces: spaces?.ok ? (spaces.data ?? []) : [] } : null,
+    wizard: wizard
+      ? {
+          deviceIds: parseDeviceIds(url.searchParams.get("deviceIds")),
+          groups: groups?.ok ? groups.list.responses.map((g) => ({ id: String(g.id), name: g.name })) : [],
+          models: models?.ok ? models.list.responses.map((m) => ({ id: String(m.id), name: m.name })) : [],
+          spaces: spaces?.ok ? (spaces.data ?? []) : [],
+        }
+      : null,
   };
 }
 
@@ -50,11 +57,28 @@ export default function DeviceJobs({ loaderData }: Route.ComponentProps) {
   const timezone = root?.timezone ?? "Asia/Seoul";
   return (
     <>
-      <PageHeader title={t("devices.jobs.title")} actions={canAdmin && !wizard && <ButtonLink to="/device-jobs?new=1" variant="primary">{t("devices.jobs.new")}</ButtonLink>} />
+      <PageHeader
+        title={t("devices.jobs.title")}
+        actions={
+          canAdmin &&
+          !wizard && (
+            <ButtonLink to="/device-jobs?new=1" variant="primary">
+              {t("devices.jobs.new")}
+            </ButtonLink>
+          )
+        }
+      />
       <DeviceAreaTabs current="jobs" />
       {wizard && canAdmin && (
         <div className="mb-4">
-          <JobWizard deviceIds={wizard.deviceIds} groups={wizard.groups} models={wizard.models} spaces={wizard.spaces} canControl={hasAny(permissions, ["DEVICE_CONTROL"])} onCreated={(job) => navigate(`/device-jobs/${encodeURIComponent(job.id)}`)} />
+          <JobWizard
+            deviceIds={wizard.deviceIds}
+            groups={wizard.groups}
+            models={wizard.models}
+            spaces={wizard.spaces}
+            canControl={hasAny(permissions, ["DEVICE_CONTROL"])}
+            onCreated={(job) => navigate(`/device-jobs/${encodeURIComponent(job.id)}`)}
+          />
         </div>
       )}
       <Card>
@@ -83,7 +107,8 @@ export default function DeviceJobs({ loaderData }: Route.ComponentProps) {
                   </td>
                   <td className="font-mono">{job.total}</td>
                   <td>
-                    <progress max={100} value={jobPercent(job)} aria-label={t("devices.jobs.progress")} /> <span className="text-[12px]">{t("devices.jobs.progressLine", { succeeded: job.succeeded, failed: job.failed, total: job.total })}</span>
+                    <progress max={100} value={jobPercent(job)} aria-label={t("devices.jobs.progress")} />{" "}
+                    <span className="text-[12px]">{t("devices.jobs.progressLine", { succeeded: job.succeeded, failed: job.failed, total: job.total })}</span>
                   </td>
                   <td>
                     <Badge tone={jobTone(job.status)}>{t(`devices.jobs.statuses.${job.status}`, { defaultValue: job.status })}</Badge>

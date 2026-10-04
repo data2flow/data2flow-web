@@ -33,7 +33,17 @@ export default function ControlScenes({ loaderData }: Route.ComponentProps) {
   const { scenes, failed, spaces } = loaderData;
   return (
     <>
-      <PageHeader crumb={t("nav.control")} title={t("control.scenes.title")} actions={hasAny(permissions, ["SCENE_MANAGE"]) && <ButtonLink to="/control/scenes/new" variant="primary">{t("control.scenes.new")}</ButtonLink>} />
+      <PageHeader
+        crumb={t("nav.control")}
+        title={t("control.scenes.title")}
+        actions={
+          hasAny(permissions, ["SCENE_MANAGE"]) && (
+            <ButtonLink to="/control/scenes/new" variant="primary">
+              {t("control.scenes.new")}
+            </ButtonLink>
+          )
+        }
+      />
       <ControlAreaTabs current="scenes" permissions={permissions} />
       <Card>
         {failed && <Alert tone="warning">{t("control.common.loadFailed")}</Alert>}

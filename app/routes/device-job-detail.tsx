@@ -41,7 +41,15 @@ export default function DeviceJobDetail({ loaderData }: Route.ComponentProps) {
         title={`#${job.id}`}
       />
       <DeviceAreaTabs current="jobs" />
-      <JobDetail key={`${job.id}`} initial={job} initialItems={items} canAdmin={hasAny(root?.me?.permissions, ["DEV_ADMIN"])} timezone={root?.timezone ?? "Asia/Seoul"} lang={i18n.language} onRetried={(next) => navigate(`/device-jobs/${encodeURIComponent(next.id)}`)} />
+      <JobDetail
+        key={`${job.id}`}
+        initial={job}
+        initialItems={items}
+        canAdmin={hasAny(root?.me?.permissions, ["DEV_ADMIN"])}
+        timezone={root?.timezone ?? "Asia/Seoul"}
+        lang={i18n.language}
+        onRetried={(next) => navigate(`/device-jobs/${encodeURIComponent(next.id)}`)}
+      />
     </>
   );
 }

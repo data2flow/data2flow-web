@@ -41,7 +41,18 @@ function scopeText(t: (k: string, o?: Record<string, unknown>) => string, stop: 
 }
 
 /** 헤더 아래 전체 폭 띠(비상 정지 빨강, 유지보수 주황) */
-export function GlobalBands({ initialStops, initialMaintenance, spaces, canRelease, canEndMaintenance, timezone, lang, api = controlAdminApi, pollMs = BAND_POLL_MS, refreshKey = 0 }: GlobalBandsProps) {
+export function GlobalBands({
+  initialStops,
+  initialMaintenance,
+  spaces,
+  canRelease,
+  canEndMaintenance,
+  timezone,
+  lang,
+  api = controlAdminApi,
+  pollMs = BAND_POLL_MS,
+  refreshKey = 0,
+}: GlobalBandsProps) {
   const { t } = useTranslation();
   const [stops, setStops] = useState(initialStops);
   const [maintenance, setMaintenance] = useState(initialMaintenance);
@@ -154,7 +165,17 @@ export function GlobalBands({ initialStops, initialMaintenance, spaces, canRelea
 }
 
 /** [⏻ 자동화 비상 정지] 버튼과 실행 대화상자 */
-export function EmergencyStopButton({ api = controlAdminApi, loadSpaces, onStarted, compact = false }: { api?: ControlAdminApi; loadSpaces?: () => Promise<SpaceNode[]>; onStarted?: () => void; compact?: boolean }) {
+export function EmergencyStopButton({
+  api = controlAdminApi,
+  loadSpaces,
+  onStarted,
+  compact = false,
+}: {
+  api?: ControlAdminApi;
+  loadSpaces?: () => Promise<SpaceNode[]>;
+  onStarted?: () => void;
+  compact?: boolean;
+}) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [scopeType, setScopeType] = useState<"ORG" | "SPACE">("ORG");
@@ -199,7 +220,12 @@ export function EmergencyStopButton({ api = controlAdminApi, loadSpaces, onStart
 
   return (
     <>
-      <button type="button" onClick={() => void openDialog()} className={cx("rounded-md border border-bad px-2 py-1 text-[12.5px] font-medium text-bad hover:bg-bad-soft", compact && "px-1.5")} aria-label={t("control.emergency.button")}>
+      <button
+        type="button"
+        onClick={() => void openDialog()}
+        className={cx("rounded-md border border-bad px-2 py-1 text-[12.5px] font-medium text-bad hover:bg-bad-soft", compact && "px-1.5")}
+        aria-label={t("control.emergency.button")}
+      >
         ⏻ {compact ? "" : t("control.emergency.button")}
       </button>
       <Dialog
@@ -227,10 +253,27 @@ export function EmergencyStopButton({ api = controlAdminApi, loadSpaces, onStart
           </label>
         </fieldset>
         {scopeType === "SPACE" && (
-          <SpaceSelect spaces={spaces} label={t("control.emergency.space")} value={spaceId} onChange={(e) => setSpaceId(e.target.value)} error={submitted && problems.includes("space") ? t("control.emergency.spaceRequired") : undefined} />
+          <SpaceSelect
+            spaces={spaces}
+            label={t("control.emergency.space")}
+            value={spaceId}
+            onChange={(e) => setSpaceId(e.target.value)}
+            error={submitted && problems.includes("space") ? t("control.emergency.spaceRequired") : undefined}
+          />
         )}
-        <TextField label={t("control.emergency.reason")} value={reason} maxLength={200} onChange={(e) => setReason(e.target.value)} error={submitted && problems.includes("reason") ? t("control.emergency.reasonRequired") : undefined} />
-        <TextField label={t("control.emergency.confirmLabel", { word: confirmWord })} value={confirm} onChange={(e) => setConfirm(e.target.value)} error={submitted && problems.includes("confirm") ? t("control.emergency.confirmMismatch", { word: confirmWord }) : undefined} />
+        <TextField
+          label={t("control.emergency.reason")}
+          value={reason}
+          maxLength={200}
+          onChange={(e) => setReason(e.target.value)}
+          error={submitted && problems.includes("reason") ? t("control.emergency.reasonRequired") : undefined}
+        />
+        <TextField
+          label={t("control.emergency.confirmLabel", { word: confirmWord })}
+          value={confirm}
+          onChange={(e) => setConfirm(e.target.value)}
+          error={submitted && problems.includes("confirm") ? t("control.emergency.confirmMismatch", { word: confirmWord }) : undefined}
+        />
         <p className="text-[12.5px] text-muted">{t("control.emergency.manualStillAllowed")}</p>
         {error && <Alert tone="danger">{error}</Alert>}
       </Dialog>

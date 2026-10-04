@@ -121,7 +121,11 @@ export function sceneProblems(name: string, items: SceneItem[]): { field: string
 /** 관계 대상은 기능을 target에도 넣는다(API-ACT-10 `{spaceId, relation:"controls", capability, includeChildren}`) */
 export function normalizeSceneItem(item: SceneItem): SceneItem {
   if (item.target.deviceId) return { target: { deviceId: item.target.deviceId }, capability: item.capability, desired: item.desired };
-  return { target: { spaceId: item.target.spaceId, relation: "controls", capability: item.capability, includeChildren: Boolean(item.target.includeChildren) }, capability: item.capability, desired: item.desired };
+  return {
+    target: { spaceId: item.target.spaceId, relation: "controls", capability: item.capability, includeChildren: Boolean(item.target.includeChildren) },
+    capability: item.capability,
+    desired: item.desired,
+  };
 }
 
 /** 미리보기 요약: 바뀌는 수, 변경 없음, 차단 예상, 오프라인(TC-ACT-096) */
@@ -214,7 +218,7 @@ export function isValidCron(cron: string): boolean {
 export function daysTimeToCron(days: number[], time: string): string | undefined {
   const match = /^(\d{2}):(\d{2})$/.exec(time);
   if (!match || days.length === 0) return undefined;
-  const dow = [...new Set(days)].sort((a, b) => a - b).map((d) => (d === 7 ? 0 : d));
+  const dow = [...new Set(days.map((d) => (d === 7 ? 0 : d)))].sort((a, b) => a - b);
   return `${Number(match[2])} ${Number(match[1])} * * ${dow.join(",")}`;
 }
 
@@ -251,7 +255,10 @@ export function scheduleProblems(form: ScheduleForm): string[] {
 
 /** 화면 폼 → API-ACT-15 요청. `at`은 조직 시간대 입력을 UTC로 바꿔 받는다 */
 export function scheduleBody(form: ScheduleForm, toUtc: (local: string) => string | undefined): Record<string, unknown> {
-  const target = form.targetType === "scene" ? { sceneId: form.sceneId } : { deviceId: form.deviceId, capability: form.capability, command: form.command, args: JSON.parse(form.args || "{}") as Record<string, unknown> };
+  const target =
+    form.targetType === "scene"
+      ? { sceneId: form.sceneId }
+      : { deviceId: form.deviceId, capability: form.capability, command: form.command, args: JSON.parse(form.args || "{}") as Record<string, unknown> };
   const body: Record<string, unknown> = { name: form.name.trim(), target, kind: form.kind, skipHolidays: form.skipHolidays, timezone: form.timezone || undefined };
   if (form.kind === "ONCE") body.at = toUtc(form.at);
   if (form.kind === "RECURRING") body.cron = form.cron.trim() || daysTimeToCron(form.days, form.time);
@@ -262,7 +269,27 @@ export function scheduleBody(form: ScheduleForm, toUtc: (local: string) => strin
 }
 
 export function emptyScheduleForm(timezone: string): ScheduleForm {
-  return { name: "", targetType: "scene", sceneId: "", deviceId: "", capability: "", command: "set", args: "{}", kind: "RECURRING", at: "", days: [1, 2, 3, 4, 5], time: "08:50", cron: "", spaceId: "", edge: "END", offsetMinutes: "10", validFrom: "", validTo: "", skipHolidays: true, timezone };
+  return {
+    name: "",
+    targetType: "scene",
+    sceneId: "",
+    deviceId: "",
+    capability: "",
+    command: "set",
+    args: "{}",
+    kind: "RECURRING",
+    at: "",
+    days: [1, 2, 3, 4, 5],
+    time: "08:50",
+    cron: "",
+    spaceId: "",
+    edge: "END",
+    offsetMinutes: "10",
+    validFrom: "",
+    validTo: "",
+    skipHolidays: true,
+    timezone,
+  };
 }
 
 export function scheduleToForm(s: Schedule, timezone: string, toLocal: (iso: string) => string): ScheduleForm {
@@ -349,7 +376,24 @@ export interface InterlockForm {
 }
 
 export function emptyInterlockForm(): InterlockForm {
-  return { name: "", spaceId: "", includeChildren: true, kind: "state", deviceId: "", metric: "", capability: "Contact", attribute: "open", op: "==", value: "true", forbidCapability: "Thermostat", forbidCommand: "set", forbidAttribute: "mode", forbidValues: "cool, heat", message: "", enabled: true };
+  return {
+    name: "",
+    spaceId: "",
+    includeChildren: true,
+    kind: "state",
+    deviceId: "",
+    metric: "",
+    capability: "Contact",
+    attribute: "open",
+    op: "==",
+    value: "true",
+    forbidCapability: "Thermostat",
+    forbidCommand: "set",
+    forbidAttribute: "mode",
+    forbidValues: "cool, heat",
+    message: "",
+    enabled: true,
+  };
 }
 
 /** 입력 문자열 값 → JSON 값(true/false/숫자/문자열) */
@@ -377,7 +421,14 @@ export function interlockBody(form: InterlockForm): Record<string, unknown> {
   const condition: InterlockCondition =
     form.kind === "metric"
       ? { kind: "metric", ...(form.deviceId ? { deviceId: form.deviceId } : { spaceAgg: "avg" }), metric: form.metric.trim(), op: form.op, value: parseScalar(form.value) }
-      : { kind: "state", ...(form.deviceId ? { deviceId: form.deviceId } : { relation: "measures" }), capability: form.capability.trim(), attribute: form.attribute.trim(), op: form.op, value: parseScalar(form.value) };
+      : {
+          kind: "state",
+          ...(form.deviceId ? { deviceId: form.deviceId } : { relation: "measures" }),
+          capability: form.capability.trim(),
+          attribute: form.attribute.trim(),
+          op: form.op,
+          value: parseScalar(form.value),
+        };
   const values = form.forbidValues
     .split(",")
     .map((v) => v.trim())
@@ -501,11 +552,23 @@ export const DRIVER_FIELDS: Record<DriverType, { config: { key: string; type: "t
     ],
     secret: ["apiToken"],
   },
-  LG_THINQ: { config: [{ key: "region", type: "text", required: true }, { key: "clientId", type: "text", required: true }], secret: ["pat"] },
+  LG_THINQ: {
+    config: [
+      { key: "region", type: "text", required: true },
+      { key: "clientId", type: "text", required: true },
+    ],
+    secret: ["pat"],
+  },
   SMARTTHINGS: { config: [{ key: "locationId", type: "text" }], secret: ["token"] },
 };
 
-export const DRIVER_DEFAULTS = { pollingSec: 60, ackTimeoutSec: 30, applyTimeoutSec: 60, retry: { maxAttempts: 3, initialMs: 1000, multiplier: 2, maxMs: 30000 }, circuit: { failureRate: 50, windowSec: 60, openSec: 30 } };
+export const DRIVER_DEFAULTS = {
+  pollingSec: 60,
+  ackTimeoutSec: 30,
+  applyTimeoutSec: 60,
+  retry: { maxAttempts: 3, initialMs: 1000, multiplier: 2, maxMs: 30000 },
+  circuit: { failureRate: 50, windowSec: 60, openSec: 30 },
+};
 
 export const MQTT_DEFAULT_CONFIG = { commandTopic: "devices/{device-key}/command", ackTopic: "devices/{device-key}/command/ack", stateTopic: "devices/{device-key}/state", qos: 1 };
 
@@ -524,7 +587,16 @@ export function emptyDriverForm(type: DriverType = "LORAWAN"): DriverForm {
   const config: Record<string, string | boolean> = {};
   for (const f of DRIVER_FIELDS[type].config) config[f.key] = f.type === "boolean" ? true : "";
   if (type === "MQTT") Object.assign(config, { ...MQTT_DEFAULT_CONFIG, qos: String(MQTT_DEFAULT_CONFIG.qos) });
-  return { name: "", type, config, secret: {}, pollingSec: String(DRIVER_DEFAULTS.pollingSec), ackTimeoutSec: String(DRIVER_DEFAULTS.ackTimeoutSec), applyTimeoutSec: String(DRIVER_DEFAULTS.applyTimeoutSec), maxAttempts: String(DRIVER_DEFAULTS.retry.maxAttempts) };
+  return {
+    name: "",
+    type,
+    config,
+    secret: {},
+    pollingSec: String(DRIVER_DEFAULTS.pollingSec),
+    ackTimeoutSec: String(DRIVER_DEFAULTS.ackTimeoutSec),
+    applyTimeoutSec: String(DRIVER_DEFAULTS.applyTimeoutSec),
+    maxAttempts: String(DRIVER_DEFAULTS.retry.maxAttempts),
+  };
 }
 
 export function driverToForm(d: Driver): DriverForm {
@@ -534,7 +606,16 @@ export function driverToForm(d: Driver): DriverForm {
     const v = d.config?.[f.key];
     config[f.key] = f.type === "boolean" ? Boolean(v ?? true) : v === undefined || v === null ? "" : String(v);
   }
-  return { name: d.name, type, config, secret: {}, pollingSec: String(d.pollingSec ?? DRIVER_DEFAULTS.pollingSec), ackTimeoutSec: String(d.ackTimeoutSec ?? DRIVER_DEFAULTS.ackTimeoutSec), applyTimeoutSec: String(d.applyTimeoutSec ?? DRIVER_DEFAULTS.applyTimeoutSec), maxAttempts: String(d.retry?.maxAttempts ?? DRIVER_DEFAULTS.retry.maxAttempts) };
+  return {
+    name: d.name,
+    type,
+    config,
+    secret: {},
+    pollingSec: String(d.pollingSec ?? DRIVER_DEFAULTS.pollingSec),
+    ackTimeoutSec: String(d.ackTimeoutSec ?? DRIVER_DEFAULTS.ackTimeoutSec),
+    applyTimeoutSec: String(d.applyTimeoutSec ?? DRIVER_DEFAULTS.applyTimeoutSec),
+    maxAttempts: String(d.retry?.maxAttempts ?? DRIVER_DEFAULTS.retry.maxAttempts),
+  };
 }
 
 /** 저장 전 검사. 새 드라이버는 비밀값이 필요한 종류면 비밀값 필수, 수정은 비워 두면 기존 값 유지(hasSecret) */
@@ -681,11 +762,21 @@ export function bulkDone(job: BulkJob): boolean {
 
 export interface RuntimeReport {
   items: { date: string; onSeconds: number; cycles: number; energyWh?: number | null; energySource?: "RATED" | "REPORTED" | string | null }[];
-  noEffectEvents: { at: string; commandId?: string | null; metric: string; expected?: { direction?: string; withinMinutes?: number } | string | null; observed?: { start?: number; end?: number; delta?: number } | string | null }[];
+  noEffectEvents: {
+    at: string;
+    commandId?: string | null;
+    metric: string;
+    expected?: { direction?: string; withinMinutes?: number } | string | null;
+    observed?: { start?: number; end?: number; delta?: number } | string | null;
+  }[];
 }
 
 export function runtimeTotals(report: RuntimeReport) {
-  return report.items.reduce((acc, i) => ({ onHours: acc.onHours + i.onSeconds / 3600, cycles: acc.cycles + i.cycles, energyKwh: acc.energyKwh + (i.energyWh ?? 0) / 1000 }), { onHours: 0, cycles: 0, energyKwh: 0 });
+  return report.items.reduce((acc, i) => ({ onHours: acc.onHours + i.onSeconds / 3600, cycles: acc.cycles + i.cycles, energyKwh: acc.energyKwh + (i.energyWh ?? 0) / 1000 }), {
+    onHours: 0,
+    cycles: 0,
+    energyKwh: 0,
+  });
 }
 
 export function effectText(value: RuntimeReport["noEffectEvents"][number]["expected"] | RuntimeReport["noEffectEvents"][number]["observed"]): string {
@@ -703,7 +794,10 @@ export function effectText(value: RuntimeReport["noEffectEvents"][number]["expec
 /** "mode=cool, targetTemperature=24" ↔ {mode:"cool", targetTemperature:24} (장면 목표 상태 입력) */
 export function parseDesired(text: string): Record<string, unknown> | undefined {
   const out: Record<string, unknown> = {};
-  for (const part of text.split(",").map((p) => p.trim()).filter(Boolean)) {
+  for (const part of text
+    .split(",")
+    .map((p) => p.trim())
+    .filter(Boolean)) {
     const match = /^([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.+)$/.exec(part);
     if (!match) return undefined;
     out[match[1]] = parseScalar(match[2]);

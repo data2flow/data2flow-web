@@ -11,7 +11,18 @@ import { errorText } from "~/lib/error-text";
 import { formatDateTime } from "~/lib/format";
 import { findSpace, type SpaceNode } from "~/lib/spaces";
 import { controlAdminApi, type ControlAdminApi } from "./admin-api";
-import { INTERLOCK_OPS, conditionText, emptyInterlockForm, forbidText, interlockBody, interlockProblems, interlockToForm, type Interlock, type InterlockForm, type InterlockSummary } from "./model/admin";
+import {
+  INTERLOCK_OPS,
+  conditionText,
+  emptyInterlockForm,
+  forbidText,
+  interlockBody,
+  interlockProblems,
+  interlockToForm,
+  type Interlock,
+  type InterlockForm,
+  type InterlockSummary,
+} from "./model/admin";
 
 type Block = { at: string; commandId: string; deviceId: string; deviceName?: string; capability: string; command: string; message?: string };
 
@@ -60,7 +71,16 @@ export function InterlockManager({ initial, failed, spaces, devices, timezone, l
       return;
     }
     const saved: Interlock = result.data;
-    const row: InterlockSummary = { interlockId: saved.interlockId, name: saved.name, spaceId: saved.spaceId, includeChildren: saved.includeChildren, forbid: saved.forbid, enabled: saved.enabled, blocks7d: rows.find((r) => r.interlockId === saved.interlockId)?.blocks7d ?? 0, updatedAt: saved.updatedAt };
+    const row: InterlockSummary = {
+      interlockId: saved.interlockId,
+      name: saved.name,
+      spaceId: saved.spaceId,
+      includeChildren: saved.includeChildren,
+      forbid: saved.forbid,
+      enabled: saved.enabled,
+      blocks7d: rows.find((r) => r.interlockId === saved.interlockId)?.blocks7d ?? 0,
+      updatedAt: saved.updatedAt,
+    };
     setRows((list) => (list.some((r) => r.interlockId === row.interlockId) ? list.map((r) => (r.interlockId === row.interlockId ? row : r)) : [row, ...list]));
     setConditions((c) => ({ ...c, [row.interlockId]: conditionText(saved.condition) }));
     setEditing(null);
@@ -84,7 +104,14 @@ export function InterlockManager({ initial, failed, spaces, devices, timezone, l
   return (
     <div className="flex flex-col gap-4">
       {notice && <Alert tone={notice.tone}>{notice.text}</Alert>}
-      <Card title={t("control.interlocks.title")} actions={<Button variant="primary" onClick={() => void open(null)}>{t("control.interlocks.new")}</Button>}>
+      <Card
+        title={t("control.interlocks.title")}
+        actions={
+          <Button variant="primary" onClick={() => void open(null)}>
+            {t("control.interlocks.new")}
+          </Button>
+        }
+      >
         {failed && <Alert tone="warning">{t("control.common.loadFailed")}</Alert>}
         {rows.length === 0 && !failed ? (
           <EmptyState title={t("control.interlocks.empty")} />
@@ -165,9 +192,21 @@ export function InterlockManager({ initial, failed, spaces, devices, timezone, l
       {editing && form && (
         <Card title={editing.id ? t("control.interlocks.edit") : t("control.interlocks.new")} actions={<Button onClick={() => setEditing(null)}>{t("common.close")}</Button>}>
           <div className="grid gap-3 sm:grid-cols-2">
-            <TextField label={t("control.interlocks.name")} value={form.name} maxLength={100} onChange={(e) => set({ name: e.target.value })} error={err("name", t("control.interlocks.nameRequired"))} />
+            <TextField
+              label={t("control.interlocks.name")}
+              value={form.name}
+              maxLength={100}
+              onChange={(e) => set({ name: e.target.value })}
+              error={err("name", t("control.interlocks.nameRequired"))}
+            />
             <div className="flex flex-col gap-1">
-              <SpaceSelect spaces={spaces} label={t("control.interlocks.space")} value={form.spaceId} onChange={(e) => set({ spaceId: e.target.value })} error={err("space", t("control.interlocks.spaceRequired"))} />
+              <SpaceSelect
+                spaces={spaces}
+                label={t("control.interlocks.space")}
+                value={form.spaceId}
+                onChange={(e) => set({ spaceId: e.target.value })}
+                error={err("space", t("control.interlocks.spaceRequired"))}
+              />
               <Checkbox label={t("control.scenes.includeChildren")} checked={form.includeChildren} onChange={(e) => set({ includeChildren: e.target.checked })} />
             </div>
             <SelectField label={t("control.interlocks.conditionKind")} value={form.kind} onChange={(e) => set({ kind: e.target.value as InterlockForm["kind"] })}>
@@ -183,10 +222,21 @@ export function InterlockManager({ initial, failed, spaces, devices, timezone, l
               ))}
             </SelectField>
             {form.kind === "metric" ? (
-              <TextField label={t("control.interlocks.metric")} value={form.metric} placeholder="pm2_5" onChange={(e) => set({ metric: e.target.value })} error={err("metric", t("control.interlocks.metricRequired"))} />
+              <TextField
+                label={t("control.interlocks.metric")}
+                value={form.metric}
+                placeholder="pm2_5"
+                onChange={(e) => set({ metric: e.target.value })}
+                error={err("metric", t("control.interlocks.metricRequired"))}
+              />
             ) : (
               <>
-                <TextField label={t("control.scenes.capability")} value={form.capability} onChange={(e) => set({ capability: e.target.value })} error={err("state", t("control.interlocks.stateRequired"))} />
+                <TextField
+                  label={t("control.scenes.capability")}
+                  value={form.capability}
+                  onChange={(e) => set({ capability: e.target.value })}
+                  error={err("state", t("control.interlocks.stateRequired"))}
+                />
                 <TextField label={t("control.interlocks.attribute")} value={form.attribute} onChange={(e) => set({ attribute: e.target.value })} />
               </>
             )}
@@ -198,11 +248,23 @@ export function InterlockManager({ initial, failed, spaces, devices, timezone, l
               ))}
             </SelectField>
             <TextField label={t("control.interlocks.value")} value={form.value} onChange={(e) => set({ value: e.target.value })} error={err("condition", t("control.interlocks.conditionInvalid"))} />
-            <TextField label={t("control.interlocks.forbidCapability")} value={form.forbidCapability} onChange={(e) => set({ forbidCapability: e.target.value })} error={err("forbid", t("control.interlocks.forbidRequired"))} />
+            <TextField
+              label={t("control.interlocks.forbidCapability")}
+              value={form.forbidCapability}
+              onChange={(e) => set({ forbidCapability: e.target.value })}
+              error={err("forbid", t("control.interlocks.forbidRequired"))}
+            />
             <TextField label={t("control.interlocks.forbidCommand")} value={form.forbidCommand} onChange={(e) => set({ forbidCommand: e.target.value })} />
             <TextField label={t("control.interlocks.forbidAttribute")} value={form.forbidAttribute} onChange={(e) => set({ forbidAttribute: e.target.value })} />
             <TextField label={t("control.interlocks.forbidValues")} value={form.forbidValues} hint={t("control.interlocks.forbidValuesHint")} onChange={(e) => set({ forbidValues: e.target.value })} />
-            <TextField label={t("control.interlocks.message")} value={form.message} maxLength={200} className="sm:col-span-2" onChange={(e) => set({ message: e.target.value })} error={err("message", t("control.interlocks.messageRequired"))} />
+            <TextField
+              label={t("control.interlocks.message")}
+              value={form.message}
+              maxLength={200}
+              className="sm:col-span-2"
+              onChange={(e) => set({ message: e.target.value })}
+              error={err("message", t("control.interlocks.messageRequired"))}
+            />
             <Checkbox label={t("control.common.enabled")} checked={form.enabled} onChange={(e) => set({ enabled: e.target.checked })} />
           </div>
           <p className="mt-2 text-[12.5px] text-muted">{t("control.interlocks.staleRule")}</p>

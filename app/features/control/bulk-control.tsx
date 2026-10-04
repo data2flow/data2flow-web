@@ -24,7 +24,14 @@ export interface BulkControlDialogProps {
   pollMs?: number;
 }
 
-export function BulkControlDialog({ open, onClose, target, capabilities = ["Switch", "Thermostat", "FanSpeed", "Ventilation", "Dimmer", "Lock"], api = controlAdminApi, pollMs = BULK_POLL_MS }: BulkControlDialogProps) {
+export function BulkControlDialog({
+  open,
+  onClose,
+  target,
+  capabilities = ["Switch", "Thermostat", "FanSpeed", "Ventilation", "Dimmer", "Lock"],
+  api = controlAdminApi,
+  pollMs = BULK_POLL_MS,
+}: BulkControlDialogProps) {
   const { t } = useTranslation();
   const [capability, setCapability] = useState("");
   const [definition, setDefinition] = useState<CapabilityDefinition | null>(null);
@@ -113,11 +120,15 @@ export function BulkControlDialog({ open, onClose, target, capabilities = ["Swit
       {tooMany && <Alert tone="danger">{t("errors.COMMAND_BULK_LIMIT_EXCEEDED")}</Alert>}
       {!job && (
         <>
-          <SelectField label={t("control.scenes.capability")} value={capability} onChange={(e) => {
+          <SelectField
+            label={t("control.scenes.capability")}
+            value={capability}
+            onChange={(e) => {
               setCapability(e.target.value);
               setArgs({});
               setPreview(null);
-            }}>
+            }}
+          >
             <option value="">{t("control.scenes.chooseCapability")}</option>
             {capabilities.map((c) => (
               <option key={c} value={c}>
@@ -132,10 +143,17 @@ export function BulkControlDialog({ open, onClose, target, capabilities = ["Swit
               return (
                 <div key={a.name} className="flex flex-col gap-1">
                   <span className="text-[12.5px] font-medium text-muted">{t(`control.attr.${a.name}`, { defaultValue: a.name })}</span>
-                  <AttributeInput capability={control.name} attribute={a} range={range} value={args[a.name]} disabled={false} onChange={(v) => {
+                  <AttributeInput
+                    capability={control.name}
+                    attribute={a}
+                    range={range}
+                    value={args[a.name]}
+                    disabled={false}
+                    onChange={(v) => {
                       setArgs((x) => ({ ...x, [a.name]: v }));
                       setPreview(null);
-                    }} />
+                    }}
+                  />
                   {problem && (
                     <p role="alert" className="text-[12px] text-bad">
                       {t("control.validation.range", { min: range.min ?? "", max: range.max ?? "", unit: range.unit ?? "" })}

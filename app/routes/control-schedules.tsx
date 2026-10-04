@@ -41,7 +41,15 @@ export default function ControlSchedules({ loaderData }: Route.ComponentProps) {
     <>
       <PageHeader crumb={t("nav.control")} title={t("control.schedules.title")} />
       <ControlAreaTabs current="schedules" permissions={root?.me?.permissions} />
-      <ScheduleManager initial={loaderData.schedules} failed={loaderData.failed} scenes={loaderData.scenes} devices={loaderData.devices} spaces={loaderData.spaces} timezone={root?.timezone ?? "Asia/Seoul"} lang={i18n.language} />
+      <ScheduleManager
+        initial={loaderData.schedules}
+        failed={loaderData.failed}
+        scenes={loaderData.scenes}
+        devices={loaderData.devices}
+        spaces={loaderData.spaces}
+        timezone={root?.timezone ?? "Asia/Seoul"}
+        lang={i18n.language}
+      />
     </>
   );
 }

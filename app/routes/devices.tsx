@@ -252,18 +252,18 @@ export default function Devices({ loaderData, actionData }: Route.ComponentProps
           }
         >
           {canPlace && (
-          <Form method="post" className="flex flex-wrap items-end gap-3">
-            <CsrfField />
-            <input type="hidden" name="intent" value="tag" />
-            {selected.map((id) => (
-              <input key={id} type="hidden" name="deviceId" value={id} />
-            ))}
-            <TextField label={t("devices.tagAdd")} name="add" hint={t("devices.tagHint")} />
-            <TextField label={t("devices.tagRemove")} name="remove" />
-            <Button type="submit" variant="primary">
-              {t("devices.applyTags")}
-            </Button>
-          </Form>
+            <Form method="post" className="flex flex-wrap items-end gap-3">
+              <CsrfField />
+              <input type="hidden" name="intent" value="tag" />
+              {selected.map((id) => (
+                <input key={id} type="hidden" name="deviceId" value={id} />
+              ))}
+              <TextField label={t("devices.tagAdd")} name="add" hint={t("devices.tagHint")} />
+              <TextField label={t("devices.tagRemove")} name="remove" />
+              <Button type="submit" variant="primary">
+                {t("devices.applyTags")}
+              </Button>
+            </Form>
           )}
         </Card>
       )}

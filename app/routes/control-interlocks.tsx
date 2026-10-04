@@ -39,7 +39,14 @@ export default function ControlInterlocks({ loaderData }: Route.ComponentProps) 
     <>
       <PageHeader crumb={t("nav.control")} title={t("control.interlocks.title")} />
       <ControlAreaTabs current="interlocks" permissions={root?.me?.permissions} />
-      <InterlockManager initial={loaderData.interlocks} failed={loaderData.failed} spaces={loaderData.spaces} devices={loaderData.devices} timezone={root?.timezone ?? "Asia/Seoul"} lang={i18n.language} />
+      <InterlockManager
+        initial={loaderData.interlocks}
+        failed={loaderData.failed}
+        spaces={loaderData.spaces}
+        devices={loaderData.devices}
+        timezone={root?.timezone ?? "Asia/Seoul"}
+        lang={i18n.language}
+      />
     </>
   );
 }

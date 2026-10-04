@@ -145,5 +145,12 @@ export function creatorName(createdBy: DeviceJobSummary["createdBy"]): string {
 
 /** `?deviceIds=a,b` → 대상 기기 목록(중복 제거) */
 export function parseDeviceIds(raw: string | null | undefined): string[] {
-  return [...new Set((raw ?? "").split(",").map((s) => s.trim()).filter(Boolean))];
+  return [
+    ...new Set(
+      (raw ?? "")
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean),
+    ),
+  ];
 }

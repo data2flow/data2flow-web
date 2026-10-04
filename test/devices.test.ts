@@ -291,10 +291,8 @@ describe("DEV-02.01 UI-DEV-06 기기 상세", () => {
     expect(raw.body).toContain("412B");
     expect(raw.body).toContain("{&quot;temperature&quot;:22.3}");
     expect(raw.body).toContain("cursor=c2");
-    // 변경 이력(API-DEV-27)은 core M2에 없어 탭을 두지 않는다: ?tab=history는 개요로
-    const history = await browser.get("/devices/1042?tab=history");
-    expect(history.body).not.toContain(`href="/devices/1042?tab=history"`);
-    expect(app.gateway.received.some((r) => r.path.includes("/history"))).toBe(false);
+    // 변경 이력(API-DEV-27)은 M4(DEV-02.07)에서 탭으로 연다(test/control-m4.test.ts)
+    expect(raw.body).toContain('href="/devices/1042?tab=history"');
   });
 
   it("원본 메시지를 못 불러오면 안내, 데이터 탭은 모델 측정 항목을 후보로", async () => {

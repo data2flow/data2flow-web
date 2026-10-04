@@ -22,7 +22,11 @@ export function CapabilityPreview({ definition }: { definition: CapabilityDefini
       {definition.attributes.map((a) => (
         <div key={a.name} className="grid gap-1 sm:grid-cols-[160px_1fr] sm:items-center">
           <span className="text-[13px] font-medium">{a.name}</span>
-          {writable.has(a.name) ? <AttributeInput capability={definition.name} attribute={a} range={attributeRange(capability, a.name)} value={undefined} disabled onChange={() => undefined} /> : <span className="text-[12.5px] text-muted">{t("control.capabilities.readOnlyAttr")}</span>}
+          {writable.has(a.name) ? (
+            <AttributeInput capability={definition.name} attribute={a} range={attributeRange(capability, a.name)} value={undefined} disabled onChange={() => undefined} />
+          ) : (
+            <span className="text-[12.5px] text-muted">{t("control.capabilities.readOnlyAttr")}</span>
+          )}
         </div>
       ))}
     </section>
@@ -123,7 +127,14 @@ export function CapabilityCatalog({ initial, failed, canManage, api = controlAdm
       return;
     }
     const d = result.data;
-    const row: CapabilitySummaryRow = { name: d.name, version: d.version ?? 1, standard: false, matterCluster: d.matterCluster ?? null, attributeCount: d.attributes.length, commandCount: d.commands.length };
+    const row: CapabilitySummaryRow = {
+      name: d.name,
+      version: d.version ?? 1,
+      standard: false,
+      matterCluster: d.matterCluster ?? null,
+      attributeCount: d.attributes.length,
+      commandCount: d.commands.length,
+    };
     setRows((list) => (list.some((r) => r.name === row.name) ? list.map((r) => (r.name === row.name ? row : r)) : [...list, row]));
     setDetail(d);
     setEditor(null);
@@ -133,7 +144,16 @@ export function CapabilityCatalog({ initial, failed, canManage, api = controlAdm
   return (
     <div className="flex flex-col gap-4">
       {notice && <Alert tone={notice.tone}>{notice.text}</Alert>}
-      <Card title={t("control.capabilities.title")} actions={canManage && <Button variant="primary" onClick={() => setEditor({ name: null, text: CUSTOM_CAPABILITY_TEMPLATE })}>{t("control.capabilities.new")}</Button>}>
+      <Card
+        title={t("control.capabilities.title")}
+        actions={
+          canManage && (
+            <Button variant="primary" onClick={() => setEditor({ name: null, text: CUSTOM_CAPABILITY_TEMPLATE })}>
+              {t("control.capabilities.new")}
+            </Button>
+          )
+        }
+      >
         {failed && <Alert tone="warning">{t("control.common.loadFailed")}</Alert>}
         {rows.length === 0 && !failed ? (
           <EmptyState title={t("control.capabilities.empty")} />
@@ -173,7 +193,24 @@ export function CapabilityCatalog({ initial, failed, canManage, api = controlAdm
           actions={
             <>
               {canManage && !detail.standard && (
-                <Button onClick={() => setEditor({ name: detail.name, text: JSON.stringify({ name: detail.name, matterCluster: detail.matterCluster ?? undefined, attributes: detail.attributes, commands: detail.commands, expectedEffects: detail.expectedEffects ?? [] }, null, 2) })}>
+                <Button
+                  onClick={() =>
+                    setEditor({
+                      name: detail.name,
+                      text: JSON.stringify(
+                        {
+                          name: detail.name,
+                          matterCluster: detail.matterCluster ?? undefined,
+                          attributes: detail.attributes,
+                          commands: detail.commands,
+                          expectedEffects: detail.expectedEffects ?? [],
+                        },
+                        null,
+                        2,
+                      ),
+                    })
+                  }
+                >
                   {t("common.edit")}
                 </Button>
               )}
@@ -188,7 +225,10 @@ export function CapabilityCatalog({ initial, failed, canManage, api = controlAdm
       )}
 
       {editor && (
-        <Card title={editor.name ? t("control.capabilities.editCustom", { name: editor.name }) : t("control.capabilities.new")} actions={<Button onClick={() => setEditor(null)}>{t("common.close")}</Button>}>
+        <Card
+          title={editor.name ? t("control.capabilities.editCustom", { name: editor.name }) : t("control.capabilities.new")}
+          actions={<Button onClick={() => setEditor(null)}>{t("common.close")}</Button>}
+        >
           <div className="grid gap-4 lg:grid-cols-2">
             <div>
               <TextArea label={t("control.capabilities.json")} value={editor.text} rows={18} onChange={(e) => setEditor({ ...editor, text: e.target.value })} />

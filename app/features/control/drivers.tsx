@@ -11,7 +11,21 @@ import { Alert, Badge, Button, Card, Checkbox, EmptyState, SelectField, Table, T
 import { errorText } from "~/lib/error-text";
 import { formatDateTime } from "~/lib/format";
 import { controlAdminApi, type ControlAdminApi } from "./admin-api";
-import { DRIVER_FIELDS, DRIVER_TYPES, driverBody, driverProblems, driverToForm, driverTone, emptyDriverForm, type Driver, type DriverForm, type DriverMetrics, type DriverSummary, type DriverType, type HealthcheckResult } from "./model/admin";
+import {
+  DRIVER_FIELDS,
+  DRIVER_TYPES,
+  driverBody,
+  driverProblems,
+  driverToForm,
+  driverTone,
+  emptyDriverForm,
+  type Driver,
+  type DriverForm,
+  type DriverMetrics,
+  type DriverSummary,
+  type DriverType,
+  type HealthcheckResult,
+} from "./model/admin";
 
 export interface DriverRow extends DriverSummary {
   metrics?: DriverMetrics | null;
@@ -80,7 +94,15 @@ export function DriverManager({ initial, failed, timezone, lang, api = controlAd
       return;
     }
     const d = result.data;
-    const row: DriverRow = { driverId: d.driverId, name: d.name, type: d.type, status: d.status, deviceCount: rows.find((r) => r.driverId === d.driverId)?.deviceCount ?? 0, updatedAt: d.updatedAt, metrics: rows.find((r) => r.driverId === d.driverId)?.metrics };
+    const row: DriverRow = {
+      driverId: d.driverId,
+      name: d.name,
+      type: d.type,
+      status: d.status,
+      deviceCount: rows.find((r) => r.driverId === d.driverId)?.deviceCount ?? 0,
+      updatedAt: d.updatedAt,
+      metrics: rows.find((r) => r.driverId === d.driverId)?.metrics,
+    };
     setRows((list) => (list.some((r) => r.driverId === row.driverId) ? list.map((r) => (r.driverId === row.driverId ? row : r)) : [row, ...list]));
     setEditing(null);
     setNotice({ tone: "success", text: t("control.drivers.saved") });
@@ -97,7 +119,14 @@ export function DriverManager({ initial, failed, timezone, lang, api = controlAd
   return (
     <div className="flex flex-col gap-4">
       {notice && <Alert tone={notice.tone}>{notice.text}</Alert>}
-      <Card title={t("control.drivers.title")} actions={<Button variant="primary" onClick={() => void open(null)}>{t("control.drivers.new")}</Button>}>
+      <Card
+        title={t("control.drivers.title")}
+        actions={
+          <Button variant="primary" onClick={() => void open(null)}>
+            {t("control.drivers.new")}
+          </Button>
+        }
+      >
         {failed && <Alert tone="warning">{t("control.common.loadFailed")}</Alert>}
         {rows.length === 0 && !failed ? (
           <EmptyState title={t("control.drivers.empty")} />
@@ -126,7 +155,9 @@ export function DriverManager({ initial, failed, timezone, lang, api = controlAd
                   <td className="font-mono">{row.deviceCount ?? 0}</td>
                   <td>
                     <Badge tone={driverTone(row.status)}>{t(`control.drivers.statuses.${row.status}`, { defaultValue: row.status })}</Badge>
-                    {row.metrics?.circuit?.state === "OPEN" && row.metrics.circuit.openedAt && <span className="ml-1 text-[12px] text-warn">{t("control.drivers.openedAt", { at: formatDateTime(row.metrics.circuit.openedAt, timezone, lang, true) })}</span>}
+                    {row.metrics?.circuit?.state === "OPEN" && row.metrics.circuit.openedAt && (
+                      <span className="ml-1 text-[12px] text-warn">{t("control.drivers.openedAt", { at: formatDateTime(row.metrics.circuit.openedAt, timezone, lang, true) })}</span>
+                    )}
                   </td>
                   <td className="font-mono">{pct(row.metrics?.errorRate)}</td>
                   <td className="font-mono">{row.metrics?.avgMs != null ? `${Math.round(row.metrics.avgMs)}ms` : "–"}</td>
@@ -156,7 +187,17 @@ export function DriverManager({ initial, failed, timezone, lang, api = controlAd
               {detail.metrics?.circuit?.openedAt && ` · ${formatDateTime(detail.metrics.circuit.openedAt, timezone, lang, true)}`}
             </dd>
             <dt className="text-muted">{t("control.drivers.window1h")}</dt>
-            <dd className="font-mono">{detail.metrics ? t("control.drivers.metricsLine", { requests: detail.metrics.requests ?? 0, errors: detail.metrics.errors ?? 0, rate: pct(detail.metrics.errorRate), avg: Math.round(detail.metrics.avgMs ?? 0), p95: Math.round(detail.metrics.p95Ms ?? 0) }) : t("control.drivers.noMetrics")}</dd>
+            <dd className="font-mono">
+              {detail.metrics
+                ? t("control.drivers.metricsLine", {
+                    requests: detail.metrics.requests ?? 0,
+                    errors: detail.metrics.errors ?? 0,
+                    rate: pct(detail.metrics.errorRate),
+                    avg: Math.round(detail.metrics.avgMs ?? 0),
+                    p95: Math.round(detail.metrics.p95Ms ?? 0),
+                  })
+                : t("control.drivers.noMetrics")}
+            </dd>
             <dt className="text-muted">{t("control.drivers.secret")}</dt>
             <dd>{detail.driver.hasSecret ? t("control.drivers.secretSet") : t("control.drivers.secretNone")}</dd>
           </dl>
@@ -188,7 +229,12 @@ export function DriverManager({ initial, failed, timezone, lang, api = controlAd
             </SelectField>
             {DRIVER_FIELDS[form.type].config.map((f) =>
               f.type === "boolean" ? (
-                <Checkbox key={f.key} label={t(`control.drivers.fields.${f.key}`)} checked={Boolean(form.config[f.key])} onChange={(e) => set({ config: { ...form.config, [f.key]: e.target.checked } })} />
+                <Checkbox
+                  key={f.key}
+                  label={t(`control.drivers.fields.${f.key}`)}
+                  checked={Boolean(form.config[f.key])}
+                  onChange={(e) => set({ config: { ...form.config, [f.key]: e.target.checked } })}
+                />
               ) : (
                 <TextField
                   key={f.key}
@@ -212,16 +258,48 @@ export function DriverManager({ initial, failed, timezone, lang, api = controlAd
                 error={err("secret", t("control.drivers.secretRequired"))}
               />
             ))}
-            <TextField label={t("control.drivers.pollingSec")} type="number" value={form.pollingSec} hint={t("control.drivers.pollingHint")} onChange={(e) => set({ pollingSec: e.target.value })} error={err("pollingSec", t("control.drivers.fieldInvalid"))} />
-            <TextField label={t("control.drivers.ackTimeoutSec")} type="number" value={form.ackTimeoutSec} onChange={(e) => set({ ackTimeoutSec: e.target.value })} error={err("ackTimeoutSec", t("control.drivers.fieldInvalid"))} />
-            <TextField label={t("control.drivers.applyTimeoutSec")} type="number" value={form.applyTimeoutSec} onChange={(e) => set({ applyTimeoutSec: e.target.value })} error={err("applyTimeoutSec", t("control.drivers.fieldInvalid"))} />
-            <TextField label={t("control.drivers.maxAttempts")} type="number" min={0} max={3} value={form.maxAttempts} hint={t("control.drivers.retryHint")} onChange={(e) => set({ maxAttempts: e.target.value })} error={err("maxAttempts", t("control.drivers.retryInvalid"))} />
+            <TextField
+              label={t("control.drivers.pollingSec")}
+              type="number"
+              value={form.pollingSec}
+              hint={t("control.drivers.pollingHint")}
+              onChange={(e) => set({ pollingSec: e.target.value })}
+              error={err("pollingSec", t("control.drivers.fieldInvalid"))}
+            />
+            <TextField
+              label={t("control.drivers.ackTimeoutSec")}
+              type="number"
+              value={form.ackTimeoutSec}
+              onChange={(e) => set({ ackTimeoutSec: e.target.value })}
+              error={err("ackTimeoutSec", t("control.drivers.fieldInvalid"))}
+            />
+            <TextField
+              label={t("control.drivers.applyTimeoutSec")}
+              type="number"
+              value={form.applyTimeoutSec}
+              onChange={(e) => set({ applyTimeoutSec: e.target.value })}
+              error={err("applyTimeoutSec", t("control.drivers.fieldInvalid"))}
+            />
+            <TextField
+              label={t("control.drivers.maxAttempts")}
+              type="number"
+              min={0}
+              max={3}
+              value={form.maxAttempts}
+              hint={t("control.drivers.retryHint")}
+              onChange={(e) => set({ maxAttempts: e.target.value })}
+              error={err("maxAttempts", t("control.drivers.retryInvalid"))}
+            />
           </div>
           <p className="mt-2 text-[12.5px] text-muted">{t("control.drivers.circuitHint")}</p>
           {form.type === "LORAWAN" && <p className="mt-1 text-[12.5px] text-muted">{t("control.drivers.lorawanHint")}</p>}
           {check && (
             <div className="mt-3">
-              <Alert tone={check.ok ? "success" : "danger"}>{check.ok ? t("control.drivers.checkOk", { ms: check.latencyMs ?? 0, caps: (check.capabilities ?? []).join(", ") || "–" }) : t("control.drivers.checkFailed", { message: check.error?.message ?? check.error?.kind ?? "" })}</Alert>
+              <Alert tone={check.ok ? "success" : "danger"}>
+                {check.ok
+                  ? t("control.drivers.checkOk", { ms: check.latencyMs ?? 0, caps: (check.capabilities ?? []).join(", ") || "–" })
+                  : t("control.drivers.checkFailed", { message: check.error?.message ?? check.error?.kind ?? "" })}
+              </Alert>
             </div>
           )}
           <div className="mt-3 flex justify-end gap-2">

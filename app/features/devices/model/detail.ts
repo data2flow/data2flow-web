@@ -114,15 +114,18 @@ export function commandBands(commands: Command[], untilIso: string): ChartAnnota
 
 // ── 온보딩 체크리스트 바로가기(UI-DEV-06, BR-DEV-26) ──────────────────────────
 
-export function onboardingLink(item: string, device: Pick<DeviceDetail, "id" | "source" | "space">): string | undefined {
+/** 권한이 있는 바로가기만 준다: 편집 DEV_PLACE, 소스 SRC_READ, 규칙 RULE_WRITE */
+export function onboardingLink(item: string, device: Pick<DeviceDetail, "id" | "source" | "space">, permissions: readonly string[] = []): string | undefined {
+  const has = (p: string) => permissions.includes(p);
   switch (item) {
     case "model":
     case "space":
-      return "?edit=1";
+      return has("DEV_PLACE") ? "?edit=1" : undefined;
     case "firstData":
     case "decodeOk":
-      return device.source?.id ? `/sources/${encodeURIComponent(device.source.id)}` : undefined;
+      return device.source?.id && has("SRC_READ") ? `/sources/${encodeURIComponent(device.source.id)}` : undefined;
     case "rulesApplied":
+      if (!has("RULE_WRITE")) return undefined;
       return `/rules/new?deviceId=${encodeURIComponent(device.id)}${device.space?.id ? `&spaceId=${encodeURIComponent(device.space.id)}` : ""}`;
     default:
       return undefined;

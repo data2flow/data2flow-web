@@ -11,7 +11,20 @@ import { Alert, Badge, Button, Card, Checkbox, EmptyState, SelectField, Table, T
 import { errorText } from "~/lib/error-text";
 import { findSpace, type SpaceNode } from "~/lib/spaces";
 import { controlAdminApi, type ControlAdminApi } from "./admin-api";
-import { SCENE_ITEM_LIMIT, desiredText, normalizeSceneItem, parseDesired, previewSummary, runSummary, sceneProblems, stateText, type Scene, type SceneItem, type ScenePreviewItem, type SceneRun } from "./model/admin";
+import {
+  SCENE_ITEM_LIMIT,
+  desiredText,
+  normalizeSceneItem,
+  parseDesired,
+  previewSummary,
+  runSummary,
+  sceneProblems,
+  stateText,
+  type Scene,
+  type SceneItem,
+  type ScenePreviewItem,
+  type SceneRun,
+} from "./model/admin";
 
 export const SCENE_RUN_POLL_MS = 2000;
 
@@ -65,7 +78,11 @@ export function SceneEditor({ scene, devices, spaces, capabilities, canManage, c
   }));
   const problems = sceneProblems(name, items);
   const badDesired = rows.map((r) => parseDesired(r.desired) === undefined);
-  const dirty = !current || name !== current.name || (description ?? "") !== (current.description ?? "") || JSON.stringify(items.map(normalizeSceneItem)) !== JSON.stringify((current.items ?? []).map(normalizeSceneItem));
+  const dirty =
+    !current ||
+    name !== current.name ||
+    (description ?? "") !== (current.description ?? "") ||
+    JSON.stringify(items.map(normalizeSceneItem)) !== JSON.stringify((current.items ?? []).map(normalizeSceneItem));
 
   useEffect(() => {
     if (!run || run.status !== "RUNNING" || !runId.current) return;
@@ -133,7 +150,14 @@ export function SceneEditor({ scene, devices, spaces, capabilities, canManage, c
       {notice && <Alert tone={notice.tone}>{notice.text}</Alert>}
       <Card title={t("control.scenes.edit")}>
         <div className="grid gap-3 sm:grid-cols-2">
-          <TextField label={t("control.scenes.name")} value={name} maxLength={60} readOnly={!canManage} onChange={(e) => setName(e.target.value)} error={fieldError("name") ? t("control.scenes.nameInvalid") : undefined} />
+          <TextField
+            label={t("control.scenes.name")}
+            value={name}
+            maxLength={60}
+            readOnly={!canManage}
+            onChange={(e) => setName(e.target.value)}
+            error={fieldError("name") ? t("control.scenes.nameInvalid") : undefined}
+          />
           <TextField label={t("control.scenes.description")} value={description} readOnly={!canManage} onChange={(e) => setDescription(e.target.value)} />
         </div>
         <div className="mt-3">
@@ -156,7 +180,13 @@ export function SceneEditor({ scene, devices, spaces, capabilities, canManage, c
                         <option value="relation">{t("control.scenes.byRelation")}</option>
                       </SelectField>
                       {row.mode === "device" ? (
-                        <SelectField label={t("control.scenes.device", { n: i + 1 })} value={row.deviceId} disabled={!canManage} onChange={(e) => update(i, { deviceId: e.target.value })} error={fieldError(`items[${i}].target`) ? t("control.scenes.targetRequired") : undefined}>
+                        <SelectField
+                          label={t("control.scenes.device", { n: i + 1 })}
+                          value={row.deviceId}
+                          disabled={!canManage}
+                          onChange={(e) => update(i, { deviceId: e.target.value })}
+                          error={fieldError(`items[${i}].target`) ? t("control.scenes.targetRequired") : undefined}
+                        >
                           <option value="">{t("control.scenes.chooseDevice")}</option>
                           {devices.map((d) => (
                             <option key={d.id} value={d.id}>
@@ -166,14 +196,32 @@ export function SceneEditor({ scene, devices, spaces, capabilities, canManage, c
                         </SelectField>
                       ) : (
                         <>
-                          <SpaceSelect spaces={spaces} label={t("control.scenes.space", { n: i + 1 })} value={row.spaceId} disabled={!canManage} onChange={(e) => update(i, { spaceId: e.target.value })} error={fieldError(`items[${i}].target`) ? t("control.scenes.targetRequired") : undefined} />
-                          <Checkbox label={t("control.scenes.includeChildren")} checked={row.includeChildren} disabled={!canManage} onChange={(e) => update(i, { includeChildren: e.target.checked })} />
+                          <SpaceSelect
+                            spaces={spaces}
+                            label={t("control.scenes.space", { n: i + 1 })}
+                            value={row.spaceId}
+                            disabled={!canManage}
+                            onChange={(e) => update(i, { spaceId: e.target.value })}
+                            error={fieldError(`items[${i}].target`) ? t("control.scenes.targetRequired") : undefined}
+                          />
+                          <Checkbox
+                            label={t("control.scenes.includeChildren")}
+                            checked={row.includeChildren}
+                            disabled={!canManage}
+                            onChange={(e) => update(i, { includeChildren: e.target.checked })}
+                          />
                         </>
                       )}
                     </div>
                   </td>
                   <td>
-                    <SelectField label={t("control.scenes.capabilityOf", { n: i + 1 })} value={row.capability} disabled={!canManage} onChange={(e) => update(i, { capability: e.target.value })} error={fieldError(`items[${i}].capability`) ? t("control.scenes.capabilityRequired") : undefined}>
+                    <SelectField
+                      label={t("control.scenes.capabilityOf", { n: i + 1 })}
+                      value={row.capability}
+                      disabled={!canManage}
+                      onChange={(e) => update(i, { capability: e.target.value })}
+                      error={fieldError(`items[${i}].capability`) ? t("control.scenes.capabilityRequired") : undefined}
+                    >
                       <option value="">{t("control.scenes.chooseCapability")}</option>
                       {capabilities.map((c) => (
                         <option key={c} value={c}>
@@ -213,7 +261,10 @@ export function SceneEditor({ scene, devices, spaces, capabilities, canManage, c
         <div className="mt-3 flex flex-wrap justify-between gap-2">
           <div className="flex gap-2">
             {canManage && (
-              <Button disabled={rows.length >= SCENE_ITEM_LIMIT} onClick={() => setRows((list) => [...list, { mode: "device", deviceId: "", spaceId: "", includeChildren: true, capability: "", desired: "" }])}>
+              <Button
+                disabled={rows.length >= SCENE_ITEM_LIMIT}
+                onClick={() => setRows((list) => [...list, { mode: "device", deviceId: "", spaceId: "", includeChildren: true, capability: "", desired: "" }])}
+              >
                 {t("control.scenes.addItem")}
               </Button>
             )}
@@ -309,4 +360,3 @@ export function SceneEditor({ scene, devices, spaces, capabilities, canManage, c
 export function sceneSpaceName(spaces: SpaceNode[], id: string | null | undefined): string {
   return id ? (findSpace(spaces, id)?.name ?? `#${id}`) : "–";
 }
-

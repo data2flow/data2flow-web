@@ -18,7 +18,12 @@ export const JOB_POLL_MS = 3000;
 type R<T> = Promise<BffJsonResult<T>>;
 
 export interface DeviceJobsApi {
-  create(body: { type: JobType; target: { deviceIds: string[] } | { groupId: string }; params: Record<string, unknown>; dryRun?: boolean }): R<DeviceJob & { targetCount?: number; sample?: { deviceId: string; name?: string; before?: unknown; after?: unknown }[]; deniedCount?: number }>;
+  create(body: {
+    type: JobType;
+    target: { deviceIds: string[] } | { groupId: string };
+    params: Record<string, unknown>;
+    dryRun?: boolean;
+  }): R<DeviceJob & { targetCount?: number; sample?: { deviceId: string; name?: string; before?: unknown; after?: unknown }[]; deniedCount?: number }>;
   job(id: string): R<DeviceJob>;
   items(id: string, status?: string): R<{ responses: DeviceJobItem[]; totalCount?: number }>;
   retryFailed(id: string): R<DeviceJob>;
@@ -91,18 +96,26 @@ export function JobWizard({ deviceIds, groups, models, spaces, canControl, api =
         <li>
           <h3 className="mb-2 text-[13px] font-semibold">{t("devices.jobs.step1")}</h3>
           <div className="flex flex-wrap items-end gap-3">
-            <SelectField label={t("devices.jobs.targetKind")} value={targetKind} onChange={(e) => {
+            <SelectField
+              label={t("devices.jobs.targetKind")}
+              value={targetKind}
+              onChange={(e) => {
                 setTargetKind(e.target.value as "devices" | "group");
                 setPreview(null);
-              }}>
+              }}
+            >
               <option value="devices">{t("devices.jobs.targetDevices", { n: deviceIds.length })}</option>
               <option value="group">{t("devices.jobs.targetGroup")}</option>
             </SelectField>
             {targetKind === "group" && (
-              <SelectField label={t("devices.jobs.group")} value={groupId} onChange={(e) => {
+              <SelectField
+                label={t("devices.jobs.group")}
+                value={groupId}
+                onChange={(e) => {
                   setGroupId(e.target.value);
                   setPreview(null);
-                }}>
+                }}
+              >
                 <option value="">{t("devices.jobs.chooseGroup")}</option>
                 {groups.map((g) => (
                   <option key={g.id} value={g.id}>
@@ -143,26 +156,41 @@ export function JobWizard({ deviceIds, groups, models, spaces, canControl, api =
                 ))}
               </SelectField>
             )}
-            {form.type === "SET_SPACE" && <SpaceSelect spaces={spaces} label={t("devices.space")} value={form.spaceId} onChange={(e) => set({ spaceId: e.target.value })} error={err("spaceId", t("devices.jobs.valueRequired"))} />}
+            {form.type === "SET_SPACE" && (
+              <SpaceSelect spaces={spaces} label={t("devices.space")} value={form.spaceId} onChange={(e) => set({ spaceId: e.target.value })} error={err("spaceId", t("devices.jobs.valueRequired"))} />
+            )}
             {form.type === "SET_STATUS" && (
               <SelectField label={t("devices.status")} value={form.status} onChange={(e) => set({ status: e.target.value as JobForm["status"] })}>
                 <option value="ACTIVE">{t("devices.activate")}</option>
                 <option value="INACTIVE">{t("devices.deactivate")}</option>
               </SelectField>
             )}
-            {(form.type === "ADD_TAGS" || form.type === "REMOVE_TAGS") && <TextField label={t("devices.tags")} value={form.tags} hint={t("devices.tagHint")} onChange={(e) => set({ tags: e.target.value })} error={err("tags", t("devices.jobs.valueRequired"))} />}
+            {(form.type === "ADD_TAGS" || form.type === "REMOVE_TAGS") && (
+              <TextField label={t("devices.tags")} value={form.tags} hint={t("devices.tagHint")} onChange={(e) => set({ tags: e.target.value })} error={err("tags", t("devices.jobs.valueRequired"))} />
+            )}
             {form.type === "SET_ATTRIBUTES" && (
               <>
                 <SelectField label={t("devices.jobs.attrScope")} value={form.attrScope} onChange={(e) => set({ attrScope: e.target.value as JobForm["attrScope"] })}>
                   <option value="SERVER">SERVER</option>
                   <option value="SHARED">SHARED</option>
                 </SelectField>
-                <TextField label={t("devices.jobs.attributes")} value={form.attributes} onChange={(e) => set({ attributes: e.target.value })} error={err("attributes", t("devices.jobs.jsonRequired"))} />
+                <TextField
+                  label={t("devices.jobs.attributes")}
+                  value={form.attributes}
+                  onChange={(e) => set({ attributes: e.target.value })}
+                  error={err("attributes", t("devices.jobs.jsonRequired"))}
+                />
               </>
             )}
             {form.type === "SEND_COMMAND" && (
               <>
-                <TextField label={t("devices.jobs.capability")} value={form.capability} placeholder="Switch" onChange={(e) => set({ capability: e.target.value })} error={err("command", t("devices.jobs.valueRequired"))} />
+                <TextField
+                  label={t("devices.jobs.capability")}
+                  value={form.capability}
+                  placeholder="Switch"
+                  onChange={(e) => set({ capability: e.target.value })}
+                  error={err("command", t("devices.jobs.valueRequired"))}
+                />
                 <TextField label={t("devices.jobs.command")} value={form.command} onChange={(e) => set({ command: e.target.value })} />
                 <TextField label={t("devices.jobs.args")} value={form.args} onChange={(e) => set({ args: e.target.value })} error={err("args", t("devices.jobs.jsonRequired"))} />
               </>
@@ -299,7 +327,9 @@ export function JobDetail({ initial, initialItems, canAdmin, timezone, lang, api
                   {item.commandId && <span className="ml-1 font-mono text-[11.5px] text-muted">{item.commandId}</span>}
                 </td>
                 <td>
-                  <Badge tone={item.status === "SUCCEEDED" ? "success" : item.status === "FAILED" ? "danger" : "neutral"}>{t(`devices.jobs.itemStatuses.${item.status}`, { defaultValue: item.status })}</Badge>
+                  <Badge tone={item.status === "SUCCEEDED" ? "success" : item.status === "FAILED" ? "danger" : "neutral"}>
+                    {t(`devices.jobs.itemStatuses.${item.status}`, { defaultValue: item.status })}
+                  </Badge>
                 </td>
                 <td>
                   {item.errorCode && <span className="font-mono text-[12px]">{item.errorCode}</span>} {item.errorMessage ?? ""}
