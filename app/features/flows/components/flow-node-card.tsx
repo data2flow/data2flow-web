@@ -45,6 +45,8 @@ export interface FlowNodeData extends Record<string, unknown> {
   replay?: Record<string, number>;
   /** 다른 편집자가 고른 노드(UI-FLW-17) */
   presence?: { name: string; color: string };
+  /** 서브플로우 노드의 더 새 버전 */
+  newerVersion?: number;
 }
 
 export type FlowNodeView = Node<FlowNodeData, "flowNode">;
@@ -91,6 +93,7 @@ export function FlowNodeCard({ data, selected }: NodeProps<FlowNodeView>) {
       <p className="truncate font-semibold">{node.name}</p>
       <p className="truncate font-mono text-[11px] text-muted">{data.summary || node.type}</p>
       {errorCount ? <p className="text-[11px] text-bad">{t("flows.node.errors1h", { n: errorCount })}</p> : null}
+      {data.newerVersion !== undefined && <p className="text-[10.5px] text-accent">{t("flows.subflow.newer", { v: data.newerVersion })}</p>}
       {(data.bypassed || data.debug) && (
         <p className="flex gap-1 text-[10.5px]">
           {data.bypassed && <span className="rounded bg-warn-soft px-1 text-warn">{t("flows.overlay.bypassed")}</span>}

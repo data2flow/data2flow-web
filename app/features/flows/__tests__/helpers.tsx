@@ -87,6 +87,8 @@ export function fakeApi(overrides: Partial<FlowApi> = {}): FlowApi {
     variables: vi.fn(() => okr({ responses: [], totalCount: 0 })),
     resetVariable: vi.fn(() => okr({}, 204)),
     rawMessages: vi.fn(() => okr({ responses: [] })),
+    createSubflow: vi.fn(() => okr({ subflowId: "sf-1", version: 1, replacedNodeId: "n-sub00001" }, 201)),
+    subflow: vi.fn((id: string) => okr({ subflowId: id, name: "평균 후 기준 판정", version: 1, usedBy: [] })),
     ...overrides,
   } as FlowApi;
 }

@@ -163,6 +163,7 @@ export function PropertyPanel({
   onChange,
   overlay,
   lockedBy,
+  newerSubflowVersion,
 }: {
   node: FlowNode;
   catalog: Catalog;
@@ -172,6 +173,8 @@ export function PropertyPanel({
   overlay?: OverlayToggles;
   /** 다른 사람이 이 노드를 편집 중이면 그 이름(UI-FLW-17 잠금 배너, 읽기 전용) */
   lockedBy?: string;
+  /** 서브플로우 노드에 새 버전이 있으면 그 번호([버전 올리기], BR-FLW-17) */
+  newerSubflowVersion?: number;
 }) {
   const { t } = useTranslation();
   const readOnly = baseReadOnly || Boolean(lockedBy);
@@ -198,6 +201,16 @@ export function PropertyPanel({
           readOnly && <p className="text-[12px] text-muted">{t("flows.panel.readOnly")}</p>
         )}
       </header>
+      {newerSubflowVersion !== undefined && (
+        <div className="flex items-center gap-2 rounded-md border border-accent/40 p-2 text-[12px]">
+          <span>{t("flows.subflow.newerDetail", { current: String(node.config.version ?? 1), v: newerSubflowVersion })}</span>
+          {!readOnly && (
+            <button type="button" className="text-accent underline" onClick={() => onChange({ config: { ...node.config, version: newerSubflowVersion } })}>
+              {t("flows.subflow.upgrade")}
+            </button>
+          )}
+        </div>
+      )}
       {overlay && (
         <div className="flex flex-col gap-1 rounded-md border border-line p-2" title={overlay.reason}>
           <Checkbox label={t("flows.overlay.bypass")} checked={overlay.bypassed} disabled={!overlay.canToggle || overlay.busy} onChange={(e) => overlay.onToggle("bypass", e.target.checked)} />

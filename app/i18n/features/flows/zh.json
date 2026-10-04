@@ -641,6 +641,32 @@
       "removeVar": "删除",
       "noVariables": "没有变量",
       "addVar": "添加变量"
+    },
+    "subflow": {
+      "title": "创建子流程",
+      "make": "创建子流程",
+      "create": "创建",
+      "name": "名称",
+      "nameRule": "名称请输入1~100个字符",
+      "description": "说明",
+      "ports": "输入{{inputs}}个 · 节点{{nodes}}个",
+      "outputs": "输出端口",
+      "output": "输出{{n}}({{port}})",
+      "params": "公开参数",
+      "paramLabel": "显示名称",
+      "reason": {
+        "empty": "请选择要做成子流程的节点",
+        "trigger": "触发节点不能放入子流程",
+        "noInput": "需要有从外部进入的连接",
+        "tooManyInputs": "输入端口最多{{max}}个",
+        "noOutput": "需要有向外部输出的连接",
+        "tooManyOutputs": "输出端口最多{{max}}个"
+      },
+      "saveFirst": "请先保存",
+      "created": "已创建子流程{{name}} v{{v}}",
+      "newer": "有新版本(v{{v}})",
+      "newerDetail": "当前v{{current}} · 有新版本v{{v}}",
+      "upgrade": "升级版本"
     }
   },
   "errors": {

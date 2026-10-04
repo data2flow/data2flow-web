@@ -641,6 +641,32 @@
       "removeVar": "삭제",
       "noVariables": "변수가 없습니다",
       "addVar": "변수 추가"
+    },
+    "subflow": {
+      "title": "서브플로우로 만들기",
+      "make": "서브플로우로 만들기",
+      "create": "만들기",
+      "name": "이름",
+      "nameRule": "이름은 1~100자로 입력하세요",
+      "description": "설명",
+      "ports": "입력 {{inputs}}개 · 노드 {{nodes}}개",
+      "outputs": "출력 포트",
+      "output": "출력 {{n}} ({{port}})",
+      "params": "노출 파라미터",
+      "paramLabel": "표시 이름",
+      "reason": {
+        "empty": "서브플로우로 만들 노드를 고르세요",
+        "trigger": "트리거 노드는 서브플로우에 넣을 수 없습니다",
+        "noInput": "바깥에서 들어오는 연결이 있어야 합니다",
+        "tooManyInputs": "입력 포트는 최대 {{max}}개입니다",
+        "noOutput": "바깥으로 나가는 연결이 있어야 합니다",
+        "tooManyOutputs": "출력 포트는 최대 {{max}}개입니다"
+      },
+      "saveFirst": "먼저 저장하세요",
+      "created": "서브플로우 {{name}} v{{v}}을(를) 만들었습니다",
+      "newer": "새 버전 있음(v{{v}})",
+      "newerDetail": "지금 v{{current}} · 새 버전 v{{v}}이 있습니다",
+      "upgrade": "버전 올리기"
     }
   },
   "errors": {

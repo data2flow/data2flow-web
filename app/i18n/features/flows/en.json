@@ -641,6 +641,32 @@
       "removeVar": "Delete",
       "noVariables": "No variables",
       "addVar": "Add variable"
+    },
+    "subflow": {
+      "title": "Make a subflow",
+      "make": "Make subflow",
+      "create": "Create",
+      "name": "Name",
+      "nameRule": "Enter a name of 1–100 characters",
+      "description": "Description",
+      "ports": "{{inputs}} inputs · {{nodes}} nodes",
+      "outputs": "Output ports",
+      "output": "Output {{n}} ({{port}})",
+      "params": "Exposed parameters",
+      "paramLabel": "Display name",
+      "reason": {
+        "empty": "Select the nodes to turn into a subflow",
+        "trigger": "Trigger nodes cannot be part of a subflow",
+        "noInput": "There must be a connection coming in from outside",
+        "tooManyInputs": "A subflow can have at most {{max}} input ports",
+        "noOutput": "There must be a connection going out",
+        "tooManyOutputs": "A subflow can have at most {{max}} output ports"
+      },
+      "saveFirst": "Save first",
+      "created": "Created subflow {{name}} v{{v}}",
+      "newer": "New version available (v{{v}})",
+      "newerDetail": "Using v{{current}} · v{{v}} is available",
+      "upgrade": "Upgrade version"
     }
   },
   "errors": {

@@ -36,6 +36,8 @@ describe("FLW API 클라이언트(BFF 경로·멱등 키)", () => {
     await flowApi.variables("f1");
     await flowApi.resetVariable("f1", "last alert");
     await flowApi.rawMessages({ from: "2026-10-03T00:00:00Z", to: "2026-10-04T00:00:00Z", deviceIds: ["1042"] });
+    await flowApi.createSubflow({ name: "s", description: "", definition: {}, fromFlow: { flowId: "f1", nodeIds: ["a"] } });
+    await flowApi.subflow("sf 1");
     expect(calls.slice(12).map((c) => `${c.method} ${c.url}`)).toEqual([
       "POST /bff/api/core/flows/f1/test-run",
       "POST /bff/api/core/flows/f1/replay",
@@ -49,6 +51,8 @@ describe("FLW API 클라이언트(BFF 경로·멱등 키)", () => {
       "GET /bff/api/core/flows/f1/variables",
       "POST /bff/api/core/flows/f1/variables/last%20alert/reset",
       "GET /bff/api/core/ingest/raw-messages?from=2026-10-03T00%3A00%3A00Z&to=2026-10-04T00%3A00%3A00Z&size=20&deviceId=1042",
+      "POST /bff/api/core/subflows",
+      "GET /bff/api/core/subflows/sf%201",
     ]);
     expect(JSON.parse(calls[12].body!)).toEqual({ definition: def, input: { message: { deviceId: 1 } }, startNodeId: "n-js1" });
     expect(calls[13].headers.get("Idempotency-Key")).toBeTruthy();

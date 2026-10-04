@@ -39,6 +39,8 @@ export interface FlowCanvasProps {
   /** 과거 재생 분기 건수(노드 → 포트 → 건수) */
   replay?: Record<string, Record<string, number>> | null;
   presence?: Map<string, { name: string; color: string }>;
+  /** 서브플로우 노드 → 더 새 버전(BR-FLW-17 "새 버전 있음") */
+  newerSubflows?: Map<string, number>;
 }
 
 function diffOf(diff: VersionDiff | null | undefined, id: string): "added" | "changed" | "removed" | undefined {
@@ -80,7 +82,7 @@ export function handleEdgeChanges(changes: EdgeChange[], graph: FlowGraph, handl
 
 export function FlowCanvas(props: FlowCanvasProps) {
   const { t } = useTranslation();
-  const { graph, catalog, selected, badges, errorCounts, diff, readOnly, live, overlay, replay, presence } = props;
+  const { graph, catalog, selected, badges, errorCounts, diff, readOnly, live, overlay, replay, presence, newerSubflows } = props;
   const now = props.now ?? 0;
   const nodes: FlowNodeView[] = useMemo(
     () =>
@@ -105,9 +107,10 @@ export function FlowCanvas(props: FlowCanvasProps) {
           debug: overlay?.debug.includes(node.id),
           replay: replay?.[node.id],
           presence: presence?.get(node.id),
+          newerVersion: newerSubflows?.get(node.id),
         },
       })),
-    [graph.nodes, catalog, selected, badges, errorCounts, diff, readOnly, live, overlay, replay, presence],
+    [graph.nodes, catalog, selected, badges, errorCounts, diff, readOnly, live, overlay, replay, presence, newerSubflows],
   );
   const edges: Edge[] = useMemo(
     () =>

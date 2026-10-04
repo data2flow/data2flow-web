@@ -21,11 +21,13 @@ import { LiveBanner, LiveIndicator, NodeInspector, TracePanel } from "./componen
 import { MetricsPanel } from "./components/metrics-panel";
 import { SettingsPanel } from "./components/settings-panel";
 import { ShadowPanel } from "./components/shadow-panel";
+import { SubflowDialog } from "./components/subflow-dialog";
 import { TestRunPanel } from "./components/test-run-panel";
 import { defaultSocketFactory, type SocketFactory } from "./live/flow-socket";
 import { useFlowLive } from "./live/use-flow-live";
 import { useFlowPresence } from "./live/use-flow-presence";
 import { PRESENCE_HEARTBEAT_MS, avatars, othersSelection, updatedByName } from "./model/presence";
+import { subflowDraft, subflowRefs, subflowRequest, type SubflowDraft } from "./model/subflow";
 import { Palette } from "./components/palette";
 import { PropertyPanel } from "./components/property-panel";
 import { FlowStatusBadge } from "./components/status-badge";
@@ -99,6 +101,9 @@ export function FlowEditor(props: FlowEditorProps) {
   const [replayCounts, setReplayCounts] = useState<Record<string, Record<string, number>> | null>(null);
   const [shadow, setShadow] = useState<ShadowStatus | null>(null);
   const [shadowBusy, setShadowBusy] = useState(false);
+  const [subflow, setSubflow] = useState<{ draft: SubflowDraft; busy?: boolean; error?: string } | null>(null);
+  /** 서브플로우 최신 버전(노드 "새 버전 있음", BR-FLW-17) */
+  const [subflowLatest, setSubflowLatest] = useState<Record<string, number>>({});
   const live = useFlowLive({ flowId: state.flowId, enabled: Boolean(detail?.flow.activeVersion), create: createSocket, debugNodes: overlay.debug, now });
   const presence = useFlowPresence({ flowId: state.flowId, enabled: Boolean(state.flowId), create: createSocket, me: props.me?.userId });
   const presenceMap = useMemo(() => othersSelection(presence.state, props.me?.userId), [presence.state, props.me?.userId]);
@@ -296,6 +301,47 @@ export function FlowEditor(props: FlowEditorProps) {
       return;
     }
     setNotice({ tone: "success", text: t("flows.apply.applied", { v: result.data.appliedVersion ?? state.draftVersion }) });
+    props.onReload();
+  };
+
+  const subflowKey = subflowRefs(graph)
+    .map((r) => r.subflowId)
+    .sort()
+    .join(",");
+  useEffect(() => {
+    if (!subflowKey) return;
+    let cancelled = false;
+    void Promise.all(subflowKey.split(",").map((id) => api.subflow(id))).then((results) => {
+      if (cancelled) return;
+      const latest: Record<string, number> = {};
+      for (const r of results) if (r.ok) latest[r.data.subflowId] = r.data.version;
+      setSubflowLatest(latest);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [subflowKey, api]);
+  const newerSubflows = useMemo(() => new Map(subflowRefs(graph).filter((r) => (subflowLatest[r.subflowId] ?? 0) > r.version).map((r) => [r.nodeId, subflowLatest[r.subflowId]])), [graph, subflowLatest]);
+
+  const startSubflow = () => {
+    const check = subflowDraft(graph, state.selected, catalog);
+    if (!check.ok) {
+      setNotice({ tone: "danger", text: t(`flows.subflow.reason.${check.reason}`, { max: check.reason === "tooManyInputs" ? 5 : 10 }) });
+      return;
+    }
+    setSubflow({ draft: check.draft });
+  };
+
+  const createSubflow = async (form: Parameters<typeof subflowRequest>[1]) => {
+    if (!subflow || !state.flowId) return;
+    setSubflow({ ...subflow, busy: true, error: undefined });
+    const result = await api.createSubflow(subflowRequest(subflow.draft, form, state.flowId));
+    if (!result.ok) {
+      setSubflow({ ...subflow, busy: false, error: errorText(t, result) });
+      return;
+    }
+    setSubflow(null);
+    setNotice({ tone: "success", text: t("flows.subflow.created", { name: form.name.trim(), v: result.data.version }) });
     props.onReload();
   };
 
@@ -572,6 +618,11 @@ export function FlowEditor(props: FlowEditorProps) {
           <Button onClick={() => change(alignToGrid(graph, state.selected))} disabled={graph.nodes.length === 0}>
             {t("flows.toolbar.align")}
           </Button>
+          {state.flowId && (
+            <Button onClick={startSubflow} disabled={state.selected.length === 0 || dirty} title={dirty ? t("flows.subflow.saveFirst") : undefined}>
+              {t("flows.subflow.make")}
+            </Button>
+          )}
           <Button variant="danger" onClick={requestDelete} disabled={state.selected.length === 0}>
             {t("flows.toolbar.delete")}
           </Button>
@@ -598,10 +649,21 @@ export function FlowEditor(props: FlowEditorProps) {
           overlay={overlay}
           replay={replayCounts}
           presence={presenceMap}
+          newerSubflows={newerSubflows}
         />
         <aside aria-label={t("flows.panel.aside")} className="w-80 shrink-0 overflow-y-auto border-l border-line p-3">
           {selectedNode ? (
-            <PropertyPanel key={selectedNode.id} node={selectedNode} catalog={catalog} readOnly={readOnly} ctx={ctx} onChange={updateSelected} overlay={overlayToggles} lockedBy={lockedBy} />
+            <PropertyPanel
+              key={selectedNode.id}
+              node={selectedNode}
+              catalog={catalog}
+              readOnly={readOnly}
+              ctx={ctx}
+              onChange={updateSelected}
+              overlay={overlayToggles}
+              lockedBy={lockedBy}
+              newerSubflowVersion={newerSubflows.get(selectedNode.id)}
+            />
           ) : (
             <p className="text-[12.5px] text-muted">{state.selected.length > 1 ? t("common.selectedCount", { n: state.selected.length }) : t("flows.panel.empty")}</p>
           )}
@@ -718,6 +780,7 @@ export function FlowEditor(props: FlowEditorProps) {
       >
         <p className="text-[13px]">{t("flows.delete.question", { name: confirmDelete ? nameOf(confirmDelete) : "" })}</p>
       </Dialog>
+      {subflow && <SubflowDialog draft={subflow.draft} busy={subflow.busy} error={subflow.error} onCancel={() => setSubflow(null)} onCreate={(form) => void createSubflow(form)} />}
       <ApplyDialog
         open={applyCheck !== null}
         title={t("flows.apply.title", { name: state.name, from: state.activeVersion ? `v${state.activeVersion}` : "–", to: `v${state.draftVersion ?? ""}` })}

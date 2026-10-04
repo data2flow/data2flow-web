@@ -85,6 +85,10 @@ export interface FlowApi {
   /** API-FLW-21 변수 */
   variables(flowId: string): Promise<BffJsonResult<{ responses: FlowVariable[]; totalCount?: number }>>;
   resetVariable(flowId: string, name: string): Promise<BffJsonResult<unknown>>;
+  /** API-FLW-22 서브플로우 생성(고른 노드 묶음을 서브플로우 노드 하나로) */
+  createSubflow(body: { name: string; description: string; definition: Record<string, unknown>; fromFlow: { flowId: string; nodeIds: string[] } }): Promise<BffJsonResult<{ subflowId: string; version: number; replacedNodeId?: string }>>;
+  /** API-FLW-23 조회(최신 버전·사용 중인 플로우) */
+  subflow(subflowId: string): Promise<BffJsonResult<{ subflowId: string; name?: string; version: number; usedBy?: { flowId: string; name: string; version: number }[] }>>;
   /** API-ING-05 최근 원본 메시지(시험 실행 입력) */
   rawMessages(query: { from: string; to: string; deviceIds?: string[] }): Promise<BffJsonResult<{ responses: RawMessageRow[] }>>;
   capability(name: string): Promise<BffJsonResult<CapabilityDetail>>;
@@ -116,6 +120,8 @@ export const flowApi: FlowApi = {
   updateSettings: (id, patch) => bffJson(flow(id), { method: "PATCH", body: patch }),
   variables: (id) => bffJson(`${flow(id)}/variables`),
   resetVariable: (id, name) => bffJson(`${flow(id)}/variables/${encodeURIComponent(name)}/reset`, { method: "POST" }),
+  createSubflow: (body) => bffJson(`${base}/subflows`, { method: "POST", body, idempotencyKey: clientIdempotencyKey() }),
+  subflow: (id) => bffJson(`${base}/subflows/${encodeURIComponent(id)}`),
   rawMessages: (q) => {
     const params = new URLSearchParams({ from: q.from, to: q.to, size: "20" });
     for (const id of q.deviceIds ?? []) params.append("deviceId", id);

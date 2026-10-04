@@ -641,6 +641,32 @@
       "removeVar": "削除",
       "noVariables": "変数がありません",
       "addVar": "変数を追加"
+    },
+    "subflow": {
+      "title": "サブフローにする",
+      "make": "サブフローにする",
+      "create": "作成",
+      "name": "名前",
+      "nameRule": "名前は1〜100文字で入力してください",
+      "description": "説明",
+      "ports": "入力{{inputs}}個 · ノード{{nodes}}個",
+      "outputs": "出力ポート",
+      "output": "出力{{n}}({{port}})",
+      "params": "公開パラメータ",
+      "paramLabel": "表示名",
+      "reason": {
+        "empty": "サブフローにするノードを選んでください",
+        "trigger": "トリガーノードはサブフローに含められません",
+        "noInput": "外部から入る接続が必要です",
+        "tooManyInputs": "入力ポートは最大{{max}}個です",
+        "noOutput": "外部へ出る接続が必要です",
+        "tooManyOutputs": "出力ポートは最大{{max}}個です"
+      },
+      "saveFirst": "先に保存してください",
+      "created": "サブフロー{{name}} v{{v}}を作成しました",
+      "newer": "新しいバージョンあり(v{{v}})",
+      "newerDetail": "現在v{{current}} · 新しいバージョンv{{v}}があります",
+      "upgrade": "バージョンを上げる"
     }
   },
   "errors": {
