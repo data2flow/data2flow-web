@@ -92,6 +92,24 @@ data2flow 화면과 BFF입니다. React Router v8 프레임워크 모드(SSR, Vi
 - 메신저 콜백 비밀값: BFF 환경 변수 `DATA2FLOW_MESSENGER_TELEGRAM_SECRET`(없으면 404)와 core 텔레그램 채널의 `webhookSecret`이 같아야 합니다. action이 같은 헤더를 채널 정의의 `webhookSecret`과 다시 비교하고, 버튼 데이터 `ACK|{alarmId}|{deliveryId}`(또는 `MUTE_30M|…`)를 연결된 계정 권한으로 core `/internal/core/alarms/{id}/ack|mute`에 넘깁니다. action 주소는 `DATA2FLOW_ACTION_URL`(기본 `http://data2flow-action`).
 - 비상 정지 띠는 `/bff/stream/live?topics=notifications` 연결로 받는 `emergency-stop` 이벤트(토픽과 관계없이 조직의 모든 연결에 옴)로 그리고 지웁니다. 같은 연결의 `notification`은 오른쪽 아래 알림으로 띄웁니다(읽음 수 없음). 유지보수 띠는 실시간 토픽이 없어 5초마다 조회합니다(API-OPS-23).
 
+## M5 데이터 관리 화면
+
+### 평면도·공간 탐색·외부 맥락(floor)
+
+| 경로 | 화면 | 스펙 |
+|---|---|---|
+| `/spaces/{id}?tab=floorplan` | 평면도 보기: 마커 현재값 + 상태 색·기호(✔ 정상·▲ 알람·✕ 오프라인), 마커 팝업(현재값 전체·[기기 상세]), `space:{id}` 실시간 갱신, [히트 컬러](IDW 보간, 색약 친화 팔레트, 범례 최저~최고, "보간 추정"), 확대·이동. 편집은 `&edit=1`(DEV_ADMIN) | DSH-02.02, DSH-02.03 |
+| `/spaces/{건물}?tab=floorplan&floor={층}`, `/spaces/{층}?tab=floorplan` | 층 전환 바(▲▼, URL에 층 유지, 층마다 확대 초기화) | DSH-12.04 |
+| `/spaces/{건물}?tab=model3d` | [3D] IFC 모델 목록·열람(매핑 요소는 공간 상태 색, 매핑 없음 회색, 열람 전용), IFC 올리기(.ifc ≤200MB)·공간 연결·삭제(DEV_ADMIN) | DSH-12.04 |
+| (공간 화면 머리) | 위치 경로 사이트 › 건물 › 층(평면도) › 실, `?from=portfolio`면 앞에 포트폴리오 | DSH-09.02 |
+| `/spaces/{id}?tab=schedule` | 운영 모드 수동 지정·해제(DEV_PLACE, API-DEV-08 POST) | DEV-11.02 화면 |
+| `/calendar` | 조직 달력: 월·주·목록, 유형 색 + 출처 기호(✎ 수동·★ 공휴일·⇩ iCal), 범위 필터, 일정 추가·수정·삭제(DEV_PLACE), 자동 일정은 운영 모드 영향만 | DEV-12.01 |
+| `/sources/context`, `/sources/context/{siteId}` | 외부 맥락: 기상청 날씨(격자 nx·ny)·대기질(가까운 측정소 5곳)·공휴일·학사일정(iCal URL/파일, 카테고리 → 유형 매핑) 켜기·설정(SRC_ADMIN), 지금 갱신, 호출량 막대 90일(80% 경고·100% 중지·비용) | DSC-06.01·06.02·06.04·06.05 |
+
+- core API: `GET /core/buildings/{id}/floors`, `GET|POST /core/buildings/{id}/models`, `GET|DELETE …/models/{mid}`, `PUT …/models/{mid}/space-mapping`, `…/file`(API-DSH-24), `GET|POST /core/calendar-events`, `GET|PATCH|DELETE /core/calendar-events/{id}`(API-DEV-100~102), `POST /core/spaces/{id}/override-mode`, `GET /core/sites/{id}/context-sources`, `PUT …/context-sources/{type}`, `GET /core/sources/{id}/api-usage?days=90`, `POST /core/sources/{id}/refresh-now`, `GET /core/external/airkorea-stations`, `POST /core/sources/ical/upload`(API-DSC-40~45).
+- core 평면도 응답(API-DSH-03)은 마커 좌표만 주므로 현재값·연결 상태는 공간 요약(API-DSH-02)과 실시간 `device-update`로 채우고, 열린 알람이 있으면 알람 상태로 그린다. 히트 컬러 보간은 화면에서 계산한다(SVG 격자, 캔버스 없음).
+- 3D 렌더링(web-ifc + three.js)은 넣지 않았다. [3D] 탭은 IFC 공간 요소를 상태 색 타일로 보여 주고 원본은 [IFC 내려받기]로 연다.
+
 ## 개발
 
 ```bash

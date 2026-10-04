@@ -22,6 +22,7 @@ const SECTIONS = [
   { key: "sources", to: "/sources", permission: "SRC_READ" },
   { key: "scripts", to: "/scripts", permission: "SCRIPT_READ" },
   { key: "failures", to: "/ingest/failures", permission: "INGEST_READ" },
+  { key: "context", to: "/sources/context", permission: "SRC_READ" },
 ] as const;
 
 /** 수집 구역 보조 탭(00-navigation §2 수집 메뉴) */

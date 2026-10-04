@@ -2,6 +2,8 @@
  * /spaces/:spaceId 공간 상세(UI-DEV-01·02·03 + UI-DSH-02, DEV-01.01~01.04, DEV-10.01, DEV-11.01, DSH-01.02, DSH-07.05).
  * 왼쪽 트리(편집은 DEV_ADMIN), 오른쪽 경로·쾌적도·즐겨찾기와 탭: 개요(실시간 기기 카드)·기기·속성·목표 환경·운영 시간·평면도.
  * API: API-DEV-01~10, API-DSH-02(개요)·03(평면도 보기)·12(즐겨찾기·최근 본 항목), API-DEV-11(기기 목록)·18(공간 기기)
+ * M5: 평면도 보기(실시간 마커·히트 컬러·확대, DSH-02.02·02.03), 위치 경로(DSH-09.02), 건물 층 전환(`?floor=`)과 [3D] 탭(IFC, DSH-12.04, API-DSH-24),
+ * 운영 모드 수동 지정(API-DEV-08 POST, DEV_PLACE — core M5 DEV-11.02)
  */
 import { useTranslation } from "react-i18next";
 import { Form, Link, data, useActionData, useLoaderData, useRouteLoaderData } from "react-router";
@@ -9,6 +11,12 @@ import { callApi, callList, field } from "~/bff/api.server";
 import { bff } from "~/bff/middleware.server";
 import { Alert, Badge, Button, Card, CsrfField, PageHeader, StatusDot, Table, Tabs } from "~/components/ui";
 import { isFavorite, toggleFavorite, type Favorite } from "~/features/home/model/home";
+import { LocationPath } from "~/components/breadcrumb/location-path";
+import { BimPanel } from "~/features/bim/components/bim-panel";
+import { checkIfcFile, mappingBody, type ModelDetail, type ModelSummary } from "~/features/bim/model/bim";
+import { FloorSwitcher } from "~/features/floorplan/components/floor-switcher";
+import { FloorplanLive } from "~/features/floorplan/components/floorplan-live";
+import { buildingOf, floorNav, locationPath, type FloorItem, type FloorNav } from "~/features/floorplan/model/location";
 import { FloorplanPanel, type FloorplanView } from "~/features/spaces/components/floorplan";
 import { ModeCard, PropsForm, ScheduleEditor, TargetsEditor, type FormResult, type ModeData, type ScheduleData, type SpaceDetail, type TargetsData } from "~/features/spaces/components/space-manage";
 import { SpaceAlarms } from "~/features/spaces/components/space-alarms";
@@ -25,7 +33,7 @@ import type { Route } from "./+types/space-detail";
 import { loadTree, treeAction } from "./spaces-shared.server";
 
 // 보기 탭(UI-DSH-02: 개요·알람) + 관리 탭(UI-DEV-01~03)
-const TABS = ["overview", "alarms", "devices", "props", "targets", "schedule", "floorplan"] as const;
+const TABS = ["overview", "alarms", "devices", "props", "targets", "schedule", "floorplan", "model3d"] as const;
 type Tab = (typeof TABS)[number];
 
 interface Overview {
@@ -81,6 +89,15 @@ export async function loader({ request, context, params }: Route.LoaderArgs) {
   let spaceDevices: { id: string; name: string }[] = [];
   let alarms: SpaceAlarm[] = [];
   let alarmsFailed = false;
+  // M5 평면도 보기·층 전환(DSH-02.02·12.04), [3D](DSH-12.04)
+  let floors: FloorItem[] = [];
+  let floorNavState: FloorNav | null = null;
+  let floorBase: { kind: "building" | "floor"; buildingId: string } | null = null;
+  let planOverview: Overview | null = null;
+  let planSpaceId = params.spaceId;
+  let models: ModelSummary[] = [];
+  let modelDetail: ModelDetail | null = null;
+  const edit = url.searchParams.get("edit") === "1";
   if (tab === "alarms") {
     // 공간 하위 열린 알람(API-RUL-10, spaceId는 하위 포함, 기본 상태 ACTIVE·ACKNOWLEDGED·SUPPRESSED)
     const list = await callList<SpaceAlarm>(ctx, request, `/api/v1/core/alarms?spaceId=${id}&size=100`);
@@ -98,9 +115,34 @@ export async function loader({ request, context, params }: Route.LoaderArgs) {
     schedule = s.ok ? s.data : { inherit: true, slots: [] };
     mode = m.ok ? m.data : null;
   } else if (tab === "floorplan") {
-    const [f, d] = await Promise.all([callApi<FloorplanView>(ctx, request, `${base}/floorplan`), callList<{ id: string; name: string }>(ctx, request, `${base}/devices?includeDescendants=false`)]);
+    // 건물이면 층 목록(GET /core/buildings/{id}/floors)으로 층 전환, 층이면 같은 건물의 다른 층으로 이동(AT-DSH-13.1)
+    const building = space.data.type === "BUILDING" ? params.spaceId : space.data.type === "FLOOR" ? (buildingOf(tree, params.spaceId)?.id ?? null) : null;
+    if (building && !edit) {
+      const f = await callApi<FloorItem[]>(ctx, request, `/api/v1/core/buildings/${encodeURIComponent(String(building))}/floors`);
+      floors = f.ok ? (f.data ?? []).map((x) => ({ ...x, spaceId: String(x.spaceId) })) : [];
+      if (floors.length) {
+        floorBase = { kind: space.data.type === "BUILDING" ? "building" : "floor", buildingId: String(building) };
+        floorNavState = floorNav(floors, space.data.type === "BUILDING" ? url.searchParams.get("floor") : params.spaceId);
+        if (space.data.type === "BUILDING" && floorNavState.current) planSpaceId = floorNavState.current.spaceId;
+      }
+    }
+    const planBase = `/api/v1/core/spaces/${encodeURIComponent(planSpaceId)}`;
+    const [f, d, o] = await Promise.all([
+      callApi<FloorplanView>(ctx, request, `${planBase}/floorplan`),
+      edit ? callList<{ id: string; name: string }>(ctx, request, `${base}/devices?includeDescendants=false`) : Promise.resolve(null),
+      planSpaceId !== params.spaceId ? callApi<Overview>(ctx, request, `${planBase}/overview`) : Promise.resolve(null),
+    ]);
     floorplan = f.ok ? f.data : null;
-    spaceDevices = d.ok ? d.list.responses.map((x) => ({ id: String(x.id), name: x.name })) : [];
+    spaceDevices = d?.ok ? d.list.responses.map((x) => ({ id: String(x.id), name: x.name })) : [];
+    planOverview = o ? (o.ok ? o.data : null) : overview.ok ? overview.data : null;
+  } else if (tab === "model3d" && space.data.type === "BUILDING") {
+    const list = await callApi<ModelSummary[]>(ctx, request, `/api/v1/core/buildings/${id}/models`);
+    models = list.ok ? (list.data ?? []).map((m) => ({ ...m, id: String(m.id) })) : [];
+    const wanted = url.searchParams.get("model") ?? models[0]?.id;
+    if (wanted && models.some((m) => m.id === wanted)) {
+      const detail = await callApi<ModelDetail>(ctx, request, `/api/v1/core/buildings/${id}/models/${encodeURIComponent(wanted)}`);
+      modelDetail = detail.ok ? { ...detail.data, id: String(detail.data.id), mappings: detail.data.mappings ?? [] } : null;
+    }
   }
   return {
     tab,
@@ -117,6 +159,15 @@ export async function loader({ request, context, params }: Route.LoaderArgs) {
     spaceDevices,
     alarms,
     alarmsFailed,
+    floors,
+    floorNav: floorNavState,
+    floorBase,
+    planOverview,
+    planSpaceId,
+    models,
+    modelDetail,
+    edit,
+    from: url.searchParams.get("from"),
     now: Date.now(),
   };
 }
@@ -183,6 +234,35 @@ export async function action({ request, context, params }: Route.ActionArgs) {
       const result = await callApi(ctx, request, `${base}/floorplan/markers`, { method: "PUT", body: { markers } });
       return result.ok ? ({ intent, ok: true } as FormResult) : fail(intent, result);
     }
+    case "override": {
+      // API-DEV-08 POST 운영 모드 수동 지정(mode 비우면 해제, until 선택 — 7일 이내)
+      const mode = field(form, "mode");
+      const until = field(form, "until");
+      const result = await callApi(ctx, request, `${base}/override-mode`, { method: "POST", body: mode ? { mode, ...(until ? { until } : {}) } : { mode: null } });
+      return result.ok ? ({ intent, ok: true } as FormResult) : fail(intent, result);
+    }
+    case "bimUpload": {
+      const file = form.get("file");
+      const problem = checkIfcFile(file instanceof File ? { name: file.name, size: file.size } : null);
+      if (problem) return data({ intent, error: { code: "MODEL_FILE_INVALID" } } as FormResult, { status: problem === "TOO_LARGE" ? 413 : 400 });
+      const upload = new FormData();
+      upload.set("file", file as File, (file as File).name);
+      const name = field(form, "name").trim();
+      if (name) upload.set("name", name);
+      const result = await callApi(ctx, request, `/api/v1/core/buildings/${encodeURIComponent(params.spaceId)}/models`, { method: "POST", rawBody: upload });
+      return result.ok ? ({ intent, ok: true } as FormResult) : fail(intent, result);
+    }
+    case "bimMapping": {
+      const result = await callApi(ctx, request, `/api/v1/core/buildings/${encodeURIComponent(params.spaceId)}/models/${encodeURIComponent(field(form, "modelId"))}/space-mapping`, {
+        method: "PUT",
+        body: mappingBody(parseJsonArray<{ ifcGlobalId: string; spaceId: string }>(field(form, "mappings"))),
+      });
+      return result.ok ? ({ intent, ok: true } as FormResult) : fail(intent, result);
+    }
+    case "bimDelete": {
+      const result = await callApi(ctx, request, `/api/v1/core/buildings/${encodeURIComponent(params.spaceId)}/models/${encodeURIComponent(field(form, "modelId"))}`, { method: "DELETE" });
+      return result.ok ? ({ intent, ok: true } as FormResult) : fail(intent, result);
+    }
     case "favorite": {
       const prefs = await callApi<Preferences>(ctx, request, "/api/v1/core/accounts/me/preferences");
       if (!prefs.ok) return fail(intent, prefs);
@@ -207,7 +287,8 @@ export default function SpaceDetailPage() {
   const { space, tree, tab, overview } = loaded;
   const flat = findSpace(tree, space.id);
   const children = (flat?.node.children ?? []).map((c) => ({ id: String(c.id), name: c.name, type: c.type }));
-  const tabs = TABS.map((key) => ({ key, label: t(`spaces.tab.${key}`), to: `/spaces/${space.id}?tab=${key}` }));
+  const tabs = TABS.filter((key) => key !== "model3d" || space.type === "BUILDING").map((key) => ({ key, label: key === "model3d" ? t("floor.tab3d") : t(`spaces.tab.${key}`), to: `/spaces/${space.id}?tab=${key}` }));
+  const crumbs = locationPath(tree, String(space.id), loaded.from);
   return (
     <div className="grid min-w-0 gap-4 md:grid-cols-[260px_1fr]">
       <aside className="min-w-0">
@@ -215,7 +296,7 @@ export default function SpaceDetailPage() {
       </aside>
       <section className="min-w-0">
         <PageHeader
-          crumb={(flat?.path ?? [space.name]).join(" › ")}
+          crumb={crumbs.length ? <LocationPath crumbs={crumbs} from={loaded.from} /> : (flat?.path ?? [space.name]).join(" › ")}
           title={
             <span className="inline-flex items-center gap-2">
               {space.name}
@@ -253,10 +334,46 @@ export default function SpaceDetailPage() {
           <div className="grid gap-4 lg:grid-cols-[1fr_280px]">
             <ScheduleEditor data={loaded.schedule} canEdit={canEdit} result={result} />
             {/* 운영 모드 수동 지정(API-DEV-08 POST …/override-mode)은 DEV-11.02(M5, 조직 달력 DEV-12.01 필요) 범위라 M2에서는 조회만 보인다 */}
-            <ModeCard data={loaded.mode} canOverride={false} timezone={timezone} lang={lang} now={loaded.now} result={result} />
+            <ModeCard data={loaded.mode} canOverride={hasAny(me?.permissions, ["DEV_PLACE"])} timezone={timezone} lang={lang} now={loaded.now} result={result} />
           </div>
         )}
-        {tab === "floorplan" && <FloorplanPanel view={loaded.floorplan} devices={loaded.spaceDevices} canEdit={canEdit} result={result} />}
+        {tab === "floorplan" && (loaded.edit || (loaded.planSpaceId === String(space.id) && !loaded.floorplan?.imageUrl) || (result && ["markers", "floorplan"].includes(result.intent ?? "")) ? (
+          <FloorplanPanel view={loaded.floorplan} devices={loaded.spaceDevices} canEdit={canEdit} result={result} />
+        ) : (
+          <FloorplanLive
+            key={loaded.planSpaceId}
+            spaceId={loaded.planSpaceId}
+            view={loaded.floorplan}
+            devices={loaded.planOverview?.devices ?? []}
+            alarms={(loaded.planOverview?.openAlarms ?? []).map((a) => ({ deviceId: a.device?.id ?? null, severity: a.severity }))}
+            now={loaded.now}
+            lang={lang}
+            emptyAction={
+              canEdit ? (
+                <Link to={`/spaces/${encodeURIComponent(loaded.planSpaceId)}?tab=floorplan`} className="text-accent underline">
+                  {t("floor.view.uploadForFloor")}
+                </Link>
+              ) : undefined
+            }
+            toolbar={
+              <div className="flex flex-wrap items-start justify-between gap-2">
+                {loaded.floorNav && loaded.floorBase && (
+                  <FloorSwitcher
+                    nav={loaded.floorNav}
+                    total={loaded.floors.length}
+                    hrefFor={(floorId) => (loaded.floorBase!.kind === "building" ? `/spaces/${space.id}?tab=floorplan&floor=${encodeURIComponent(floorId)}` : `/spaces/${encodeURIComponent(floorId)}?tab=floorplan`)}
+                  />
+                )}
+                {canEdit && loaded.planSpaceId === String(space.id) && (
+                  <Link to={`/spaces/${space.id}?tab=floorplan&edit=1`} className="ml-auto text-[12.5px] text-accent underline">
+                    {t("floor.view.edit")}
+                  </Link>
+                )}
+              </div>
+            }
+          />
+        ))}
+        {tab === "model3d" && space.type === "BUILDING" && <BimPanel spaceId={String(space.id)} models={loaded.models} detail={loaded.modelDetail} tree={tree} canEdit={canEdit} result={result} />}
         {result?.error && (result.intent === "favorite" || (!canEdit && ["create", "rename", "move", "delete"].includes(result.intent ?? ""))) && <Alert tone="danger">{t(`errors.${result.error.code}`, { defaultValue: t("errors.UNKNOWN") })}</Alert>}
       </section>
     </div>

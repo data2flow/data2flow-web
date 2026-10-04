@@ -32,7 +32,9 @@ describe("DEV-01.01 공간 트리(UI-DEV-01)", () => {
     expect(index.response.headers.get("Location")).toBe("/spaces/1");
     const page = await browser.get("/spaces/31");
     expect(page.response.status).toBe(200);
-    expect(page.body).toContain("광주캠퍼스 › 본관 › 3층 › 실습실");
+    // 위치 경로(DSH-09.02): 단계마다 링크, 마지막은 현재 공간
+    expect(page.body).toContain('aria-label="위치 경로"');
+    expect(page.body).toMatch(/광주캠퍼스<\/a>.*본관<\/a>.*3층<\/a>.*aria-current="page">실습실/s);
     expect(page.body).toContain("사이트 추가");
     expect(page.body).toContain("하위 추가");
     const vpage = await (await viewer()).get("/spaces/31");
@@ -204,14 +206,14 @@ describe("DEV-01.02·01.04·11.01 관리 탭(UI-DEV-02)", () => {
     const overlap = await browser.post("/spaces/31?tab=schedule", { intent: "schedule", slots: JSON.stringify([...slots, { dayOfWeek: 1, start: "11:00", end: "13:00" }]) });
     expect(overlap.response.status).toBe(400);
     expect(overlap.body).toContain("같은 요일의 시간 구간이 겹칩니다");
-    // 운영 모드 수동 지정(override-mode)은 core M2에 없어 조회만(OPERATOR에게도 폼 없음, 서버로 보내지 않음)
+    // 운영 모드 수동 지정(override-mode)은 core M5(DEV-11.02)에서 열려 OPERATOR(DEV_PLACE)에게 폼이 보인다 — 자세한 검사는 test/floor.test.ts
     const op = await operator();
     const opPage = await op.get("/spaces/31?tab=schedule");
     expect(opPage.body).toContain("운영 중");
-    expect(opPage.body).not.toContain("수동 지정 해제");
+    expect(opPage.body).toContain("수동 지정 해제");
     const override = await op.post("/spaces/31?tab=schedule", { intent: "override", mode: "MAINTENANCE", until: new Date(Date.now() + 3600_000).toISOString() });
-    expect(override.response.status).toBe(400);
-    expect(sent("POST", "/api/v1/core/spaces/31/override-mode")).toHaveLength(0);
+    expect(override.response.status).toBe(200);
+    expect(sent("POST", "/api/v1/core/spaces/31/override-mode")).toHaveLength(1);
     const v = await (await viewer()).get("/spaces/31?tab=schedule");
     expect(v.body).not.toContain("수동 지정 해제");
   });

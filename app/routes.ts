@@ -113,5 +113,10 @@ export default [
     route("control/capabilities", "routes/control-capabilities.tsx"),
     route("device-jobs", "routes/device-jobs.tsx"),
     route("device-jobs/:jobId", "routes/device-job-detail.tsx"),
+
+    // M5 floor: 조직 달력(UI-DEV-14, DEV-12.01), 외부 맥락 데이터(UI-DSC-04, DSC-06). 평면도 보기·층 전환·[3D]는 /spaces/{id}?tab=floorplan|model3d
+    route("calendar", "routes/calendar.tsx"),
+    route("sources/context", "routes/sources-context.tsx"),
+    route("sources/context/:siteId", "routes/sources-context-site.tsx"),
   ]),
 ] satisfies RouteConfig;

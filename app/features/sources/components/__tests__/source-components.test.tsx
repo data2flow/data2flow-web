@@ -456,10 +456,11 @@ describe("수집 구역 탭·스파크라인", () => {
     expect(screen.queryByRole("img", { name: "none" })).toBeNull();
   });
 
-  it("OPERATOR에게는 네 구역", async () => {
+  it("OPERATOR에게는 다섯 구역(M5 외부 맥락 포함, UI-DSC-04)", async () => {
     await renderRoute(<IngestTabs current="sources" />, { session: meOf("OPERATOR") });
     expect(await screen.findByRole("link", { name: "데이터 소스" })).toHaveAttribute("aria-current", "page");
-    expect(screen.getAllByRole("link")).toHaveLength(4);
+    expect(screen.getByRole("link", { name: "외부 맥락" })).toHaveAttribute("href", "/sources/context");
+    expect(screen.getAllByRole("link")).toHaveLength(5);
   });
 });
 
