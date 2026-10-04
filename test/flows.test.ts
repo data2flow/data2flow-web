@@ -312,7 +312,9 @@ describe("M4 라이브 편집·시험(FLW-03.05·03.06·03.04·05.05·06.04·06.
     const browser = await operator();
     await browser.get("/automation/flows/f-7f3a");
     const detail = parse((await browser.get("/bff/api/core/flows/f-7f3a")).body).response as { version: { definition: unknown } };
-    const run = await json(browser, "/bff/api/core/flows/f-7f3a/test-run", "POST", { definition: detail.version.definition, input: { message: { deviceId: 1042, measuredAt: "2026-10-04T00:00:00Z", metrics: [{ key: "temperature", value: 28.1 }] } } });
+    // 엔진은 input.message를 contracts CanonicalTelemetry로 읽는다(봉투 필수 항목 포함, 화면은 toCanonicalTelemetry로 채움)
+    const message = { v: 1, messageId: "00000000-0000-4000-8000-000000000001", organizationId: 1, sourceId: 1, externalId: "test-1042", deviceId: 1042, deviceStatus: "ACTIVE", measuredAt: "2026-10-04T00:00:00Z", receivedAt: "2026-10-04T00:00:00Z", rawMessageId: 1, metrics: [{ key: "temperature", value: 28.1, quality: 0 }] };
+    const run = await json(browser, "/bff/api/core/flows/f-7f3a/test-run", "POST", { definition: detail.version.definition, input: { message } });
     expect(run.response.status).toBe(200);
     const trace = parse(run.body).response.trace as { steps: { nodeId: string; action?: { dryRun: boolean } }[] };
     expect(trace.steps.map((s) => s.nodeId)).toEqual(["n-trg00001", "n-agg00001", "n-thr00001", "n-act00001"]);
@@ -320,6 +322,10 @@ describe("M4 라이브 편집·시험(FLW-03.05·03.06·03.04·05.05·06.04·06.
     const bad = await json(browser, "/bff/api/core/flows/f-7f3a/test-run", "POST", { definition: detail.version.definition, input: { message: { foo: 1 } } });
     expect(bad.response.status).toBe(400);
     expect(parse(bad.body).header.resultCode).toBe("FLOW_TEST_INPUT_INVALID");
+    // 최근 원본 메시지: core가 rawMessageId(숫자)를 텔레메트리로 바꿔 엔진에 넘긴다
+    expect((await json(browser, "/bff/api/core/flows/f-7f3a/test-run", "POST", { input: { rawMessageId: "8812345" } })).response.status).toBe(200);
+    const badRaw = await json(browser, "/bff/api/core/flows/f-7f3a/test-run", "POST", { input: { rawMessageId: "abc" } });
+    expect(parse(badRaw.body)).toMatchObject({ header: { resultCode: "FLOW_TEST_INPUT_INVALID" }, errors: [{ field: "input.rawMessageId" }] });
   });
 
   it("TC-FLW-076·077 과거 재생: 7일 넘으면 400 FLOW_REPLAY_TOO_LARGE, 정상은 202 jobId → 작업 결과", async () => {
@@ -331,8 +337,29 @@ describe("M4 라이브 편집·시험(FLW-03.05·03.06·03.04·05.05·06.04·06.
     const started = await json(browser, "/bff/api/core/flows/f-7f3a/replay", "POST", { version: 13, from: "2026-09-27T15:00:00Z", to: "2026-10-04T15:00:00Z" }, { "Idempotency-Key": "rp-1" });
     expect(started.response.status).toBe(202);
     const jobId = parse(started.body).response.jobId as string;
+    expect(parse(started.body).response).toEqual({ jobId, status: "QUEUED" });
     const job = parse((await browser.get(`/bff/api/core/flow-replays/${jobId}`)).body).response;
-    expect(job).toMatchObject({ status: "SUCCEEDED", result: { actions: { command: 12, notify: 3 } } });
+    expect(job).toMatchObject({ jobId, flowId: "f-7f3a", status: "SUCCEEDED", progress: { processed: 1000, total: 1000 }, result: { actions: { command: 12, notify: 3 } }, error: null });
+    // 끝난 작업 취소는 상태를 바꾸지 않고 작업을 돌려준다(엔진 ReplayService.cancel)
+    const cancelled = await json(browser, `/bff/api/core/flow-replays/${jobId}/cancel`, "POST", {});
+    expect(cancelled.response.status).toBe(200);
+    expect(parse(cancelled.body).response).toMatchObject({ jobId, status: "SUCCEEDED" });
+    const badRange = await json(browser, "/bff/api/core/flows/f-7f3a/replay", "POST", { version: 13, from: "어제", to: "2026-10-04T15:00:00Z" });
+    expect(parse(badRange.body)).toMatchObject({ header: { resultCode: "INVALID_REQUEST" }, errors: [{ field: "from" }] });
+    expect((await browser.get("/bff/api/core/flow-replays/404404")).response.status).toBe(404);
+  });
+
+  it("ADR-048 실행 추적: 공간 범위 밖 spaceId를 가진 입력·출력은 core가 가리고 masked=true, 지표는 엔진이 살아 있으면 그대로 중계", async () => {
+    const browser = await operator();
+    await browser.get("/automation/flows/f-7f3a");
+    state().traces.set("m-scope", { messageId: "m-scope", flowId: "f-7f3a", version: 13, startedAt: "2026-10-04T00:00:00Z", result: "COMPLETED", error: null, steps: [{ nodeId: "n-trg00001", type: "trigger.telemetry", durationMs: 0.1, input: { message: { spaceId: 32 } }, outputs: [{ port: "out", payload: { spaceId: 32, temperature: 28 } }] }, { nodeId: "n-thr00001", type: "condition.threshold", durationMs: 0.1, input: { spaceId: 31 }, outputs: [{ port: "true", payload: { spaceId: 31 } }] }] });
+    state().traceScope = ["31"];
+    const trace = parse((await browser.get("/bff/api/core/flows/f-7f3a/traces/m-scope")).body).response as { steps: Record<string, unknown>[] };
+    expect(trace.steps[0]).toMatchObject({ input: null, masked: true, outputs: [{ port: "out", payload: null, masked: true }] });
+    expect(trace.steps[1].masked).toBeUndefined();
+    const metrics = await browser.get("/bff/api/core/flows/f-7f3a/metrics?window=1h&step=1m");
+    expect(metrics.response.status).toBe(200);
+    expect(parse(metrics.body).response).toMatchObject({ summary: { executions: 812 } });
   });
 
   it("TC-FLW-146 바이패스(overlay): revision 불일치 409, 제어 노드 바이패스는 OPERATOR 403, INTEGRATOR는 버전 그대로 반영", async () => {

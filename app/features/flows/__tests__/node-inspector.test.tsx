@@ -78,6 +78,22 @@ describe("FLW-03.04 TC-FLW-072 실행 추적 타임라인", () => {
     expect(actionText(t, { nodeId: "a", type: "x" })).toBeUndefined();
   });
 
+  it("ADR-048 공간 범위 밖 내용은 core가 가린다(input null·payload null, masked=true) → '일부 가림'과 안내 문구", async () => {
+    const masked: Trace = {
+      messageId: "m-scope",
+      result: "COMPLETED",
+      steps: [
+        { nodeId: "n-trg", type: "trigger.telemetry", durationMs: 0.2, input: null, masked: true, outputs: [{ port: "out", payload: null, masked: true }] },
+        { nodeId: "n-thr", type: "condition.threshold", durationMs: 0.4, input: { temperature: 27.8 }, outputs: [{ port: "true" }] },
+      ],
+    };
+    await renderRoute(<TraceView trace={masked} nameOf={nameOf} timezone="Asia/Seoul" />, { session: meOf("OPERATOR") });
+    const steps = await screen.findAllByTestId("trace-step");
+    expect(within(steps[0]).getByTestId("trace-masked")).toHaveTextContent("일부 가림");
+    expect(within(steps[0]).getByText("권한 범위 밖 공간의 내용이라 가렸습니다")).toBeInTheDocument();
+    expect(within(steps[1]).queryByTestId("trace-masked")).toBeNull();
+  });
+
   it("[추적] 탭: 메시지 ID로 불러오기, 없으면(404) 1시간 보관 안내", async () => {
     const trace = vi.fn().mockResolvedValueOnce({ ok: false, status: 404, code: "RESOURCE_NOT_FOUND", message: "" }).mockResolvedValueOnce({ ok: true, status: 200, data: TRACE });
     await renderRoute(<TracePanel flowId="f-7f3a" api={{ trace }} nameOf={nameOf} timezone="Asia/Seoul" onSelectNode={vi.fn()} />, { session: meOf("OPERATOR") });

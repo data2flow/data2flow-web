@@ -11,7 +11,7 @@ import { Alert, Button, SelectField, TextArea, TextField } from "~/components/ui
 import { errorText } from "~/lib/error-text";
 import { formatDateTime, zonedDate } from "~/lib/format";
 import type { FlowApi, TestRunInput } from "../api";
-import { REPLAY_POLL_MS, checkTestMessage, replayDone, replayPercent, replayRange, sampleMessage } from "../model/test-run";
+import { REPLAY_POLL_MS, checkTestMessage, replayDone, replayPercent, replayRange, sampleMessage, toCanonicalTelemetry } from "../model/test-run";
 import type { FlowDefinition, RawMessageRow, ReplayJob, Trace } from "../model/types";
 import type { TargetDevice } from "./target-field";
 import { TraceView } from "./live-panels";
@@ -22,7 +22,7 @@ export interface TestRunPanelProps {
   version: number | null;
   dirty: boolean;
   definition: () => FlowDefinition;
-  api: Pick<FlowApi, "testRun" | "replay" | "replayJob" | "rawMessages">;
+  api: Pick<FlowApi, "testRun" | "replay" | "replayJob" | "cancelReplay" | "rawMessages">;
   devices: TargetDevice[];
   timezone: string;
   now?: () => number;
@@ -92,7 +92,7 @@ export function TestRunPanel(props: TestRunPanelProps) {
         setInputError(checked.error === "json" ? t("flows.test.invalidJson") : t("flows.test.invalidSchema", { field: checked.field ?? "" }));
         return;
       }
-      input = { message: checked.message };
+      input = { message: toCanonicalTelemetry(checked.message, new Date(now()).toISOString()) };
     }
     setRunning(true);
     const result = await api.testRun(flowId, { definition: props.definition(), input });
@@ -138,8 +138,23 @@ export function TestRunPanel(props: TestRunPanelProps) {
       return;
     }
     setJobId(result.data.jobId);
-    setJob({ status: "QUEUED" });
+    setJob({ jobId: result.data.jobId, status: result.data.status ?? "QUEUED" });
     poll(result.data.jobId);
+  };
+
+  const cancelReplay = async () => {
+    if (!jobId) return;
+    if (timer.current) {
+      clearTimeout(timer.current);
+      timer.current = null;
+    }
+    const result = await api.cancelReplay(jobId);
+    if (!result.ok) {
+      setReplayError(errorText(t, result));
+      return;
+    }
+    setJob(result.data);
+    if (!replayDone(result.data)) poll(jobId);
   };
 
   const outcome = job?.result;
@@ -208,6 +223,11 @@ export function TestRunPanel(props: TestRunPanelProps) {
           <Button onClick={() => void startReplay()} disabled={Boolean(job && !replayDone(job))}>
             {t("flows.replay.start")}
           </Button>
+          {job && !replayDone(job) && (
+            <Button className="ml-2" onClick={() => void cancelReplay()}>
+              {t("flows.replay.cancel")}
+            </Button>
+          )}
         </div>
         {replayError && <Alert tone="danger">{replayError}</Alert>}
         {job && (
@@ -216,7 +236,12 @@ export function TestRunPanel(props: TestRunPanelProps) {
             <div role="progressbar" aria-label={t("flows.replay.progress")} aria-valuemin={0} aria-valuemax={100} aria-valuenow={replayPercent(job)} className="h-2 w-full rounded bg-bg">
               <div className="h-2 rounded bg-accent" style={{ width: `${replayPercent(job)}%` }} />
             </div>
-            {job.progress && <p className="text-muted">{t("flows.replay.processed", { processed: job.progress.processed, total: job.progress.total })}</p>}
+            {job.progress && (
+              <p className="text-muted">
+                {job.progress.total == null ? t("flows.replay.processedSoFar", { processed: job.progress.processed }) : t("flows.replay.processed", { processed: job.progress.processed, total: job.progress.total })}
+              </p>
+            )}
+            {job.status === "FAILED" && job.error && <Alert tone="danger">{job.error}</Alert>}
             {outcome && (
               <>
                 <p className="font-semibold">{t("flows.replay.summary", { executions: outcome.executions, command: outcome.actions.command, notify: outcome.actions.notify, sink: outcome.actions.sink, errors: outcome.errors })}</p>

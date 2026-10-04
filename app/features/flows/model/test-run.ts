@@ -25,6 +25,27 @@ export function sampleMessage(nowIso: string, deviceId?: string | null, spaceId?
   };
 }
 
+/**
+ * 엔진은 직접 입력을 contracts `CanonicalTelemetry`로 읽고(필수: organizationId·sourceId·externalId·deviceStatus·rawMessageId·receivedAt),
+ * 빠지면 400 FLOW_TEST_INPUT_INVALID다. 사용자가 측정값만 적어도 시험할 수 있게 봉투 항목의 빈자리를 시험용 값으로 채운다.
+ */
+export function toCanonicalTelemetry(message: Record<string, unknown>, nowIso: string): Record<string, unknown> {
+  const measuredAt = typeof message.measuredAt === "string" ? message.measuredAt : nowIso;
+  return {
+    v: 1,
+    messageId: "00000000-0000-4000-8000-000000000001",
+    organizationId: 1,
+    sourceId: 1,
+    externalId: `test-${String(message.deviceId ?? "device")}`,
+    deviceStatus: "ACTIVE",
+    receivedAt: measuredAt,
+    late: false,
+    virtual: false,
+    rawMessageId: 1,
+    ...message,
+  };
+}
+
 export type MessageCheck = { ok: true; message: Record<string, unknown> } | { ok: false; error: "json" | "schema"; field?: string };
 
 /** JSON 형식 → 표준 메시지 필수 항목(deviceId, measuredAt ISO-8601, metrics[{key, value}] 1개 이상) */
@@ -62,8 +83,9 @@ export function replayRange(fromDate: string, toDate: string, timezone: string):
 
 export const replayDone = (job: ReplayJob | null | undefined) => Boolean(job && ["SUCCEEDED", "FAILED", "CANCELLED"].includes(job.status));
 
+/** 엔진은 전체 건수를 세기 전에는 `progress.total`을 null로 준다 */
 export function replayPercent(job: ReplayJob | null | undefined): number {
   const p = job?.progress;
-  if (!p || p.total <= 0) return job?.status === "SUCCEEDED" ? 100 : 0;
+  if (!p || p.total == null || p.total <= 0) return job?.status === "SUCCEEDED" ? 100 : 0;
   return Math.min(100, Math.round((p.processed / p.total) * 100));
 }

@@ -175,7 +175,43 @@
       "spaceId": "対象空間",
       "threshold": "基準値",
       "targetTemperature": "目標温度",
-      "commaHint": "カンマ区切り"
+      "commaHint": "カンマ区切り",
+      "range": "範囲[最小, 最大]",
+      "invert": "範囲外なら真",
+      "expression": "値パス(JSONPath)",
+      "cases": "ケース",
+      "rules": "マッピングルール",
+      "scriptRef": "スクリプト参照",
+      "rate": "周期",
+      "key": "キー",
+      "events": "イベント",
+      "capability": "機能",
+      "command": "コマンド",
+      "args": "引数",
+      "priority": "優先度",
+      "sceneId": "シーン",
+      "fields": "送るフィールド",
+      "mode": "方式",
+      "severity": "重大度",
+      "title": "タイトル",
+      "ruleId": "ルール",
+      "policyId": "通知ポリシー",
+      "channels": "チャネル",
+      "recipients": "受信者",
+      "templateKey": "テンプレート",
+      "aggregateWindow": "まとめ窓",
+      "variables": "テンプレート変数",
+      "link": "ショートカットリンク",
+      "items": "条件項目",
+      "emit": "出力",
+      "delta": "変化量",
+      "direction": "方向",
+      "connectionId": "保存先接続",
+      "mapping": "フィールドマッピング",
+      "upsertKeys": "upsertキー",
+      "batchSize": "バッチサイズ",
+      "includeVirtual": "仮想データを含む",
+      "payload": "送る値"
     },
     "rule": {
       "required": "必須項目です",
@@ -433,7 +469,9 @@
       "kind": {
         "COMMAND": "制御",
         "NOTIFY": "通知",
-        "SINK": "保存"
+        "SINK": "保存",
+        "SCENE": "シーン",
+        "ALARM": "アラーム"
       },
       "skipped": "{{kind}}をスキップ({{reason}})",
       "dryRun": "ドライラン(実行しない): {{kind}} {{summary}}",
@@ -443,7 +481,8 @@
       "result": {
         "COMPLETED": "最後まで処理",
         "FAILED": "失敗",
-        "DROPPED": "破棄"
+        "DROPPED": "破棄",
+        "HOP_LIMIT": "ノード数の上限超過"
       },
       "noSteps": "通過したノードはありません",
       "ms": "{{ms}}ms",
@@ -453,7 +492,9 @@
       "notFound": "トレースがありません。デバッグをオンにしたかサンプリングされたメッセージのみ1時間保存されます",
       "messageId": "メッセージID",
       "hint": "デバッグタブの[トレースを見る]からも開けます",
-      "load": "読み込む"
+      "load": "読み込む",
+      "masked": "一部非表示",
+      "maskedContent": "権限範囲外の空間の内容のため非表示にしました"
     },
     "test": {
       "title": "テスト実行(ドライラン)",
@@ -509,7 +550,9 @@
       "summary": "実行{{executions}}回 · 制御{{command}}回 · 通知{{notify}}回 · 保存{{sink}}回 · エラー{{errors}}件",
       "noRealActions": "ドライランのため実際の命令・通知は0件です",
       "overlayShown": "キャンバスに過去再生の分岐件数を重ねて表示しています。",
-      "overlayClear": "消す"
+      "overlayClear": "消す",
+      "cancel": "再生を取消",
+      "processedSoFar": "{{processed}}件処理"
     },
     "metrics": {
       "title": "フロー指標",
@@ -519,7 +562,7 @@
         "24h": "24時間",
         "7d": "7日"
       },
-      "unavailable": "指標なし(エンジン指標をまだ取得できません)",
+      "unavailable": "指標なし(フローエンジンに接続できません。しばらくしてから再確認してください)",
       "errorsValue": "{{n}} ({{rate}}%)",
       "latencyValue": "平均 {{avg}}ms · p95 {{p95}}ms",
       "actionsValue": "制御 {{command}} · 通知 {{notify}} · 保存 {{sink}}",

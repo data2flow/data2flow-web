@@ -7,7 +7,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { meOf, renderRoute } from "../../../../test/render";
 import { JsTestRun } from "../components/js-test-run";
 import { TestRunPanel, type TestRunPanelProps } from "../components/test-run-panel";
-import { checkTestMessage, replayDone, replayPercent, replayRange, sampleMessage } from "../model/test-run";
+import { checkTestMessage, replayDone, replayPercent, replayRange, sampleMessage, toCanonicalTelemetry } from "../model/test-run";
 import type { Trace } from "../model/types";
 
 afterEach(() => vi.useRealTimers());
@@ -27,8 +27,9 @@ const ok = <T,>(data: T, status = 200) => Promise.resolve({ ok: true as const, s
 function panel(overrides: Partial<TestRunPanelProps> = {}) {
   const api = {
     testRun: vi.fn(() => ok({ trace: DRY })),
-    replay: vi.fn(() => ok({ jobId: "rp-1" }, 202)),
+    replay: vi.fn(() => ok({ jobId: "9001", status: "QUEUED" as const }, 202)),
     replayJob: vi.fn(),
+    cancelReplay: vi.fn(),
     rawMessages: vi.fn(() => ok({ responses: [{ id: "9001", receivedAt: "2026-10-04T00:12:03Z", deviceId: "1042", deviceName: "EM300-TH-151606" }] })),
     ...(overrides.api ?? {}),
   };
@@ -80,7 +81,13 @@ describe("FLW-03.05 TC-FLW-073 AT-FLW-05.1 시험 실행(드라이런)", () => {
     await userEvent.click(screen.getByRole("button", { name: "실행" }));
     expect(await screen.findByText("입력 형식이 올바르지 않습니다")).toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: "실행" }));
-    expect(testRun).toHaveBeenLastCalledWith("f-7f3a", expect.objectContaining({ input: { message: { deviceId: 1, measuredAt: "2026-10-04T00:00:00Z", metrics: [{ key: "temperature", value: 28 }] } } }));
+    // 엔진은 contracts CanonicalTelemetry로 읽으므로 봉투 필수 항목(조직·소스·외부 ID·상태·원본 ID·수신 시각)을 시험용 값으로 채워 보낸다
+    expect(testRun).toHaveBeenLastCalledWith(
+      "f-7f3a",
+      expect.objectContaining({
+        input: { message: expect.objectContaining({ v: 1, organizationId: 1, sourceId: 1, externalId: "test-1", deviceStatus: "ACTIVE", rawMessageId: 1, receivedAt: "2026-10-04T00:00:00Z", deviceId: 1, measuredAt: "2026-10-04T00:00:00Z", metrics: [{ key: "temperature", value: 28 }] }) },
+      }),
+    );
     expect(await screen.findByText(/드라이런\(실행 안 함\)/)).toBeInTheDocument();
   });
 
@@ -142,6 +149,42 @@ describe("FLW-03.06 TC-FLW-076 AT-FLW-05.2 과거 재생", () => {
     expect(await screen.findByText("재생할 데이터가 너무 많습니다. 기간을 줄여 주세요")).toBeInTheDocument();
   });
 
+  it("엔진이 전체 건수를 모르면(total null) 처리 건수만, [재생 취소] → POST cancel → 취소됨, 더 묻지 않음", async () => {
+    const replayJob = vi.fn().mockResolvedValue({ ok: true, status: 200, data: { jobId: "9001", flowId: "f-7f3a", status: "RUNNING", progress: { processed: 500, total: null }, result: null, error: null } });
+    const cancelReplay = vi.fn(() => ok({ jobId: "9001", flowId: "f-7f3a", status: "CANCELLED" as const, progress: { processed: 500, total: null }, result: null, error: null }));
+    const { view } = panel({ api: { replayJob, cancelReplay } as never });
+    await view;
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    await userEvent.click(await screen.findByRole("button", { name: "재생 시작" }));
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(2000);
+    });
+    expect(screen.getByText("500건 처리")).toBeInTheDocument();
+    expect(screen.getByRole("progressbar", { name: "재생 진행률" })).toHaveAttribute("aria-valuenow", "0");
+    await userEvent.click(screen.getByRole("button", { name: "재생 취소" }));
+    expect(cancelReplay).toHaveBeenCalledWith("9001");
+    expect(await screen.findByText("취소됨")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "재생 취소" })).toBeNull();
+    const calls = replayJob.mock.calls.length;
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(10_000);
+    });
+    expect(replayJob).toHaveBeenCalledTimes(calls);
+  });
+
+  it("재생 실패면 엔진 오류 문구를 보인다", async () => {
+    const replayJob = vi.fn().mockResolvedValue({ ok: true, status: 200, data: { jobId: "9001", flowId: "f-7f3a", status: "FAILED", progress: { processed: 10, total: 100 }, result: null, error: "텔레메트리 조회 실패" } });
+    const { view } = panel({ api: { replayJob } as never });
+    await view;
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    await userEvent.click(await screen.findByRole("button", { name: "재생 시작" }));
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(2000);
+    });
+    expect(screen.getByText("실패")).toBeInTheDocument();
+    expect(screen.getByText("텔레메트리 조회 실패")).toBeInTheDocument();
+  });
+
   it("저장한 버전이 없으면 재생할 수 없다", async () => {
     const { view } = panel({ version: null });
     await view;
@@ -157,6 +200,9 @@ describe("시험 입력·재생 기간 모델", () => {
     expect(checkTestMessage('{"deviceId":1,"measuredAt":"2026-10-04T00:00:00Z","metrics":[]}')).toEqual({ ok: false, error: "schema", field: "metrics" });
     expect(checkTestMessage(JSON.stringify(sampleMessage("2026-10-04T00:00:00Z", "1042", "31"))).ok).toBe(true);
     expect(sampleMessage("2026-10-04T00:00:00Z")).toMatchObject({ deviceId: 1 });
+    // 사용자가 적은 값이 시험용 기본값보다 앞선다
+    expect(toCanonicalTelemetry({ deviceId: 7, organizationId: 3, measuredAt: "2026-10-04T00:00:00Z" }, "2026-10-05T00:00:00Z")).toMatchObject({ deviceId: 7, organizationId: 3, receivedAt: "2026-10-04T00:00:00Z", deviceStatus: "ACTIVE", externalId: "test-7" });
+    expect(replayPercent({ status: "RUNNING", progress: { processed: 5, total: null } })).toBe(0);
     expect(replayRange("2026-10-01", "2026-10-01", "Asia/Seoul")).toEqual({ ok: true, from: "2026-09-30T15:00:00Z", to: "2026-10-01T15:00:00Z" });
     expect(replayRange("2026-10-02", "2026-10-01", "Asia/Seoul")).toEqual({ ok: false, error: "order" });
     expect(replayRange("", "2026-10-01", "Asia/Seoul")).toEqual({ ok: false, error: "required" });

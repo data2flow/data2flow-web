@@ -27,6 +27,7 @@ describe("FLW API 클라이언트(BFF 경로·멱등 키)", () => {
     await flowApi.testRun("f1", { definition: def, input: { message: { deviceId: 1 } }, startNodeId: "n-js1" });
     await flowApi.replay("f1", { version: 4, from: "2026-10-01T00:00:00Z", to: "2026-10-02T00:00:00Z" });
     await flowApi.replayJob("rp 1");
+    await flowApi.cancelReplay("9001");
     await flowApi.trace("f1", "m/1");
     await flowApi.overlay("f1", { bypass: ["n1"], debug: [], revision: 2 });
     await flowApi.shadow("f1");
@@ -42,6 +43,7 @@ describe("FLW API 클라이언트(BFF 경로·멱등 키)", () => {
       "POST /bff/api/core/flows/f1/test-run",
       "POST /bff/api/core/flows/f1/replay",
       "GET /bff/api/core/flow-replays/rp%201",
+      "POST /bff/api/core/flow-replays/9001/cancel",
       "GET /bff/api/core/flows/f1/traces/m%2F1",
       "PUT /bff/api/core/flows/f1/overlay",
       "GET /bff/api/core/flows/f1/shadow",

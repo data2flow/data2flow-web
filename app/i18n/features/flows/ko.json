@@ -175,7 +175,43 @@
       "spaceId": "대상 공간",
       "threshold": "기준 값",
       "targetTemperature": "목표 온도",
-      "commaHint": "쉼표로 구분"
+      "commaHint": "쉼표로 구분",
+      "range": "범위[최소, 최대]",
+      "invert": "범위 밖이면 참",
+      "expression": "값 경로(JSONPath)",
+      "cases": "케이스",
+      "rules": "매핑 규칙",
+      "scriptRef": "스크립트 참조",
+      "rate": "주기",
+      "key": "키",
+      "events": "이벤트",
+      "capability": "기능",
+      "command": "명령",
+      "args": "인자",
+      "priority": "우선순위",
+      "sceneId": "장면",
+      "fields": "보낼 필드",
+      "mode": "방식",
+      "severity": "심각도",
+      "title": "제목",
+      "ruleId": "규칙",
+      "policyId": "알림 정책",
+      "channels": "채널",
+      "recipients": "수신자",
+      "templateKey": "템플릿",
+      "aggregateWindow": "묶기 창",
+      "variables": "템플릿 변수",
+      "link": "바로가기 링크",
+      "items": "조건 항목",
+      "emit": "내보내기",
+      "delta": "변화량",
+      "direction": "방향",
+      "connectionId": "저장소 연결",
+      "mapping": "필드 매핑",
+      "upsertKeys": "upsert 키",
+      "batchSize": "배치 크기",
+      "includeVirtual": "가상 데이터 포함",
+      "payload": "보낼 값"
     },
     "rule": {
       "required": "필수 입력입니다",
@@ -433,7 +469,9 @@
       "kind": {
         "COMMAND": "제어",
         "NOTIFY": "알림",
-        "SINK": "저장"
+        "SINK": "저장",
+        "SCENE": "장면",
+        "ALARM": "알람"
       },
       "skipped": "{{kind}} 건너뜀({{reason}})",
       "dryRun": "드라이런(실행 안 함): {{kind}} {{summary}}",
@@ -443,7 +481,8 @@
       "result": {
         "COMPLETED": "끝까지 처리",
         "FAILED": "실패",
-        "DROPPED": "버림"
+        "DROPPED": "버림",
+        "HOP_LIMIT": "노드 수 한도 초과"
       },
       "noSteps": "거친 노드가 없습니다",
       "ms": "{{ms}}ms",
@@ -453,7 +492,9 @@
       "notFound": "추적이 없습니다. 디버그를 켰거나 샘플된 메시지만 1시간 보관합니다",
       "messageId": "메시지 ID",
       "hint": "디버그 탭의 [추적 보기]로도 열 수 있습니다",
-      "load": "불러오기"
+      "load": "불러오기",
+      "masked": "일부 가림",
+      "maskedContent": "권한 범위 밖 공간의 내용이라 가렸습니다"
     },
     "test": {
       "title": "시험 실행(드라이런)",
@@ -509,7 +550,9 @@
       "summary": "실행 {{executions}}회 · 제어 {{command}}회 · 알림 {{notify}}회 · 저장 {{sink}}회 · 오류 {{errors}}건",
       "noRealActions": "드라이런이라 실제 명령·알림은 0건입니다",
       "overlayShown": "캔버스에 과거 재생 분기 건수를 겹쳐 보이고 있습니다.",
-      "overlayClear": "지우기"
+      "overlayClear": "지우기",
+      "cancel": "재생 취소",
+      "processedSoFar": "{{processed}}건 처리"
     },
     "metrics": {
       "title": "플로우 지표",
@@ -519,7 +562,7 @@
         "24h": "24시간",
         "7d": "7일"
       },
-      "unavailable": "지표 없음(엔진 지표를 아직 받을 수 없습니다)",
+      "unavailable": "지표 없음(플로우 엔진에 연결할 수 없습니다. 잠시 뒤 다시 확인하세요)",
       "errorsValue": "{{n}} ({{rate}}%)",
       "latencyValue": "평균 {{avg}}ms · p95 {{p95}}ms",
       "actionsValue": "제어 {{command}} · 알림 {{notify}} · 저장 {{sink}}",

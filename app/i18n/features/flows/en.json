@@ -175,7 +175,43 @@
       "spaceId": "Target space",
       "threshold": "Threshold",
       "targetTemperature": "Target temperature",
-      "commaHint": "Separate with commas"
+      "commaHint": "Separate with commas",
+      "range": "Range [min, max]",
+      "invert": "True when outside the range",
+      "expression": "Value path (JSONPath)",
+      "cases": "Cases",
+      "rules": "Mapping rules",
+      "scriptRef": "Script reference",
+      "rate": "Interval",
+      "key": "Key",
+      "events": "Events",
+      "capability": "Capability",
+      "command": "Command",
+      "args": "Arguments",
+      "priority": "Priority",
+      "sceneId": "Scene",
+      "fields": "Fields to send",
+      "mode": "Mode",
+      "severity": "Severity",
+      "title": "Title",
+      "ruleId": "Rule",
+      "policyId": "Notification policy",
+      "channels": "Channels",
+      "recipients": "Recipients",
+      "templateKey": "Template",
+      "aggregateWindow": "Grouping window",
+      "variables": "Template variables",
+      "link": "Shortcut link",
+      "items": "Condition items",
+      "emit": "Emit",
+      "delta": "Change",
+      "direction": "Direction",
+      "connectionId": "Storage connection",
+      "mapping": "Field mapping",
+      "upsertKeys": "Upsert keys",
+      "batchSize": "Batch size",
+      "includeVirtual": "Include virtual data",
+      "payload": "Payload"
     },
     "rule": {
       "required": "Required",
@@ -433,7 +469,9 @@
       "kind": {
         "COMMAND": "Control",
         "NOTIFY": "Notification",
-        "SINK": "Sink"
+        "SINK": "Sink",
+        "SCENE": "Scene",
+        "ALARM": "Alarm"
       },
       "skipped": "{{kind}} skipped ({{reason}})",
       "dryRun": "Dry run (not executed): {{kind}} {{summary}}",
@@ -443,7 +481,8 @@
       "result": {
         "COMPLETED": "Completed",
         "FAILED": "Failed",
-        "DROPPED": "Dropped"
+        "DROPPED": "Dropped",
+        "HOP_LIMIT": "Node limit exceeded"
       },
       "noSteps": "No nodes were visited",
       "ms": "{{ms}} ms",
@@ -453,7 +492,9 @@
       "notFound": "No trace. Traces are kept for 1 hour only for debug-enabled or sampled messages.",
       "messageId": "Message ID",
       "hint": "You can also open it from [View trace] in the Debug tab",
-      "load": "Load"
+      "load": "Load",
+      "masked": "Partly hidden",
+      "maskedContent": "Hidden: content from a space outside your access scope"
     },
     "test": {
       "title": "Test run (dry run)",
@@ -509,7 +550,9 @@
       "summary": "{{executions}} runs · {{command}} controls · {{notify}} notifications · {{sink}} sink writes · {{errors}} errors",
       "noRealActions": "Dry run: no real commands or notifications were sent",
       "overlayShown": "Replay branch counts are shown on the canvas.",
-      "overlayClear": "Clear"
+      "overlayClear": "Clear",
+      "cancel": "Cancel replay",
+      "processedSoFar": "{{processed}} processed"
     },
     "metrics": {
       "title": "Flow metrics",
@@ -519,7 +562,7 @@
         "24h": "24 hours",
         "7d": "7 days"
       },
-      "unavailable": "No metrics (engine metrics are not available yet)",
+      "unavailable": "No metrics (cannot reach the flow engine; try again shortly)",
       "errorsValue": "{{n}} ({{rate}}%)",
       "latencyValue": "avg {{avg}} ms · p95 {{p95}} ms",
       "actionsValue": "control {{command}} · notify {{notify}} · sink {{sink}}",

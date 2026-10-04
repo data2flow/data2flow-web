@@ -190,12 +190,15 @@ export interface FlowMetrics {
 export interface TraceStep {
   nodeId: string;
   type: string;
-  inMs?: number;
+  inMs?: number | null;
   durationMs?: number;
+  /** 입력. 공간 범위 밖이면 core가 null로 지우고 `masked: true`(ADR-048) */
   input?: unknown;
-  outputs?: { port: string; payload?: unknown }[];
-  action?: { kind: "COMMAND" | "NOTIFY" | "SINK"; idempotencyKey?: string; dryRun?: boolean; skipped?: string | null; summary?: string } | null;
+  outputs?: { port: string; payload?: unknown; masked?: boolean }[];
+  action?: { kind: "COMMAND" | "SCENE" | "NOTIFY" | "SINK" | "ALARM"; idempotencyKey?: string; dryRun?: boolean; skipped?: string | null; summary?: string } | null;
   error?: { code?: string; errorType?: string; message?: string; line?: number } | null;
+  /** 입력이나 출력 중 하나라도 범위 밖이라 가렸으면 true(core FlowRunService.trace) */
+  masked?: boolean;
 }
 
 export interface Trace {
@@ -204,15 +207,19 @@ export interface Trace {
   version?: number;
   startedAt?: string;
   steps: TraceStep[];
+  /** COMPLETED · FAILED · HOP_LIMIT · DROPPED */
   result?: string;
   error?: { code?: string; errorType?: string; message?: string; nodeId?: string; line?: number } | null;
 }
 
-/** API-FLW-13 과거 재생 작업 */
+/** API-FLW-13 과거 재생 작업(엔진 ReplayService.view: {jobId, flowId, status, progress:{processed, total|null}, result, error}) */
 export interface ReplayJob {
+  jobId?: string;
+  flowId?: string;
   status: "QUEUED" | "RUNNING" | "SUCCEEDED" | "FAILED" | "CANCELLED";
-  progress?: { processed: number; total: number };
-  result?: { executions: number; branchCounts: Record<string, Record<string, number>>; actions: { command: number; notify: number; sink: number }; errors: number } | null;
+  progress?: { processed: number; total: number | null };
+  result?: { executions: number; branchCounts: Record<string, Record<string, number>>; actions: { command: number; notify: number; sink: number; alarm?: number }; errors: number } | null;
+  error?: string | null;
 }
 
 /** API-FLW-18 섀도우 실행 */

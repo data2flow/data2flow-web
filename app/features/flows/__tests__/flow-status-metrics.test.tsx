@@ -44,7 +44,7 @@ describe("FLW-05.05 TC-FLW-109 AT-FLW-10.4 플로우 지표", () => {
       .mockResolvedValueOnce({ ok: true, status: 200, data: M });
     await renderRoute(<MetricsPanel flowId="f-7f3a" api={{ metrics }} initial={M} nameOf={nameOf} />, { session: meOf("OPERATOR") });
     await userEvent.selectOptions(await screen.findByLabelText("기간"), "24h");
-    expect(await screen.findByText("지표 없음(엔진 지표를 아직 받을 수 없습니다)")).toBeInTheDocument();
+    expect(await screen.findByText("지표 없음(플로우 엔진에 연결할 수 없습니다. 잠시 뒤 다시 확인하세요)")).toBeInTheDocument();
     expect(metrics).toHaveBeenCalledWith("f-7f3a", "24h");
     await userEvent.selectOptions(screen.getByLabelText("기간"), "7d");
     expect(await screen.findByRole("alert")).toBeInTheDocument();

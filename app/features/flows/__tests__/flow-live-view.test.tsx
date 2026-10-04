@@ -55,14 +55,19 @@ describe("FLW-03.01 TC-FLW-065 AT-FLW-04.1 AT-FLW-04.2 실시간 흐름 표시",
 
   it("권한이 바뀌어 4403으로 닫히면 다시 연결하지 않고 안내, 초안만 있는 플로우는 연결하지 않는다", async () => {
     const { sockets, unmount } = await renderEditor({ role: "ANALYST", detail: activeDetail() });
-    const live = sockets.sockets.find((s) => !s.url.endsWith("/presence"))!;
+    // 소켓은 effect에서 열리므로 생길 때까지 기다린다(부하가 큰 전체 실행에서도 안정)
+    const live = await vi.waitFor(() => {
+      const found = sockets.sockets.find((s) => !s.url.endsWith("/presence"));
+      if (!found) throw new Error("live socket not opened yet");
+      return found;
+    });
     act(() => live.serverClose(4403));
-    expect(screen.getByText("라이브 뷰를 볼 권한이 없습니다")).toBeInTheDocument();
+    expect(await screen.findByText("라이브 뷰를 볼 권한이 없습니다")).toBeInTheDocument();
     unmount();
     const draft = await renderEditor({ role: "OPERATOR", detail: detailOf(coolingGraph()) });
     expect(draft.sockets.sockets.filter((s) => !s.url.endsWith("/presence"))).toHaveLength(0);
-    await userEvent.click(screen.getByRole("tab", { name: "디버그" }));
-    expect(screen.getByText("적용된 버전이 있어야 실시간 흐름을 볼 수 있습니다")).toBeInTheDocument();
+    await userEvent.click(await screen.findByRole("tab", { name: "디버그" }));
+    expect(await screen.findByText("적용된 버전이 있어야 실시간 흐름을 볼 수 있습니다")).toBeInTheDocument();
   });
 
   it("apply.status로 적용 수렴, flow.status로 엔진 판정 상태를 보여 준다(FLW-06.01·06.02)", async () => {

@@ -69,9 +69,11 @@ export interface FlowApi {
   capabilities(): Promise<BffJsonResult<{ responses: CapabilitySummary[] }>>;
   /** API-FLW-12 시험 실행(드라이런) */
   testRun(flowId: string, body: TestRunBody): Promise<BffJsonResult<{ trace: Trace }>>;
-  /** API-FLW-13 과거 재생: 202 {jobId} */
-  replay(flowId: string, body: { version: number; from: string; to: string; deviceIds?: string[] }): Promise<BffJsonResult<{ jobId: string }>>;
+  /** API-FLW-13 과거 재생: 202 {jobId, status:"QUEUED"} */
+  replay(flowId: string, body: { version: number; from: string; to: string; deviceIds?: string[] }): Promise<BffJsonResult<{ jobId: string; status?: ReplayJob["status"] }>>;
   replayJob(jobId: string): Promise<BffJsonResult<ReplayJob>>;
+  /** API-FLW-13 재생 취소 → 작업(CANCELLED) */
+  cancelReplay(jobId: string): Promise<BffJsonResult<ReplayJob>>;
   /** API-FLW-41 실행 추적 */
   trace(flowId: string, messageId: string): Promise<BffJsonResult<Trace>>;
   /** API-FLW-11 바이패스·디버그 */
@@ -112,6 +114,7 @@ export const flowApi: FlowApi = {
   testRun: (id, body) => bffJson(`${flow(id)}/test-run`, { method: "POST", body }),
   replay: (id, body) => bffJson(`${flow(id)}/replay`, { method: "POST", body, idempotencyKey: clientIdempotencyKey() }),
   replayJob: (jobId) => bffJson(`${base}/flow-replays/${encodeURIComponent(jobId)}`),
+  cancelReplay: (jobId) => bffJson(`${base}/flow-replays/${encodeURIComponent(jobId)}/cancel`, { method: "POST" }),
   trace: (id, messageId) => bffJson(`${flow(id)}/traces/${encodeURIComponent(messageId)}`),
   overlay: (id, body) => bffJson(`${flow(id)}/overlay`, { method: "PUT", body }),
   shadow: (id) => bffJson(`${flow(id)}/shadow`),

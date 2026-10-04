@@ -51,10 +51,23 @@ function clean(config: Record<string, unknown>): Record<string, unknown> {
   return Object.fromEntries(Object.entries(config).filter(([, v]) => v !== undefined));
 }
 
+/**
+ * 위젯 결정: 카탈로그의 `x-widget`이 먼저, 없으면 core 카탈로그(node-types.json) 관례로 추론한다.
+ * core는 trigger.telemetry·action.control의 `target`, `metric(s)` 필드에 `x-widget`을 달지 않는다.
+ */
+export function widgetOf(name: string, schema: ConfigSchema): string | undefined {
+  if (schema["x-widget"]) return schema["x-widget"];
+  if (schema.format === "duration") return "duration";
+  const type = Array.isArray(schema.type) ? schema.type[0] : schema.type;
+  if (name === "target" && type === "object") return "target";
+  if ((name === "metric" && type === "string") || (name === "metrics" && type === "array")) return "metric";
+  return undefined;
+}
+
 function Field({ name, schema, value, onChange, problem, ctx, disabled, nodeType }: { name: string; schema: ConfigSchema; value: unknown; onChange: (v: unknown) => void; problem?: string; ctx: PanelContext; disabled: boolean; nodeType: string }) {
   const { t } = useTranslation();
   const label = t(`flows.field.${name}`, { defaultValue: schema.title ?? name });
-  const widget = schema["x-widget"] ?? (schema.format === "duration" ? "duration" : undefined);
+  const widget = widgetOf(name, schema);
   if (widget === "duration") return <DurationField label={label} value={value} onChange={onChange} error={problem} disabled={disabled} />;
   if (widget === "target") return <TargetField label={label} value={value as TargetValue | undefined} onChange={onChange} spaces={ctx.spaces} devices={ctx.devices} models={ctx.models} defaultRelation={nodeType.startsWith("action.") ? "controls" : "measures"} error={problem} disabled={disabled} />;
   if (widget === "code") {

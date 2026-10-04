@@ -175,7 +175,43 @@
       "spaceId": "目标空间",
       "threshold": "阈值",
       "targetTemperature": "目标温度",
-      "commaHint": "用逗号分隔"
+      "commaHint": "用逗号分隔",
+      "range": "范围[最小, 最大]",
+      "invert": "范围外为真",
+      "expression": "值路径(JSONPath)",
+      "cases": "分支",
+      "rules": "映射规则",
+      "scriptRef": "脚本引用",
+      "rate": "周期",
+      "key": "键",
+      "events": "事件",
+      "capability": "功能",
+      "command": "命令",
+      "args": "参数",
+      "priority": "优先级",
+      "sceneId": "场景",
+      "fields": "发送字段",
+      "mode": "方式",
+      "severity": "严重度",
+      "title": "标题",
+      "ruleId": "规则",
+      "policyId": "通知策略",
+      "channels": "渠道",
+      "recipients": "接收人",
+      "templateKey": "模板",
+      "aggregateWindow": "合并窗口",
+      "variables": "模板变量",
+      "link": "快捷链接",
+      "items": "条件项",
+      "emit": "输出",
+      "delta": "变化量",
+      "direction": "方向",
+      "connectionId": "存储连接",
+      "mapping": "字段映射",
+      "upsertKeys": "upsert键",
+      "batchSize": "批量大小",
+      "includeVirtual": "包含虚拟数据",
+      "payload": "发送值"
     },
     "rule": {
       "required": "必填",
@@ -433,7 +469,9 @@
       "kind": {
         "COMMAND": "控制",
         "NOTIFY": "通知",
-        "SINK": "存储"
+        "SINK": "存储",
+        "SCENE": "场景",
+        "ALARM": "告警"
       },
       "skipped": "已跳过{{kind}}({{reason}})",
       "dryRun": "试运行(未执行): {{kind}} {{summary}}",
@@ -443,7 +481,8 @@
       "result": {
         "COMPLETED": "处理完成",
         "FAILED": "失败",
-        "DROPPED": "已丢弃"
+        "DROPPED": "已丢弃",
+        "HOP_LIMIT": "超出节点数上限"
       },
       "noSteps": "没有经过的节点",
       "ms": "{{ms}}ms",
@@ -453,7 +492,9 @@
       "notFound": "没有追踪记录。仅开启调试或被采样的消息保存1小时",
       "messageId": "消息ID",
       "hint": "也可以从调试标签页的[查看追踪]打开",
-      "load": "加载"
+      "load": "加载",
+      "masked": "部分隐藏",
+      "maskedContent": "该内容属于权限范围外的空间，已隐藏"
     },
     "test": {
       "title": "试运行(空跑)",
@@ -509,7 +550,9 @@
       "summary": "执行{{executions}}次 · 控制{{command}}次 · 通知{{notify}}次 · 存储{{sink}}次 · 错误{{errors}}条",
       "noRealActions": "因是空跑，实际命令·通知为0条",
       "overlayShown": "画布上叠加显示历史回放的分支数量。",
-      "overlayClear": "清除"
+      "overlayClear": "清除",
+      "cancel": "取消回放",
+      "processedSoFar": "已处理{{processed}}条"
     },
     "metrics": {
       "title": "流程指标",
@@ -519,7 +562,7 @@
         "24h": "24小时",
         "7d": "7天"
       },
-      "unavailable": "无指标(暂时无法获取引擎指标)",
+      "unavailable": "无指标(无法连接流程引擎，请稍后再试)",
       "errorsValue": "{{n}} ({{rate}}%)",
       "latencyValue": "平均 {{avg}}ms · p95 {{p95}}ms",
       "actionsValue": "控制 {{command}} · 通知 {{notify}} · 存储 {{sink}}",

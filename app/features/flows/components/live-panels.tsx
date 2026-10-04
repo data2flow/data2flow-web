@@ -144,6 +144,11 @@ export function TraceView({ trace, nameOf, timezone, onSelectNode }: { trace: Tr
                 <span className="font-mono text-[11.5px] text-muted">{t("flows.trace.ms", { ms: (step.durationMs ?? 0).toFixed(1) })}</span>
                 {ports && <span className="text-[11.5px]">→ {ports}</span>}
                 {action && <span className="text-[11.5px] text-accent">{action}</span>}
+                {step.masked && (
+                  <span data-testid="trace-masked" className="rounded bg-bg px-1 text-[11px] text-muted">
+                    {t("flows.trace.masked")}
+                  </span>
+                )}
               </button>
               {step.error && (
                 <p role="alert" className="text-[11.5px] text-bad">
@@ -154,7 +159,7 @@ export function TraceView({ trace, nameOf, timezone, onSelectNode }: { trace: Tr
               <details className="text-[11.5px]">
                 <summary className="cursor-pointer text-muted">{t("flows.trace.details")}</summary>
                 <div className="grid grid-cols-2 gap-2">
-                  <Json value={step.input ?? null} />
+                  {step.masked && step.input === null ? <p className="text-muted">{t("flows.trace.maskedContent")}</p> : <Json value={step.input ?? null} />}
                   <Json value={step.outputs ?? []} />
                 </div>
               </details>

@@ -202,7 +202,8 @@ describe("UI-FLW-16 기간 위젯 ↔ ISO-8601", () => {
 describe("FLW-01.02 BR-FLW-05 설정 스키마 검증·그래프 검증", () => {
   it("required·type·min·max·enum·length·duration·items", () => {
     const schema = M3_NODE_TYPES.find((t) => t.type === "condition.threshold")!.configSchema!;
-    expect(validateConfig(schema, { metric: "temperature", op: ">" })).toEqual([{ path: "value", rule: "required" }]);
+    // core 카탈로그(node-types.json)의 임계값은 op만 필수
+    expect(validateConfig(schema, { metric: "temperature" })).toEqual([{ path: "op", rule: "required" }]);
     expect(validateConfig(schema, { metric: "temperature", op: "~", value: "27", for: "PT0S", repeat: 0 })).toEqual([
       { path: "op", rule: "enum" },
       { path: "value", rule: "type", limit: "number" },
@@ -226,12 +227,12 @@ describe("FLW-01.02 BR-FLW-05 설정 스키마 검증·그래프 검증", () => 
 
   it("노드 이름 1~60자, JS 코드 64KB, 재시도 0~10", () => {
     const node = { id: "n-js000001", type: "transform.js", typeVersion: 1, name: "", config: { code: "x".repeat(64 * 1024 + 1) }, retry: { maxAttempts: 11 }, position: { x: 0, y: 0 } };
-    expect(nodeProblems(node, catalog).map((p) => `${p.path}:${p.rule}`)).toEqual(["name:required", "code:maxBytes", "retry.maxAttempts:maximum"]);
+    expect(nodeProblems(node, catalog).map((p) => `${p.path}:${p.rule}`)).toEqual(["name:required", "code:maxLength", "code:maxBytes", "retry.maxAttempts:maximum"]);
     expect(nodeProblems({ ...node, name: "a".repeat(61), config: { code: "ok" }, retry: { maxAttempts: -1 } }, catalog).map((p) => `${p.path}:${p.rule}`)).toEqual(["name:maxLength", "retry.maxAttempts:minimum"]);
   });
 
   it("NO_TRIGGER·UNCONNECTED·CYCLE·INVALID_CONFIG", () => {
-    const graph = createFlowGraph(catalog).node("debug.log", "n-a0000001").node("debug.log", "n-b0000001").wire("n-a0000001", "out", "n-b0000001").wire("n-b0000001", "out", "n-a0000001").node("condition.threshold", "n-c0000001", { metric: "t", op: ">" }).build();
+    const graph = createFlowGraph(catalog).node("debug.log", "n-a0000001").node("debug.log", "n-b0000001").wire("n-a0000001", "out", "n-b0000001").wire("n-b0000001", "out", "n-a0000001").node("condition.threshold", "n-c0000001", { metric: "t", op: "~" }).build();
     const result = validateGraph(graph, catalog);
     expect(result.errors.map((e) => e.code)).toEqual(["NO_TRIGGER", "UNCONNECTED", "CYCLE", "INVALID_CONFIG"]);
     expect(issueNodeIds(result.errors[2])).toEqual(["n-a0000001", "n-b0000001"]);

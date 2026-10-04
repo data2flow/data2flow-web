@@ -25,9 +25,9 @@ describe("FLW-01.01 TC-FLW-003 AT-FLW-02.3 노드 50개 화면 편집", () => {
   });
 });
 
-describe("FLW-01.02 TC-FLW-010 AT-FLW-02.2 임계값 value 미입력 → 저장은 되고 배지·적용 비활성", () => {
+describe("FLW-01.02 TC-FLW-010 AT-FLW-02.2 임계값 설정 오류(반복 0) → 저장은 되고 배지·적용 비활성", () => {
   it("저장 성공, 노드 오류 배지, 적용 버튼 비활성과 이유", async () => {
-    const graph = updateNode(coolingGraph(), "n-thr00001", { config: { metric: "temperature", op: ">", for: "PT5M" } });
+    const graph = updateNode(coolingGraph(), "n-thr00001", { config: { metric: "temperature", op: ">", value: 27, for: "PT5M", repeat: 0 } });
     const api = fakeApi();
     const { container } = await renderEditor({ detail: detailOf(graph, { draftVersion: 3 }), api });
     await screen.findByRole("toolbar", { name: "편집 도구" });
@@ -45,8 +45,10 @@ describe("FLW-01.02 TC-FLW-010 AT-FLW-02.2 임계값 value 미입력 → 저장�
     // 노드 선택 → 값 입력 → 오류 사라짐
     fireEvent.click(nodeEl(container, "n-thr00001"));
     const panel = await screen.findByRole("region", { name: "임계값 설정" });
-    expect(within(panel).getByText("필수 입력입니다")).toBeInTheDocument();
-    await userEvent.type(within(panel).getByRole("spinbutton", { name: "값" }), "27");
+    expect(within(panel).getByText("1 이상이어야 합니다")).toBeInTheDocument();
+    const repeat = within(panel).getByRole("spinbutton", { name: "반복" });
+    await userEvent.clear(repeat);
+    await userEvent.type(repeat, "2");
     expect(within(nodeEl(container, "n-thr00001")).queryByText("오류 1")).toBeNull();
     // Ctrl+S로 저장
     fireEvent.keyDown(screen.getByRole("toolbar", { name: "편집 도구" }), { key: "s", ctrlKey: true });

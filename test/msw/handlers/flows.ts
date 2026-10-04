@@ -73,6 +73,8 @@ export interface FlowsState {
   variables: Map<string, { name: string; type: string; value: unknown; updatedAt: string }[]>;
   replays: Map<string, Record<string, unknown>>;
   traces: Map<string, Record<string, unknown>>;
+  /** 로그인 사용자의 공간 범위(null = 제한 없음). core FlowRunService.trace처럼 범위 밖 spaceId 내용은 가리고 masked=true */
+  traceScope: string[] | null;
   seq: number;
 }
 
@@ -189,6 +191,7 @@ export function flowsState(core: CoreState): FlowsState {
       variables: new Map(),
       replays: new Map(),
       traces: new Map(),
+      traceScope: null,
       approvals: [],
       flows: [
         { flowId: "f-7f3a", name: "고온이면 냉방", description: null, kind: "FLOW", status: "ACTIVE", environment: "PROD", activeVersion: 13, draftVersion: null, spaceIds: ["31"], metrics1h: { executions: 812, errorRate: 0, actions: 3 }, updatedBy: by, updatedAt: "2026-10-03T01:40:00Z", lock: 5, versions: [version(13, "ACTIVE", coolingDefinition("31"), "기준 온도 상향"), version(12, "ARCHIVED", coolingDefinition("31", 28), "처음 적용")] },
@@ -362,18 +365,21 @@ export const flowsHandler: CoreHandler = (core, req) => {
     return ok({ flowId: flow.flowId, draftVersion: 1, warnings: fakeValidate(state, def).warnings }, 201, { Location: `/api/v1/core/flows/${flow.flowId}` });
   }
 
-  const replayJob = /^\/flow-replays\/([^/]+)$/.exec(path);
-  if (replayJob && method === "GET") {
-    if (!can("FLOW_READ")) return denied();
+  // API-FLW-13 재생 작업(core FlowRunService → 엔진 ReplayService.view: {jobId, flowId, status, progress:{processed, total|null}, result, error})
+  const replayJob = /^\/flow-replays\/([^/]+?)(\/cancel)?$/.exec(path);
+  if (replayJob && (method === "GET" || (method === "POST" && replayJob[2]))) {
+    if (!can(replayJob[2] ? "FLOW_WRITE" : "FLOW_READ")) return denied();
     const job = state.replays.get(decodeURIComponent(replayJob[1]));
-    return job ? ok(job) : fail(404, "RESOURCE_NOT_FOUND");
+    if (!job || !state.flows.some((f) => f.flowId === job.flowId)) return fail(404, "RESOURCE_NOT_FOUND");
+    if (replayJob[2] && (job.status === "QUEUED" || job.status === "RUNNING")) job.status = "CANCELLED";
+    return ok(job);
   }
 
   const traceMatch = /^\/flows\/([^/]+)\/traces\/([^/]+)$/.exec(path);
   if (traceMatch && method === "GET") {
     if (!can("FLOW_READ")) return denied();
     const trace = state.traces.get(decodeURIComponent(traceMatch[2]));
-    return trace ? ok(trace) : fail(404, "RESOURCE_NOT_FOUND");
+    return trace ? ok(maskTrace(trace, state.traceScope)) : fail(404, "RESOURCE_NOT_FOUND");
   }
 
   const variableReset = /^\/flows\/([^/]+)\/variables\/([^/]+)\/reset$/.exec(path);
@@ -590,21 +596,35 @@ export const flowsHandler: CoreHandler = (core, req) => {
       return ok({ revision: next.revision });
     }
     case "POST test-run": {
+      // core FlowRunService.testRun + 엔진 TestRunService: input은 {rawMessageId}(숫자) 또는 {message: CanonicalTelemetry} | {body}
       if (!write()) return denied();
-      const input = (b.input ?? {}) as { rawMessageId?: string; message?: { deviceId?: unknown; measuredAt?: unknown } };
-      if (!input.rawMessageId && !(input.message && input.message.deviceId !== undefined && typeof input.message.measuredAt === "string")) return fail(400, "FLOW_TEST_INPUT_INVALID");
-      const def = (b.definition as Def) ?? flow.versions.find((x) => x.version === Number(b.version))?.definition;
+      const input = b.input as { rawMessageId?: unknown; message?: Record<string, unknown>; body?: unknown } | undefined;
+      if (!input || typeof input !== "object") return fail(400, "FLOW_TEST_INPUT_INVALID", { errors: [{ field: "input", code: "NotNull", message: null }] });
+      if (input.rawMessageId != null) {
+        if (!/^\d+$/.test(String(input.rawMessageId))) return fail(400, "FLOW_TEST_INPUT_INVALID", { errors: [{ field: "input.rawMessageId", code: "Pattern", message: null }] });
+      } else if (input.message) {
+        const missing = CANONICAL_REQUIRED.find((k) => input.message![k] === undefined || input.message![k] === null || input.message![k] === "");
+        if (missing) return fail(400, "FLOW_TEST_INPUT_INVALID", { errors: [{ field: "input", code: "INVALID", message: `input.message가 표준 텔레메트리 형식이 아닙니다: ${missing}` }] });
+      } else if (input.body === undefined) {
+        return fail(400, "FLOW_TEST_INPUT_INVALID", { errors: [{ field: "input", code: "NotNull", message: null }] });
+      }
+      const versionNo = b.version != null ? Number(b.version) : (flow.draftVersion ?? flow.activeVersion);
+      const def = (b.definition as Def) ?? flow.versions.find((x) => x.version === versionNo)?.definition;
       if (!def) return fail(404, "RESOURCE_NOT_FOUND");
-      return ok({ trace: dryRunTrace(def, "m-dryrun", flow.draftVersion ?? flow.activeVersion ?? 0, b.startNodeId as string | undefined) });
+      return ok({ trace: dryRunTrace(def, "m-dryrun", versionNo ?? 0, b.startNodeId as string | undefined) });
     }
     case "POST replay": {
+      // core FlowRunService.replay: from·to ISO-8601(아니면 400 INVALID_REQUEST), to > from, 7일 초과 400 FLOW_REPLAY_TOO_LARGE → 202 {jobId, status:"QUEUED"}
       if (!write()) return denied();
-      const span = Date.parse(String(b.to)) - Date.parse(String(b.from));
-      if (!(span > 0) || span > 7 * 86_400_000) return fail(400, "FLOW_REPLAY_TOO_LARGE");
+      const from = Date.parse(String(b.from ?? ""));
+      const to = Date.parse(String(b.to ?? ""));
+      if (Number.isNaN(from)) return fail(400, "INVALID_REQUEST", { errors: [{ field: "from", code: "INVALID", message: null }] });
+      if (Number.isNaN(to) || to <= from) return fail(400, "INVALID_REQUEST", { errors: [{ field: "to", code: "INVALID", message: null }] });
+      if (to - from > 7 * 86_400_000) return fail(400, "FLOW_REPLAY_TOO_LARGE");
       state.seq += 1;
-      const jobId = `rp-${state.seq}`;
-      state.replays.set(jobId, { status: "SUCCEEDED", progress: { processed: 1000, total: 1000 }, result: { executions: 1000, branchCounts: { "n-thr00001": { true: 12, false: 988 } }, actions: { command: 12, notify: 3, sink: 0 }, errors: 0 } });
-      return ok({ jobId }, 202);
+      const jobId = String(9000 + state.seq);
+      state.replays.set(jobId, { jobId, flowId: flow.flowId, status: "SUCCEEDED", progress: { processed: 1000, total: 1000 }, result: { executions: 1000, branchCounts: { "n-thr00001": { true: 12, false: 988 } }, actions: { command: 12, notify: 3, sink: 0, alarm: 0 }, errors: 0 }, error: null });
+      return ok({ jobId, status: "QUEUED" }, 202);
     }
     case "GET shadow": {
       const shadow = state.shadows.get(flow.flowId);
@@ -624,3 +644,31 @@ export const flowsHandler: CoreHandler = (core, req) => {
       return undefined;
   }
 };
+
+/** 엔진이 input.message를 읽는 contracts CanonicalTelemetry 필수 항목 */
+const CANONICAL_REQUIRED = ["v", "messageId", "organizationId", "sourceId", "externalId", "deviceId", "deviceStatus", "measuredAt", "receivedAt", "metrics", "rawMessageId"];
+
+/** core FlowRunService.trace: 범위 밖 spaceId(본문 또는 message.spaceId)를 가진 입력·출력은 null + masked=true */
+export function maskTrace(trace: Record<string, unknown>, scope: string[] | null): Record<string, unknown> {
+  if (!scope) return trace;
+  const out = (payload: unknown) => {
+    if (!payload || typeof payload !== "object") return false;
+    const p = payload as { spaceId?: unknown; message?: { spaceId?: unknown } };
+    const space = p.spaceId ?? p.message?.spaceId;
+    return space != null && !scope.includes(String(space));
+  };
+  const steps = ((trace.steps as Record<string, unknown>[]) ?? []).map((step) => {
+    const next: Record<string, unknown> = { ...step };
+    if (out(step.input)) {
+      next.input = null;
+      next.masked = true;
+    }
+    next.outputs = ((step.outputs as Record<string, unknown>[]) ?? []).map((o) => {
+      if (!out(o.payload)) return o;
+      next.masked = true;
+      return { ...o, payload: null, masked: true };
+    });
+    return next;
+  });
+  return { ...trace, steps };
+}

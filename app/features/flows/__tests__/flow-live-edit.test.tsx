@@ -57,10 +57,10 @@ describe("FLW-06.04 TC-FLW-147 바이패스·디버그(overlay)", () => {
     const api = fakeApi({ overlay: vi.fn(() => Promise.resolve({ ok: false as const, status: 409, code: "FLOW_VERSION_CONFLICT", message: "" })) });
     const { container } = await renderEditor({ role: "OPERATOR", detail: active(), api, onReload });
     fireEvent.click(nodeEl(container, "n-act00001"));
-    expect(screen.getByRole("checkbox", { name: "바이패스(일시 해제)" })).toBeDisabled();
-    expect(screen.getAllByText("제어 노드 바이패스는 제어 배포 권한이 필요합니다").length).toBeGreaterThan(0);
+    expect(await screen.findByRole("checkbox", { name: "바이패스(일시 해제)" })).toBeDisabled();
+    expect((await screen.findAllByText("제어 노드 바이패스는 제어 배포 권한이 필요합니다")).length).toBeGreaterThan(0);
     fireEvent.click(nodeEl(container, "n-thr00001"));
-    await userEvent.click(screen.getByRole("checkbox", { name: "디버그" }));
+    await userEvent.click(await screen.findByRole("checkbox", { name: "디버그" }));
     expect(await screen.findByText("다른 사람이 먼저 바이패스·디버그를 바꿨습니다. 새로 불러왔습니다")).toBeInTheDocument();
     expect(onReload).toHaveBeenCalled();
   });
@@ -69,7 +69,7 @@ describe("FLW-06.04 TC-FLW-147 바이패스·디버그(overlay)", () => {
     const overlay = vi.fn().mockResolvedValueOnce({ ok: false, status: 403, code: "PERMISSION_DENIED", message: "" }).mockResolvedValueOnce({ ok: true, status: 202, data: { approvalId: "ap-1" } });
     const { container, unmount } = await renderEditor({ role: "INTEGRATOR", detail: active(), api: fakeApi({ overlay }) });
     fireEvent.click(nodeEl(container, "n-act00001"));
-    await userEvent.click(screen.getByRole("checkbox", { name: "바이패스(일시 해제)" }));
+    await userEvent.click(await screen.findByRole("checkbox", { name: "바이패스(일시 해제)" }));
     expect(await screen.findByText("제어 노드 바이패스는 제어 배포 권한이 필요합니다", { selector: "[role=alert], [role=alert] *" })).toBeInTheDocument();
     await userEvent.click(screen.getByRole("checkbox", { name: "바이패스(일시 해제)" }));
     expect(await screen.findByText("승인 요청을 보냈습니다")).toBeInTheDocument();
