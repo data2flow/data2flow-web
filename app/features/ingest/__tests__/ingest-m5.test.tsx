@@ -202,9 +202,9 @@ describe("ING-06.02 TC-ING-072 데이터 품질(UI-ING-06)", () => {
     expect(await screen.findByText("AM103-081175")).toBeInTheDocument();
     expect(screen.queryByRole("link")).toBeNull();
     expect(screen.getByText("분포 데이터가 없습니다")).toBeInTheDocument();
-    expect(await screen.findByRole("status")).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByText("조회 기간은 31일 이하여야 합니다.")).toBeInTheDocument());
     third.unmount();
     await renderRoute(<QualityView items={items} summary={null} group="model" day="2026-10-03" failed={false} timezone="UTC" api={api({ trend: vi.fn(async () => ok({ points: [] })) })} chartFactory={chartFactory} />, { session: meOf("ANALYST") });
-    expect(await screen.findByText("추이 데이터가 없습니다")).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByText("추이 데이터가 없습니다")).toBeInTheDocument());
   });
 });
