@@ -8,7 +8,7 @@ import { FORWARD_TIMEOUT_MS, MAX_HOOK_BODY_BYTES, MemoryReplayGuard, RedisReplay
 
 const SECRET = "tg-webhook-secret-0123456789";
 const ACTION = "http://data2flow-action";
-const update = (id: number, data = "ACK:a-501") => JSON.stringify({ update_id: id, callback_query: { id: "cq-1", from: { id: 7001 }, data } });
+const update = (id: number, data = "ACK|501|7d3f6a52-1c2b-4e8a-9a51-0c1d2e3f4a5b") => JSON.stringify({ update_id: id, callback_query: { id: "cq-1", from: { id: 7001 }, data } });
 
 function deps(overrides: Partial<HookDeps> = {}) {
   const calls: { url: string; init: RequestInit }[] = [];

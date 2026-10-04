@@ -1,7 +1,8 @@
 /**
  * 로그인 뒤 화면 틀(상단 내비게이션 + 권한별 메뉴, IAM-04.05). 가드는 미들웨어에서 먼저 한다(user.server.ts).
  * 전역 띠(00-navigation.md §1.3): 진행 중인 자동화 비상 정지(API-ACT-21 `?active=true`, UI-ACT-07)와 유지보수(API-OPS-23 `status=ACTIVE`)를
- * 서버에서 먼저 읽어 그리고, 화면에서는 5초마다 다시 읽는다. 읽기에 실패하면 띠 없이 화면을 연다.
+ * 서버에서 먼저 읽어 그린다. 화면에서는 비상 정지를 실시간 이벤트(API-DSH-20 `emergency-stop`)로, 유지보수는 5초마다 다시 읽어 맞춘다.
+ * 같은 실시간 연결로 본인 웹 알림(`notifications` 토픽)도 받는다. 읽기에 실패하면 띠 없이 화면을 연다.
  */
 import { useEffect, useState } from "react";
 import { Outlet, useNavigate, useRouteLoaderData } from "react-router";
