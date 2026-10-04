@@ -135,6 +135,21 @@ data2flow 화면과 BFF입니다. React Router v8 프레임워크 모드(SSR, Vi
 - API: 검색식 `GET /core/devices?q=`(API-DEV-133, `counts{total,tookMs}`, 400 `DEVICE_QUERY_INVALID`의 `response.column`), 저장된 검색 API-DEV-134, 모델 API-DEV-44·45(multipart `file`·`format`·`createMissingMetrics`·`dryRun`), 표준 내보내기 API-DEV-135(202 `{jobId}` → `GET /core/export-jobs/{id}`, 끝나지 않았으면 2초마다) · 파일 `/core/export-jobs/{id}/file`, NGSI-LD 주기 전송 API-DEV-136, 게이트웨이 API-DEV-60~62, 조직 단위 API-DEV-57, 사용자 단위 API-DSH-12 `temperatureUnit`(`effectiveTemperatureUnit`).
 - 실패 응답의 `response`는 BFF 화면 도우미에서 `ApiFailure.detail`로 읽는다(검색식 오류 열). 검색식은 서버가 열을 세므로 앞뒤 공백을 그대로 보낸다.
 - 검색식 문법 검사(`app/features/devmodel/model/query.ts`)는 core `DeviceQueryParser`와 같은 문법·열 번호이고, 판정은 서버가 다시 한다.
+### 현장 작업(작업 지시·자산·QR·현장 설치·모바일)
+
+| 경로 | 화면 | 스펙 |
+|---|---|---|
+| `/work-orders?view=mine\|all\|dueSoon\|overdue&spaceId=&deviceId=`, `/work-orders/{id}`, `/work-orders/plans` | 작업 지시 목록(통계: 열린·지연·평균 처리 시간, 마감 임박 48시간)·생성·상세(체크리스트·첨부·댓글·상태 전이·유형별 완료 결과)·정기 점검 계획(DEV_ADMIN) | DEV-08.02·08.05·08.06 |
+| `/devices/{id}?tab=asset` | 자산 정보(시리얼·구매·설치·보증 만료·공급처·사진)와 QR 라벨(미리 보기·재발급·PDF 인쇄) | DEV-08.01, DEV-09.04 |
+| `/devices/installation?siteId=` | 설치 현황판(층별 예정·완료·확인·문제, 칸 → 기기·체크리스트, 목록 라벨 인쇄, 실시간 `space:{사이트}`의 `commissioning`) | DEV-13.06 |
+| `/d/{qrToken}` | QR 딥링크: 로그인(`next`) → core `GET /qr/{token}` → 302 `/m/devices/{id}`, 재발급된 라벨·권한 밖은 404 안내 | DEV-09.04 |
+| `/m/alarms`, `/m/spaces`, `/m/work-orders`, `/m/work-orders/{id}`, `/m/notifications`, `/m/scan`, `/m/devices/{id}` | 모바일 셸(하단 탭, 오프라인 띠, 360px·44px 버튼): 알람·공간·작업(체크·사진·완료)·내 알림·QR 스캔·기기 상세 | DSH-13.04, DEV-09.04 |
+| `/m/commission?token=` | 현장 설치: QR 스캔 → 기기 확인·공간 → 평면도 위치(비율 x·y) → 사진 0~5장 → 저장 → 첫 수신 대기(10분, 점검 체크리스트) | DEV-13.05 |
+
+- 오프라인 대기열(BR-DSH-22, BR-DEV-37): 연결이 없을 때 만든 체크·사진·완료·현장 설치를 IndexedDB(`data2flow-field`, 없으면 메모리)에 넣은 순서대로 보관했다가 `online` 이벤트에 보냅니다. 작업마다 처음 정한 `Idempotency-Key`(현장 설치는 `clientOpId`)를 다시 보내므로 같은 작업은 한 번만 반영됩니다. 409 `COMMISSION_CONFLICT`는 서버 기록과 내 입력을 나란히 보여 줍니다.
+- QR 스캔은 브라우저 `BarcodeDetector`(후면 카메라)를 쓰고, 없거나 카메라를 거부하면 라벨 주소·토큰을 직접 넣습니다. 새 의존성은 없습니다(QR 그림은 기존 `qrcode`, MIT).
+- `/bff/api` 중계는 multipart 업로드를 60MB까지 받습니다(첨부·자산 사진 파일당 20MB, 현장 설치 사진 5장). PDF 등 바이너리 응답은 `Content-Disposition`과 함께 그대로 넘깁니다.
+- 작업 지시 목록 API에 기기 필터가 없어 기기별 보기(`deviceId`)·모바일 기기 상세는 그 기기 공간으로 거른 뒤 대상 기기로 다시 거릅니다.
 
 ## 개발
 

@@ -1,0 +1,386 @@
+{
+  "field": {
+    "title": "工单",
+    "loadFailed": "无法加载数据。",
+    "area": {
+      "workOrders": "工单",
+      "installation": "安装进度"
+    },
+    "views": {
+      "mine": "我的工单",
+      "all": "全部",
+      "dueSoon": "即将到期",
+      "overdue": "已逾期"
+    },
+    "status": {
+      "OPEN": "待处理",
+      "ASSIGNED": "已分配",
+      "IN_PROGRESS": "进行中",
+      "DONE": "已完成",
+      "CANCELLED": "已取消"
+    },
+    "priority": {
+      "LOW": "低",
+      "NORMAL": "普通",
+      "HIGH": "高",
+      "URGENT": "紧急"
+    },
+    "types": {
+      "BATTERY": "更换电池",
+      "CALIBRATION": "校准",
+      "INSPECTION": "巡检",
+      "REPAIR": "维修",
+      "REPLACE": "更换设备",
+      "RELOCATE": "迁移",
+      "OTHER": "其他"
+    },
+    "origins": {
+      "MANUAL": "手动",
+      "ALARM": "告警",
+      "ANALYSIS": "分析",
+      "FLOW": "流程",
+      "SCHEDULE": "定期巡检"
+    },
+    "severity": {
+      "CRITICAL": "严重",
+      "MAJOR": "主要",
+      "MINOR": "次要",
+      "WARNING": "警告",
+      "INFO": "信息"
+    },
+    "list": {
+      "views": "工单视图",
+      "stats": "未完成 {{open}} · 逾期 {{overdue}} · 平均处理 {{hours}} 小时",
+      "title": "标题",
+      "type": "类型",
+      "priority": "优先级",
+      "target": "对象",
+      "assignee": "负责人",
+      "due": "截止",
+      "status": "状态",
+      "origin": "来源",
+      "user": "用户 #{{id}}",
+      "deviceCount": "{{count}} 台设备",
+      "spaceCount": "{{count}} 个空间",
+      "empty": "没有工单",
+      "emptyView": {
+        "mine": "没有分配给您的未完成工单",
+        "all": "没有工单",
+        "dueSoon": "48 小时内没有到期的工单",
+        "overdue": "没有逾期工单"
+      },
+      "dueAt": "截止 {{at}}",
+      "overdueAt": "已逾期 {{at}}",
+      "spaceFilter": "空间(含下级)",
+      "allSpaces": "全部空间",
+      "forDevice": "{{name}} 的工单"
+    },
+    "create": {
+      "open": "+ 新建工单",
+      "title": "新建工单",
+      "titleLabel": "标题",
+      "targets": "对象(设备或空间,至少一个)",
+      "deviceFilter": "按设备名查找",
+      "noDevices": "没有匹配的设备",
+      "space": "空间",
+      "noSpace": "无空间",
+      "assignee": "负责人",
+      "unassigned": "未分配",
+      "me": "我",
+      "checklist": "检查清单(每行一项,{{count}} 项)",
+      "submit": "创建",
+      "linked": "已添加到现有工单"
+    },
+    "validation": {
+      "title": {
+        "required": "请输入标题",
+        "tooLong": "标题不超过 150 个字符"
+      },
+      "type": {
+        "required": "请选择类型"
+      },
+      "targets": {
+        "required": "请至少选择一个对象"
+      },
+      "dueAt": {
+        "invalid": "截止时间格式无效",
+        "past": "截止时间必须晚于现在"
+      },
+      "checklist": {
+        "tooMany": "检查清单最多 50 项"
+      },
+      "name": {
+        "required": "请输入名称",
+        "tooLong": "名称不超过 100 个字符"
+      },
+      "targetGroupId": {
+        "required": "请选择目标分组"
+      },
+      "intervalDays": {
+        "range": "周期为 {{min}}~{{max}} 天"
+      },
+      "leadDays": {
+        "range": "提前天数须大于等于 0 且小于周期"
+      },
+      "nextDueOn": {
+        "required": "请输入下次截止日期"
+      },
+      "checklistTemplate": {
+        "tooMany": "检查清单最多 50 项"
+      },
+      "serialNo": {
+        "tooLong": "不超过 100 个字符"
+      },
+      "supplier": {
+        "tooLong": "不超过 100 个字符"
+      },
+      "installer": {
+        "tooLong": "不超过 100 个字符"
+      },
+      "installedOn": {
+        "order": "安装日期须不早于购买日期"
+      },
+      "warrantyUntil": {
+        "order": "保修截止日期须不早于购买日期"
+      }
+    },
+    "detail": {
+      "title": "工单详情",
+      "targets": "对象",
+      "device": "设备 #{{id}}",
+      "space": "空间 #{{id}}",
+      "origin": "来源:{{origin}}",
+      "linkedOrigins": "同一原因又请求了 {{count}} 次",
+      "checklist": "检查清单 {{done}}/{{total}}",
+      "noChecklist": "没有检查清单"
+    },
+    "attachments": {
+      "title": "附件 {{count}}",
+      "add": "添加照片或文件",
+      "empty": "没有附件",
+      "remove": "删除 {{name}}",
+      "uploaded": "照片已上传",
+      "invalid": {
+        "type": "只能上传图片或 PDF",
+        "size": "文件不能超过 20MB"
+      }
+    },
+    "comments": {
+      "title": "评论",
+      "empty": "没有评论",
+      "new": "评论",
+      "add": "发表"
+    },
+    "actions": {
+      "ASSIGN": "分配",
+      "assignMe": "分配给我",
+      "START": "开始工作",
+      "COMPLETE": "完成",
+      "CANCEL": "取消工单",
+      "done": {
+        "ASSIGN": "已分配",
+        "START": "已开始工作",
+        "COMPLETE": "工作已完成",
+        "CANCEL": "工单已取消"
+      }
+    },
+    "errors": {
+      "stateConflict": "其他人已先更改了状态,请查看新状态",
+      "versionConflict": "其他人已先保存了修改,请刷新后重新保存"
+    },
+    "complete": {
+      "title": "完成工作",
+      "replacedOn": "电池更换日期",
+      "attributeKey": "校准属性键",
+      "attributeValue": "新值",
+      "newDeviceId": "新设备 ID",
+      "newDeviceHint": "新设备将关联到旧设备的逻辑设备",
+      "note": "备注"
+    },
+    "plans": {
+      "title": "定期巡检计划",
+      "new": "新建计划",
+      "edit": "编辑计划",
+      "empty": "没有定期巡检计划",
+      "name": "名称",
+      "group": "目标分组",
+      "chooseGroup": "选择分组",
+      "interval": "周期",
+      "everyDays": "每 {{days}} 天(截止前 {{lead}} 天创建)",
+      "intervalDays": "周期(天)",
+      "leadDays": "提前创建(天)",
+      "nextDue": "下次截止",
+      "checklist": "检查清单模板(每行一项)",
+      "enabled": "启用",
+      "deleted": "计划已删除",
+      "deleteNamed": "删除 {{name}}"
+    },
+    "asset": {
+      "tab": "资产",
+      "title": "资产信息",
+      "serialNo": "序列号",
+      "purchasedOn": "购买日期",
+      "installedOn": "安装日期",
+      "warrantyUntil": "保修截止",
+      "supplier": "供应商",
+      "installer": "安装单位",
+      "photos": "照片 {{count}} 张",
+      "photoAlt": "资产照片 {{n}}",
+      "addPhoto": "添加照片",
+      "removePhoto": "删除照片 {{n}}",
+      "warrantySoon": "保修将在 {{days}} 天后到期",
+      "warrantyExpired": "保修已过期",
+      "workOrders": "查看此设备的工单"
+    },
+    "qr": {
+      "title": "二维码标签",
+      "alt": "{{name}} 的二维码",
+      "print": "打印标签(PDF)",
+      "printList": "打印 {{count}} 台设备的标签",
+      "reissue": "重新签发二维码",
+      "reissueWarning": "重新签发后,旧标签将无法打开(404)。请打印新标签并替换。",
+      "reissued": "二维码已重新签发,请打印新标签",
+      "notFound": "此二维码标签已失效。可能已重新签发,或您无权查看该设备。",
+      "labels": {
+        "empty": "没有可打印的设备",
+        "tooMany": "每次最多打印 200 台"
+      }
+    },
+    "board": {
+      "title": "安装进度",
+      "titleSite": "安装进度 · {{site}}",
+      "site": "站点",
+      "floor": "楼层",
+      "planned": "计划",
+      "installed": "已安装",
+      "verified": "已确认",
+      "problem": "有问题",
+      "progress": "进度",
+      "progressOf": "{{floor}} 进度",
+      "total": "合计",
+      "empty": "没有需要安装的设备",
+      "cellLabel": "查看 {{floor}} {{status}} 的 {{count}} 台设备",
+      "drawer": "{{floor}} · {{status}}",
+      "noDevices": "没有设备",
+      "commission": "打开现场安装"
+    },
+    "commission": {
+      "steps": "安装步骤",
+      "step": {
+        "scan": "扫描二维码",
+        "confirm": "确认设备",
+        "position": "指定位置",
+        "photos": "照片",
+        "wait": "等待首次数据"
+      },
+      "space": "安装空间",
+      "chooseSpace": "请选择空间",
+      "rescan": "重新扫描",
+      "next": "下一步:位置",
+      "back": "上一步",
+      "nextPhotos": "下一步:照片",
+      "noFloorplan": "该空间没有平面图,将不记录位置",
+      "floorplanAlt": "安装楼层平面图",
+      "here": "这里",
+      "photos": "安装照片 {{count}}/{{max}}",
+      "addPhoto": "拍照",
+      "removePhoto": "移除 {{name}}",
+      "save": "保存安装",
+      "queueTitle": "待发送的安装记录",
+      "queued": "{{name}}:联网后发送",
+      "sent": "{{name}}:已保存",
+      "failed": "{{name}}:保存失败({{code}})",
+      "conflict": "{{name}}:其他人员已先记录安装",
+      "server": "服务器记录",
+      "mine": "我的输入",
+      "installedAt": "安装时间",
+      "installedBy": "安装人",
+      "waitTitle": "等待首次数据 {{time}}",
+      "waiting": "正在等待数据,超过 10 分钟将显示检查提示",
+      "firstData": "已收到首次数据 · {{at}}",
+      "problem": "10 分钟内未收到数据,请检查以下各项",
+      "nextDevice": "扫描下一台设备",
+      "status": {
+        "PLANNED": "计划安装",
+        "INSTALLED": "已安装",
+        "VERIFIED": "已确认首次数据",
+        "PROBLEM": "有问题"
+      },
+      "check": {
+        "firstData": "首次数据",
+        "position": "位置",
+        "photo": "照片",
+        "signal": "信号",
+        "battery": "电池",
+        "gateway": "网关",
+        "source": "数据源连接"
+      },
+      "hint": {
+        "signal": "信号较弱,请检查与网关的距离和障碍物",
+        "battery": "电池电量低,请检查电池",
+        "gateway": "附近网关离线",
+        "source": "请检查数据源连接",
+        "firstData": "请检查设备电源和入网状态"
+      }
+    },
+    "deviceStatus": {
+      "PENDING": "待审批",
+      "ACTIVE": "使用中",
+      "INACTIVE": "已停用"
+    },
+    "device": {
+      "connectivity": "连接状态",
+      "conn": {
+        "ONLINE": "在线",
+        "OFFLINE": "离线",
+        "UNKNOWN": "未知"
+      },
+      "lastSeen": "最后接收",
+      "battery": "电池",
+      "latest": "当前值",
+      "noLatest": "尚无数据",
+      "alarms": "最近告警",
+      "noAlarms": "没有最近告警",
+      "openOrders": "未完成工单 {{count}}",
+      "noOrders": "没有未完成工单"
+    },
+    "mobile": {
+      "tabs": "移动端菜单",
+      "tab": {
+        "alarms": "告警",
+        "spaces": "空间",
+        "work": "工单",
+        "notifications": "通知",
+        "scan": "二维码"
+      },
+      "desktop": "电脑版",
+      "workActions": "工作操作",
+      "scan": "扫描二维码",
+      "photo": "照片",
+      "noSpaces": "没有可查看的空间",
+      "spaceCounts": "设备 {{devices}} · 告警 {{alarms}}"
+    },
+    "notifications": {
+      "hint": "这是打开此页面后收到的通知。",
+      "settings": "接收设置",
+      "empty": "没有新通知"
+    },
+    "offline": {
+      "band": "离线 — 只读。{{count}} 个待上传项将在联网后发送",
+      "sending": "正在发送 {{count}} 个待处理项",
+      "queued": "联网后发送",
+      "whenOnline": "联网后发送",
+      "pendingAction": "{{action}}:联网后发送"
+    },
+    "scan": {
+      "start": "用相机扫描",
+      "camera": "二维码相机",
+      "denied": "无法使用相机,请在设置中允许相机访问",
+      "unsupported": "此浏览器不支持扫描二维码,请输入标签下方的地址",
+      "manual": "二维码地址或代码",
+      "open": "打开",
+      "invalid": "不是有效的二维码地址",
+      "notFound": "找不到该设备"
+    }
+  }
+}

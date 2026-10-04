@@ -120,6 +120,31 @@ describe("proxy /bff/api/{svc}/**", () => {
     expect((await response.json()).header.resultCode).toBe("AUTH_SESSION_EXPIRED");
   });
 
+  it("DEV-08.02 DEV-09.04 TC-DEV-213 TC-DEV-256: multipart 업로드는 60MB까지 경계값째 넘기고, PDF 응답은 바이트·Content-Disposition 그대로", async () => {
+    const cookie = await cookieFor();
+    const ctx = { session: t.session(cookie), runtime: t.state.runtime, meta, nonce: "" };
+    let received: { type: string | null; size: number; key: string | null } | null = null;
+    const pdf = new Uint8Array([0x25, 0x50, 0x44, 0x46, 0x2d, 0x31, 0x2e, 0x37, 0x00, 0xff]);
+    t.server.use(
+      http.post("http://gateway.test/api/v1/core/work-orders/5/attachments", async ({ request }) => {
+        received = { type: request.headers.get("content-type"), size: (await request.arrayBuffer()).byteLength, key: request.headers.get("idempotency-key") };
+        return HttpResponse.json({ header: { isSuccessful: true, resultCode: "SUCCESS", resultMessage: "SUCCESS" }, response: { id: "1" } }, { status: 201 });
+      }),
+      http.post("http://gateway.test/api/v1/core/devices/qr-labels", () => new HttpResponse(pdf, { headers: { "Content-Type": "application/pdf", "Content-Disposition": 'attachment; filename="qr-labels.pdf"' } })),
+    );
+    const upload = new Uint8Array(15 * 1024 * 1024);
+    const ok = await proxyRequest(new Request(`${ORIGIN}/bff/api/core/work-orders/5/attachments`, { method: "POST", headers: { "Content-Type": "multipart/form-data; boundary=b1", "Idempotency-Key": "k-1" }, body: upload }), ctx, "core", "work-orders/5/attachments");
+    expect(ok.status).toBe(201);
+    expect(received).toEqual({ type: "multipart/form-data; boundary=b1", size: upload.byteLength, key: "k-1" });
+    const tooBig = new Request(`${ORIGIN}/bff/api/core/work-orders/5/attachments`, { method: "POST", headers: { "Content-Type": "multipart/form-data; boundary=b1" }, body: new Uint8Array(60 * 1024 * 1024 + 1) });
+    expect((await proxyRequest(tooBig, ctx, "core", "work-orders/5/attachments")).status).toBe(413);
+
+    const labels = await proxyRequest(new Request(`${ORIGIN}/bff/api/core/devices/qr-labels`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ deviceIds: ["1042"], layout: "A4_3x8" }) }), ctx, "core", "devices/qr-labels");
+    expect(labels.headers.get("content-type")).toBe("application/pdf");
+    expect(labels.headers.get("content-disposition")).toBe('attachment; filename="qr-labels.pdf"');
+    expect(new Uint8Array(await labels.arrayBuffer())).toEqual(pdf);
+  });
+
   it("auth 장애는 그 상태·Retry-After로 돌려준다", async () => {
     const cookie = await cookieFor();
     const session = t.session(cookie);

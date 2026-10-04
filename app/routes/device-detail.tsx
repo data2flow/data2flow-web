@@ -31,6 +31,7 @@ import { DeviceControlPanel } from "~/features/control/control-panel";
 import { historyQuery, type Command, type ControlInfo } from "~/features/control/model/control";
 import { OperationTab } from "~/features/control/operation-tab";
 import { DeviceHistoryTab, DeviceRulesTab } from "~/features/devices/detail-tabs";
+import { AssetPanel } from "~/features/field/components/asset-panel";
 import { alarmsForDevice, onboardingLink, rulesForDevice, type AlarmRow, type HistoryEntry, type RuleRow, type RuleVia } from "~/features/devices/model/detail";
 import type { Route } from "./+types/device-detail";
 
@@ -39,7 +40,7 @@ export function meta() {
 }
 
 // 제어(UI-ACT-01)·명령 이력(UI-ACT-02)은 M3, 가동(UI-ACT-11)·규칙·알람·변경 이력(DEV-02.07)은 M4
-const TABS = ["overview", "data", "control", "commands", "operation", "virtual", "raw", "rules", "history", "semantic", "credentials"] as const;
+const TABS = ["overview", "data", "control", "commands", "operation", "virtual", "raw", "rules", "history", "semantic", "credentials", "asset"] as const;
 const ACTUATOR_KINDS = new Set(["ACTUATOR", "HYBRID"]);
 type Tab = (typeof TABS)[number];
 
@@ -242,7 +243,7 @@ export default function DeviceDetailRoute({ loaderData, actionData }: Route.Comp
   const [deleteOpen, setDeleteOpen] = useState(false);
   const favorite = isFavorite(preferences?.favorites, "DEVICE", device.id);
   const platformBroker = device.source?.type === "PLATFORM_BROKER";
-  const tabItems = TABS.filter((k) => (k !== "credentials" || platformBroker) && (k !== "virtual" || device.virtual) && (k !== "operation" || actuator)).map((k) => ({ key: k, label: k === "virtual" ? t("sim.virtual") : t(`devices.tabs.${k}`), to: `?tab=${k}` }));
+  const tabItems = TABS.filter((k) => (k !== "credentials" || platformBroker) && (k !== "virtual" || device.virtual) && (k !== "operation" || actuator)).map((k) => ({ key: k, label: k === "virtual" ? t("sim.virtual") : k === "asset" ? t("field.asset.tab") : t(`devices.tabs.${k}`), to: `?tab=${k}` }));
   const fmt = (iso?: string | null) => formatDateTime(iso ?? undefined, timezone, i18n.language, true);
   const conflict = result?.error?.code === "VERSION_CONFLICT";
 
@@ -407,6 +408,7 @@ export default function DeviceDetailRoute({ loaderData, actionData }: Route.Comp
           <CommandHistory key={commands.rows.map((r) => r.id).join(",")} rows={commands.rows} failed={commands.failed} moreHref={commands.nextCursor ? `?tab=commands&cursor=${encodeURIComponent(commands.nextCursor)}` : null} showDevice={false} canControl={hasAny(permissions, ["DEVICE_CONTROL"])} timezone={timezone} lang={i18n.language} />
         </Card>
       )}
+      {tab === "asset" && <AssetPanel deviceId={device.id} deviceName={device.name} canEdit={hasAny(permissions, ["DEV_ADMIN"])} canPlace={hasAny(permissions, ["DEV_PLACE"])} />}
       {tab === "semantic" && <SemanticTab semantic={semantic ?? null} canEdit={canAdmin} fieldErrors={result?.intent === "semantic-save" ? result.fieldErrors : undefined} />}
       {tab === "credentials" && platformBroker && (
         <Card title={t("devices.tabs.credentials")}>

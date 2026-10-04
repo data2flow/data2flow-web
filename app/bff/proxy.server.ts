@@ -37,6 +37,12 @@ export function limitStream(body: ReadableStream<Uint8Array>, max: number): Read
   );
 }
 
+/**
+ * 파일 올리기(multipart)는 더 크게 받는다: 작업 지시 첨부·자산 사진은 파일당 20MB(API-DEV-93·96),
+ * 현장 설치는 사진 5장까지 한 번에(API-DEV-137). 실제 파일 크기 검사는 core가 다시 한다
+ */
+export const MAX_MULTIPART_BYTES = 60 * 1024 * 1024;
+
 export async function proxyRequest(request: Request, ctx: BffRequestContext, service: string, rest: string): Promise<Response> {
   const { session, runtime, meta } = ctx;
   if (!PROXY_SERVICES.has(service) || rest.split("/").some((part) => part === ".." || part === ".")) {
@@ -61,7 +67,8 @@ export async function proxyRequest(request: Request, ctx: BffRequestContext, ser
     body = request.body ? limitStream(request.body, MAX_UPLOAD_BYTES) : undefined;
   } else if (method !== "GET" && method !== "HEAD") {
     body = await request.arrayBuffer();
-    if (body.byteLength > MAX_BODY_BYTES) return errorResponse(413, "INVALID_REQUEST", meta.lang, meta.requestId);
+    const multipart = (request.headers.get("content-type") ?? "").toLowerCase().startsWith("multipart/form-data");
+    if (body.byteLength > (multipart ? MAX_MULTIPART_BYTES : MAX_BODY_BYTES)) return errorResponse(413, "INVALID_REQUEST", meta.lang, meta.requestId);
   }
 
   // 제한 시간은 응답 머리까지만 센다. 본문(1년치 CSV 내려받기 등, TSD-04.01)은 브라우저가 끊을 때까지 흘려보낸다

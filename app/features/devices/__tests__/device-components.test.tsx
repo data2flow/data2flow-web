@@ -47,11 +47,11 @@ const device: DeviceDetail = {
 };
 
 describe("기기 하위 탭과 상태 표시", () => {
-  it("하위 탭 7개(M4 일괄 작업, M5 게이트웨이 포함)와 승인 대기 수, 현재 탭 표시", async () => {
+  it("하위 탭 9개(M4 일괄 작업, M5 게이트웨이·작업 지시·설치 현황 포함)와 승인 대기 수, 현재 탭 표시", async () => {
     await renderRoute(<DeviceAreaTabs current="pending" pendingCount={2} />);
     const current = await screen.findByRole("link", { name: "승인 대기 (2)" });
     expect(current).toHaveAttribute("aria-current", "page");
-    expect(screen.getAllByRole("link").map((a) => a.getAttribute("href"))).toEqual(["/devices", "/devices/pending", "/models", "/metrics", "/device-groups", "/device-jobs", "/gateways"]);
+    expect(screen.getAllByRole("link").map((a) => a.getAttribute("href"))).toEqual(["/devices", "/devices/pending", "/models", "/metrics", "/device-groups", "/device-jobs", "/gateways", "/work-orders", "/devices/installation"]);
   });
 
   it("상태 배지(용어 툴팁), 연결 표시, 배터리 막대(20% 이하 경고), 품질 표시", async () => {
