@@ -46,7 +46,10 @@
       "confirmName": "플로우 이름",
       "confirmMismatch": "이름이 일치하지 않습니다",
       "deleted": "플로우를 삭제했습니다.",
-      "metricsNone": "지표 없음"
+      "metricsNone": "지표 없음",
+      "owner": "책임자",
+      "ownerMe": "나",
+      "noOwner": "책임자 없음"
     },
     "editor": {
       "name": "플로우 이름",

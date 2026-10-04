@@ -7,9 +7,10 @@ import { useTranslation } from "react-i18next";
 import { Form, Link, data, useNavigate, useRevalidator, useRouteLoaderData, useSearchParams } from "react-router";
 import { callApi, callList, field, listOrThrow } from "~/bff/api.server";
 import { bff } from "~/bff/middleware.server";
-import { Alert, Button, ButtonLink, Card, CsrfField, Dialog, EmptyState, PageHeader, Pager, SelectField, Table, TextField } from "~/components/ui";
+import { Alert, Badge, Button, ButtonLink, Card, CsrfField, Dialog, EmptyState, PageHeader, Pager, SelectField, Table, TextField } from "~/components/ui";
 import { SpaceSelect } from "~/components/space-picker";
 import { FlowStatusBadge } from "~/features/flows/components/status-badge";
+import { ownerMissing } from "~/features/flows/model/settings";
 import { errorText } from "~/lib/error-text";
 import { formatDateTime } from "~/lib/format";
 import { hasAny } from "~/lib/permissions";
@@ -31,6 +32,10 @@ interface FlowRow {
   metrics1h?: { executions?: number; errorRate?: number | null; actions?: number } | null;
   updatedBy?: { userId: string; name: string } | null;
   updatedAt?: string;
+  /** FLW-11.06 설명서(목록 응답에 오면 보인다): 목적, 책임자(비활성이면 active=false) */
+  purpose?: string | null;
+  ownerUserId?: string | null;
+  owner?: { userId: string; name: string; active?: boolean } | null;
 }
 
 const PAGE_SIZE = 50;
@@ -45,14 +50,14 @@ export async function loader({ request, context }: Route.LoaderArgs) {
   const url = new URL(request.url);
   const page = Math.max(1, Number(url.searchParams.get("page")) || 1);
   const query = new URLSearchParams({ page: String(page), size: String(PAGE_SIZE), sort: url.searchParams.get("sort") || "health" });
-  for (const key of ["q", "kind", "spaceId"]) {
+  for (const key of ["q", "kind", "spaceId", "owner"]) {
     const value = url.searchParams.get(key)?.trim();
     if (value) query.set(key, value);
   }
   const status = url.searchParams.get("status");
   if (status) query.append("status", status);
   const [flows, spaces] = await Promise.all([callList<FlowRow>(ctx, request, `/api/v1/core/flows?${query}`), callApi<SpaceNode[]>(ctx, request, "/api/v1/core/spaces")]);
-  return { page, list: listOrThrow(flows), spaces: spaces.ok ? (spaces.data ?? []) : [], filtered: ["q", "kind", "spaceId", "status"].some((k) => url.searchParams.get(k)) };
+  return { page, list: listOrThrow(flows), spaces: spaces.ok ? (spaces.data ?? []) : [], filtered: ["q", "kind", "spaceId", "status", "owner"].some((k) => url.searchParams.get(k)) };
 }
 
 export async function action({ request, context }: Route.ActionArgs) {
@@ -135,6 +140,12 @@ export default function Flows({ loaderData, actionData }: Route.ComponentProps) 
             <option value="RULE">{t("flows.kind.RULE")}</option>
           </SelectField>
           <SpaceSelect spaces={spaces} name="spaceId" label={t("flows.list.space")} emptyLabel={t("common.all")} defaultValue={params.get("spaceId") ?? ""} />
+          {root?.me && (
+            <SelectField label={t("flows.list.owner")} name="owner" defaultValue={params.get("owner") ?? ""}>
+              <option value="">{t("common.all")}</option>
+              <option value={root.me.id}>{t("flows.list.ownerMe")}</option>
+            </SelectField>
+          )}
           <Button type="submit">{t("common.search")}</Button>
         </Form>
         {list.responses.length === 0 ? (
@@ -171,6 +182,12 @@ export default function Flows({ loaderData, actionData }: Route.ComponentProps) 
                       <Link to={`/automation/flows/${encodeURIComponent(f.flowId)}`} className="text-accent hover:underline">
                         {f.name}
                       </Link>
+                      {f.purpose && <p className="text-[11.5px] text-muted">{f.purpose}</p>}
+                      {ownerMissing(f) && (
+                        <span className="ml-1">
+                          <Badge tone="warning">{t("flows.list.noOwner")}</Badge>
+                        </span>
+                      )}
                     </td>
                     <td>{t(`flows.kind.${f.kind}`, { defaultValue: f.kind })}</td>
                     <td>{(f.spaceIds ?? []).map((id) => findSpace(spaces, id)?.name ?? id).join(", ") || "–"}</td>

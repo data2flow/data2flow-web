@@ -46,7 +46,10 @@
       "confirmName": "Flow name",
       "confirmMismatch": "The name does not match",
       "deleted": "Flow deleted.",
-      "metricsNone": "No metrics"
+      "metricsNone": "No metrics",
+      "owner": "Owner",
+      "ownerMe": "Me",
+      "noOwner": "No owner"
     },
     "editor": {
       "name": "Flow name",

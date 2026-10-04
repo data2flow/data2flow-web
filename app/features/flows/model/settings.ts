@@ -135,3 +135,9 @@ export function parseInitial(type: VariableDef["type"], raw: string): unknown {
 export function initialText(value: unknown): string {
   return typeof value === "string" ? value : JSON.stringify(value);
 }
+
+/** 플로우 목록의 책임자 없음 경고(FLW-11.06 AT-FLW-30.3): 목록에 책임자 필드가 오고, 비었거나 비활성 사용자일 때 */
+export function ownerMissing(row: { ownerUserId?: string | null; owner?: { active?: boolean } | null }): boolean {
+  if (row.owner) return row.owner.active === false;
+  return "ownerUserId" in row && !row.ownerUserId;
+}

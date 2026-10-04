@@ -46,7 +46,10 @@
       "confirmName": "フロー名",
       "confirmMismatch": "名前が一致しません",
       "deleted": "フローを削除しました。",
-      "metricsNone": "指標なし"
+      "metricsNone": "指標なし",
+      "owner": "責任者",
+      "ownerMe": "自分",
+      "noOwner": "責任者なし"
     },
     "editor": {
       "name": "フロー名",

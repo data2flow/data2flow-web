@@ -46,7 +46,10 @@
       "confirmName": "流程名称",
       "confirmMismatch": "名称不匹配",
       "deleted": "流程已删除。",
-      "metricsNone": "暂无指标"
+      "metricsNone": "暂无指标",
+      "owner": "负责人",
+      "ownerMe": "我",
+      "noOwner": "无负责人"
     },
     "editor": {
       "name": "流程名称",
