@@ -9,6 +9,7 @@ import { Background, Controls, MiniMap, ReactFlow, ReactFlowProvider, type Conne
 import { useCallback, useMemo, type DragEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { canConnect, categoryOf, configSummary, inputPorts, outputPorts, wireKey, type Catalog } from "../model/flow-graph";
+import { isWireActive, type LiveState } from "../model/live";
 import type { FlowGraph, VersionDiff, Wire } from "../model/types";
 import type { NodeBadge } from "../store/flow-editor-store";
 import { FlowNodeCard, type FlowNodeView } from "./flow-node-card";
@@ -30,6 +31,14 @@ export interface FlowCanvasProps {
   onSelect: (ids: string[]) => void;
   onRemoveWire: (wire: Wire) => void;
   onDropType: (type: string, position: { x: number; y: number }) => void;
+  /** 라이브 뷰(FLW-03.01): 노드 카운터·배지·와이어 움직임 */
+  live?: LiveState | null;
+  /** 지금 시각(와이어 움직임 판단) */
+  now?: number;
+  overlay?: { bypass: string[]; debug: string[] } | null;
+  /** 과거 재생 분기 건수(노드 → 포트 → 건수) */
+  replay?: Record<string, Record<string, number>> | null;
+  presence?: Map<string, { name: string; color: string }>;
 }
 
 function diffOf(diff: VersionDiff | null | undefined, id: string): "added" | "changed" | "removed" | undefined {
@@ -71,7 +80,8 @@ export function handleEdgeChanges(changes: EdgeChange[], graph: FlowGraph, handl
 
 export function FlowCanvas(props: FlowCanvasProps) {
   const { t } = useTranslation();
-  const { graph, catalog, selected, badges, errorCounts, diff, readOnly } = props;
+  const { graph, catalog, selected, badges, errorCounts, diff, readOnly, live, overlay, replay, presence } = props;
+  const now = props.now ?? 0;
   const nodes: FlowNodeView[] = useMemo(
     () =>
       graph.nodes.map((node) => ({
@@ -81,13 +91,38 @@ export function FlowCanvas(props: FlowCanvasProps) {
         selected: selected.includes(node.id),
         draggable: !readOnly,
         connectable: !readOnly,
-        data: { node, category: categoryOf(node.type, catalog), summary: configSummary(node), inputs: inputPorts(node, catalog), outputs: outputPorts(node, catalog), badge: badges.get(node.id), errorCount: errorCounts?.get(node.id), diff: diffOf(diff, node.id) },
+        data: {
+          node,
+          category: categoryOf(node.type, catalog),
+          summary: configSummary(node),
+          inputs: inputPorts(node, catalog),
+          outputs: outputPorts(node, catalog),
+          badge: badges.get(node.id),
+          errorCount: errorCounts?.get(node.id),
+          diff: diffOf(diff, node.id),
+          live: live?.stats[node.id],
+          bypassed: overlay?.bypass.includes(node.id),
+          debug: overlay?.debug.includes(node.id),
+          replay: replay?.[node.id],
+          presence: presence?.get(node.id),
+        },
       })),
-    [graph.nodes, catalog, selected, badges, errorCounts, diff, readOnly],
+    [graph.nodes, catalog, selected, badges, errorCounts, diff, readOnly, live, overlay, replay, presence],
   );
   const edges: Edge[] = useMemo(
-    () => graph.wires.map((w) => ({ id: wireKey(w), source: w.from, sourceHandle: w.port, target: w.to, label: w.port === "out" ? undefined : w.port, className: w.port === "error" ? "text-bad" : undefined, deletable: !readOnly })),
-    [graph.wires, readOnly],
+    () =>
+      graph.wires.map((w) => ({
+        id: wireKey(w),
+        source: w.from,
+        sourceHandle: w.port,
+        target: w.to,
+        label: w.port === "out" ? undefined : w.port,
+        className: w.port === "error" ? "text-bad" : undefined,
+        deletable: !readOnly,
+        // 메시지가 방금 지나간 와이어는 움직인다(FLW-03.01)
+        animated: live ? isWireActive(live, w.from, w.port, now) : false,
+      })),
+    [graph.wires, readOnly, live, now],
   );
   const nameOf = (id: string) => graph.nodes.find((n) => n.id === id)?.name ?? id;
 

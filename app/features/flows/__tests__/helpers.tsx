@@ -1,6 +1,7 @@
 /**
  * 플로우 화면 테스트 도구: React Flow용 jsdom 스텁(ResizeObserver·DOMMatrixReadOnly), 가짜 FlowApi, 편집기 렌더.
  */
+import { screen } from "@testing-library/react";
 import { vi } from "vitest";
 import type { EditorFactory } from "~/components/code-editor";
 import type { Me } from "~/lib/api-types";
@@ -11,6 +12,7 @@ import { FlowEditor, type FlowEditorProps } from "../flow-editor";
 import { createFlowGraph, catalogOf, toDefinition } from "../model/flow-graph";
 import type { FlowDetail, FlowGraph } from "../model/types";
 import { M3_NODE_TYPES } from "../model/__tests__/catalog-fixture";
+import { fakeSockets } from "./fake-socket";
 
 export function stubReactFlowDom() {
   class RO {
@@ -73,6 +75,18 @@ export function fakeApi(overrides: Partial<FlowApi> = {}): FlowApi {
           : { name, attributes: [{ name: "on", type: "boolean" }], commands: [{ name: "set" }] },
       ),
     ),
+    testRun: vi.fn(() => okr({ trace: { messageId: "m-test", version: 14, steps: [], result: "COMPLETED" } })),
+    replay: vi.fn(() => okr({ jobId: "rp-1" }, 202)),
+    replayJob: vi.fn(() => okr({ status: "SUCCEEDED" as const, progress: { processed: 10, total: 10 }, result: { executions: 10, branchCounts: {}, actions: { command: 0, notify: 0, sink: 0 }, errors: 0 } })),
+    trace: vi.fn(() => okr({ messageId: "m-1", version: 13, steps: [], result: "COMPLETED" })),
+    overlay: vi.fn((_id: string, body: { revision: number }) => okr({ revision: body.revision + 1 })),
+    shadow: vi.fn(() => Promise.resolve({ ok: false as const, status: 404, code: "RESOURCE_NOT_FOUND", message: "" })),
+    startShadow: vi.fn(() => okr({ status: "RUNNING" })),
+    endShadow: vi.fn(() => okr({}, 204)),
+    updateSettings: vi.fn((id: string, patch: object) => okr({ flowId: id, ...patch })),
+    variables: vi.fn(() => okr({ responses: [], totalCount: 0 })),
+    resetVariable: vi.fn(() => okr({}, 204)),
+    rawMessages: vi.fn(() => okr({ responses: [] })),
     ...overrides,
   } as FlowApi;
 }
@@ -81,6 +95,8 @@ export async function renderEditor(props: Partial<FlowEditorProps> & { role?: st
   const { role = "INTEGRATOR", session, ...rest } = props;
   const me = session ?? meOf(role);
   const api = rest.api ?? fakeApi();
+  // 라이브 뷰·편집 참여는 가짜 WebSocket(frontend.md §3.4)
+  const sockets = fakeSockets();
   const all: FlowEditorProps = {
     detail: null,
     nodeTypes: M3_NODE_TYPES,
@@ -95,9 +111,13 @@ export async function renderEditor(props: Partial<FlowEditorProps> & { role?: st
     onCreated: vi.fn(),
     onReload: vi.fn(),
     editorFactory: textareaFactory,
+    socketFactory: sockets.create,
+    me: { userId: me.id, name: me.name ?? me.loginId },
     ...rest,
     api,
   };
   const view = await renderRoute(<FlowEditor {...all} />, { session: me });
-  return { ...view, props: all, api };
+  // root 로더가 끝나 편집기가 그려질 때까지(그 뒤에 라이브 연결이 열린다)
+  await screen.findByRole("tablist", { name: "하단 패널" });
+  return { ...view, props: all, api, sockets };
 }

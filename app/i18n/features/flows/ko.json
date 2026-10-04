@@ -66,7 +66,8 @@
       "emergencyStop": "자동 제어 비상 정지 중 — 제어 노드는 건너뜁니다",
       "virtualBadge": "가상",
       "virtualTargets": "이 플로우는 가상 공간을 대상으로 합니다. 가상 환경에서 시나리오를 실행해 동작을 확인하세요.",
-      "runScenario": "가상 환경에서 실행"
+      "runScenario": "가상 환경에서 실행",
+      "testRun": "시험 실행"
     },
     "applyBlock": {
       "readOnly": "보기 전용이라 적용할 수 없습니다",
@@ -247,7 +248,13 @@
       "label": "하단 패널",
       "validation": "검증 ({{n}})",
       "versions": "버전",
-      "errors": "오류"
+      "errors": "오류",
+      "debug": "디버그",
+      "traces": "추적",
+      "test": "시험 실행",
+      "metrics": "지표",
+      "shadow": "섀도우",
+      "settings": "설정"
     },
     "validation": {
       "ok": "검증 문제가 없습니다",
@@ -281,7 +288,8 @@
       "approvalSent": "승인 요청을 보냈습니다",
       "applied": "v{{v}}을(를) 적용했습니다",
       "noControlPermission": "제어 노드가 있는 플로우를 적용할 권한이 없습니다",
-      "ackRequired": "위험 변경이 있습니다. 내용을 확인하고 \"이해했습니다\"를 선택한 뒤 다시 적용하세요"
+      "ackRequired": "위험 변경이 있습니다. 내용을 확인하고 \"이해했습니다\"를 선택한 뒤 다시 적용하세요",
+      "policyRule": "노드 상태 처리는 노드 종류의 규칙(BR-FLW-07)으로 정해집니다"
     },
     "statePolicy": {
       "KEEP": "유지(KEEP)",
@@ -356,6 +364,280 @@
       "reasonRequired": "거절 사유를 1~500자로 입력하세요",
       "approved": "승인했습니다. 원자적으로 적용됩니다.",
       "rejected": "거절했습니다"
+    },
+    "live": {
+      "health": {
+        "OK": "정상",
+        "WARN": "경고",
+        "ERROR": "오류"
+      },
+      "healthLabel": "상태: {{status}}",
+      "lastError": "최근 오류: {{message}}",
+      "lastAt": "최근 처리 {{at}}",
+      "counter": "처리 {{in}} · 오류 {{errors}}",
+      "reconnecting": "라이브 연결이 끊겼습니다. 다시 연결 중…",
+      "denied": "라이브 뷰를 볼 권한이 없습니다",
+      "ended": "세션이 끝나 라이브 뷰를 닫았습니다. 다시 로그인하세요",
+      "version": "엔진 처리 버전 v{{v}}",
+      "on": "라이브",
+      "state": {
+        "idle": "라이브 꺼짐",
+        "connecting": "연결 중",
+        "open": "라이브",
+        "reconnecting": "재연결 중",
+        "denied": "권한 없음",
+        "ended": "세션 끝남"
+      },
+      "statusChanged": "엔진이 플로우 상태를 {{status}}(으)로 바꿨습니다",
+      "notApplied": "적용된 버전이 있어야 실시간 흐름을 볼 수 있습니다"
+    },
+    "overlay": {
+      "bypassed": "바이패스",
+      "debugOn": "디버그",
+      "bypass": "바이패스(일시 해제)",
+      "debug": "디버그",
+      "hint": "버전을 바꾸지 않고 1초 안에 실행 중인 플로우에 반영됩니다",
+      "noControlPermission": "제어 노드 바이패스는 제어 배포 권한이 필요합니다",
+      "conflict": "다른 사람이 먼저 바이패스·디버그를 바꿨습니다. 새로 불러왔습니다",
+      "bypassOnDone": "{{name}} 노드를 바이패스했습니다",
+      "bypassOffDone": "{{name}} 노드 바이패스를 풀었습니다",
+      "debugOnDone": "{{name}} 노드 디버그를 켰습니다",
+      "debugOffDone": "{{name}} 노드 디버그를 껐습니다"
+    },
+    "presence": {
+      "editing": "{{name}} 편집 중",
+      "locked": "{{name}}님이 편집 중입니다(읽기 전용)",
+      "label": "함께 보고 있는 사람",
+      "viewer": "{{name}}(보기 전용)",
+      "readOnly": "보기",
+      "reconnecting": "실시간 협업 연결이 끊겼습니다. 다시 연결 중…",
+      "updated": "{{name}}님이 v{{v}}을(를) 저장했습니다.",
+      "reload": "다시 불러오기"
+    },
+    "inspector": {
+      "masked": "권한 밖 데이터",
+      "label": "{{name}} 최근 메시지",
+      "title": "{{name}} · 최근 메시지",
+      "sampling": "메시지가 많아 서버가 초당 {{n}}건을 줄여 보내고 있습니다",
+      "skipped": "화면 표시 상한(초당 5건)으로 {{n}}건을 생략했습니다",
+      "empty": "아직 지나간 메시지가 없습니다",
+      "trace": "추적 보기",
+      "input": "입력",
+      "output": "출력",
+      "pickNode": "노드를 고르면 그 노드를 지나간 최근 메시지를 볼 수 있습니다"
+    },
+    "trace": {
+      "kind": {
+        "COMMAND": "제어",
+        "NOTIFY": "알림",
+        "SINK": "저장"
+      },
+      "skipped": "{{kind}} 건너뜀({{reason}})",
+      "dryRun": "드라이런(실행 안 함): {{kind}} {{summary}}",
+      "recorded": "{{kind}} 아웃박스 기록({{key}}…)",
+      "label": "실행 추적",
+      "message": "메시지 {{id}}",
+      "result": {
+        "COMPLETED": "끝까지 처리",
+        "FAILED": "실패",
+        "DROPPED": "버림"
+      },
+      "noSteps": "거친 노드가 없습니다",
+      "ms": "{{ms}}ms",
+      "error": "오류 {{code}}: {{message}}",
+      "line": "({{line}}번째 줄)",
+      "details": "입력·출력 보기",
+      "notFound": "추적이 없습니다. 디버그를 켰거나 샘플된 메시지만 1시간 보관합니다",
+      "messageId": "메시지 ID",
+      "hint": "디버그 탭의 [추적 보기]로도 열 수 있습니다",
+      "load": "불러오기"
+    },
+    "test": {
+      "title": "시험 실행(드라이런)",
+      "inputMode": "입력 방식",
+      "mode": {
+        "recent": "최근 원본 메시지",
+        "custom": "직접 입력"
+      },
+      "noRecent": "최근 24시간 원본 메시지가 없습니다. 직접 입력을 쓰세요",
+      "recent": "원본 메시지",
+      "message": "표준 메시지(JSON)",
+      "pickMessage": "원본 메시지를 고르세요",
+      "invalidJson": "JSON 형식이 올바르지 않습니다",
+      "invalidSchema": "표준 메시지 형식이 아닙니다: {{field}}",
+      "usesEdits": "저장하지 않은 편집 내용으로 실행합니다. 제어·알림·저장 노드는 실제로 실행하지 않습니다",
+      "dryRunNote": "제어·알림·저장 노드는 실제로 실행하지 않고 기록만 합니다",
+      "run": "실행"
+    },
+    "jsTest": {
+      "title": "노드 시험 실행",
+      "message": "예시 메시지(JSON)",
+      "saveFirst": "플로우를 한 번 저장하면 시험 실행할 수 있습니다",
+      "tooLarge": "코드가 {{max}}바이트를 넘어 실행할 수 없습니다",
+      "run": "노드 시험 실행",
+      "outputs": "출력",
+      "noOutput": "출력이 없습니다(null·undefined 반환)"
+    },
+    "replay": {
+      "portCount": "과거 재생 건수",
+      "title": "과거 데이터 재생",
+      "from": "시작일",
+      "to": "종료일",
+      "device": "대상 기기",
+      "allDevices": "모든 기기",
+      "range": {
+        "required": "기간을 입력하세요",
+        "order": "종료일이 시작일보다 앞설 수 없습니다",
+        "tooLong": "기간은 최대 {{days}}일입니다"
+      },
+      "notSaved": "저장한 버전이 있어야 재생할 수 있습니다",
+      "tooLarge": "재생할 데이터가 너무 많습니다. 기간을 줄여 주세요",
+      "savedOnly": "재생은 저장한 버전(v{{v}})으로 합니다",
+      "start": "재생 시작",
+      "status": {
+        "QUEUED": "대기 중",
+        "RUNNING": "재생 중",
+        "SUCCEEDED": "완료",
+        "FAILED": "실패",
+        "CANCELLED": "취소됨"
+      },
+      "progress": "재생 진행률",
+      "processed": "{{processed}} / {{total}}건",
+      "summary": "실행 {{executions}}회 · 제어 {{command}}회 · 알림 {{notify}}회 · 저장 {{sink}}회 · 오류 {{errors}}건",
+      "noRealActions": "드라이런이라 실제 명령·알림은 0건입니다",
+      "overlayShown": "캔버스에 과거 재생 분기 건수를 겹쳐 보이고 있습니다.",
+      "overlayClear": "지우기"
+    },
+    "metrics": {
+      "title": "플로우 지표",
+      "window": "기간",
+      "windows": {
+        "1h": "1시간",
+        "24h": "24시간",
+        "7d": "7일"
+      },
+      "unavailable": "지표 없음(엔진 지표를 아직 받을 수 없습니다)",
+      "errorsValue": "{{n}} ({{rate}}%)",
+      "latencyValue": "평균 {{avg}}ms · p95 {{p95}}ms",
+      "actionsValue": "제어 {{command}} · 알림 {{notify}} · 저장 {{sink}}",
+      "card": {
+        "executions": "실행 수",
+        "errors": "오류(오류율)",
+        "latency": "소요 시간",
+        "actions": "행동",
+        "dropped": "버린 트리거"
+      },
+      "series": "시간대별 실행 수",
+      "avgMs": "평균 ms"
+    },
+    "shadow": {
+      "title": "섀도우 비교",
+      "heading": "섀도우 비교 v{{active}}(실행) vs v{{shadow}}(섀도우)",
+      "progress": "{{elapsed}}분 경과 / {{total}}분",
+      "status": {
+        "RUNNING": "진행 중",
+        "COMPLETED": "기간이 끝났습니다",
+        "PROMOTED": "전환됨",
+        "CANCELLED": "중단됨"
+      },
+      "item": "항목",
+      "activeCol": "v{{v}}",
+      "shadowCol": "v{{v}}",
+      "delta": "차이",
+      "branch": "분기 {{name}} {{port}}",
+      "action": {
+        "command": "제어",
+        "notify": "알림",
+        "sink": "저장"
+      },
+      "wouldControl": "v{{v}}였다면 제어 {{delta}}회",
+      "errors": "섀도우 오류 {{n}}건",
+      "diffs": "결과가 달라진 메시지 {{n}}건",
+      "cancel": "중단",
+      "promote": "v{{v}}로 전환",
+      "start": "섀도우 시작",
+      "option": "섀도우로 먼저 실행(실제 행동 없이 비교)",
+      "minutes": "섀도우 기간(분)",
+      "minutesRule": "기간은 {{min}}~{{max}}분입니다",
+      "inProgress": "섀도우 비교가 끝난 뒤 적용하세요",
+      "started": "v{{v}}을(를) {{minutes}}분 동안 섀도우로 실행합니다",
+      "promoted": "v{{v}}로 전환했습니다",
+      "cancelled": "섀도우를 중단했습니다",
+      "banner": "v{{v}} 섀도우 진행 중입니다.",
+      "view": "비교 보기"
+    },
+    "statePolicyHelp": {
+      "KEEP": "진행 중인 타이머·집계 창을 그대로 이어받습니다",
+      "RESET": "상태를 지우고 새로 시작합니다",
+      "MIGRATE": "새 설정에 맞게 상태를 바꿔 이어받습니다"
+    },
+    "limit": {
+      "nodes": "노드는 플로우당 최대 {{max}}개입니다(현재 {{n}}개)"
+    },
+    "conflict": {
+      "diffLabel": "실행 v{{active}} → 내 초안 v{{draft}}",
+      "applied": "다른 사람이 먼저 적용했습니다. 내 변경은 덮어쓰지 않았습니다.",
+      "showDiff": "차이 보기"
+    },
+    "settings": {
+      "saved": "설정을 저장했습니다",
+      "variableReset": "{{name}} 변수 값을 초기화했습니다",
+      "rule": {
+        "purpose": "목적은 1~{{purposeMax}}자로 입력하세요",
+        "description": "설명은 {{descriptionMax}}자 이하로 입력하세요",
+        "errorRate": "오류율 기준은 1~100%입니다",
+        "catchSelf": "자기 자신을 catch 플로우로 고를 수 없습니다",
+        "max": "최대 동시 실행은 1~50입니다",
+        "var": {
+          "name": "이름은 영문·숫자·_ 1~40자입니다",
+          "duplicate": "같은 이름의 변수가 있습니다",
+          "limit": "변수는 플로우당 {{limit}}개까지입니다"
+        }
+      },
+      "docs": "설명서",
+      "purpose": "목적",
+      "owner": "책임자",
+      "noOwner": "책임자 없음",
+      "assignMe": "나로 지정",
+      "relatedSpaces": "관련 공간",
+      "description": "상세 설명(마크다운)",
+      "count": "{{n}} / {{max}}자",
+      "tags": "태그",
+      "errorHandling": "오류 처리",
+      "catchFlow": "catch 플로우 ID",
+      "autoPause": "DEGRADED면 자동 일시 정지",
+      "errorRate": "오류율 기준(%/5분)",
+      "pauseMode": "일시 정지 동작",
+      "pause": {
+        "DROP": "트리거 버림",
+        "BUFFER": "보관 후 재개 때 처리(최대 1시간)"
+      },
+      "save": "설정 저장",
+      "execution": "실행 모드·변수",
+      "versioned": "실행 모드와 변수 정의는 버전에 들어갑니다. [저장]·[적용] 때 반영됩니다",
+      "mode": "실행 모드",
+      "concurrency": {
+        "queued": "queued(순서대로)",
+        "single": "single(실행 중이면 무시)",
+        "restart": "restart(취소 후 새로)",
+        "parallel": "parallel(동시)"
+      },
+      "keyBy": "키 단위",
+      "key": {
+        "deviceId": "기기",
+        "spaceId": "공간",
+        "flow": "플로우"
+      },
+      "max": "최대 동시 실행",
+      "variables": "플로우 변수",
+      "varName": "이름",
+      "varType": "타입",
+      "varInitial": "초기값",
+      "varValue": "현재 값",
+      "resetValue": "값 초기화",
+      "removeVar": "삭제",
+      "noVariables": "변수가 없습니다",
+      "addVar": "변수 추가"
     }
   },
   "errors": {
@@ -369,6 +651,10 @@
     "FLOW_DEFINITION_TOO_LARGE": "플로우 정의가 너무 큽니다",
     "FLOW_LIMIT_EXCEEDED": "플로우 한도를 넘었습니다",
     "FLOW_SHADOW_IN_PROGRESS": "섀도우 실행 중에는 적용할 수 없습니다",
-    "CAPABILITY_NOT_FOUND": "기능을 찾을 수 없습니다"
+    "CAPABILITY_NOT_FOUND": "기능을 찾을 수 없습니다",
+    "FLOW_TEST_INPUT_INVALID": "입력 형식이 올바르지 않습니다",
+    "FLOW_REPLAY_TOO_LARGE": "기간을 줄여 주세요",
+    "FLOW_METRICS_UNAVAILABLE": "지표를 아직 받을 수 없습니다",
+    "SUBFLOW_IN_USE": "사용 중인 서브플로우입니다"
   }
 }

@@ -3,7 +3,19 @@
  * 화면 부품은 이 묶음을 받아 쓰고, 테스트는 가짜 묶음을 넣는다.
  */
 import { bffJson, clientIdempotencyKey, type BffJsonResult } from "~/lib/bff-client";
-import type { FlowDefinition, FlowMetrics, ValidateResponse, ValidationResult, VersionDiff, VersionRow } from "./model/types";
+import type { FlowDefinition, FlowMetrics, FlowSettings, FlowVariable, RawMessageRow, ReplayJob, ShadowStatus, Trace, ValidateResponse, ValidationResult, VersionDiff, VersionRow } from "./model/types";
+
+/** API-FLW-12 시험 입력: 저장된 원본 메시지 또는 직접 넣은 표준 메시지 */
+export type TestRunInput = { rawMessageId: string } | { message: Record<string, unknown> };
+export interface TestRunBody {
+  version?: number;
+  definition?: FlowDefinition;
+  input: TestRunInput;
+  startNodeId?: string;
+}
+
+/** API-FLW-10 부분 수정(온 키만) */
+export type FlowSettingsPatch = Partial<Omit<FlowSettings, "flowId" | "version">>;
 
 export interface SaveResult {
   flowId: string;
@@ -48,13 +60,33 @@ export interface FlowApi {
   rename(flowId: string, name: string): Promise<BffJsonResult<{ flowId: string; name: string }>>;
   saveDraft(flowId: string, body: { name?: string; baseVersion: number; definition: FlowDefinition }): Promise<BffJsonResult<SaveResult>>;
   validate(flowId: string, version: number): Promise<BffJsonResult<ValidateResponse>>;
-  apply(flowId: string, body: { version: number; baseVersion: number; memo?: string; acknowledgedRisks: boolean }): Promise<BffJsonResult<ApplyResult>>;
+  apply(flowId: string, body: { version: number; baseVersion: number; memo?: string; acknowledgedRisks: boolean; shadow?: { durationMinutes: number } }): Promise<BffJsonResult<ApplyResult>>;
   /** API-FLW-04 `{responses, totalCount}`(페이징 없음, 최대 100개) */
   versions(flowId: string): Promise<BffJsonResult<{ responses: VersionRow[]; totalCount?: number }>>;
   diff(flowId: string, from: number, to: number): Promise<BffJsonResult<VersionDiff>>;
   rollback(flowId: string, body: { toVersion: number; memo?: string }): Promise<BffJsonResult<ApplyResult>>;
   metrics(flowId: string, window: "1h" | "24h" | "7d"): Promise<BffJsonResult<FlowMetrics>>;
   capabilities(): Promise<BffJsonResult<{ responses: CapabilitySummary[] }>>;
+  /** API-FLW-12 시험 실행(드라이런) */
+  testRun(flowId: string, body: TestRunBody): Promise<BffJsonResult<{ trace: Trace }>>;
+  /** API-FLW-13 과거 재생: 202 {jobId} */
+  replay(flowId: string, body: { version: number; from: string; to: string; deviceIds?: string[] }): Promise<BffJsonResult<{ jobId: string }>>;
+  replayJob(jobId: string): Promise<BffJsonResult<ReplayJob>>;
+  /** API-FLW-41 실행 추적 */
+  trace(flowId: string, messageId: string): Promise<BffJsonResult<Trace>>;
+  /** API-FLW-11 바이패스·디버그 */
+  overlay(flowId: string, body: { bypass: string[]; debug: string[]; revision: number }): Promise<BffJsonResult<{ revision: number }>>;
+  /** API-FLW-18 섀도우 */
+  shadow(flowId: string): Promise<BffJsonResult<ShadowStatus>>;
+  startShadow(flowId: string, body: { version: number; durationMinutes: number }): Promise<BffJsonResult<ShadowStatus>>;
+  endShadow(flowId: string, action: "promote" | "cancel"): Promise<BffJsonResult<unknown>>;
+  /** API-FLW-10 플로우 설정·설명서 */
+  updateSettings(flowId: string, patch: FlowSettingsPatch): Promise<BffJsonResult<FlowSettings>>;
+  /** API-FLW-21 변수 */
+  variables(flowId: string): Promise<BffJsonResult<{ responses: FlowVariable[]; totalCount?: number }>>;
+  resetVariable(flowId: string, name: string): Promise<BffJsonResult<unknown>>;
+  /** API-ING-05 최근 원본 메시지(시험 실행 입력) */
+  rawMessages(query: { from: string; to: string; deviceIds?: string[] }): Promise<BffJsonResult<{ responses: RawMessageRow[] }>>;
   capability(name: string): Promise<BffJsonResult<CapabilityDetail>>;
 }
 
@@ -73,4 +105,20 @@ export const flowApi: FlowApi = {
   metrics: (id, window) => bffJson(`${flow(id)}/metrics?window=${window}&step=${window === "1h" ? "1m" : "1h"}`),
   capabilities: () => bffJson(`${base}/capabilities?size=100`),
   capability: (name) => bffJson(`${base}/capabilities/${encodeURIComponent(name)}`),
+  testRun: (id, body) => bffJson(`${flow(id)}/test-run`, { method: "POST", body }),
+  replay: (id, body) => bffJson(`${flow(id)}/replay`, { method: "POST", body, idempotencyKey: clientIdempotencyKey() }),
+  replayJob: (jobId) => bffJson(`${base}/flow-replays/${encodeURIComponent(jobId)}`),
+  trace: (id, messageId) => bffJson(`${flow(id)}/traces/${encodeURIComponent(messageId)}`),
+  overlay: (id, body) => bffJson(`${flow(id)}/overlay`, { method: "PUT", body }),
+  shadow: (id) => bffJson(`${flow(id)}/shadow`),
+  startShadow: (id, body) => bffJson(`${flow(id)}/shadow`, { method: "POST", body, idempotencyKey: clientIdempotencyKey() }),
+  endShadow: (id, action) => bffJson(`${flow(id)}/shadow/${action}`, { method: "POST", idempotencyKey: clientIdempotencyKey() }),
+  updateSettings: (id, patch) => bffJson(flow(id), { method: "PATCH", body: patch }),
+  variables: (id) => bffJson(`${flow(id)}/variables`),
+  resetVariable: (id, name) => bffJson(`${flow(id)}/variables/${encodeURIComponent(name)}/reset`, { method: "POST" }),
+  rawMessages: (q) => {
+    const params = new URLSearchParams({ from: q.from, to: q.to, size: "20" });
+    for (const id of q.deviceIds ?? []) params.append("deviceId", id);
+    return bffJson(`${base}/ingest/raw-messages?${params}`);
+  },
 };
