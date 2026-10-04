@@ -127,8 +127,8 @@ describe("UI-FLW-08 Sink 저장소 연결(FLW-04.01, BR-FLW-27·28)", () => {
 });
 
 describe("UI-FLW-18 스냅샷(FLW-11.02)", () => {
-  it("ANALYST는 403(경로 가드 FLOW_WRITE), OPERATOR는 목록(최신순)과 새 스냅샷 검증", async () => {
-    expect((await (await analyst()).get("/automation/snapshots")).response.status).toBe(403);
+  it("ANALYST는 보기만(경로 가드 FLOW_READ), OPERATOR는 목록(최신순)과 새 스냅샷 검증", async () => {
+    expect((await (await analyst()).get("/automation/snapshots")).response.status).toBe(200);
     const browser = await operator();
     const page = await browser.get("/automation/snapshots");
     expect(page.body.indexOf("냉방 튜닝 후")).toBeLessThan(page.body.indexOf("학기 시작 전"));
@@ -197,8 +197,9 @@ describe("UI-FLW-18 스냅샷(FLW-11.02)", () => {
 });
 
 describe("UI-FLW-19 승격 파이프라인(FLW-11.03)과 UI-FLW-13 대상 매핑(FLW-09.01)", () => {
-  it("OPERATOR는 403(경로 가드), INTEGRATOR는 단계 그림·요청 가능(정의 편집 없음), ADMIN은 정의 편집", async () => {
-    expect((await (await operator()).get("/automation/pipelines")).response.status).toBe(403);
+  it("ANALYST는 403(경로 가드 FLOW_WRITE), OPERATOR도 열림(TC-FLW-200 승격 요청), INTEGRATOR는 단계 그림·요청 가능(정의 편집 없음), ADMIN은 정의 편집", async () => {
+    expect((await (await analyst()).get("/automation/pipelines")).response.status).toBe(403);
+    expect((await (await operator()).get("/automation/pipelines")).response.status).toBe(200);
     const browser = await integrator();
     const page = await browser.get("/automation/pipelines");
     expect(page.body).toContain("승격 파이프라인: 기본");

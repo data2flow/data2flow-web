@@ -63,9 +63,9 @@ export const ROUTE_GUARDS: { prefix: string; anyOf: string[] }[] = [
   { prefix: "/notifications", anyOf: ["NOTIFY_POLICY_WRITE"] },
   { prefix: "/notifications/silences", anyOf: ["ALARM_HANDLE", "NOTIFY_POLICY_WRITE"] },
   { prefix: "/automation/sink-connections", anyOf: ["SINK_CONNECTION_MANAGE"] },
-  { prefix: "/automation/snapshots", anyOf: ["FLOW_WRITE"] },
-  { prefix: "/automation/pipelines", anyOf: ["FLOW_DEPLOY_CONTROL", "FLOW_APPROVE"] },
-  { prefix: "/automation/packages", anyOf: ["FLOW_DEPLOY_CONTROL", "NODE_PACKAGE_MANAGE"] },
+  // 스냅샷(UI-FLW-18)은 ANALYST도 본다(/automation의 FLOW_READ). 승격 요청(UI-FLW-19)은 OPERATOR부터, 확장 노드 목록(UI-FLW-21)도 OPERATOR부터 본다
+  { prefix: "/automation/pipelines", anyOf: ["FLOW_WRITE"] },
+  { prefix: "/automation/packages", anyOf: ["FLOW_WRITE"] },
   { prefix: "/settings/git-sync", anyOf: ["GIT_SYNC_MANAGE"] },
   { prefix: "/control/scenes", anyOf: ["SCENE_RUN", "SCENE_MANAGE"] },
   { prefix: "/control/schedules", anyOf: ["SCHEDULE_MANAGE"] },
