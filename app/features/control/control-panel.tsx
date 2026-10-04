@@ -4,8 +4,10 @@
  * - [적용]은 바뀐 값이 있을 때만 켜지고, 명령마다 Idempotency-Key를 붙여 API-ACT-01로 보낸다. 1초 안의 연타는 버린다
  * - 명령 상태는 실시간 구독 `commands:{deviceId}`(event `command-status`)로, 기기 보고는 `space:{spaceId}`(event `device-update`)로 받는다(API-DSH-20)
  * - APPLIED가 되면 섀도(API-ACT-04)를 다시 읽는다. 실패·거부는 사유를 보여 준다
+ * - M4: 수동 우선 남은 시간(30초마다 다시 셈)과 [자동으로 되돌리기](ACT-06.05, API-ACT-06), 오프라인 대기열 명령 수(ACT-07.01),
+ *   LoRaWAN Class A `QUEUED_FOR_DOWNLINK` 예상 전달 시각(ACT-07.02), 단계형 정수 속성(FanSpeed·Ventilation level)은 단계 버튼(ACT-04.01)
  */
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { LiveBanner, LiveDot, useLiveStream, type UseLiveStreamOptions } from "~/components/live";
 import { Alert, Badge, Button, Card, EmptyState, cx } from "~/components/ui";
@@ -33,6 +35,8 @@ import {
   type Shadow,
 } from "./model/control";
 
+const QUEUED = new Set(["QUEUED", "QUEUED_FOR_DOWNLINK"]);
+
 export interface TrackedCommand {
   id: string;
   capability: string;
@@ -40,6 +44,8 @@ export interface TrackedCommand {
   reason?: string;
   /** 명령 출처(플로우면 flowName, 사용자면 userName — core가 붙인다, ADR-043) */
   source?: CommandSource | null;
+  /** Class A 다운링크 예상 전달 시각(API-ACT-01 `expectedDeliveryAt`) */
+  expectedDeliveryAt?: string | null;
 }
 
 /** 실시간 `command-status`(commands:{deviceId}, API-DSH-20): 실패 사유는 reason(상태 사유 코드), message(차단 사유 문구) */
@@ -91,17 +97,24 @@ export function DeviceControlPanel({ deviceId, spaceId, initial, canControl, tim
   const guard = useMemo(() => createDebounceGuard(1000, now), [now]);
   const commandsRef = useRef(commands);
   commandsRef.current = commands;
+  // 수동 우선 남은 시간을 30초마다 다시 센다
+  const [, setTick] = useState(0);
+  useEffect(() => {
+    if (!info?.manualOverride) return;
+    const timer = setInterval(() => setTick((n) => n + 1), 30_000);
+    return () => clearInterval(timer);
+  }, [info?.manualOverride]);
 
   const refreshShadow = useCallback(async () => {
     const result = await api.shadow(deviceId);
     if (result.ok) setShadow(result.data);
   }, [api, deviceId]);
 
-  const track = useCallback((id: string, capability: string, status: string, reason?: string, source?: CommandSource | null) => {
+  const track = useCallback((id: string, capability: string, status: string, reason?: string, source?: CommandSource | null, expectedDeliveryAt?: string | null) => {
     setCommands((list) => {
       const existing = list.find((c) => c.id === id);
-      if (existing) return list.map((c) => (c.id === id ? { ...c, status: nextStatus(c.status, status), reason: reason ?? c.reason, source: source ?? c.source } : c));
-      return [{ id, capability, status, reason, source }, ...list].slice(0, 20);
+      if (existing) return list.map((c) => (c.id === id ? { ...c, status: nextStatus(c.status, status), reason: reason ?? c.reason, source: source ?? c.source, expectedDeliveryAt: expectedDeliveryAt ?? c.expectedDeliveryAt } : c));
+      return [{ id, capability, status, reason, source, expectedDeliveryAt }, ...list].slice(0, 20);
     });
   }, []);
 
@@ -142,6 +155,7 @@ export function DeviceControlPanel({ deviceId, spaceId, initial, canControl, tim
   if (!info.controllable) return <EmptyState title={t("control.panel.notControllable")} />;
 
   const pendingCaps = new Set(commands.filter((c) => !progressOf(c.status).terminal).map((c) => c.capability));
+  const queuedCount = new Set([...commands.filter((c) => QUEUED.has(c.status)).map((c) => c.id), ...(info.pending ?? []).filter((p) => QUEUED.has(p.status)).map((p) => p.commandId)]).size;
   const circuitOpen = info.driver?.status === "CIRCUIT_OPEN";
   const overrideMinutes = info.manualOverride?.until ? Math.max(0, Math.ceil((Date.parse(info.manualOverride.until) - now()) / 60_000)) : null;
 
@@ -154,7 +168,7 @@ export function DeviceControlPanel({ deviceId, spaceId, initial, canControl, tim
     setNotice(null);
     const result = await api.command(deviceId, { capability: capability.name, command: "set", args });
     if (result.ok) {
-      track(result.data.id, capability.name, result.data.status, result.data.message ?? result.data.statusReason ?? undefined);
+      track(result.data.id, capability.name, result.data.status, result.data.message ?? result.data.statusReason ?? undefined, null, result.data.expectedDeliveryAt);
       setEdits((e) => ({ ...e, [capability.name]: {} }));
       setShadow((s) => ({ ...(s ?? {}), desired: { ...(s?.desired ?? {}), [capability.name]: { ...(s?.desired?.[capability.name] ?? {}), ...args } } }));
     } else {
@@ -183,6 +197,7 @@ export function DeviceControlPanel({ deviceId, spaceId, initial, canControl, tim
           {t("control.panel.driver")}: <span className="font-mono">{info.driver?.name ?? info.driver?.type ?? "–"}</span>
         </span>
         <Badge tone={shadow?.connectivity === "ONLINE" ? "success" : shadow?.connectivity === "OFFLINE" ? "danger" : "neutral"}>{t(`control.connectivity.${shadow?.connectivity ?? "UNKNOWN"}`, { defaultValue: shadow?.connectivity ?? "UNKNOWN" })}</Badge>
+        {queuedCount > 0 && <Badge tone="warning">{t("control.panel.queued", { n: queuedCount })}</Badge>}
         {shadow?.reportedAt && <span className="text-muted">{t("control.panel.reportedAt", { at: formatDateTime(shadow.reportedAt, timezone, lang, true) })}</span>}
         {overrideMinutes !== null && (
           <span className="inline-flex items-center gap-2">
@@ -206,6 +221,8 @@ export function DeviceControlPanel({ deviceId, spaceId, initial, canControl, tim
           sync={syncState(shadow, capability.name, pendingCaps)}
           command={commands.find((c) => c.capability === capability.name)}
           canControl={canControl}
+          timezone={timezone}
+          lang={lang}
           onEdit={(attribute, value) => setEdit(capability.name, attribute, value)}
           onApply={() => void apply(capability)}
         />
@@ -221,6 +238,8 @@ function CapabilityCard({
   sync,
   command,
   canControl,
+  timezone,
+  lang,
   onEdit,
   onApply,
 }: {
@@ -230,6 +249,8 @@ function CapabilityCard({
   sync: "synced" | "pending" | "deviceChanged";
   command?: TrackedCommand;
   canControl: boolean;
+  timezone: string;
+  lang: string;
   onEdit: (attribute: string, value: unknown) => void;
   onApply: () => void;
 }) {
@@ -283,7 +304,7 @@ function CapabilityCard({
           <div className="flex flex-wrap items-center justify-between gap-2">
             {command ? (
               <span className="inline-flex flex-wrap items-center gap-2">
-                <CommandProgress command={command} />
+                <CommandProgress command={command} expectedAt={command.expectedDeliveryAt ? formatDateTime(command.expectedDeliveryAt, timezone, lang) : undefined} />
                 {command.source && command.source.type !== "USER" && (
                   <span className="text-[12px] text-muted">
                     <SourceLabel source={command.source} />
@@ -305,7 +326,7 @@ function CapabilityCard({
   );
 }
 
-function AttributeInput({ capability, attribute, range, value, disabled, onChange }: { capability: string; attribute: AttributeDef; range: ReturnType<typeof attributeRange>; value: unknown; disabled: boolean; onChange: (v: unknown) => void }) {
+export function AttributeInput({ capability, attribute, range, value, disabled, onChange }: { capability: string; attribute: AttributeDef; range: ReturnType<typeof attributeRange>; value: unknown; disabled: boolean; onChange: (v: unknown) => void }) {
   const { t } = useTranslation();
   const label = `${capability} ${t(`control.attr.${attribute.name}`, { defaultValue: attribute.name })}`;
   if (attribute.type === "boolean") {
@@ -346,6 +367,26 @@ function AttributeInput({ capability, attribute, range, value, disabled, onChang
       </div>
     );
   }
+  if (attribute.type === "integer" && range.min !== undefined && range.max !== undefined && range.max - range.min <= 10 && range.max >= range.min) {
+    // 단계 버튼(FanSpeed·Ventilation level 1~N, UI-ACT-01)
+    const levels = Array.from({ length: range.max - range.min + 1 }, (_, i) => (range.min as number) + i);
+    return (
+      <div role="group" aria-label={label} className="flex flex-wrap gap-1">
+        {levels.map((level) => (
+          <button
+            key={level}
+            type="button"
+            aria-pressed={value === level}
+            disabled={disabled}
+            onClick={() => onChange(level)}
+            className={cx("min-w-8 rounded-md border px-2.5 py-1 font-mono text-[12.5px]", value === level ? "border-accent bg-accent-soft text-accent" : "border-line text-text")}
+          >
+            {level}
+          </button>
+        ))}
+      </div>
+    );
+  }
   if (attribute.type === "number" || attribute.type === "integer") {
     const numeric = typeof value === "number" ? value : value === undefined || value === null || value === "" ? "" : Number(value);
     const step = range.step ?? (attribute.type === "integer" ? 1 : 0.5);
@@ -365,8 +406,8 @@ function AttributeInput({ capability, attribute, range, value, disabled, onChang
   return <input aria-label={label} className="rounded-md border border-line bg-panel px-2 py-1 text-[13px]" value={value === undefined || value === null ? "" : String(value)} disabled={disabled} onChange={(e) => onChange(e.target.value)} />;
 }
 
-/** 진행 칩: ✓요청 ✓전송 ✓응답 ✓적용, 실패하면 빨간 사유(ACT-04.02) */
-export function CommandProgress({ command }: { command: Pick<TrackedCommand, "status" | "reason"> }) {
+/** 진행 칩: ✓요청 ✓전송 ✓응답 ✓적용, 실패하면 빨간 사유(ACT-04.02). Class A 대기는 예상 전달 시각(ACT-07.02) */
+export function CommandProgress({ command, expectedAt }: { command: Pick<TrackedCommand, "status" | "reason">; expectedAt?: string }) {
   const { t } = useTranslation();
   const progress = progressOf(command.status);
   const statusText = t(`control.status.${command.status}`, { defaultValue: command.status });
@@ -387,6 +428,7 @@ export function CommandProgress({ command }: { command: Pick<TrackedCommand, "st
         </span>
       ))}
       {progress.waiting && <Badge tone="warning">{statusText}</Badge>}
+      {command.status === "QUEUED_FOR_DOWNLINK" && <span className="text-muted">{expectedAt ? t("control.panel.nextUplink", { at: expectedAt }) : t("control.panel.nextUplinkUnknown")}</span>}
     </span>
   );
 }

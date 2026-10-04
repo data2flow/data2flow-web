@@ -1,6 +1,7 @@
 /**
  * 상단 흰 내비게이션 바: 로고, 메뉴(현재 메뉴 파란 밑줄), 사용자 메뉴(내 정보, 로그아웃).
  * 메뉴는 권한으로 거르고(보조 수단, IAM-04.05), 임시 비밀번호 상태에서는 메뉴를 보이지 않는다(AT-IAM-01.1).
+ * `headerActions`(⏻ 자동화 비상 정지 등, UI-ACT-07)는 사용자 메뉴 앞에, `bands`(비상 정지·유지보수 띠)는 헤더 바로 아래 전체 폭으로 둔다(00-navigation.md §1.3).
  */
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
@@ -11,7 +12,7 @@ import { nextTheme, type Theme } from "~/lib/theme";
 import { Logo } from "./logo";
 import { CsrfField, cx } from "./ui";
 
-export function AppShell({ me, children, theme = "SYSTEM" }: { me: Me | null; children: ReactNode; theme?: Theme }) {
+export function AppShell({ me, children, theme = "SYSTEM", headerActions, bands }: { me: Me | null; children: ReactNode; theme?: Theme; headerActions?: ReactNode; bands?: ReactNode }) {
   const { t } = useTranslation();
   const locked = !me || Boolean(me.mustChangePassword);
   const menu = visibleMenu(me?.permissions, locked);
@@ -37,6 +38,7 @@ export function AppShell({ me, children, theme = "SYSTEM" }: { me: Me | null; ch
             ))}
           </nav>
           <div className="flex items-center gap-3 text-[13px]">
+            {!locked && headerActions}
             {me && (
               <NavLink to="/me" className="text-text hover:text-accent">
                 {me.name || me.loginId}
@@ -59,6 +61,7 @@ export function AppShell({ me, children, theme = "SYSTEM" }: { me: Me | null; ch
           </div>
         </div>
       </header>
+      {!locked && bands}
       <main className="mx-auto max-w-7xl px-4 py-6">{children}</main>
     </div>
   );

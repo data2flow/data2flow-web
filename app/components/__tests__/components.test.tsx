@@ -31,6 +31,30 @@ describe("TC-IAM-008 AT-IAM-01.1 상단 메뉴(IAM-04.05 보조 숨김)", () => 
   });
 });
 
+describe("ACT-06.03 UI-ACT-07 헤더 동작·전역 띠 자리(00-navigation §1.3)", () => {
+  it("헤더 동작(⏻)과 띠는 메뉴가 열린 사용자에게만, 임시 비밀번호 상태에서는 숨긴다", async () => {
+    const { unmount } = await renderRoute(
+      <AppShell me={meOf("OPERATOR")} headerActions={<button type="button">⏻ 비상</button>} bands={<div role="alert">비상 정지 중</div>}>
+        본문
+      </AppShell>,
+      { session: meOf("OPERATOR") },
+    );
+    await screen.findByText("본문");
+    expect(screen.getByRole("button", { name: "⏻ 비상" })).toBeInTheDocument();
+    expect(screen.getByRole("alert")).toHaveTextContent("비상 정지 중");
+    unmount();
+    await renderRoute(
+      <AppShell me={meOf("OPERATOR", { mustChangePassword: true })} headerActions={<button type="button">⏻ 비상</button>} bands={<div role="alert">비상 정지 중</div>}>
+        본문
+      </AppShell>,
+      { session: meOf("OPERATOR") },
+    );
+    await screen.findByText("본문");
+    expect(screen.queryByRole("button", { name: "⏻ 비상" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+  });
+});
+
 describe("UI-IAM-13 오류·접근 안내", () => {
   it("403: 권한 없음 문구, 401: 다시 로그인 버튼과 탭 알림", async () => {
     const { unmount } = await renderRoute(<ErrorView status={403} code="PERMISSION_DENIED" />);

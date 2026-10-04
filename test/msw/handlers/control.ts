@@ -5,6 +5,7 @@
 import { HttpResponse } from "msw";
 import { fail, list, noContent, ok, type CoreHandler, type CoreState } from "../core-fixtures";
 import { envelope } from "../fake-gateway";
+import { controlM4Handler, controlM4State } from "./control-m4";
 import { setModelPackage } from "./models";
 
 export interface FakeCommand {
@@ -139,9 +140,13 @@ function cursorList<T>(items: T[], url: URL) {
   return HttpResponse.json({ ...envelope(), size, responses: page, nextCursor: next });
 }
 
-export const controlHandler: CoreHandler = (core, { method, path, url, body, can, request }) => {
+export const controlHandler: CoreHandler = (core, req) => {
+  const { method, path, url, body, can, request } = req;
   // 기기 상세(가상 에어컨) 조회가 먼저 오면 기기를 만들어 둔다
   if (path === `/devices/${AIRCON_ID}`) controlState(core);
+  // M4(비상 정지·장면·예약·인터락·드라이버 쓰기·일괄 제어·가동·변경 이력·일괄 작업)
+  const m4 = controlM4Handler(core, req);
+  if (m4) return m4;
   if (!CONTROL_PATH.test(path)) return undefined;
   const state = controlState(core);
   const filtered = (items: FakeCommand[]) =>
@@ -230,7 +235,8 @@ export const controlHandler: CoreHandler = (core, { method, path, url, body, can
   if (path === "/drivers" && method === "GET") {
     if (!can("DRIVER_MANAGE")) return fail(403, "PERMISSION_DENIED");
     const items = state.drivers.map(({ capabilities: _c, ...rest }) => (void _c, rest));
-    return list(items, url);
+    const m4 = [...controlM4State(core).drivers.values()].map((d) => ({ driverId: d.driverId, name: d.name, type: d.type, status: d.status, deviceCount: d.deviceCount, updatedAt: d.updatedAt }));
+    return list([...items, ...m4], url);
   }
   const driver = /^\/drivers\/([^/]+)$/.exec(path);
   if (driver && method === "GET") {
