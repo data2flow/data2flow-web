@@ -29,6 +29,12 @@
         "ALARM_RAISED": "告警发生",
         "ALARM_CLEARED": "告警解除",
         "CONTROL": "控制"
+      },
+      "origin": {
+        "USER": "手动",
+        "FLOW": "自动·流程",
+        "RULE": "自动·规则",
+        "SCHEDULE": "定时"
       }
     },
     "empty": {
@@ -37,6 +43,14 @@
       "askAdmin": "请联系管理员连接数据源并创建空间。",
       "connectSource": "连接数据源",
       "createSpace": "创建空间"
-    }
+    },
+    "severity": {
+      "critical": "严重",
+      "major": "主要",
+      "minor": "次要",
+      "warning": "警告",
+      "info": "信息"
+    },
+    "aiReport": "查看报告"
   }
 }

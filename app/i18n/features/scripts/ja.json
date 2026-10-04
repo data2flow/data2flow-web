@@ -6,11 +6,36 @@
     "quotaReached": "組織の上限（300件）に達しました。使っていないスクリプトを削除してから作成してください。",
     "empty": "スクリプトがまだありません。テンプレートから始めましょう",
     "noMatch": "条件に合うスクリプトがありません",
-    "kind": { "label": "種類", "DECODE": "DECODE", "TRANSFORM": "TRANSFORM" },
-    "status": { "label": "状態", "ENABLED": "有効", "DISABLED": "無効", "AUTO_DISABLED": "自動無効", "checkFailed": "検査失敗" },
+    "kind": {
+      "label": "種類",
+      "DECODE": "DECODE",
+      "TRANSFORM": "TRANSFORM"
+    },
+    "status": {
+      "label": "状態",
+      "ENABLED": "有効",
+      "DISABLED": "無効",
+      "AUTO_DISABLED": "自動無効",
+      "checkFailed": "検査失敗"
+    },
     "keyword": "名前で検索",
-    "col": { "name": "名前", "kind": "種類", "targets": "対象", "active": "有効バージョン", "draft": "DRAFT", "processed": "24h処理", "errorRate": "エラー率", "p95": "p95(ms)", "lastDeploy": "最終デプロイ" },
-    "targets": { "sources": "ソース {{n}}", "models": "モデル {{n}}", "devices": "デバイス {{n}}", "none": "接続なし" },
+    "col": {
+      "name": "名前",
+      "kind": "種類",
+      "targets": "対象",
+      "active": "有効バージョン",
+      "draft": "DRAFT",
+      "processed": "24h処理",
+      "errorRate": "エラー率",
+      "p95": "p95(ms)",
+      "lastDeploy": "最終デプロイ"
+    },
+    "targets": {
+      "sources": "ソース {{n}}",
+      "models": "モデル {{n}}",
+      "devices": "デバイス {{n}}",
+      "none": "接続なし"
+    },
     "hasDraft": "保存済みDRAFTあり",
     "create": {
       "open": "新しいスクリプト",
@@ -49,7 +74,11 @@
       "tooLarge": "コードが64KBを超えました",
       "readOnly": "閲覧専用です。作成・デプロイはINTEGRATOR以上のみ可能です。",
       "leaveWarning": "保存していない変更があります。移動しますか？",
-      "tabs": { "code": "コード", "versions": "バージョン" }
+      "tabs": {
+        "code": "コード",
+        "versions": "バージョン",
+        "usage": "使用先"
+      }
     },
     "problems": {
       "title": "問題",
@@ -94,7 +123,12 @@
       "context": "コンテキスト（ctx.device.attributes · ctx.last · ctx.config）",
       "run": "実行",
       "running": "実行中…",
-      "tabs": { "output": "出力", "diff": "差分", "logs": "ログ", "info": "情報" },
+      "tabs": {
+        "output": "出力",
+        "diff": "差分",
+        "logs": "ログ",
+        "info": "情報"
+      },
       "timeout": "タイムアウト",
       "failed": "実行エラー",
       "duration": "実行 {{ms}}ms",
@@ -116,6 +150,37 @@
       "view": "コードを見る",
       "forced": "強制",
       "empty": "バージョンがありません"
+    },
+    "usageTab": {
+      "title": "使用先",
+      "status": {
+        "ENABLED": "有効",
+        "DISABLED": "無効",
+        "AUTO_DISABLED": "自動無効"
+      },
+      "enable": "有効化",
+      "disable": "無効化",
+      "delete": "削除",
+      "deleteBlocked": "使用中のスクリプトは削除できません。先に接続先とフローノードの参照を解除してください。",
+      "noBindings": "接続されたソース・モデル・デバイスはありません。",
+      "type": "種類",
+      "name": "名前",
+      "devices": "デバイス",
+      "processed24h": "24時間の処理",
+      "failurePolicy": "失敗ポリシー",
+      "target": {
+        "SOURCE": "ソース",
+        "MODEL": "モデル",
+        "DEVICE": "デバイス"
+      },
+      "flowNodes": "フローノードの参照",
+      "noFlowNodes": "このスクリプトを使うフローノードはありません。",
+      "disableTitle": "スクリプトを無効化",
+      "disableImpact": "接続 {{bindings}} 件、デバイス {{devices}} 台、24時間 {{n}} 件がこのスクリプトなしで処理されます。",
+      "disableFlows": "フローノード {{n}} 件もこのスクリプトを参照しています。",
+      "disableNote": "次のメッセージからスキップします。いつでも再度有効化できます。",
+      "disabled": "無効化しました。デバイス {{devices}} 台、24時間 {{n}} 件に影響します。",
+      "enabled": "有効化しました。"
     }
   },
   "errors": {

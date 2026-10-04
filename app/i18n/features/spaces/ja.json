@@ -67,7 +67,8 @@
       "props": "属性",
       "targets": "目標環境",
       "schedule": "運用時間",
-      "floorplan": "平面図"
+      "floorplan": "平面図",
+      "alarms": "アラーム"
     },
     "targets": {
       "inherit": "上位の値を使用",
@@ -155,6 +156,30 @@
       "title": "最初のサイトを作成して始めましょう",
       "body": "サイト → 建物 → フロア → 部屋の順に空間を作成し、デバイスを配置します。",
       "askAdmin": "空間は管理者（INTEGRATOR 以上）が作成できます。管理者に依頼してください。"
+    },
+    "alarms": {
+      "empty": "この空間に未解決のアラームはありません。",
+      "failed": "アラームを読み込めませんでした。",
+      "openList": "アラーム一覧で見る",
+      "severityCol": "重大度",
+      "title": "アラーム",
+      "device": "デバイス",
+      "status": "状態",
+      "raisedAt": "発生時刻",
+      "flapping": "フラッピング",
+      "openN": "アラーム {{n}}",
+      "severity": {
+        "CRITICAL": "重大",
+        "MAJOR": "重要",
+        "MINOR": "軽微",
+        "WARNING": "注意",
+        "INFO": "情報"
+      },
+      "state": {
+        "ACTIVE": "発生中",
+        "ACKNOWLEDGED": "確認済み",
+        "SUPPRESSED": "抑制中"
+      }
     }
   },
   "sites": {
@@ -163,7 +188,23 @@
     "goSpaces": "空間画面でサイトを作成",
     "stats": "デバイス {{devices}} ・ オフライン {{offline}} ・ アラーム {{alarms}}",
     "comfort": "快適度 {{score}}",
-    "noLocation": "位置情報なし"
+    "noLocation": "位置情報なし",
+    "enter": "開く",
+    "mapStats": "オフライン {{offline}} · アラーム {{alarms}}",
+    "comfortSummary": "空間の快適度: {{summary}}",
+    "status": {
+      "ALARM": "未解決のアラームあり",
+      "OFFLINE": "オフラインのデバイスあり",
+      "OK": "正常"
+    },
+    "mapLabel": "サイトマップ",
+    "noLocations": "位置情報のあるサイトがないため一覧で表示します。",
+    "missingLocation": "位置なし {{n}} 件(一覧のみ)",
+    "viewToggle": "表示方法",
+    "view": {
+      "map": "地図",
+      "list": "一覧"
+    }
   },
   "errors": {
     "SPACE_DEPTH_EXCEEDED": "空間階層は6段階まで作成できます。",

@@ -87,7 +87,15 @@ export function CatalogView({
             ))}
           </div>
         )
-      ) : types.length === 0 ? (
+      ) : (
+        <>
+          {canManage && (
+            <div className="mb-3 flex justify-end">
+              {/* UI-SIM-14 사용자 정의 유형 만들기(SIM-09.06) */}
+              <ButtonLink to={`?tab=${tab}&type=new`}>{t("sim.types.new")}</ButtonLink>
+            </div>
+          )}
+          {types.length === 0 ? (
         <EmptyState title={t("sim.catalog.empty")} />
       ) : (
         <div className="grid gap-3 md:grid-cols-4">
@@ -101,9 +109,16 @@ export function CatalogView({
               </ul>
               {ty.linkedModelCode && <p className="mt-1 text-[12px]">{t("sim.catalog.model", { code: ty.linkedModelCode })}</p>}
               {!ty.builtin && <Badge tone="neutral">{t("sim.catalog.custom")}</Badge>}
+              {!ty.builtin && canManage && (
+                <Link className="ml-2 text-[12.5px] text-accent hover:underline" to={`?tab=${tab}&type=${encodeURIComponent(ty.id)}`} aria-label={t("sim.types.editOf", { name: ty.name })}>
+                  {t("sim.types.edit")}
+                </Link>
+              )}
             </Card>
           ))}
         </div>
+      )}
+        </>
       )}
       {placing && (
         <PlaceDialog

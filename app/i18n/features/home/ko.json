@@ -29,6 +29,12 @@
         "ALARM_RAISED": "알람 발생",
         "ALARM_CLEARED": "알람 해제",
         "CONTROL": "제어"
+      },
+      "origin": {
+        "USER": "수동",
+        "FLOW": "자동, 플로우",
+        "RULE": "자동, 규칙",
+        "SCHEDULE": "예약"
       }
     },
     "empty": {
@@ -37,6 +43,14 @@
       "askAdmin": "데이터 소스 연결과 공간 만들기는 관리자에게 요청하세요.",
       "connectSource": "데이터 소스 연결",
       "createSpace": "공간 만들기"
-    }
+    },
+    "severity": {
+      "critical": "위험",
+      "major": "주요",
+      "minor": "경미",
+      "warning": "주의",
+      "info": "정보"
+    },
+    "aiReport": "리포트 보기"
   }
 }

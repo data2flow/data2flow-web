@@ -29,6 +29,12 @@
         "ALARM_RAISED": "アラーム発生",
         "ALARM_CLEARED": "アラーム解除",
         "CONTROL": "制御"
+      },
+      "origin": {
+        "USER": "手動",
+        "FLOW": "自動・フロー",
+        "RULE": "自動・ルール",
+        "SCHEDULE": "予約"
       }
     },
     "empty": {
@@ -37,6 +43,14 @@
       "askAdmin": "データソースの接続と空間の作成は管理者に依頼してください。",
       "connectSource": "データソースを接続",
       "createSpace": "空間を作成"
-    }
+    },
+    "severity": {
+      "critical": "重大",
+      "major": "重要",
+      "minor": "軽微",
+      "warning": "注意",
+      "info": "情報"
+    },
+    "aiReport": "レポートを見る"
   }
 }

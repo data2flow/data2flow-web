@@ -318,7 +318,12 @@ function UsageTab({ sourceId, usage }: { sourceId: string; usage: Usage | null }
         {usage.flows && usage.flows.length > 0 ? (
           <ul className="text-[13px]">
             {usage.flows.map((f) => (
-              <li key={f.id}>{f.name}</li>
+              <li key={f.id}>
+                {/* 이 소스를 트리거로 쓰는 플로우 → 플로우 편집기(DSC-07.06, TC-DSC-198) */}
+                <Link to={`/automation/flows/${encodeURIComponent(f.id)}`} className="text-accent hover:underline">
+                  {f.name}
+                </Link>
+              </li>
             ))}
           </ul>
         ) : (

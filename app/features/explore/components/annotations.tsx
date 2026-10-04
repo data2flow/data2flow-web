@@ -33,7 +33,11 @@ export function AnnotationList({ items, timezone, meId, canEdit }: { items: ApiA
     <ul className="flex flex-col gap-1 text-[12.5px]">
       {items.map((a) => (
         <li key={a.id} className="flex flex-wrap items-center gap-2">
-          <Badge tone="neutral">{t(`explore.annotationType.${a.type}`, { defaultValue: a.type })}</Badge>
+          {/* 알람 주석은 차트의 빨간 세로선과 같은 색·기호로(DSH-05.04) */}
+          <Badge tone={a.type === "ALARM" ? "danger" : "neutral"}>
+            {a.type === "ALARM" && <span aria-hidden>▲ </span>}
+            {t(`explore.annotationType.${a.type}`, { defaultValue: a.type })}
+          </Badge>
           <span className="font-medium">{a.title}</span>
           <span className="font-mono text-muted">
             {formatDateTime(a.timeFrom, timezone, i18n.language)}

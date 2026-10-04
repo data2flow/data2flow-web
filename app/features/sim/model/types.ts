@@ -60,6 +60,11 @@ export interface SimType {
   propertyDefs: PropertyDef[];
   linkedModelCode?: string | null;
   summary?: string[] | null;
+  /** 사용자 정의 유형(API-SIM-03)만: 아이콘·설명·물리 영향·버전(PUT baseVersion) */
+  icon?: string | null;
+  description?: string | null;
+  physicsEffects?: { effect: string; propertyKey: string }[] | null;
+  version?: number | null;
 }
 
 export interface SimKit {
@@ -198,7 +203,7 @@ export interface SimRun {
 /** API-SIM-17 */
 export interface SimReport {
   runId: string;
-  scenario?: { scenarioId?: string; name?: string } | string | null;
+  scenario?: { scenarioId?: string; name?: string; expectations?: Expectation[] } | string | null;
   seed: number;
   acceleration: number;
   simFrom: string;
@@ -206,7 +211,8 @@ export interface SimReport {
   partial: boolean;
   passed: number;
   total: number;
-  expectations: { id: string; kind: ExpectationKind; passed: boolean; evidence?: { at?: string; value?: unknown; actual?: unknown } | null }[];
+  /** `passed`가 null이거나 `state`가 SKIPPED면 정지 실행에서 판정할 수 없던 항목(TC-SIM-057) */
+  expectations: { id: string; kind: ExpectationKind; passed: boolean | null; state?: string | null; evidence?: { at?: string; value?: unknown; actual?: unknown; alarmIds?: unknown[] } | null }[];
   metrics: { comfortScore?: number | null; outOfTargetSec?: number | null; energyKwh?: number | null; controlCount?: number | null; alarmCount?: number | null };
   faults: { id: string; kind: string; target: string; from: string; to?: string | null }[];
   devicesCreated?: number;

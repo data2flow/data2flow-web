@@ -29,6 +29,12 @@
         "ALARM_RAISED": "Alarm raised",
         "ALARM_CLEARED": "Alarm cleared",
         "CONTROL": "Control"
+      },
+      "origin": {
+        "USER": "Manual",
+        "FLOW": "Automatic, flow",
+        "RULE": "Automatic, rule",
+        "SCHEDULE": "Scheduled"
       }
     },
     "empty": {
@@ -37,6 +43,14 @@
       "askAdmin": "Ask an administrator to connect data sources and create spaces.",
       "connectSource": "Connect a data source",
       "createSpace": "Create spaces"
-    }
+    },
+    "severity": {
+      "critical": "Critical",
+      "major": "Major",
+      "minor": "Minor",
+      "warning": "Warning",
+      "info": "Info"
+    },
+    "aiReport": "View report"
   }
 }
