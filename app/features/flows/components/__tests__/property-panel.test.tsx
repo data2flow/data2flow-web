@@ -135,7 +135,7 @@ describe("FLW-01.02 UI-FLW-16 설정 폼(스키마 자동 생성)", () => {
   });
 
   it("스키마 위젯: 불리언·객체(JSON)·문자열, 읽기 전용", async () => {
-    const custom: NodeType = { type: "test.widgets", typeVersion: 1, category: "transform", name: "위젯", inputs: [{ name: "in", type: "any" }], outputs: [{ name: "out", type: "any" }], configSchema: { type: "object", properties: { enabled: { type: "boolean", title: "사용" }, mapping: { type: "object", title: "매핑" }, label: { type: "string", title: "라벨" } } } };
+    const custom: NodeType = { type: "test.widgets", typeVersion: 1, category: "transform", name: "위젯", inputs: [{ name: "in", type: "any" }], outputs: [{ name: "out", type: "any" }], configSchema: { type: "object", properties: { enabled: { type: "boolean", title: "사용" }, extra: { type: "object", title: "매핑" }, label: { type: "string", title: "라벨" } } } };
     const spy = vi.fn();
     const { unmount } = await render(<Harness initial={node("test.widgets")} cat={catalogOf([custom])} spy={spy} />);
     const panel = await screen.findByRole("region", { name: "노드 설정" });
@@ -143,7 +143,7 @@ describe("FLW-01.02 UI-FLW-16 설정 폼(스키마 자동 생성)", () => {
     await userEvent.type(within(panel).getByRole("textbox", { name: "라벨" }), "a");
     const mapping = within(panel).getByRole("textbox", { name: "매핑" });
     await userEvent.type(mapping, '{{"a":1}');
-    expect(spy.mock.lastCall?.[0].config).toEqual({ enabled: true, label: "a", mapping: { a: 1 } });
+    expect(spy.mock.lastCall?.[0].config).toEqual({ enabled: true, label: "a", extra: { a: 1 } });
     await userEvent.type(mapping, "x");
     expect(within(panel).getByText("형식이 맞지 않습니다(object)")).toBeInTheDocument();
     unmount();

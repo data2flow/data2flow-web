@@ -11,6 +11,8 @@ import { liveUrl } from "~/lib/event-stream";
 import { formatNumber, formatRelative } from "~/lib/format";
 import { comfortTone, causeText, type ComfortCause } from "../../home/model/home";
 import { applyDeviceUpdate, type DeviceUpdate, type OverviewDevice } from "../model/live-devices";
+import { alarmCountByDevice, type SpaceAlarm } from "../model/space-alarms";
+import { DeviceAlarmBadge } from "./space-alarms";
 
 export function ComfortBadge({ state }: { state?: string | null }) {
   const { t } = useTranslation();
@@ -33,9 +35,10 @@ export function ComfortCauses({ causes }: { causes?: ComfortCause[] }) {
 
 const CONNECTION_TONE: Record<string, "good" | "bad" | "warn" | "muted"> = { ONLINE: "good", OFFLINE: "bad", UNKNOWN: "warn" };
 
-export function DeviceCards({ spaceId, devices: initial, now, lang, streamOptions }: { spaceId: string; devices: OverviewDevice[]; now: number; lang: string; streamOptions?: UseLiveStreamOptions }) {
+export function DeviceCards({ spaceId, devices: initial, now, lang, streamOptions, alarms }: { spaceId: string; devices: OverviewDevice[]; now: number; lang: string; streamOptions?: UseLiveStreamOptions; alarms?: SpaceAlarm[] }) {
   const { t } = useTranslation();
   const [devices, setDevices] = useState(initial);
+  const alarmsByDevice = alarmCountByDevice(alarms);
   const onEvent = useCallback((event: { data: unknown }) => setDevices((current) => applyDeviceUpdate(current, event.data as DeviceUpdate)), []);
   const status = useLiveStream(devices.length ? liveUrl([`space:${spaceId}`]) : null, ["device-update"], onEvent, streamOptions);
   if (devices.length === 0) {
@@ -47,14 +50,15 @@ export function DeviceCards({ spaceId, devices: initial, now, lang, streamOption
       <div className="flex justify-end">
         <LiveDot status={status} />
       </div>
-      <ul className="grid gap-3 md:grid-cols-3">
+      <ul className="grid gap-3 sm:grid-cols-2 md:grid-cols-3">
         {devices.map((d) => (
-          <li key={d.id}>
+          <li key={d.id} className="min-w-0">
             <Card>
-              <div className="flex items-center justify-between gap-2">
-                <Link to={`/devices/${d.id}`} className="font-semibold text-accent hover:underline">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <Link to={`/devices/${d.id}`} className="min-w-0 break-words font-semibold text-accent hover:underline">
                   {d.name}
                 </Link>
+                {alarmsByDevice.has(d.id) && <DeviceAlarmBadge count={alarmsByDevice.get(d.id)!.count} worst={alarmsByDevice.get(d.id)!.worst} />}
                 <StatusDot tone={CONNECTION_TONE[d.connection ?? "UNKNOWN"] ?? "muted"} label={t(`status.connectivity.${d.connection ?? "UNKNOWN"}`, { defaultValue: d.connection ?? "" })} />
               </div>
               <p className="text-[12px] text-muted">{d.modelName ?? "–"}</p>

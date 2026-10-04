@@ -1,0 +1,472 @@
+{
+  "rules": {
+    "crumb": "Rules & alarms",
+    "title": "Rules",
+    "newRule": "New rule",
+    "newTitle": "New rule",
+    "tuningCount": "Tuning suggestions ({{n}})",
+    "limitNear": "You have {{total}} rules. An organization can have up to {{limit}}.",
+    "openFlow": "Open as flow",
+    "convertedNotice": "A rule converted to a flow can no longer be edited with this form.",
+    "errorReason": "Rule error: {{reason}}",
+    "errorReasons": {
+      "NO_TARGET": "No target devices",
+      "METRIC_DELETED": "Metric deleted",
+      "FLOW_ERROR": "Flow apply failed"
+    },
+    "status": {
+      "ACTIVE": "Active",
+      "INACTIVE": "Inactive",
+      "ERROR": "Error",
+      "CONVERTED": "Converted to flow",
+      "DELETED": "Deleted"
+    },
+    "scope": {
+      "SPACE": "Space",
+      "DEVICE": "Device",
+      "MODEL": "Device model",
+      "TAG": "Tag"
+    },
+    "dow": {
+      "1": "Mon",
+      "2": "Tue",
+      "3": "Wed",
+      "4": "Thu",
+      "5": "Fri",
+      "6": "Sat",
+      "7": "Sun"
+    },
+    "unit": {
+      "s": "s",
+      "m": "m",
+      "h": "h"
+    },
+    "list": {
+      "search": "Search",
+      "status": "Status",
+      "severity": "Severity",
+      "space": "Space",
+      "template": "Template",
+      "empty": "No rules yet. Start from a template",
+      "noMatch": "No rules match the filters",
+      "raised7d": "Raised in last 7 days",
+      "openAlarms": "Open alarms",
+      "copy": "Duplicate",
+      "activate": "Activate",
+      "deactivate": "Deactivate",
+      "withChildren": "incl. children",
+      "clearOpenAlarms": "Clear this rule's open alarms",
+      "convertBody": "This creates an equivalent regular flow. After converting, the rule can no longer be edited with the form.",
+      "raised7dValue": "7d {{n}}",
+      "openAlarmsValue": "open {{n}}",
+      "scopeValue": "{{scope}} · {{n}} devices",
+      "deleteTitle": "Delete \"{{name}}\"",
+      "deleteBody": "The rule will be deleted. It has {{n}} open alarms.",
+      "convertTitle": "Open \"{{name}}\" as a flow"
+    },
+    "form": {
+      "template": "Template",
+      "custom": "Custom",
+      "name": "Name",
+      "scope": "Scope",
+      "scopeType": "Scope type",
+      "targets": "Targets",
+      "noTargets": "Nothing to choose",
+      "includeChildren": "Include child spaces",
+      "targetCountLabel": "Current target count",
+      "noTargetWarn": "With no target devices the rule goes into error (NO_TARGET)",
+      "condition": "Condition",
+      "time": "Time condition",
+      "timeEnabled": "Use a time condition",
+      "days": "Days",
+      "timeFrom": "From",
+      "timeTo": "To",
+      "schedule": "Space operating hours",
+      "scheduleNone": "Not used",
+      "scheduleInside": "Inside operating hours",
+      "scheduleOutside": "Outside operating hours",
+      "severity": "Severity",
+      "titleTemplate": "Alarm title",
+      "titleHint": "Variables: {{device.name}} {{space.path}} {{value}}",
+      "autoClear": "Clear automatically when the condition ends",
+      "policy": "Notification policy",
+      "noPolicy": "None (matching policies apply)",
+      "simulate": "Simulate",
+      "fixErrors": "Please check the highlighted fields",
+      "conflict": "Someone else changed this rule in the meantime. Refresh and save again.",
+      "targetCount": "Currently {{n}} target devices",
+      "savedCount": "{{n}} when saved"
+    },
+    "cond": {
+      "groupOp": "Combine",
+      "and": "AND (all)",
+      "or": "OR (any)",
+      "removeGroup": "Remove group",
+      "add": "Add condition",
+      "addGroup": "Add group",
+      "itemLabel": "Condition item",
+      "kind": "Condition type",
+      "metric": "Metric",
+      "chooseMetric": "Choose a metric",
+      "anyMetric": "Any metric",
+      "op": "Operator",
+      "value": "Value",
+      "chooseValue": "Choose a value",
+      "rangeLow": "Range low",
+      "rangeHigh": "Range high",
+      "for": "Duration",
+      "clear": "Clear at",
+      "repeat": "Repeat count",
+      "aggregate": "Evaluate per",
+      "direction": "Direction",
+      "delta": "Change",
+      "window": "Window",
+      "remove": "Remove condition",
+      "groupLabel": "Condition group, level {{depth}}",
+      "groupOpLabel": "Level {{depth}} group combine",
+      "limitReached": "You can add up to {{n}} conditions",
+      "depthHint": "Groups can be nested up to {{n}} levels",
+      "anomalySummary": "Anomaly score ≥ {{score}} (analytics)",
+      "kinds": {
+        "threshold": "Threshold",
+        "rateOfChange": "Rate of change",
+        "noData": "No data",
+        "anomaly": "Anomaly score"
+      },
+      "ops": {
+        "gt": "> greater than",
+        "gte": ">= at least",
+        "lt": "< less than",
+        "lte": "<= at most",
+        "eq": "= equals",
+        "ne": "≠ not equal",
+        "outside": "outside range",
+        "inside": "inside range"
+      },
+      "aggregates": {
+        "perDevice": "Per device",
+        "spaceAvg": "Space average",
+        "spaceMax": "Space max",
+        "spaceMin": "Space min",
+        "any": "Any device",
+        "all": "All devices"
+      },
+      "directions": {
+        "UP": "Rising",
+        "DOWN": "Falling",
+        "ANY": "Either"
+      }
+    },
+    "v": {
+      "metricRequired": "Choose a metric",
+      "valueRequired": "Enter a value",
+      "rangeOrder": "The low value must be less than the high value",
+      "forRange": "Duration must be between 0 seconds and 24 hours",
+      "repeatRange": "Repeat count must be 1–100",
+      "windowRange": "Window must be between 1 second and 24 hours",
+      "deltaPositive": "Change must be greater than 0",
+      "nameRequired": "Enter a name",
+      "nameLength": "Name can be up to 100 characters",
+      "scopeRequired": "Choose at least one target",
+      "titleRequired": "Enter an alarm title",
+      "titleLength": "Alarm title can be up to 200 characters",
+      "daysRequired": "Choose at least one day",
+      "timeFormat": "Enter both from and to as HH:mm",
+      "valueRange": "The valid range of {{metric}} is {{min}}–{{max}}",
+      "clearBelow": "The clear threshold must be less than {{value}}",
+      "clearAbove": "The clear threshold must be greater than {{value}}",
+      "countLimit": "Up to {{n}} conditions",
+      "depthLimit": "Groups can be nested up to {{n}} levels",
+      "targetLimit": "Up to {{n}} target devices",
+      "conditionUnsupported": "Anomaly conditions cannot be saved yet. They become available once real-time anomaly scores are ready (use threshold, rate-of-change or no-data conditions)."
+    },
+    "warnings": {
+      "NO_TARGET": "No target devices",
+      "TARGET_OFFLINE": "Some target devices are offline"
+    },
+    "sim": {
+      "panel": "Simulation results",
+      "period": "Period",
+      "run": "Run",
+      "rerun": "Run again",
+      "running": "Calculating…",
+      "fixForm": "Fix the rule form errors first",
+      "lowCoverage": "Less than 10% of the period has data",
+      "metric": "Item",
+      "byDevice": "By device",
+      "noAlarms": "No alarms expected",
+      "device": "Device",
+      "count": "Count",
+      "longest": "Longest",
+      "heatmap": "Alarms by time (day × hour)",
+      "title": "Simulation (last {{days}} days)",
+      "days": "{{n}} days",
+      "current": "This run ({{label}})",
+      "previous": "Previous ({{label}})",
+      "basis": "threshold {{value}}",
+      "hours": "{{n}} h",
+      "minutes": "{{n}} min",
+      "seconds": "{{n}} s",
+      "rows": {
+        "alarms": "Expected alarms",
+        "notifications": "Expected notifications",
+        "avgDurationSec": "Average duration"
+      }
+    },
+    "fromChart": {
+      "title": "Create a rule from this baseline",
+      "series": "Series",
+      "baseline": "Baseline value",
+      "create": "Create rule",
+      "hint": "Enter a baseline value"
+    }
+  },
+  "alarms": {
+    "crumb": "Rules & alarms",
+    "title": "Alarms",
+    "summary": "Alarm summary",
+    "ack": "Acknowledge",
+    "clear": "Clear",
+    "silence": "Silence",
+    "silenceMenu": "Silence ▼",
+    "empty": "No open alarms right now ✓",
+    "flapping": "Flapping",
+    "selectAll": "Select all on this page",
+    "backToList": "Alarm list",
+    "children": "{{n}} children",
+    "times": "{{n}}×",
+    "select": "Select {{title}}",
+    "selectedCount": "{{n}} selected",
+    "silenceFor": "Silence for {{duration}}",
+    "newAlarm": "New alarm: {{title}}",
+    "spaceEvent": "Space event · {{space}} · {{n}} alarms",
+    "col": {
+      "values": "Trigger / peak value"
+    },
+    "bulk": {
+      "ackResult": "{{ok}} acknowledged, {{failed}} failed",
+      "silenceResult": "{{ok}} silenced, {{failed}} failed",
+      "ok": "Done",
+      "already": "Already acknowledged"
+    },
+    "filter": {
+      "status": "Status",
+      "open": "Open alarms",
+      "severity": "Severity",
+      "space": "Space",
+      "range": "Period",
+      "source": "Source",
+      "groupBySpaceEvent": "Group by space event"
+    },
+    "range": {
+      "24h": "24 hours",
+      "7d": "7 days",
+      "30d": "30 days",
+      "all": "All time"
+    },
+    "severity": {
+      "CRITICAL": "CRITICAL",
+      "MAJOR": "MAJOR",
+      "MINOR": "MINOR",
+      "WARNING": "WARNING",
+      "INFO": "INFO"
+    },
+    "severityShort": {
+      "CRITICAL": "CRIT",
+      "MAJOR": "MAJ",
+      "MINOR": "MIN",
+      "WARNING": "WARN",
+      "INFO": "INFO"
+    },
+    "status": {
+      "ACTIVE": "Active",
+      "ACKNOWLEDGED": "Acknowledged",
+      "SUPPRESSED": "Suppressed",
+      "CLEARED": "Cleared"
+    },
+    "source": {
+      "RULE": "Rule",
+      "FLOW": "Flow",
+      "SYSTEM": "System"
+    },
+    "suppressed": {
+      "MAINTENANCE": "Maintenance",
+      "PARENT": "Parent cause",
+      "DEVICE_OFFLINE": "Device offline"
+    },
+    "clearReason": {
+      "AUTO": "Condition ended",
+      "MANUAL": "Cleared manually",
+      "PARENT_CLEARED": "Parent cleared",
+      "RULE_DELETED": "Rule deleted",
+      "RULE_SCOPE_CHANGED": "Rule scope changed"
+    },
+    "actionType": {
+      "ONSITE": "On-site check",
+      "CONFIG_CHANGE": "Configuration change",
+      "DEVICE_REPLACED": "Device replaced",
+      "OTHER": "Other"
+    },
+    "event": {
+      "RAISED": "Raised",
+      "RERAISED": "Re-raised",
+      "ACKED": "Acknowledged",
+      "CLEARED": "Cleared",
+      "ASSIGNED": "Assigned",
+      "NOTE": "Note",
+      "ACTION": "Action",
+      "ESCALATED": "Escalated",
+      "NOTIFIED": "Notified",
+      "SILENCED": "Silenced",
+      "FLAPPING_ON": "Flapping started",
+      "FLAPPING_OFF": "Flapping ended",
+      "SUPPRESSED": "Suppressed"
+    },
+    "eventText": {
+      "value": "value {{value}}",
+      "assigned": "→ {{name}}",
+      "notified": "{{channel}} · {{recipient}} · {{status}}",
+      "escalated": "step {{step}}",
+      "unassigned": "Assignee removed"
+    },
+    "dur": {
+      "days": "{{n}} d",
+      "hours": "{{n}} h",
+      "minutes": "{{n}} min",
+      "seconds": "{{n}} s"
+    },
+    "detail": {
+      "source": "Source",
+      "openRule": "Open rule",
+      "openFlow": "Open flow",
+      "target": "Target",
+      "hiddenTarget": "Target outside your scope",
+      "values": "Values",
+      "raisedAt": "Raised",
+      "ackedAt": "Acknowledged",
+      "clearedAt": "Cleared",
+      "assignee": "Assignee",
+      "assign": "Assign",
+      "parent": "Parent alarm",
+      "openParent": "View parent alarm",
+      "timeline": "Timeline",
+      "noEvents": "No history yet",
+      "deliveries": "Notification deliveries",
+      "noDeliveries": "No notifications sent",
+      "channel": "Channel",
+      "recipient": "Recipient",
+      "deliveryStatus": "Status",
+      "attempts": "Attempts",
+      "sentAt": "Sent at",
+      "noteTitle": "Notes & actions",
+      "note": "Note",
+      "actionType": "Action type",
+      "noteOnly": "Note only",
+      "clearNote": "Clear note (optional)",
+      "me": "{{name}} (me)",
+      "valueLine": "Trigger {{trigger}} · peak {{peak}} · now {{last}}",
+      "duration": "lasting {{d}}",
+      "chart": "{{metric}} around the alarm",
+      "thresholds": "Raise at {{raise}} · clear at {{clear}}",
+      "childrenTitle": "{{n}} child alarms",
+      "done": {
+        "ack": "Alarm acknowledged",
+        "clear": "Alarm cleared",
+        "note": "Saved",
+        "assign": "Assignee set",
+        "silence": "Silenced"
+      }
+    },
+    "v": {
+      "noteLength": "Notes must be 1–{{n}} characters"
+    }
+  },
+  "silences": {
+    "title": "Silences",
+    "list": "Silences",
+    "new": "New silence",
+    "empty": "No silences",
+    "active": "Active",
+    "release": "Release",
+    "targetType": "Target type",
+    "targetId": "Target",
+    "chooseTarget": "Choose a target",
+    "startsAt": "Starts",
+    "endsAt": "Ends",
+    "repeat": "Repeat",
+    "weekly": "Weekdays & hours",
+    "dates": "Date range",
+    "dateFrom": "From date",
+    "dateTo": "To date",
+    "reason": "Reason",
+    "create": "Create silence",
+    "col": {
+      "kind": "Kind",
+      "target": "Target",
+      "when": "When",
+      "reason": "Reason",
+      "by": "Created by"
+    },
+    "kind": {
+      "ONE_TIME": "One-time",
+      "RECURRING": "Recurring"
+    },
+    "target": {
+      "RULE": "Rule",
+      "DEVICE": "Device",
+      "SPACE": "Space",
+      "ALARM": "Alarm"
+    },
+    "v": {
+      "target": "Choose a target",
+      "days": "Choose at least one day",
+      "reason": "Reason can be up to 200 characters"
+    }
+  },
+  "alarmStats": {
+    "title": "Alarm statistics",
+    "period": "Period",
+    "topRules": "Top rules",
+    "topSpaces": "Top spaces",
+    "topDevices": "Top devices",
+    "daily": "Daily alarms",
+    "date": "Date",
+    "raised": "Raised",
+    "cards": {
+      "raised": "Alarms raised",
+      "mtta": "Mean time to acknowledge (MTTA)",
+      "mttr": "Mean time to resolve (MTTR)",
+      "unacked": "Unacknowledged ratio"
+    }
+  },
+  "tuning": {
+    "title": "Rule tuning suggestions",
+    "empty": "No open tuning suggestions",
+    "current": "Current",
+    "proposed": "Proposed",
+    "simulation": "Simulation",
+    "apply": "Apply",
+    "dismiss": "Dismiss",
+    "dismissed": "Suggestion dismissed",
+    "applied": "Suggestion applied (rule version {{version}})",
+    "simulationValue": "Expected alarms {{before}} → {{after}}",
+    "problem": {
+      "TOO_FREQUENT": "Too frequent",
+      "FLAPPING": "Flapping",
+      "UNACKNOWLEDGED": "Mostly unacknowledged"
+    }
+  },
+  "errors": {
+    "RULE_NOT_FOUND": "Rule not found",
+    "RULE_NAME_DUPLICATED": "A rule with the same name exists",
+    "RULE_CONDITION_INVALID": "The condition is invalid",
+    "RULE_LIMIT_EXCEEDED": "You can create up to 1,000 rules",
+    "RULE_TARGET_LIMIT_EXCEEDED": "Up to 5,000 target devices",
+    "RULE_STATE_CONFLICT": "Not possible in the current state",
+    "RULE_SIMULATION_RANGE_INVALID": "The simulation period can be up to 30 days",
+    "ALARM_NOT_FOUND": "Alarm not found",
+    "ALARM_STATE_CONFLICT": "This alarm has already been handled",
+    "ALARM_BULK_LIMIT_EXCEEDED": "You can process up to 200 at a time",
+    "SILENCE_RANGE_INVALID": "The silence period is invalid"
+  }
+}

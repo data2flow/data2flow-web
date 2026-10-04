@@ -17,6 +17,8 @@ WORKDIR /app
 COPY --from=build --chown=node:node /app/package.json ./
 COPY --from=build --chown=node:node /app/node_modules ./node_modules
 COPY --from=build --chown=node:node /app/build ./build
+COPY --from=build --chown=node:node /app/server.mjs ./server.mjs
 USER node
 EXPOSE 8080
-CMD ["node_modules/.bin/react-router-serve", "./build/server/index.js"]
+# server.mjs = react-router-serve와 같은 정적·SSR 처리 + 플로우 라이브 뷰 WebSocket 중계(API-FLW-40·42)
+CMD ["node", "server.mjs", "./build/server/index.js"]

@@ -41,10 +41,18 @@ export interface BffConfig {
   signupRequestEnabled: boolean;
   /** CSP 헤더. 운영 빌드에서만 켠다(Vite 개발 서버의 HMR 스크립트에는 nonce가 없다) */
   contentSecurityPolicy: boolean;
+  /**
+   * 메신저 콜백 `/hooks/messenger/{channel}`의 채널별 비밀값(design/auth.md §9.3, k8s Secret data2flow-web).
+   * 텔레그램은 `X-Telegram-Bot-Api-Secret-Token`과 비교한다. 값이 없는 채널은 받지 않는다(404)
+   */
+  messengerSecrets: Record<string, string>;
+  /** 메신저 콜백을 넘길 내부 action 주소(gateway를 거치지 않는 유일한 예외, ADR-021). 예: http://data2flow-action */
+  actionUrl: string;
 }
 
 const DEFAULT_GATEWAY = "http://data2flow-api-gateway";
 const DEFAULT_ORIGIN = "https://data2flow.java21.net";
+const DEFAULT_ACTION = "http://data2flow-action";
 
 function intEnv(env: NodeJS.ProcessEnv, name: string, fallback: number, min: number, max: number): number {
   const raw = env[name];
@@ -109,6 +117,8 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): BffConfig {
     redisUrl: env.DATA2FLOW_REDIS_URL || undefined,
     signupRequestEnabled: env.DATA2FLOW_SIGNUP_REQUEST_ENABLED === "true",
     contentSecurityPolicy: production,
+    messengerSecrets: env.DATA2FLOW_MESSENGER_TELEGRAM_SECRET ? { telegram: env.DATA2FLOW_MESSENGER_TELEGRAM_SECRET } : {},
+    actionUrl: stripSlash(env.DATA2FLOW_ACTION_URL || DEFAULT_ACTION),
   };
 }
 

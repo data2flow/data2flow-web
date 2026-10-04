@@ -1,5 +1,5 @@
 /**
- * UI-FLW-02 플로우 편집기(FLW-01.01·01.02·01.06·03.07·05.03·05.06). 조회 FLOW_READ(ANALYST는 읽기 전용), 저장·적용 FLOW_WRITE,
+ * UI-FLW-02 플로우 편집기(FLW-01.01·01.02·01.06·03.07·05.03·05.06, M4: FLW-03.01~03.06·05.05·06.01~06.10·10.01·11.01·11.06). 조회 FLOW_READ(ANALYST는 읽기 전용), 저장·적용 FLOW_WRITE,
  * 제어 노드 포함 적용 FLOW_DEPLOY_CONTROL(서버가 다시 검사, 없으면 팔레트의 제어 노드 잠김).
  * API: 상세 API-FLW-02, 카탈로그 API-FLW-30, 지표 API-FLW-14. 저장·검증·적용·버전·롤백은 브라우저에서 BFF로(API-FLW-03·04·06·07·08)
  */
@@ -49,6 +49,7 @@ export default function FlowDetailPage({ loaderData }: Route.ComponentProps) {
         canWrite={hasAny(permissions, ["FLOW_WRITE"])}
         canDeployControl={hasAny(permissions, ["FLOW_DEPLOY_CONTROL"])}
         timezone={root?.timezone ?? "Asia/Seoul"}
+        me={root?.me ? { userId: root.me.id, name: root.me.name ?? root.me.loginId } : undefined}
         api={flowApi}
         onCreated={(flowId) => navigate(`/automation/flows/${encodeURIComponent(flowId)}`, { replace: true })}
         onReload={() => void revalidator.revalidate()}

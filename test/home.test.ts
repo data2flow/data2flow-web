@@ -56,3 +56,15 @@ describe("DSH-01.02 홈 공간 쾌적도", () => {
     expect(viewer.body).not.toContain('href="/sources/new"');
   });
 });
+
+describe("[DSH-01.01][DSH-01.03] 홈 요약 카드·타임라인(M4)", () => {
+  it("TC-DSH-004 AT-DSH-01.1 열린 알람 카드(심각도 기호+글자, /alarms?state=ACTIVE), 타임라인 알람·자동 제어 링크", async () => {
+    const page = await (await as("kim.op", "Correct-Horse-9")).get("/");
+    expect(page.body).toContain('href="/alarms?state=ACTIVE"');
+    expect(page.body).toContain('data-severity="critical"');
+    expect(page.body).toContain('href="/alarms/1"');
+    expect(page.body).toContain('href="/control/commands"');
+    expect(page.body).toContain("자동, 플로우");
+    expect(page.body).toContain("grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5");
+  });
+});

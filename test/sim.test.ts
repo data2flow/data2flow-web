@@ -285,7 +285,7 @@ describe("UI-SIM-09·10·12 실행 패널·장애 주입·결과(SIM-04.02, SIM-
 describe("UI-SIM-11 실제 데이터 재생 — 파일 가져오기(SIM-06.03)", () => {
   it("M3: core가 재생 경로(API-SIM-22·23)를 열지 않으면(404) '아직 쓸 수 없음' 문구, 10MB 넘는 파일은 BFF에서 거부", async () => {
     const kim = await operator();
-    expect((await kim.get("/sim/replay")).body).toContain("최대 10MB");
+    expect((await kim.get("/sim/replay?mode=file")).body).toContain("최대 10MB");
     const csv = "timestamp,deviceId,temperature\n2026-10-02T00:00:00Z,AM107,22";
     const form = new FormData();
     form.set("_csrf", kim.csrf);
@@ -351,5 +351,59 @@ describe("UI-SIM-03 기기 상세 [가상] 탭(SIM-09.02)", () => {
     expect(JSON.parse(patch.body).response.properties.find((p: { key: string }) => p.key === "powerKw").origin).toBe("CATALOG");
     const real = await lee.get("/devices/1042");
     expect(real.body).not.toContain("?tab=virtual");
+  });
+});
+
+describe("[SIM-09.06] UI-SIM-14 사용자 정의 가상 기기 유형", () => {
+  const draft = { name: "VOC 센서", category: "SENSOR", icon: "", description: "", linkedModelCode: "", metrics: [{ key: "tvoc", source: "GENERATOR" }], capabilities: [], defs: [{ key: "errorPct", name: "측정 오차", type: "number", unit: "%", min: "0", max: "50", enumValues: "", default: "10", description: "" }], effects: [] };
+
+  it("TC-SIM-102 AT-SIM-14.1 만들기 → 카탈로그에 추가(API-SIM-03 POST), 편집(PUT baseVersion), 사용 중 삭제 거부, 검사 실패 400, OPERATOR는 편집 불가", async () => {
+    const lee = await integrator();
+    const page = await lee.get("/sim/catalog?tab=sensor&type=new");
+    expect(page.response.status).toBe(200);
+    expect(page.body).toContain("새 사용자 정의 유형");
+    expect(page.body).toContain(">co2<");
+    const invalid = await lee.post("/sim/catalog?tab=sensor&type=new", { intent: "saveType", draft: JSON.stringify({ ...draft, name: "V" }) });
+    expect(invalid.response.status).toBe(400);
+    expect(invalid.body).toContain("2~80자로 입력하세요.");
+    expect((await lee.post("/sim/catalog?type=new", { intent: "saveType", draft: "{" })).response.status).toBe(400);
+    const saved = await lee.post("/sim/catalog?tab=sensor&type=new", { intent: "saveType", draft: JSON.stringify(draft) });
+    expect(saved.response.status).toBe(302);
+    expect(saved.response.headers.get("Location")).toBe("/sim/catalog?tab=sensor&saved=type");
+    expect(last("POST", "/api/v1/core/sim/types")?.body).toMatchObject({ name: "VOC 센서", category: "SENSOR", metrics: [{ key: "tvoc", defaultSource: { kind: "GENERATOR" } }], propertyDefs: [{ key: "errorPct", min: 0, max: 50, default: 10 }] });
+    const catalog = await lee.get("/sim/catalog?tab=sensor&saved=type");
+    expect(catalog.body).toContain("사용자 정의 유형을 저장했습니다");
+    expect(catalog.body).toContain("VOC 센서");
+    const typeId = /type=(\d+)"/.exec(catalog.body)?.[1] as string;
+    const edit = await lee.get(`/sim/catalog?tab=sensor&type=${typeId}`);
+    expect(edit.body).toContain("사용자 정의 유형: VOC 센서");
+    const updated = await lee.post(`/sim/catalog?tab=sensor&type=${typeId}`, { intent: "saveType", typeId, baseVersion: "1", draft: JSON.stringify({ ...draft, description: "실내 VOC" }) });
+    expect(updated.response.status).toBe(302);
+    expect(last("PUT", `/api/v1/core/sim/types/${typeId}`)?.body).toMatchObject({ description: "실내 VOC", baseVersion: 1 });
+    const conflict = await lee.post(`/sim/catalog?tab=sensor&type=${typeId}`, { intent: "saveType", typeId, baseVersion: "1", draft: JSON.stringify(draft) });
+    expect(conflict.response.status).toBe(409);
+    const deleted = await lee.post(`/sim/catalog?type=${typeId}`, { intent: "deleteType", typeId });
+    expect(deleted.response.headers.get("Location")).toBe("/sim/catalog?saved=typeDeleted");
+    const inUse = await lee.post("/sim/catalog?type=11", { intent: "deleteType", typeId: "11" });
+    expect(inUse.response.status).toBe(404);
+    const kim = await operator();
+    const opPage = await kim.get("/sim/catalog?tab=sensor");
+    expect(opPage.body).not.toContain("사용자 정의 유형 만들기");
+  });
+});
+
+describe("[SIM-06.01] UI-SIM-11 원본 선택 재생(API-SIM-22 RAW, core M4)", () => {
+  it("TC-SIM-069 기본은 원본 선택: 소스·실제 기기 후보, 대상 건수(dryRun)와 재생 시작 → 실행 ID", async () => {
+    simState(app.gateway.m2).replayEnabled = true;
+    const kim = await operator();
+    const page = await kim.get("/sim/replay");
+    expect(page.response.status).toBe(200);
+    expect(page.body).toContain("보관된 실제 원본 재생");
+    expect(page.body).toContain("ChirpStack s3");
+    const body = { source: { type: "RAW", sourceId: "7", deviceIds: ["1042"], from: "2026-10-02T15:00:00.000Z", to: "2026-10-03T15:00:00.000Z" }, timeShift: { basis: "NOW" }, acceleration: 60, cloneSpaceId: "41" };
+    const dry = await json(kim, "/bff/api/core/sim/replays?dryRun=true", "POST", body);
+    expect(JSON.parse(dry.body).response.total).toBe(1440);
+    const started = await json(kim, "/bff/api/core/sim/replays", "POST", body);
+    expect(JSON.parse(started.body).response.runId).toBeTruthy();
   });
 });

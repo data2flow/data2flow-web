@@ -46,7 +46,10 @@
       "confirmName": "流程名称",
       "confirmMismatch": "名称不匹配",
       "deleted": "流程已删除。",
-      "metricsNone": "暂无指标"
+      "metricsNone": "暂无指标",
+      "owner": "负责人",
+      "ownerMe": "我",
+      "noOwner": "无负责人"
     },
     "editor": {
       "name": "流程名称",
@@ -66,7 +69,8 @@
       "emergencyStop": "自动控制紧急停止中 — 将跳过控制节点",
       "virtualBadge": "虚拟",
       "virtualTargets": "此流程以虚拟空间为目标。请在虚拟环境中运行场景进行验证。",
-      "runScenario": "在虚拟环境中运行"
+      "runScenario": "在虚拟环境中运行",
+      "testRun": "试运行"
     },
     "applyBlock": {
       "readOnly": "仅查看，无法应用",
@@ -171,7 +175,43 @@
       "spaceId": "目标空间",
       "threshold": "阈值",
       "targetTemperature": "目标温度",
-      "commaHint": "用逗号分隔"
+      "commaHint": "用逗号分隔",
+      "range": "范围[最小, 最大]",
+      "invert": "范围外为真",
+      "expression": "值路径(JSONPath)",
+      "cases": "分支",
+      "rules": "映射规则",
+      "scriptRef": "脚本引用",
+      "rate": "周期",
+      "key": "键",
+      "events": "事件",
+      "capability": "功能",
+      "command": "命令",
+      "args": "参数",
+      "priority": "优先级",
+      "sceneId": "场景",
+      "fields": "发送字段",
+      "mode": "方式",
+      "severity": "严重度",
+      "title": "标题",
+      "ruleId": "规则",
+      "policyId": "通知策略",
+      "channels": "渠道",
+      "recipients": "接收人",
+      "templateKey": "模板",
+      "aggregateWindow": "合并窗口",
+      "variables": "模板变量",
+      "link": "快捷链接",
+      "items": "条件项",
+      "emit": "输出",
+      "delta": "变化量",
+      "direction": "方向",
+      "connectionId": "存储连接",
+      "mapping": "字段映射",
+      "upsertKeys": "upsert键",
+      "batchSize": "批量大小",
+      "includeVirtual": "包含虚拟数据",
+      "payload": "发送值"
     },
     "rule": {
       "required": "必填",
@@ -247,7 +287,13 @@
       "label": "底部面板",
       "validation": "验证 ({{n}})",
       "versions": "版本",
-      "errors": "错误"
+      "errors": "错误",
+      "debug": "调试",
+      "traces": "追踪",
+      "test": "试运行",
+      "metrics": "指标",
+      "shadow": "影子",
+      "settings": "设置"
     },
     "validation": {
       "ok": "没有验证问题",
@@ -281,7 +327,8 @@
       "approvalSent": "已发送审批请求",
       "applied": "已应用 v{{v}}",
       "noControlPermission": "您没有应用含控制节点流程的权限",
-      "ackRequired": "存在风险变更。请确认内容并勾选“我已了解”后再次应用"
+      "ackRequired": "存在风险变更。请确认内容并勾选“我已了解”后再次应用",
+      "policyRule": "节点状态处理由节点类型的规则(BR-FLW-07)决定"
     },
     "statePolicy": {
       "KEEP": "保留(KEEP)",
@@ -356,6 +403,313 @@
       "reasonRequired": "请输入1~500字的拒绝原因",
       "approved": "已批准，将以原子方式应用。",
       "rejected": "已拒绝"
+    },
+    "live": {
+      "health": {
+        "OK": "正常",
+        "WARN": "警告",
+        "ERROR": "错误"
+      },
+      "healthLabel": "状态: {{status}}",
+      "lastError": "最近错误: {{message}}",
+      "lastAt": "最近处理 {{at}}",
+      "counter": "处理 {{in}} · 错误 {{errors}}",
+      "reconnecting": "实时连接已断开，正在重新连接…",
+      "denied": "没有查看实时视图的权限",
+      "ended": "会话已结束，实时视图已关闭。请重新登录",
+      "version": "引擎处理版本 v{{v}}",
+      "on": "实时",
+      "state": {
+        "idle": "实时已关闭",
+        "connecting": "连接中",
+        "open": "实时",
+        "reconnecting": "重新连接中",
+        "denied": "无权限",
+        "ended": "会话已结束"
+      },
+      "statusChanged": "引擎已将流程状态改为{{status}}",
+      "notApplied": "有已应用的版本后才能查看实时流"
+    },
+    "overlay": {
+      "bypassed": "旁路",
+      "debugOn": "调试",
+      "bypass": "旁路(临时跳过)",
+      "debug": "调试",
+      "hint": "不改变版本，1秒内生效于运行中的流程",
+      "noControlPermission": "旁路控制节点需要控制部署权限",
+      "conflict": "其他人先修改了旁路·调试，已重新加载",
+      "bypassOnDone": "已旁路节点{{name}}",
+      "bypassOffDone": "已取消节点{{name}}的旁路",
+      "debugOnDone": "已开启节点{{name}}的调试",
+      "debugOffDone": "已关闭节点{{name}}的调试"
+    },
+    "presence": {
+      "editing": "{{name}} 编辑中",
+      "locked": "{{name}}正在编辑(只读)",
+      "label": "正在查看的人",
+      "viewer": "{{name}}(仅查看)",
+      "readOnly": "查看",
+      "reconnecting": "实时协作连接已断开，正在重新连接…",
+      "updated": "{{name}}保存了v{{v}}。",
+      "reload": "重新加载"
+    },
+    "inspector": {
+      "masked": "权限外数据",
+      "label": "{{name}}的最近消息",
+      "title": "{{name}} · 最近消息",
+      "sampling": "消息过多，服务器每秒减少发送{{n}}条",
+      "skipped": "因显示上限(每秒5条)省略了{{n}}条",
+      "empty": "还没有经过的消息",
+      "trace": "查看追踪",
+      "input": "输入",
+      "output": "输出",
+      "pickNode": "选择节点即可查看经过该节点的最近消息"
+    },
+    "trace": {
+      "kind": {
+        "COMMAND": "控制",
+        "NOTIFY": "通知",
+        "SINK": "存储",
+        "SCENE": "场景",
+        "ALARM": "告警"
+      },
+      "skipped": "已跳过{{kind}}({{reason}})",
+      "dryRun": "试运行(未执行): {{kind}} {{summary}}",
+      "recorded": "{{kind}}已写入发件箱({{key}}…)",
+      "label": "执行追踪",
+      "message": "消息 {{id}}",
+      "result": {
+        "COMPLETED": "处理完成",
+        "FAILED": "失败",
+        "DROPPED": "已丢弃",
+        "HOP_LIMIT": "超出节点数上限"
+      },
+      "noSteps": "没有经过的节点",
+      "ms": "{{ms}}ms",
+      "error": "错误 {{code}}: {{message}}",
+      "line": "(第{{line}}行)",
+      "details": "查看输入·输出",
+      "notFound": "没有追踪记录。仅开启调试或被采样的消息保存1小时",
+      "messageId": "消息ID",
+      "hint": "也可以从调试标签页的[查看追踪]打开",
+      "load": "加载",
+      "masked": "部分隐藏",
+      "maskedContent": "该内容属于权限范围外的空间，已隐藏"
+    },
+    "test": {
+      "title": "试运行(空跑)",
+      "inputMode": "输入方式",
+      "mode": {
+        "recent": "最近原始消息",
+        "custom": "直接输入"
+      },
+      "noRecent": "最近24小时没有原始消息，请使用直接输入",
+      "recent": "原始消息",
+      "message": "标准消息(JSON)",
+      "pickMessage": "请选择原始消息",
+      "invalidJson": "JSON格式不正确",
+      "invalidSchema": "不是标准消息格式: {{field}}",
+      "usesEdits": "使用未保存的编辑内容运行。控制·通知·存储节点不会实际执行",
+      "dryRunNote": "控制·通知·存储节点只记录，不实际执行",
+      "run": "运行"
+    },
+    "jsTest": {
+      "title": "节点试运行",
+      "message": "示例消息(JSON)",
+      "saveFirst": "保存一次流程后即可试运行",
+      "tooLarge": "代码超过{{max}}字节，无法运行",
+      "run": "节点试运行",
+      "outputs": "输出",
+      "noOutput": "没有输出(返回null·undefined)"
+    },
+    "replay": {
+      "portCount": "历史回放数量",
+      "title": "历史数据回放",
+      "from": "开始日期",
+      "to": "结束日期",
+      "device": "目标设备",
+      "allDevices": "所有设备",
+      "range": {
+        "required": "请输入期间",
+        "order": "结束日期不能早于开始日期",
+        "tooLong": "期间最长{{days}}天"
+      },
+      "notSaved": "需要有已保存的版本才能回放",
+      "tooLarge": "回放数据过多，请缩短期间",
+      "savedOnly": "回放使用已保存的版本(v{{v}})",
+      "start": "开始回放",
+      "status": {
+        "QUEUED": "等待中",
+        "RUNNING": "回放中",
+        "SUCCEEDED": "完成",
+        "FAILED": "失败",
+        "CANCELLED": "已取消"
+      },
+      "progress": "回放进度",
+      "processed": "{{processed}} / {{total}}条",
+      "summary": "执行{{executions}}次 · 控制{{command}}次 · 通知{{notify}}次 · 存储{{sink}}次 · 错误{{errors}}条",
+      "noRealActions": "因是空跑，实际命令·通知为0条",
+      "overlayShown": "画布上叠加显示历史回放的分支数量。",
+      "overlayClear": "清除",
+      "cancel": "取消回放",
+      "processedSoFar": "已处理{{processed}}条"
+    },
+    "metrics": {
+      "title": "流程指标",
+      "window": "期间",
+      "windows": {
+        "1h": "1小时",
+        "24h": "24小时",
+        "7d": "7天"
+      },
+      "unavailable": "无指标(无法连接流程引擎，请稍后再试)",
+      "errorsValue": "{{n}} ({{rate}}%)",
+      "latencyValue": "平均 {{avg}}ms · p95 {{p95}}ms",
+      "actionsValue": "控制 {{command}} · 通知 {{notify}} · 存储 {{sink}}",
+      "card": {
+        "executions": "执行次数",
+        "errors": "错误(错误率)",
+        "latency": "耗时",
+        "actions": "动作",
+        "dropped": "丢弃的触发"
+      },
+      "series": "按时段执行次数",
+      "avgMs": "平均 ms"
+    },
+    "shadow": {
+      "title": "影子对比",
+      "heading": "影子对比 v{{active}}(运行) vs v{{shadow}}(影子)",
+      "progress": "已过{{elapsed}}分钟 / {{total}}分钟",
+      "status": {
+        "RUNNING": "进行中",
+        "COMPLETED": "期间已结束",
+        "PROMOTED": "已切换",
+        "CANCELLED": "已中止"
+      },
+      "item": "项目",
+      "activeCol": "v{{v}}",
+      "shadowCol": "v{{v}}",
+      "delta": "差异",
+      "branch": "分支 {{name}} {{port}}",
+      "action": {
+        "command": "控制",
+        "notify": "通知",
+        "sink": "存储"
+      },
+      "wouldControl": "若为v{{v}}，控制{{delta}}次",
+      "errors": "影子错误{{n}}条",
+      "diffs": "结果不同的消息{{n}}条",
+      "cancel": "中止",
+      "promote": "切换到v{{v}}",
+      "start": "开始影子运行",
+      "option": "先以影子运行(不执行实际动作进行对比)",
+      "minutes": "影子期间(分钟)",
+      "minutesRule": "期间为{{min}}~{{max}}分钟",
+      "inProgress": "请在影子对比结束后再应用",
+      "started": "将v{{v}}以影子方式运行{{minutes}}分钟",
+      "promoted": "已切换到v{{v}}",
+      "cancelled": "已中止影子运行",
+      "banner": "v{{v}}影子运行中。",
+      "view": "查看对比"
+    },
+    "statePolicyHelp": {
+      "KEEP": "沿用进行中的定时器·聚合窗口",
+      "RESET": "清除状态并重新开始",
+      "MIGRATE": "按新设置转换状态后沿用"
+    },
+    "limit": {
+      "nodes": "每个流程最多{{max}}个节点(当前{{n}}个)"
+    },
+    "conflict": {
+      "diffLabel": "运行 v{{active}} → 我的草稿 v{{draft}}",
+      "applied": "其他人已先应用。您的修改没有被覆盖。",
+      "showDiff": "查看差异"
+    },
+    "settings": {
+      "saved": "设置已保存",
+      "variableReset": "已重置变量{{name}}的值",
+      "rule": {
+        "purpose": "目的请输入1~{{purposeMax}}个字符",
+        "description": "说明不能超过{{descriptionMax}}个字符",
+        "errorRate": "错误率阈值为1~100%",
+        "catchSelf": "不能将自身选为catch流程",
+        "max": "最大并发数为1~50",
+        "var": {
+          "name": "名称为字母·数字·_，1~40个字符",
+          "duplicate": "已有同名变量",
+          "limit": "每个流程最多{{limit}}个变量"
+        }
+      },
+      "docs": "说明书",
+      "purpose": "目的",
+      "owner": "负责人",
+      "noOwner": "无负责人",
+      "assignMe": "指定为我",
+      "relatedSpaces": "相关空间",
+      "description": "详细说明(Markdown)",
+      "count": "{{n}} / {{max}}字",
+      "tags": "标签",
+      "errorHandling": "错误处理",
+      "catchFlow": "catch流程ID",
+      "autoPause": "DEGRADED时自动暂停",
+      "errorRate": "错误率阈值(%/5分钟)",
+      "pauseMode": "暂停时的动作",
+      "pause": {
+        "DROP": "丢弃触发",
+        "BUFFER": "保留并在恢复时处理(最长1小时)"
+      },
+      "save": "保存设置",
+      "execution": "执行模式·变量",
+      "versioned": "执行模式和变量定义包含在版本中，在[保存]·[应用]时生效",
+      "mode": "执行模式",
+      "concurrency": {
+        "queued": "queued(依次)",
+        "single": "single(运行中则忽略)",
+        "restart": "restart(取消后重新开始)",
+        "parallel": "parallel(并发)"
+      },
+      "keyBy": "键单位",
+      "key": {
+        "deviceId": "设备",
+        "spaceId": "空间",
+        "flow": "流程"
+      },
+      "max": "最大并发数",
+      "variables": "流程变量",
+      "varName": "名称",
+      "varType": "类型",
+      "varInitial": "初始值",
+      "varValue": "当前值",
+      "resetValue": "重置值",
+      "removeVar": "删除",
+      "noVariables": "没有变量",
+      "addVar": "添加变量"
+    },
+    "subflow": {
+      "title": "创建子流程",
+      "make": "创建子流程",
+      "create": "创建",
+      "name": "名称",
+      "nameRule": "名称请输入1~100个字符",
+      "description": "说明",
+      "ports": "输入{{inputs}}个 · 节点{{nodes}}个",
+      "outputs": "输出端口",
+      "output": "输出{{n}}({{port}})",
+      "params": "公开参数",
+      "paramLabel": "显示名称",
+      "reason": {
+        "empty": "请选择要做成子流程的节点",
+        "trigger": "触发节点不能放入子流程",
+        "noInput": "需要有从外部进入的连接",
+        "tooManyInputs": "输入端口最多{{max}}个",
+        "noOutput": "需要有向外部输出的连接",
+        "tooManyOutputs": "输出端口最多{{max}}个"
+      },
+      "saveFirst": "请先保存",
+      "created": "已创建子流程{{name}} v{{v}}",
+      "newer": "有新版本(v{{v}})",
+      "newerDetail": "当前v{{current}} · 有新版本v{{v}}",
+      "upgrade": "升级版本"
     }
   },
   "errors": {
@@ -369,6 +723,10 @@
     "FLOW_DEFINITION_TOO_LARGE": "流程定义过大",
     "FLOW_LIMIT_EXCEEDED": "超出流程限制",
     "FLOW_SHADOW_IN_PROGRESS": "影子运行期间无法应用",
-    "CAPABILITY_NOT_FOUND": "找不到功能"
+    "CAPABILITY_NOT_FOUND": "找不到功能",
+    "FLOW_TEST_INPUT_INVALID": "输入格式不正确",
+    "FLOW_REPLAY_TOO_LARGE": "请缩短期间",
+    "FLOW_METRICS_UNAVAILABLE": "暂时无法获取指标",
+    "SUBFLOW_IN_USE": "该子流程正在使用中"
   }
 }

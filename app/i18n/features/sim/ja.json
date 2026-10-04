@@ -50,7 +50,8 @@
     "expectationState": {
       "PENDING": "待機",
       "PASSED": "合格",
-      "FAILED": "不合格"
+      "FAILED": "不合格",
+      "SKIPPED": "判定不可"
     },
     "validation": {
       "number": "数値を入力してください。",
@@ -75,7 +76,19 @@
       "metricRequired": "測定列を1つ以上対応付けてください。",
       "metricKey": "測定キーは英小文字で始まる小文字・数字・_ です。",
       "json": "JSONオブジェクトの形式ではありません。",
-      "server": "サーバーが拒否しました。"
+      "server": "サーバーが拒否しました。",
+      "metricsRequired": "測定項目を1つ以上選んでください。",
+      "capabilitiesRequired": "機能を1つ以上選んでください。",
+      "tooManyDefs": "特性は {{max}} 個までです。",
+      "propertyKey": "キーは英小文字で始まる英数字2〜40文字です。",
+      "duplicateKey": "同じキーが既にあります。",
+      "minMax": "最大は最小以上にしてください。",
+      "enumRequired": "選択肢を1つ以上入力してください。",
+      "effectProperty": "影響に連携する数値特性を選んでください。",
+      "sourceRequired": "ソースを選んでください。",
+      "rangeOrder": "終了は開始より後にしてください。",
+      "rangeTooLong": "期間は最大 {{max}} 日です。",
+      "retention": "元データは直近 {{days}} 日分のみ保存しています。"
     },
     "home": {
       "title": "仮想環境",
@@ -400,7 +413,20 @@
       "defaultSuffix": " [再生]",
       "count": "対象の測定値 {{n}}件",
       "dryRun": "対象件数を確認",
-      "start": "再生開始"
+      "start": "再生開始",
+      "modeLabel": "再生データ",
+      "mode": {
+        "RAW": "元データを選択",
+        "FILE": "ファイルを取り込む"
+      },
+      "rawTitle": "保存済みの実データを再生",
+      "from": "開始",
+      "to": "終了",
+      "source": "ソース",
+      "devices": "デバイス(選択 {{n}} 台)",
+      "noDevices": "このソースから届く実デバイスはありません。",
+      "allDevicesHint": "デバイスを選ばない場合、このソースの全デバイスを再生します。",
+      "rawCount": "対象の元データ {{n}} 件"
     },
     "report": {
       "title": "結果 R-{{id}} {{name}}",
@@ -433,6 +459,89 @@
       "failurePct": "失敗確率（%、0〜100）",
       "loadFailed": "仮想設定を読み込めませんでした。",
       "notVirtual": "仮想デバイスではありません。"
+    },
+    "reportX": {
+      "expectation": "期待結果",
+      "verdict": "判定",
+      "evidence": "根拠",
+      "verdicts": {
+        "PASSED": "合格",
+        "FAILED": "不合格",
+        "SKIPPED": "判定不可(停止)"
+      },
+      "actual": "実際 {{value}}",
+      "check": "根拠を見る",
+      "describe": {
+        "deviceStateBy": "{{deadline}}までに {{device}} {{state}}",
+        "deviceState": "{{device}} {{state}}",
+        "alarmCount": "アラーム {{op}} {{value}} 件",
+        "metricRange": "{{metric}} {{min}}〜{{max}} を {{pct}}% 維持",
+        "controlMax": "{{device}} 制御 {{max}} 回以下"
+      }
+    },
+    "types": {
+      "new": "カスタムタイプを作成",
+      "edit": "編集",
+      "editOf": "{{name}} を編集",
+      "newTitle": "新しいカスタムデバイスタイプ",
+      "editTitle": "カスタムタイプ: {{name}}",
+      "back": "カタログに戻る",
+      "formLabel": "カスタムデバイスタイプ",
+      "basic": "基本",
+      "name": "名前",
+      "category": "分類",
+      "icon": "アイコン",
+      "description": "説明",
+      "linkedModel": "連携する実モデル",
+      "noModel": "連携しない",
+      "metrics": "測定項目",
+      "metricSource": "{{key}} の既定の出所",
+      "source": {
+        "PHYSICS": "物理モデル",
+        "GENERATOR": "ジェネレーター"
+      },
+      "capabilities": "機能",
+      "defs": "特性の定義",
+      "addDef": "+ 特性を追加",
+      "noDefs": "定義された特性はありません。",
+      "defRow": "特性 {{n}}",
+      "key": "キー",
+      "defName": "名前",
+      "type": "型",
+      "valueType": {
+        "number": "数値",
+        "enum": "選択肢",
+        "boolean": "はい/いいえ"
+      },
+      "unit": "単位",
+      "min": "最小",
+      "max": "最大",
+      "enumValues": "選択肢(カンマ区切り)",
+      "default": "既定値",
+      "defDescription": "説明",
+      "yes": "はい",
+      "no": "いいえ",
+      "removeDef": "特性を削除",
+      "effects": "物理的影響",
+      "addEffect": "+ 影響を追加",
+      "noEffects": "物理的影響はありません。",
+      "effect": "影響の種類",
+      "effectProperty": "連携する特性",
+      "removeEffect": "影響を削除",
+      "effectKind": {
+        "COOLING": "冷房",
+        "HEATING": "暖房",
+        "VENTILATION": "換気",
+        "PURIFICATION": "空気清浄",
+        "HUMIDIFICATION": "加湿",
+        "DEHUMIDIFICATION": "除湿",
+        "LIGHTING": "照度",
+        "POWER": "電力"
+      },
+      "save": "保存",
+      "delete": "タイプを削除",
+      "saved": "カスタムタイプを保存し、カタログに追加しました。",
+      "deleted": "カスタムタイプを削除しました。"
     }
   },
   "errors": {

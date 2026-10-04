@@ -43,10 +43,10 @@ describe("FLW-01.02 TC-FLW-007 AT-FLW-02.2 검증 결과 → 노드 배지·적�
     let state = initialState(detail());
     expect(state.baseVersion).toBe(13);
     expect(isDirty(state)).toBe(false);
-    state = editorReducer(state, { type: "change", graph: updateNode(graphOf(state), "n-thresh01", { config: { metric: "temperature", op: ">" } }) });
+    state = editorReducer(state, { type: "change", graph: updateNode(graphOf(state), "n-thresh01", { config: { metric: "temperature" } }) });
     expect(isDirty(state)).toBe(true);
-    // value 미입력: 화면 검증 INVALID_CONFIG → 적용 막힘(저장은 가능)
-    expect(combinedValidation(state, catalog).errors).toEqual([{ code: "INVALID_CONFIG", nodeId: "n-thresh01", path: "value", message: "required" }]);
+    // op 미입력(core 카탈로그 필수): 화면 검증 INVALID_CONFIG → 적용 막힘(저장은 가능)
+    expect(combinedValidation(state, catalog).errors).toEqual([{ code: "INVALID_CONFIG", nodeId: "n-thresh01", path: "op", message: "required" }]);
     expect(applyBlockReason(state, combinedValidation(state, catalog), true)).toBe("unsaved");
     state = editorReducer(state, { type: "saved", flowId: "f-1", draftVersion: 14, validation: null });
     expect(isDirty(state)).toBe(false);

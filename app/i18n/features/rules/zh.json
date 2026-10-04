@@ -1,0 +1,472 @@
+{
+  "rules": {
+    "crumb": "规则与告警",
+    "title": "规则",
+    "newRule": "新建规则",
+    "newTitle": "新建规则",
+    "tuningCount": "调优建议 {{n}} 条",
+    "limitNear": "已有 {{total}} 条规则。每个组织最多 {{limit}} 条。",
+    "openFlow": "作为流程打开",
+    "convertedNotice": "已转换为流程的规则无法再用表单编辑。",
+    "errorReason": "规则错误：{{reason}}",
+    "errorReasons": {
+      "NO_TARGET": "无目标设备",
+      "METRIC_DELETED": "测量项已删除",
+      "FLOW_ERROR": "流程应用失败"
+    },
+    "status": {
+      "ACTIVE": "启用",
+      "INACTIVE": "停用",
+      "ERROR": "错误",
+      "CONVERTED": "已转换为流程",
+      "DELETED": "已删除"
+    },
+    "scope": {
+      "SPACE": "空间",
+      "DEVICE": "设备",
+      "MODEL": "设备型号",
+      "TAG": "标签"
+    },
+    "dow": {
+      "1": "周一",
+      "2": "周二",
+      "3": "周三",
+      "4": "周四",
+      "5": "周五",
+      "6": "周六",
+      "7": "周日"
+    },
+    "unit": {
+      "s": "秒",
+      "m": "分",
+      "h": "小时"
+    },
+    "list": {
+      "search": "搜索",
+      "status": "状态",
+      "severity": "严重程度",
+      "space": "空间",
+      "template": "模板",
+      "empty": "暂无规则。请从模板开始",
+      "noMatch": "没有符合条件的规则",
+      "raised7d": "近7天触发次数",
+      "openAlarms": "未关闭告警数",
+      "copy": "复制",
+      "activate": "启用",
+      "deactivate": "停用",
+      "withChildren": "含下级",
+      "clearOpenAlarms": "关闭该规则的未关闭告警",
+      "convertBody": "将转换为行为相同的普通流程。转换后无法再用规则表单编辑。",
+      "raised7dValue": "7天 {{n}}",
+      "openAlarmsValue": "未关闭 {{n}}",
+      "scopeValue": "{{scope}} · {{n}} 台",
+      "deleteTitle": "删除“{{name}}”",
+      "deleteBody": "将删除该规则。有 {{n}} 条未关闭告警。",
+      "convertTitle": "将“{{name}}”作为流程打开"
+    },
+    "form": {
+      "template": "模板",
+      "custom": "自定义",
+      "name": "名称",
+      "scope": "范围",
+      "scopeType": "范围类型",
+      "targets": "目标",
+      "noTargets": "没有可选目标",
+      "includeChildren": "包含下级空间",
+      "targetCountLabel": "当前目标数",
+      "noTargetWarn": "没有目标设备时规则会变为错误(NO_TARGET)",
+      "condition": "条件",
+      "time": "时间条件",
+      "timeEnabled": "使用时间条件",
+      "days": "星期",
+      "timeFrom": "开始时间",
+      "timeTo": "结束时间",
+      "schedule": "空间运营时间",
+      "scheduleNone": "不使用",
+      "scheduleInside": "运营时间内",
+      "scheduleOutside": "运营时间外",
+      "severity": "严重程度",
+      "titleTemplate": "告警标题",
+      "titleHint": "变量：{{device.name}} {{space.path}} {{value}}",
+      "autoClear": "条件解除后自动关闭",
+      "policy": "通知策略",
+      "noPolicy": "无(按匹配的策略)",
+      "simulate": "模拟",
+      "fixErrors": "请检查输入",
+      "conflict": "在此期间其他人修改了该规则。请刷新后重新保存。",
+      "targetCount": "当前目标 {{n}} 台",
+      "savedCount": "保存时 {{n}} 台"
+    },
+    "cond": {
+      "groupOp": "组合",
+      "and": "AND(全部)",
+      "or": "OR(任一)",
+      "removeGroup": "删除分组",
+      "add": "添加条件",
+      "addGroup": "添加分组",
+      "itemLabel": "条件项",
+      "kind": "条件类型",
+      "metric": "测量项",
+      "chooseMetric": "选择测量项",
+      "anyMetric": "任意测量项",
+      "op": "运算符",
+      "value": "值",
+      "chooseValue": "选择值",
+      "rangeLow": "范围下限",
+      "rangeHigh": "范围上限",
+      "for": "持续时间",
+      "clear": "解除阈值",
+      "repeat": "重复次数",
+      "aggregate": "评估方式",
+      "direction": "方向",
+      "delta": "变化量",
+      "window": "时间窗口",
+      "remove": "删除条件",
+      "groupLabel": "条件分组 第{{depth}}层",
+      "groupOpLabel": "第{{depth}}层分组的组合方式",
+      "limitReached": "最多可添加 {{n}} 个条件",
+      "depthHint": "分组最多嵌套 {{n}} 层",
+      "anomalySummary": "异常分数 ≥ {{score}}(分析联动)",
+      "kinds": {
+        "threshold": "阈值",
+        "rateOfChange": "变化率",
+        "noData": "无数据",
+        "anomaly": "异常分数"
+      },
+      "ops": {
+        "gt": "> 大于",
+        "gte": ">= 大于等于",
+        "lt": "< 小于",
+        "lte": "<= 小于等于",
+        "eq": "= 等于",
+        "ne": "≠ 不等于",
+        "outside": "范围外",
+        "inside": "范围内"
+      },
+      "aggregates": {
+        "perDevice": "按设备",
+        "spaceAvg": "空间平均",
+        "spaceMax": "空间最大",
+        "spaceMin": "空间最小",
+        "any": "任一设备",
+        "all": "全部设备"
+      },
+      "directions": {
+        "UP": "上升",
+        "DOWN": "下降",
+        "ANY": "双向"
+      }
+    },
+    "v": {
+      "metricRequired": "请选择测量项",
+      "valueRequired": "请输入值",
+      "rangeOrder": "下限必须小于上限",
+      "forRange": "持续时间须在0秒至24小时之间",
+      "repeatRange": "重复次数须为1~100",
+      "windowRange": "时间窗口须在1秒至24小时之间",
+      "deltaPositive": "变化量必须大于0",
+      "nameRequired": "请输入名称",
+      "nameLength": "名称最多100个字符",
+      "scopeRequired": "请至少选择一个目标",
+      "titleRequired": "请输入告警标题",
+      "titleLength": "告警标题最多200个字符",
+      "daysRequired": "请至少选择一天",
+      "timeFormat": "请以HH:mm同时输入开始和结束时间",
+      "valueRange": "{{metric}} 的有效范围为 {{min}}~{{max}}",
+      "clearBelow": "解除阈值必须小于 {{value}}",
+      "clearAbove": "解除阈值必须大于 {{value}}",
+      "countLimit": "最多 {{n}} 个条件",
+      "depthLimit": "分组最多嵌套 {{n}} 层",
+      "targetLimit": "目标设备最多 {{n}} 台",
+      "conditionUnsupported": "暂时无法保存异常检测条件。实时异常分数就绪后即可使用（请使用阈值、变化率或无数据条件）。"
+    },
+    "warnings": {
+      "NO_TARGET": "没有目标设备",
+      "TARGET_OFFLINE": "部分目标设备离线"
+    },
+    "sim": {
+      "panel": "模拟结果",
+      "period": "期间",
+      "run": "运行",
+      "rerun": "重新运行",
+      "running": "计算中…",
+      "fixForm": "请先修正规则输入错误",
+      "lowCoverage": "期间内数据不足10%",
+      "metric": "项目",
+      "byDevice": "按设备",
+      "noAlarms": "预计没有告警",
+      "device": "设备",
+      "count": "次数",
+      "longest": "最长持续",
+      "heatmap": "按时段的触发(星期×小时)",
+      "title": "模拟(最近 {{days}} 天)",
+      "days": "{{n}} 天",
+      "current": "本次({{label}})",
+      "previous": "上次({{label}})",
+      "basis": "阈值 {{value}}",
+      "hours": "{{n}} 小时",
+      "minutes": "{{n}} 分钟",
+      "seconds": "{{n}} 秒",
+      "rows": {
+        "alarms": "预计告警",
+        "notifications": "预计通知",
+        "avgDurationSec": "平均持续"
+      }
+    },
+    "fromChart": {
+      "title": "用此基准线创建规则",
+      "series": "序列",
+      "baseline": "基准线值",
+      "create": "创建规则",
+      "hint": "请输入基准线值"
+    }
+  },
+  "alarms": {
+    "crumb": "规则与告警",
+    "title": "告警",
+    "summary": "告警概览",
+    "ack": "确认",
+    "clear": "关闭",
+    "silence": "静音",
+    "silenceMenu": "静音 ▼",
+    "empty": "当前没有未关闭的告警 ✓",
+    "flapping": "抖动",
+    "selectAll": "全选本页",
+    "backToList": "告警列表",
+    "children": "子告警 {{n}}",
+    "times": "{{n}} 次",
+    "select": "选择 {{title}}",
+    "selectedCount": "已选 {{n}} 条",
+    "silenceFor": "静音 {{duration}}",
+    "newAlarm": "新告警：{{title}}",
+    "spaceEvent": "空间事件 · {{space}} · 告警 {{n}} 条",
+    "col": {
+      "values": "触发值 / 峰值"
+    },
+    "bulk": {
+      "ackResult": "已确认 {{ok}} 条，失败 {{failed}} 条",
+      "silenceResult": "已静音 {{ok}} 条，失败 {{failed}} 条",
+      "ok": "已处理",
+      "already": "已确认过"
+    },
+    "filter": {
+      "status": "状态",
+      "open": "未关闭告警",
+      "severity": "严重程度",
+      "space": "空间",
+      "range": "期间",
+      "source": "来源",
+      "groupBySpaceEvent": "按空间事件分组"
+    },
+    "range": {
+      "24h": "24小时",
+      "7d": "7天",
+      "30d": "30天",
+      "all": "全部时间"
+    },
+    "severity": {
+      "CRITICAL": "CRITICAL 紧急",
+      "MAJOR": "MAJOR 重要",
+      "MINOR": "MINOR 轻微",
+      "WARNING": "WARNING 警告",
+      "INFO": "INFO 信息"
+    },
+    "severityShort": {
+      "CRITICAL": "CRIT",
+      "MAJOR": "MAJ",
+      "MINOR": "MIN",
+      "WARNING": "WARN",
+      "INFO": "INFO"
+    },
+    "status": {
+      "ACTIVE": "活动",
+      "ACKNOWLEDGED": "已确认",
+      "SUPPRESSED": "已抑制",
+      "CLEARED": "已关闭"
+    },
+    "source": {
+      "RULE": "规则",
+      "FLOW": "流程",
+      "SYSTEM": "系统"
+    },
+    "suppressed": {
+      "MAINTENANCE": "维护",
+      "PARENT": "上级原因",
+      "DEVICE_OFFLINE": "设备离线"
+    },
+    "clearReason": {
+      "AUTO": "条件解除",
+      "MANUAL": "手动关闭",
+      "PARENT_CLEARED": "上级告警已关闭",
+      "RULE_DELETED": "规则已删除",
+      "RULE_SCOPE_CHANGED": "规则范围已变更"
+    },
+    "actionType": {
+      "ONSITE": "现场确认",
+      "CONFIG_CHANGE": "配置变更",
+      "DEVICE_REPLACED": "更换设备",
+      "OTHER": "其他"
+    },
+    "event": {
+      "RAISED": "触发",
+      "RERAISED": "再次触发",
+      "ACKED": "确认",
+      "CLEARED": "关闭",
+      "ASSIGNED": "指派负责人",
+      "NOTE": "备注",
+      "ACTION": "处置",
+      "ESCALATED": "升级",
+      "NOTIFIED": "已发送通知",
+      "SILENCED": "静音",
+      "FLAPPING_ON": "开始抖动",
+      "FLAPPING_OFF": "抖动结束",
+      "SUPPRESSED": "抑制"
+    },
+    "eventText": {
+      "value": "值 {{value}}",
+      "assigned": "→ {{name}}",
+      "notified": "{{channel}} · {{recipient}} · {{status}}",
+      "escalated": "第 {{step}} 级",
+      "unassigned": "已取消负责人"
+    },
+    "dur": {
+      "days": "{{n}} 天",
+      "hours": "{{n}} 小时",
+      "minutes": "{{n}} 分钟",
+      "seconds": "{{n}} 秒"
+    },
+    "detail": {
+      "source": "来源",
+      "openRule": "打开规则",
+      "openFlow": "打开流程",
+      "target": "目标",
+      "hiddenTarget": "权限范围外的目标",
+      "values": "值",
+      "raisedAt": "触发",
+      "ackedAt": "确认",
+      "clearedAt": "关闭",
+      "assignee": "负责人",
+      "assign": "指派",
+      "parent": "上级告警",
+      "openParent": "查看上级告警",
+      "timeline": "时间线",
+      "noEvents": "暂无记录",
+      "deliveries": "通知发送记录",
+      "noDeliveries": "未发送通知",
+      "channel": "渠道",
+      "recipient": "接收人",
+      "deliveryStatus": "状态",
+      "attempts": "尝试次数",
+      "sentAt": "发送时间",
+      "noteTitle": "备注与处置记录",
+      "note": "备注",
+      "actionType": "处置类型",
+      "noteOnly": "仅备注",
+      "clearNote": "关闭备注(可选)",
+      "me": "{{name}}(我)",
+      "valueLine": "触发 {{trigger}} · 峰值 {{peak}} · 当前 {{last}}",
+      "duration": "持续 {{d}}",
+      "chart": "{{metric}} 告警前后",
+      "thresholds": "触发阈值 {{raise}} · 解除阈值 {{clear}}",
+      "childrenTitle": "子告警 {{n}} 条",
+      "done": {
+        "ack": "已确认告警",
+        "clear": "已关闭告警",
+        "note": "已记录",
+        "assign": "已指派负责人",
+        "silence": "已静音"
+      }
+    },
+    "v": {
+      "noteLength": "备注须为1~{{n}}个字符"
+    }
+  },
+  "silences": {
+    "title": "静音计划",
+    "list": "静音列表",
+    "new": "新建静音",
+    "empty": "暂无静音",
+    "active": "生效中",
+    "release": "解除",
+    "targetType": "目标类型",
+    "targetId": "目标",
+    "chooseTarget": "选择目标",
+    "startsAt": "开始",
+    "endsAt": "结束",
+    "repeat": "重复",
+    "weekly": "星期与时段",
+    "dates": "日期范围",
+    "dateFrom": "开始日期",
+    "dateTo": "结束日期",
+    "reason": "原因",
+    "create": "创建静音",
+    "col": {
+      "kind": "类型",
+      "target": "目标",
+      "when": "时间",
+      "reason": "原因",
+      "by": "创建人"
+    },
+    "kind": {
+      "ONE_TIME": "一次性静音",
+      "RECURRING": "周期静音"
+    },
+    "target": {
+      "RULE": "规则",
+      "DEVICE": "设备",
+      "SPACE": "空间",
+      "ALARM": "告警"
+    },
+    "v": {
+      "target": "请选择目标",
+      "days": "请至少选择一天",
+      "reason": "原因最多200个字符"
+    }
+  },
+  "alarmStats": {
+    "title": "告警统计",
+    "period": "期间",
+    "topRules": "主要规则",
+    "topSpaces": "主要空间",
+    "topDevices": "主要设备",
+    "daily": "每日告警",
+    "date": "日期",
+    "raised": "触发数",
+    "cards": {
+      "raised": "触发数",
+      "mtta": "平均确认时间(MTTA)",
+      "mttr": "平均解决时间(MTTR)",
+      "unacked": "未确认比例"
+    }
+  },
+  "tuning": {
+    "title": "规则调优建议",
+    "empty": "没有待处理的调优建议",
+    "current": "当前",
+    "proposed": "建议",
+    "simulation": "模拟",
+    "apply": "应用",
+    "dismiss": "忽略",
+    "dismissed": "已忽略建议",
+    "applied": "已应用建议(规则版本 {{version}})",
+    "simulationValue": "预计告警 {{before}} → {{after}} 条",
+    "problem": {
+      "TOO_FREQUENT": "触发过多",
+      "FLAPPING": "抖动",
+      "UNACKNOWLEDGED": "大多未确认"
+    }
+  },
+  "errors": {
+    "RULE_NOT_FOUND": "找不到规则",
+    "RULE_NAME_DUPLICATED": "已存在同名规则",
+    "RULE_CONDITION_INVALID": "条件无效",
+    "RULE_LIMIT_EXCEEDED": "最多可创建1,000条规则",
+    "RULE_TARGET_LIMIT_EXCEEDED": "目标设备最多5,000台",
+    "RULE_STATE_CONFLICT": "当前状态下无法执行",
+    "RULE_SIMULATION_RANGE_INVALID": "模拟期间最多30天",
+    "ALARM_NOT_FOUND": "找不到告警",
+    "ALARM_STATE_CONFLICT": "该告警已处理",
+    "ALARM_BULK_LIMIT_EXCEEDED": "一次最多处理200条",
+    "SILENCE_RANGE_INVALID": "静音期间无效"
+  }
+}

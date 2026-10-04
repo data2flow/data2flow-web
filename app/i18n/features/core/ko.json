@@ -6,7 +6,10 @@
     "ingest": "수집",
     "automation": "자동화",
     "control": "제어",
-    "sim": "가상 환경"
+    "sim": "가상 환경",
+    "alarms": "규칙·알람",
+    "channels": "알림 채널",
+    "maintenance": "유지보수 일정"
   },
   "common": {
     "cancel": "취소",

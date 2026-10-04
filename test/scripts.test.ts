@@ -157,3 +157,32 @@ describe("UI-SCR-02 스크립트 편집기", () => {
     expect(JSON.parse(timeout.body).response.error.code).toBe("SCRIPT_TIMEOUT");
   });
 });
+
+describe("[SCR-04.04] UI-SCR-08 사용처", () => {
+  it("TC-SCR-076 AT-SCR-09.1·09.2 연결 대상·24시간 처리량·플로우 노드 참조, 비활성화·활성화, 사용 중 삭제 불가", async () => {
+    app.gateway.m2.extra.scriptFlowNodes = { "501": [{ flowId: "f-7f3a", flowName: "실습실 냉방", nodeId: "n-js-1", flowVersion: 13 }] };
+    const viewerOp = await operator();
+    const readOnly = await viewerOp.get("/scripts/501?tab=usage");
+    expect(readOnly.response.status).toBe(200);
+    expect(readOnly.body).toContain("17,280");
+    expect(readOnly.body).not.toContain(">비활성화<");
+    const browser = await integrator();
+    const page = await browser.get("/scripts/501?tab=usage");
+    expect(page.body).toContain("24시간 처리");
+    expect(page.body).toContain('href="/automation/flows/f-7f3a"');
+    expect(page.body).toContain("n-js-1 (v13)");
+    expect(page.body).toContain("사용 중인 스크립트는 지울 수 없습니다. 연결 대상과");
+    const script = app.gateway.m2.scripts.find((s) => s.id === "501")!;
+    const disabled = await browser.post("/scripts/501?tab=usage", { intent: "disable" });
+    expect(disabled.response.status).toBe(200);
+    expect(disabled.body).toContain("비활성화했습니다. 기기 3대, 24시간 17,280건에 영향이 있습니다.");
+    expect(script.status).toBe("DISABLED");
+    const enabled = await browser.post("/scripts/501?tab=usage", { intent: "enable" });
+    expect(enabled.body).toContain("활성화했습니다.");
+    expect(script.status).toBe("ENABLED");
+    const del = await browser.post("/scripts/501?tab=usage", { intent: "delete" });
+    expect(del.response.status).toBe(409);
+    expect(del.body).toContain("사용 중인 스크립트는 지울 수 없습니다.");
+    expect((await browser.post("/scripts/501?tab=usage", { intent: "x" })).response.status).toBe(400);
+  });
+});

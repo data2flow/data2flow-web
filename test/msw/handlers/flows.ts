@@ -1,5 +1,6 @@
 /**
  * 자동화 플로우 가짜 API(design/api/FLW-api.md API-FLW-01~10·14·20·24·30, ACT-api API-ACT-25 기능 카탈로그 조회).
+ * M4: 바이패스·디버그(API-FLW-11), 시험 실행(12), 과거 재생(13), 섀도우(18), 변수(21), 실행 추적(41), 설정·설명서(10 PATCH).
  * 상태는 core.extra["flows"]. 테스트는 `flowsState(core)`로 상황(승인 필요 설정, 제어 가능 공간, 지표)을 바꾼다.
  */
 import { HttpResponse } from "msw";
@@ -63,8 +64,17 @@ export interface FlowsState {
   requireApproval: boolean;
   /** 공간별 제어 가능 기능(없으면 템플릿·검증에서 TARGET_MISSING 경고) */
   controllable: Map<string, string[]>;
-  /** 엔진 지표를 받을 수 없음(API-FLW-14 → 503 SERVICE_UNAVAILABLE) */
+  /** 엔진 지표를 받을 수 없음(API-FLW-14 → 503 FLOW_METRICS_UNAVAILABLE, ADR-047) */
   metricsUnavailable: boolean;
+  /** M4: 플로우별 오버레이·섀도우·설정·변수, 재생 작업, 추적(메시지 ID → Trace) */
+  overlays: Map<string, { bypass: string[]; debug: string[]; revision: number }>;
+  shadows: Map<string, Record<string, unknown>>;
+  settings: Map<string, Record<string, unknown>>;
+  variables: Map<string, { name: string; type: string; value: unknown; updatedAt: string }[]>;
+  replays: Map<string, Record<string, unknown>>;
+  traces: Map<string, Record<string, unknown>>;
+  /** 로그인 사용자의 공간 범위(null = 제한 없음). core FlowRunService.trace처럼 범위 밖 spaceId 내용은 가리고 masked=true */
+  traceScope: string[] | null;
   seq: number;
 }
 
@@ -175,6 +185,13 @@ export function flowsState(core: CoreState): FlowsState {
       requireApproval: false,
       controllable: new Map(),
       metricsUnavailable: false,
+      overlays: new Map(),
+      shadows: new Map(),
+      settings: new Map(),
+      variables: new Map(),
+      replays: new Map(),
+      traces: new Map(),
+      traceScope: null,
       approvals: [],
       flows: [
         { flowId: "f-7f3a", name: "고온이면 냉방", description: null, kind: "FLOW", status: "ACTIVE", environment: "PROD", activeVersion: 13, draftVersion: null, spaceIds: ["31"], metrics1h: { executions: 812, errorRate: 0, actions: 3 }, updatedBy: by, updatedAt: "2026-10-03T01:40:00Z", lock: 5, versions: [version(13, "ACTIVE", coolingDefinition("31"), "기준 온도 상향"), version(12, "ARCHIVED", coolingDefinition("31", 28), "처음 적용")] },
@@ -237,9 +254,9 @@ function detail(state: FlowsState, f: FakeFlow, requested?: number) {
   const v = f.versions.find((x) => x.version === target);
   if (!v) return undefined;
   return {
-    flow: { ...flowRow(f), description: f.description, purpose: null, ownerUserId: null, relatedSpaceIds: f.spaceIds, tags: [], version: f.lock },
+    flow: { ...flowRow(f), description: f.description, purpose: null, ownerUserId: null, relatedSpaceIds: f.spaceIds, tags: [], pauseMode: "DROP", autoPauseOnDegraded: false, errorRateThreshold: 0.1, catchFlowId: null, ...(state.settings.get(f.flowId) ?? {}), version: f.lock },
     version: { version: v.version, state: v.state, baseVersion: v.baseVersion, definition: v.definition, validation: fakeValidate(state, v.definition), changeSummary: null, memo: v.memo, appliedBy: v.appliedBy, appliedAt: v.appliedAt },
-    overlay: { bypass: [], debug: [], revision: 1 },
+    overlay: state.overlays.get(f.flowId) ?? { bypass: [], debug: [], revision: 1 },
     applyStatus: f.activeVersion ? { targetVersion: f.activeVersion, instances: [{ instanceId: "flow-engine-0", appliedVersion: f.activeVersion, reportedAt: AT }, { instanceId: "flow-engine-1", appliedVersion: f.activeVersion, reportedAt: AT }], converged: true } : null,
     editors: [],
     emergencyStop: { active: false },
@@ -279,6 +296,30 @@ function activate(f: FakeFlow, v: FakeFlowVersion, user: CoreRequest["user"], me
 }
 
 const denied = () => fail(403, "PERMISSION_DENIED");
+
+/** 드라이런 추적(API-FLW-41 Trace): 트리거부터 와이어를 따라가며 행동 노드는 dryRun(BR-FLW-11) */
+function dryRunTrace(def: Def, messageId: string, version: number, startNodeId?: string) {
+  const start = startNodeId ?? def.nodes.find((n) => n.type.startsWith("trigger."))?.id;
+  const steps: Record<string, unknown>[] = [];
+  const seen = new Set<string>();
+  let current = start;
+  while (current && !seen.has(current)) {
+    seen.add(current);
+    const node = def.nodes.find((n) => n.id === current);
+    if (!node) break;
+    const wire = def.wires.find((w) => w.from === node.id && w.port !== "error");
+    const isAction = node.type.startsWith("action.");
+    steps.push({
+      nodeId: node.id,
+      type: node.type,
+      durationMs: 0.4,
+      outputs: [{ port: isAction ? "ok" : (wire?.port ?? "out"), payload: { temperature: 28.1 } }],
+      ...(isAction ? { action: { kind: node.type === "action.control" ? "COMMAND" : node.type === "action.notify" ? "NOTIFY" : "SINK", dryRun: true, skipped: null, summary: node.type === "action.control" ? `${String(node.config.capability)}.${String(node.config.command)}` : "" } } : {}),
+    });
+    current = wire?.to;
+  }
+  return { messageId, version, startedAt: AT, steps, result: "COMPLETED", error: null };
+}
 
 function createFlow(state: FlowsState, user: CoreRequest["user"], name: string, def: Def, spaceIds: string[] = []): FakeFlow {
   state.seq += 1;
@@ -324,6 +365,48 @@ export const flowsHandler: CoreHandler = (core, req) => {
     return ok({ flowId: flow.flowId, draftVersion: 1, warnings: fakeValidate(state, def).warnings }, 201, { Location: `/api/v1/core/flows/${flow.flowId}` });
   }
 
+  // API-FLW-13 재생 작업(core FlowRunService → 엔진 ReplayService.view: {jobId, flowId, status, progress:{processed, total|null}, result, error})
+  const replayJob = /^\/flow-replays\/([^/]+?)(\/cancel)?$/.exec(path);
+  if (replayJob && (method === "GET" || (method === "POST" && replayJob[2]))) {
+    if (!can(replayJob[2] ? "FLOW_WRITE" : "FLOW_READ")) return denied();
+    const job = state.replays.get(decodeURIComponent(replayJob[1]));
+    if (!job || !state.flows.some((f) => f.flowId === job.flowId)) return fail(404, "RESOURCE_NOT_FOUND");
+    if (replayJob[2] && (job.status === "QUEUED" || job.status === "RUNNING")) job.status = "CANCELLED";
+    return ok(job);
+  }
+
+  const traceMatch = /^\/flows\/([^/]+)\/traces\/([^/]+)$/.exec(path);
+  if (traceMatch && method === "GET") {
+    if (!can("FLOW_READ")) return denied();
+    const trace = state.traces.get(decodeURIComponent(traceMatch[2]));
+    return trace ? ok(maskTrace(trace, state.traceScope)) : fail(404, "RESOURCE_NOT_FOUND");
+  }
+
+  const variableReset = /^\/flows\/([^/]+)\/variables\/([^/]+)\/reset$/.exec(path);
+  if (variableReset && method === "POST") {
+    if (!can("FLOW_WRITE")) return denied();
+    const rows = state.variables.get(decodeURIComponent(variableReset[1])) ?? [];
+    const row = rows.find((r) => r.name === decodeURIComponent(variableReset[2]));
+    if (!row) return fail(404, "RESOURCE_NOT_FOUND");
+    row.value = "";
+    return noContent();
+  }
+
+  const shadowEnd = /^\/flows\/([^/]+)\/shadow\/(promote|cancel)$/.exec(path);
+  if (shadowEnd && method === "POST") {
+    if (!can("FLOW_WRITE")) return denied();
+    const flowId = decodeURIComponent(shadowEnd[1]);
+    const shadow = state.shadows.get(flowId);
+    if (!shadow) return fail(409, "FLOW_STATE_CONFLICT");
+    state.shadows.delete(flowId);
+    const flow = state.flows.find((f) => f.flowId === flowId)!;
+    if (shadowEnd[2] === "promote") {
+      const v = flow.versions.find((x) => x.version === shadow.version)!;
+      activate(flow, v, user, v.memo);
+    }
+    return noContent();
+  }
+
   const approvalAction = /^\/flow-approvals\/([^/]+)\/(approve|reject)$/.exec(path);
   if (approvalAction && method === "POST") {
     if (!can("FLOW_APPROVE")) return denied();
@@ -357,11 +440,13 @@ export const flowsHandler: CoreHandler = (core, req) => {
       const statuses = url.searchParams.getAll("status");
       const kind = url.searchParams.get("kind");
       const spaceId = url.searchParams.get("spaceId");
+      const owner = url.searchParams.get("owner");
       const rank = (f: FakeFlow) => (f.status === "DEGRADED" ? 0 : f.metrics1h.errorRate > 0 ? 1 : 2);
       const rows = state.flows
-        .filter((f) => (!q || f.name.toLowerCase().includes(q)) && (statuses.length === 0 || statuses.includes(f.status)) && (!kind || f.kind === kind) && (!spaceId || f.spaceIds.includes(spaceId)))
+        .filter((f) => (!q || f.name.toLowerCase().includes(q)) && (statuses.length === 0 || statuses.includes(f.status)) && (!kind || f.kind === kind) && (!spaceId || f.spaceIds.includes(spaceId)) && (!owner || state.settings.get(f.flowId)?.ownerUserId === owner))
         .sort((a, c) => rank(a) - rank(c) || c.updatedAt.localeCompare(a.updatedAt));
-      return list(rows.map(flowRow), url);
+      // FLW-11.06: 설명서를 쓴 플로우는 목적·책임자를 함께 싣는다(API-FLW-01 확장)
+      return list(rows.map((f) => ({ ...flowRow(f), ...(state.settings.has(f.flowId) ? { purpose: state.settings.get(f.flowId)?.purpose ?? null, ownerUserId: state.settings.get(f.flowId)?.ownerUserId ?? null } : {}) })), url);
     }
     if (method === "POST") {
       if (!can("FLOW_WRITE")) return denied();
@@ -397,8 +482,13 @@ export const flowsHandler: CoreHandler = (core, req) => {
         if (state.flows.some((f) => f.name === name && f.flowId !== flow.flowId)) return fail(409, "FLOW_NAME_DUPLICATED");
         flow.name = name;
       }
+      // 설정·설명서(API-FLW-10, FLW-11.06): 온 키만 바꾼다
+      if (typeof b.purpose === "string" && (b.purpose.trim().length < 1 || b.purpose.length > 200)) return fail(400, "INVALID_REQUEST", { errors: [{ field: "purpose", code: "Size", message: "1~200자" }] });
+      const settings = { ...(state.settings.get(flow.flowId) ?? {}) };
+      for (const key of ["purpose", "ownerUserId", "relatedSpaceIds", "tags", "pauseMode", "autoPauseOnDegraded", "errorRateThreshold", "catchFlowId", "description"]) if (key in b) settings[key] = b[key];
+      state.settings.set(flow.flowId, settings);
       flow.lock += 1;
-      return ok({ ...flowRow(flow), version: flow.lock });
+      return ok({ ...flowRow(flow), ...settings, version: flow.lock });
     }
     if (method === "DELETE") {
       if (!write()) return denied();
@@ -456,6 +546,14 @@ export const flowsHandler: CoreHandler = (core, req) => {
         state.approvals.push({ approvalId, flowId: flow.flowId, flowName: flow.name, version: v.version, kind: "APPLY", status: "PENDING", hasControlNode: true, requestedBy: { userId: user.id, name: user.name }, requestedAt: AT });
         return HttpResponse.json({ header: { isSuccessful: true, resultCode: "FLOW_APPROVAL_REQUIRED", resultMessage: "승인 요청을 보냈습니다" }, response: { approvalId, version: v.version } }, { status: 202 });
       }
+      if (state.shadows.has(flow.flowId)) return fail(409, "FLOW_SHADOW_IN_PROGRESS");
+      const shadow = b.shadow as { durationMinutes?: number } | undefined;
+      if (shadow) {
+        const minutes = Number(shadow.durationMinutes);
+        if (!(minutes >= 10 && minutes <= 1440)) return fail(400, "INVALID_REQUEST", { errors: [{ field: "shadow.durationMinutes", code: "Range", message: "10~1440" }] });
+        state.shadows.set(flow.flowId, { status: "RUNNING", version: v.version, startedAt: AT, endsAt: new Date(Date.parse(AT) + minutes * 60_000).toISOString(), stats: { branches: [{ nodeId: "n-thr00001", port: "true", active: 12, shadow: 16 }], actions: { active: { command: 3, notify: 0, sink: 0 }, shadow: { command: 7, notify: 0, sink: 0 } }, errors: { shadow: 0 } }, diffs: [] });
+        return ok({ appliedVersion: flow.activeVersion, applyStatus: null });
+      }
       return ok(activate(flow, v, user, (b.memo as string) ?? null));
     }
     case "GET versions":
@@ -485,8 +583,57 @@ export const flowsHandler: CoreHandler = (core, req) => {
       flow.status = sub === "pause" ? "PAUSED" : sub === "resume" ? "ACTIVE" : "DISABLED";
       return ok({ flowId: flow.flowId, status: flow.status });
     }
+    case "PUT overlay": {
+      if (!write()) return denied();
+      const current = state.overlays.get(flow.flowId) ?? { bypass: [], debug: [], revision: 1 };
+      if (Number(b.revision) !== current.revision) return fail(409, "FLOW_VERSION_CONFLICT");
+      const def = flow.versions.find((x) => x.version === flow.activeVersion)?.definition;
+      const bypass = (b.bypass as string[]) ?? [];
+      const controlChanged = (def?.nodes ?? []).some((n) => n.type === "action.control" && bypass.includes(n.id) !== current.bypass.includes(n.id));
+      if (controlChanged && !can("FLOW_DEPLOY_CONTROL")) return denied();
+      const next = { bypass, debug: (b.debug as string[]) ?? [], revision: current.revision + 1 };
+      state.overlays.set(flow.flowId, next);
+      return ok({ revision: next.revision });
+    }
+    case "POST test-run": {
+      // core FlowRunService.testRun + 엔진 TestRunService: input은 {rawMessageId}(숫자) 또는 {message: CanonicalTelemetry} | {body}
+      if (!write()) return denied();
+      const input = b.input as { rawMessageId?: unknown; message?: Record<string, unknown>; body?: unknown } | undefined;
+      if (!input || typeof input !== "object") return fail(400, "FLOW_TEST_INPUT_INVALID", { errors: [{ field: "input", code: "NotNull", message: null }] });
+      if (input.rawMessageId != null) {
+        if (!/^\d+$/.test(String(input.rawMessageId))) return fail(400, "FLOW_TEST_INPUT_INVALID", { errors: [{ field: "input.rawMessageId", code: "Pattern", message: null }] });
+      } else if (input.message) {
+        const missing = CANONICAL_REQUIRED.find((k) => input.message![k] === undefined || input.message![k] === null || input.message![k] === "");
+        if (missing) return fail(400, "FLOW_TEST_INPUT_INVALID", { errors: [{ field: "input", code: "INVALID", message: `input.message가 표준 텔레메트리 형식이 아닙니다: ${missing}` }] });
+      } else if (input.body === undefined) {
+        return fail(400, "FLOW_TEST_INPUT_INVALID", { errors: [{ field: "input", code: "NotNull", message: null }] });
+      }
+      const versionNo = b.version != null ? Number(b.version) : (flow.draftVersion ?? flow.activeVersion);
+      const def = (b.definition as Def) ?? flow.versions.find((x) => x.version === versionNo)?.definition;
+      if (!def) return fail(404, "RESOURCE_NOT_FOUND");
+      return ok({ trace: dryRunTrace(def, "m-dryrun", versionNo ?? 0, b.startNodeId as string | undefined) });
+    }
+    case "POST replay": {
+      // core FlowRunService.replay: from·to ISO-8601(아니면 400 INVALID_REQUEST), to > from, 7일 초과 400 FLOW_REPLAY_TOO_LARGE → 202 {jobId, status:"QUEUED"}
+      if (!write()) return denied();
+      const from = Date.parse(String(b.from ?? ""));
+      const to = Date.parse(String(b.to ?? ""));
+      if (Number.isNaN(from)) return fail(400, "INVALID_REQUEST", { errors: [{ field: "from", code: "INVALID", message: null }] });
+      if (Number.isNaN(to) || to <= from) return fail(400, "INVALID_REQUEST", { errors: [{ field: "to", code: "INVALID", message: null }] });
+      if (to - from > 7 * 86_400_000) return fail(400, "FLOW_REPLAY_TOO_LARGE");
+      state.seq += 1;
+      const jobId = String(9000 + state.seq);
+      state.replays.set(jobId, { jobId, flowId: flow.flowId, status: "SUCCEEDED", progress: { processed: 1000, total: 1000 }, result: { executions: 1000, branchCounts: { "n-thr00001": { true: 12, false: 988 } }, actions: { command: 12, notify: 3, sink: 0, alarm: 0 }, errors: 0 }, error: null });
+      return ok({ jobId, status: "QUEUED" }, 202);
+    }
+    case "GET shadow": {
+      const shadow = state.shadows.get(flow.flowId);
+      return shadow ? ok(shadow) : fail(404, "RESOURCE_NOT_FOUND");
+    }
+    case "GET variables":
+      return items(state.variables.get(flow.flowId) ?? []);
     case "GET metrics": {
-      if (state.metricsUnavailable) return fail(503, "SERVICE_UNAVAILABLE");
+      if (state.metricsUnavailable) return fail(503, "FLOW_METRICS_UNAVAILABLE");
       const active = flow.versions.find((x) => x.version === flow.activeVersion) ?? flow.versions[0];
       const errorsByNode = (id: string, type: string) => (flow.flowId === "f-co2" && type === "transform.js" ? 145 : 0);
       const nodes = (active?.definition.nodes ?? []).map((n) => ({ nodeId: n.id, processed: flow.metrics1h.executions, errors: errorsByNode(n.id, n.type), avgMs: 0.4 }));
@@ -497,3 +644,31 @@ export const flowsHandler: CoreHandler = (core, req) => {
       return undefined;
   }
 };
+
+/** 엔진이 input.message를 읽는 contracts CanonicalTelemetry 필수 항목 */
+const CANONICAL_REQUIRED = ["v", "messageId", "organizationId", "sourceId", "externalId", "deviceId", "deviceStatus", "measuredAt", "receivedAt", "metrics", "rawMessageId"];
+
+/** core FlowRunService.trace: 범위 밖 spaceId(본문 또는 message.spaceId)를 가진 입력·출력은 null + masked=true */
+export function maskTrace(trace: Record<string, unknown>, scope: string[] | null): Record<string, unknown> {
+  if (!scope) return trace;
+  const out = (payload: unknown) => {
+    if (!payload || typeof payload !== "object") return false;
+    const p = payload as { spaceId?: unknown; message?: { spaceId?: unknown } };
+    const space = p.spaceId ?? p.message?.spaceId;
+    return space != null && !scope.includes(String(space));
+  };
+  const steps = ((trace.steps as Record<string, unknown>[]) ?? []).map((step) => {
+    const next: Record<string, unknown> = { ...step };
+    if (out(step.input)) {
+      next.input = null;
+      next.masked = true;
+    }
+    next.outputs = ((step.outputs as Record<string, unknown>[]) ?? []).map((o) => {
+      if (!out(o.payload)) return o;
+      next.masked = true;
+      return { ...o, payload: null, masked: true };
+    });
+    return next;
+  });
+  return { ...trace, steps };
+}

@@ -11,23 +11,28 @@ import { Alert, Badge, Button, Card, CsrfField, PageHeader, StatusDot, Table, Ta
 import { isFavorite, toggleFavorite, type Favorite } from "~/features/home/model/home";
 import { FloorplanPanel, type FloorplanView } from "~/features/spaces/components/floorplan";
 import { ModeCard, PropsForm, ScheduleEditor, TargetsEditor, type FormResult, type ModeData, type ScheduleData, type SpaceDetail, type TargetsData } from "~/features/spaces/components/space-manage";
+import { SpaceAlarms } from "~/features/spaces/components/space-alarms";
 import { ChildSpaces, ComfortBadge, ComfortCauses, DeviceCards } from "~/features/spaces/components/space-overview";
+import type { SpaceAlarm } from "~/features/spaces/model/space-alarms";
 import { SpaceTree, type TreeActionResult } from "~/features/spaces/components/space-tree";
 import type { OverviewDevice } from "~/features/spaces/model/live-devices";
 import { checkFloorplanFile, checkSlots, checkTargets, parseJsonArray, type Slot, type TargetRow } from "~/features/spaces/model/space-forms";
 import { formatRelative } from "~/lib/format";
 import { hasAny } from "~/lib/permissions";
-import { checkSpaceInput, findSpace } from "~/lib/spaces";
+import { checkSpaceInput, descendantIds, findSpace } from "~/lib/spaces";
 import type { RootData } from "~/root";
 import type { Route } from "./+types/space-detail";
 import { loadTree, treeAction } from "./spaces-shared.server";
 
-const TABS = ["overview", "devices", "props", "targets", "schedule", "floorplan"] as const;
+// 보기 탭(UI-DSH-02: 개요·알람) + 관리 탭(UI-DEV-01~03)
+const TABS = ["overview", "alarms", "devices", "props", "targets", "schedule", "floorplan"] as const;
 type Tab = (typeof TABS)[number];
 
 interface Overview {
   comfort?: { state?: string; causes?: { metricKey: string; value?: number | null; unit?: string | null }[]; updatedAt?: string } | null;
   devices?: OverviewDevice[];
+  /** 열린 알람(API-DSH-02 `openAlarms[]`, API-RUL-10 Alarm 모양) — 기기 카드 배지 */
+  openAlarms?: SpaceAlarm[];
   hasFloorplan?: boolean;
 }
 
@@ -74,7 +79,14 @@ export async function loader({ request, context, params }: Route.LoaderArgs) {
   let mode: ModeData | null = null;
   let floorplan: FloorplanView | null = null;
   let spaceDevices: { id: string; name: string }[] = [];
-  if (tab === "devices") {
+  let alarms: SpaceAlarm[] = [];
+  let alarmsFailed = false;
+  if (tab === "alarms") {
+    // 공간 하위 열린 알람(API-RUL-10, spaceId는 하위 포함, 기본 상태 ACTIVE·ACKNOWLEDGED·SUPPRESSED)
+    const list = await callList<SpaceAlarm>(ctx, request, `/api/v1/core/alarms?spaceId=${id}&size=100`);
+    if (list.ok) alarms = list.list.responses.map((a) => ({ ...a, id: String(a.id) }));
+    else alarmsFailed = true;
+  } else if (tab === "devices") {
     const list = await callList<DeviceRow>(ctx, request, `/api/v1/core/devices?spaceId=${id}&includeDescendants=true&size=100`);
     if (list.ok) devices = list.list.responses;
   } else if (tab === "targets") {
@@ -103,6 +115,8 @@ export async function loader({ request, context, params }: Route.LoaderArgs) {
     mode,
     floorplan,
     spaceDevices,
+    alarms,
+    alarmsFailed,
     now: Date.now(),
   };
 }
@@ -195,11 +209,11 @@ export default function SpaceDetailPage() {
   const children = (flat?.node.children ?? []).map((c) => ({ id: String(c.id), name: c.name, type: c.type }));
   const tabs = TABS.map((key) => ({ key, label: t(`spaces.tab.${key}`), to: `/spaces/${space.id}?tab=${key}` }));
   return (
-    <div className="grid gap-4 md:grid-cols-[260px_1fr]">
-      <aside>
+    <div className="grid min-w-0 gap-4 md:grid-cols-[260px_1fr]">
+      <aside className="min-w-0">
         <SpaceTree spaces={tree} selectedId={space.id} canEdit={canEdit} result={result && ["create", "rename", "move", "delete"].includes(result.intent ?? "") ? result : undefined} />
       </aside>
-      <section>
+      <section className="min-w-0">
         <PageHeader
           crumb={(flat?.path ?? [space.name]).join(" › ")}
           title={
@@ -227,10 +241,11 @@ export default function SpaceDetailPage() {
         <Tabs items={tabs} current={tab} />
         {tab === "overview" && (
           <div className="flex flex-col gap-4">
-            <DeviceCards spaceId={space.id} devices={overview?.devices ?? []} now={loaded.now} lang={lang} />
+            <DeviceCards spaceId={space.id} devices={overview?.devices ?? []} alarms={overview?.openAlarms} now={loaded.now} lang={lang} />
             <ChildSpaces>{children}</ChildSpaces>
           </div>
         )}
+        {tab === "alarms" && <SpaceAlarms initial={loaded.alarms} failed={loaded.alarmsFailed} spaceIds={descendantIds(tree, String(space.id)).length ? descendantIds(tree, String(space.id)) : [String(space.id)]} timezone={timezone} lang={lang} />}
         {tab === "devices" && <DevicesTab devices={loaded.devices} now={loaded.now} lang={lang} spaceId={space.id} />}
         {tab === "props" && <PropsForm space={space} canEdit={canEdit} result={result} />}
         {tab === "targets" && loaded.targets && <TargetsEditor data={loaded.targets} metrics={loaded.metrics} canEdit={canEdit} result={result} />}

@@ -88,7 +88,13 @@ describe("permissions IAM-04.05 메뉴 숨김", () => {
   it("권한별 메뉴, 비밀번호 변경 필요 시 메뉴 없음, 경로별 필요 권한", () => {
     expect(visibleMenu(["DEV_READ"]).map((m) => m.key)).toEqual(["home", "spaces", "devices"]);
     expect(visibleMenu(["IAM_MANAGE", "AUDIT_READ", "OPS_MANAGE"]).map((m) => m.key)).toEqual(["home", "members", "roles", "security", "audit", "settings"]);
-    expect(visibleMenu(["IAM_MANAGE", "AUDIT_READ", "OPS_MANAGE", "DEV_READ", "TS_READ", "INGEST_READ", "FLOW_READ", "DEVICE_CONTROL", "SIM_READ"])).toHaveLength(MENU.length);
+    expect(visibleMenu(["IAM_MANAGE", "AUDIT_READ", "OPS_MANAGE", "DEV_READ", "TS_READ", "INGEST_READ", "FLOW_READ", "DEVICE_CONTROL", "SIM_READ", "ALARM_READ", "DEV_PLACE", "NOTIFY_CHANNEL_MANAGE"])).toHaveLength(MENU.length);
+    // M4: 규칙·알람(ALARM_READ, 모든 역할), 유지보수 일정(DEV_PLACE), 알림 채널(NOTIFY_CHANNEL_MANAGE)
+    expect(visibleMenu(["ALARM_READ"]).map((m) => m.key)).toEqual(["home", "alarms"]);
+    expect(requiredPermissionsFor("/rules/r-1")).toEqual(["RULE_READ"]);
+    expect(requiredPermissionsFor("/alarms/a-1")).toEqual(["ALARM_READ"]);
+    expect(requiredPermissionsFor("/alarms/stats")).toEqual(["RULE_READ"]);
+    expect(requiredPermissionsFor("/notifications/silences")).toEqual(["ALARM_HANDLE", "NOTIFY_POLICY_WRITE"]);
     // M3: 자동화(FLOW_READ)·제어(DEVICE_CONTROL)·가상 환경(SIM_READ)
     expect(visibleMenu(["FLOW_READ", "SIM_READ"]).map((m) => m.key)).toEqual(["home", "automation", "sim"]);
     expect(requiredPermissionsFor("/automation/flows/f-1")).toEqual(["FLOW_READ"]);

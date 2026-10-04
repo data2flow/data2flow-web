@@ -91,6 +91,12 @@ export const spacesHandler: CoreHandler = (core, { method, path, url, body, can 
   if (path === "/sites/summary" && method === "GET") {
     return ok(core.spaces.filter((s) => s.type === "SITE").map((s) => ({ siteId: s.id, name: s.name, lat: s.latitude ?? null, lng: s.longitude ?? null, devices: core.devices.filter((d) => d.status !== "PENDING").length, offline: core.devices.filter((d) => d.connectivity === "OFFLINE").length, openAlarms: 0, comfortScore: 82 })));
   }
+  if (path === "/sites/map" && method === "GET") {
+    // API-DSH-17: 사이트 상태(알람·오프라인·쾌적도 요약). core.extra.siteMapFails면 실패
+    if (core.extra.siteMapFails) return fail(503, "SERVICE_UNAVAILABLE");
+    const alarms = (core.extra.siteAlarms as Record<string, number> | undefined) ?? {};
+    return ok({ sites: core.spaces.filter((s) => s.type === "SITE").map((s) => ({ id: s.id, name: s.name, lat: s.latitude ?? null, lng: s.longitude ?? null, alarms: alarms[s.id] ?? 0, offlineDevices: core.devices.filter((d) => d.connectivity === "OFFLINE").length, comfortSummary: { NORMAL: 1, WARNING: 0 } })) });
+  }
   if (!path.startsWith("/spaces")) return undefined;
   const extra = spaceExtra(core);
   const writeDenied = () => fail(403, "PERMISSION_DENIED");
@@ -149,7 +155,8 @@ export const spacesHandler: CoreHandler = (core, { method, path, url, body, can 
       space: { id: space.id, name: space.name, type: space.type, path: core.spacePath(space.id), targetEnv: effectiveTargets(core, space.id).items },
       comfort: comfortOf(core, space.id),
       devices: devices.map((d) => ({ id: d.id, name: d.name, modelId: d.modelId, modelName: core.model(d.modelId)?.name ?? null, status: d.status, connection: d.connectivity, lastSeenAt: d.lastSeenAt, battery: d.battery ?? null, rssi: d.rssi ?? null, virtual: d.virtual, metrics: d.latest.map((l) => ({ key: l.metricKey, value: l.value, unit: l.unit, quality: l.quality, at: l.measuredAt })) })),
-      openAlarms: [],
+      // 열린 알람(M4, API-RUL-10 Alarm 모양). 테스트가 core.extra.spaceOpenAlarms[공간 ID]로 넣는다
+      openAlarms: ((core.extra.spaceOpenAlarms as Record<string, unknown[]> | undefined) ?? {})[space.id] ?? [],
       hasFloorplan: Boolean(extra.floorplans[space.id]),
       children: core.spaces.filter((c) => c.parentId === space.id).map((c) => ({ id: c.id, name: c.name, type: c.type, comfortState: comfortOf(core, c.id).state })),
     });

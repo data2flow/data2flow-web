@@ -6,11 +6,36 @@
     "quotaReached": "The organization limit (300) has been reached. Delete unused scripts first.",
     "empty": "There are no scripts yet. Start from a template",
     "noMatch": "No scripts match the filters",
-    "kind": { "label": "Kind", "DECODE": "DECODE", "TRANSFORM": "TRANSFORM" },
-    "status": { "label": "Status", "ENABLED": "Enabled", "DISABLED": "Disabled", "AUTO_DISABLED": "Auto-disabled", "checkFailed": "Check failed" },
+    "kind": {
+      "label": "Kind",
+      "DECODE": "DECODE",
+      "TRANSFORM": "TRANSFORM"
+    },
+    "status": {
+      "label": "Status",
+      "ENABLED": "Enabled",
+      "DISABLED": "Disabled",
+      "AUTO_DISABLED": "Auto-disabled",
+      "checkFailed": "Check failed"
+    },
     "keyword": "Search by name",
-    "col": { "name": "Name", "kind": "Kind", "targets": "Targets", "active": "Active", "draft": "DRAFT", "processed": "Processed 24h", "errorRate": "Error rate", "p95": "p95 (ms)", "lastDeploy": "Last deployed" },
-    "targets": { "sources": "{{n}} sources", "models": "{{n}} models", "devices": "{{n}} devices", "none": "Not bound" },
+    "col": {
+      "name": "Name",
+      "kind": "Kind",
+      "targets": "Targets",
+      "active": "Active",
+      "draft": "DRAFT",
+      "processed": "Processed 24h",
+      "errorRate": "Error rate",
+      "p95": "p95 (ms)",
+      "lastDeploy": "Last deployed"
+    },
+    "targets": {
+      "sources": "{{n}} sources",
+      "models": "{{n}} models",
+      "devices": "{{n}} devices",
+      "none": "Not bound"
+    },
     "hasDraft": "Saved DRAFT exists",
     "create": {
       "open": "New script",
@@ -49,7 +74,11 @@
       "tooLarge": "Code exceeds 64KB",
       "readOnly": "Read only. Only INTEGRATOR or above can edit and deploy.",
       "leaveWarning": "You have unsaved changes. Leave anyway?",
-      "tabs": { "code": "Code", "versions": "Versions" }
+      "tabs": {
+        "code": "Code",
+        "versions": "Versions",
+        "usage": "Usage"
+      }
     },
     "problems": {
       "title": "Problems",
@@ -94,7 +123,12 @@
       "context": "Context (ctx.device.attributes · ctx.last · ctx.config)",
       "run": "Run",
       "running": "Running…",
-      "tabs": { "output": "Output", "diff": "Diff", "logs": "Logs", "info": "Info" },
+      "tabs": {
+        "output": "Output",
+        "diff": "Diff",
+        "logs": "Logs",
+        "info": "Info"
+      },
       "timeout": "Timed out",
       "failed": "Runtime error",
       "duration": "Ran in {{ms}}ms",
@@ -116,6 +150,37 @@
       "view": "View code",
       "forced": "Forced",
       "empty": "No versions"
+    },
+    "usageTab": {
+      "title": "Where it is used",
+      "status": {
+        "ENABLED": "Enabled",
+        "DISABLED": "Disabled",
+        "AUTO_DISABLED": "Auto-disabled"
+      },
+      "enable": "Enable",
+      "disable": "Disable",
+      "delete": "Delete",
+      "deleteBlocked": "A script in use cannot be deleted. Remove its bindings and flow node references first.",
+      "noBindings": "No sources, models or devices use this script.",
+      "type": "Type",
+      "name": "Name",
+      "devices": "Devices",
+      "processed24h": "Processed (24h)",
+      "failurePolicy": "Failure policy",
+      "target": {
+        "SOURCE": "Source",
+        "MODEL": "Model",
+        "DEVICE": "Device"
+      },
+      "flowNodes": "Flow node references",
+      "noFlowNodes": "No flow nodes use this script.",
+      "disableTitle": "Disable script",
+      "disableImpact": "{{bindings}} bindings, {{devices}} devices and {{n}} messages per 24h will be processed without this script.",
+      "disableFlows": "{{n}} flow nodes also reference this script.",
+      "disableNote": "Skipped from the next message. You can enable it again at any time.",
+      "disabled": "Disabled. Affects {{devices}} devices and {{n}} messages per 24h.",
+      "enabled": "Enabled."
     }
   },
   "errors": {

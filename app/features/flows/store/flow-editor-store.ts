@@ -167,3 +167,17 @@ export function applyBlockReason(state: EditorState, validation: ValidationResul
   if (validation.errors.length > 0) return "errors";
   return null;
 }
+
+/** 실행 중 즉시 변경(overlay, FLW-06.04, BR-FLW-10): 바이패스·디버그 목록만 바꾼다. 정의·버전·저장 상태는 그대로다(TC-FLW-147) */
+export interface Overlay {
+  bypass: string[];
+  debug: string[];
+  revision: number;
+}
+
+export function toggleOverlay(overlay: Overlay, kind: "bypass" | "debug", nodeId: string, on: boolean): Overlay {
+  const list = new Set(overlay[kind]);
+  if (on) list.add(nodeId);
+  else list.delete(nodeId);
+  return { ...overlay, [kind]: [...list] };
+}

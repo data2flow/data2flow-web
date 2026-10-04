@@ -21,13 +21,37 @@ describe("TC-IAM-008 AT-IAM-01.1 상단 메뉴(IAM-04.05 보조 숨김)", () => 
     const { unmount } = await renderRoute(<AppShell me={meOf("ADMIN")}>본문</AppShell>, { session: meOf("ADMIN") });
     await screen.findByText("본문");
     const links = screen.getByRole("navigation", { name: "주 메뉴" }).querySelectorAll("a");
-    expect([...links].map((a) => a.getAttribute("href"))).toEqual(["/", "/spaces", "/devices", "/explore", "/ingest/monitor", "/automation/flows", "/control/commands", "/sim", "/admin/members", "/admin/roles", "/admin/security", "/admin/audit", "/admin/settings"]);
+    expect([...links].map((a) => a.getAttribute("href"))).toEqual(["/", "/spaces", "/devices", "/explore", "/ingest/monitor", "/alarms", "/automation/flows", "/control/commands", "/sim", "/admin/members", "/admin/roles", "/admin/security", "/admin/audit", "/admin/settings", "/admin/maintenance", "/admin/channels"]);
     expect(screen.getByRole("link", { name: "김운영" })).toHaveAttribute("href", "/me");
     unmount();
     await renderRoute(<AppShell me={meOf("OPERATOR")}>본문</AppShell>, { session: meOf("OPERATOR") });
     await screen.findByText("본문");
-    expect(screen.getByRole("navigation", { name: "주 메뉴" }).querySelectorAll("a")).toHaveLength(8);
+    expect(screen.getByRole("navigation", { name: "주 메뉴" }).querySelectorAll("a")).toHaveLength(10);
     expect(document.querySelector('input[name="_csrf"]')).toHaveValue("csrf-test-token");
+  });
+});
+
+describe("ACT-06.03 UI-ACT-07 헤더 동작·전역 띠 자리(00-navigation §1.3)", () => {
+  it("헤더 동작(⏻)과 띠는 메뉴가 열린 사용자에게만, 임시 비밀번호 상태에서는 숨긴다", async () => {
+    const { unmount } = await renderRoute(
+      <AppShell me={meOf("OPERATOR")} headerActions={<button type="button">⏻ 비상</button>} bands={<div role="alert">비상 정지 중</div>}>
+        본문
+      </AppShell>,
+      { session: meOf("OPERATOR") },
+    );
+    await screen.findByText("본문");
+    expect(screen.getByRole("button", { name: "⏻ 비상" })).toBeInTheDocument();
+    expect(screen.getByRole("alert")).toHaveTextContent("비상 정지 중");
+    unmount();
+    await renderRoute(
+      <AppShell me={meOf("OPERATOR", { mustChangePassword: true })} headerActions={<button type="button">⏻ 비상</button>} bands={<div role="alert">비상 정지 중</div>}>
+        본문
+      </AppShell>,
+      { session: meOf("OPERATOR") },
+    );
+    await screen.findByText("본문");
+    expect(screen.queryByRole("button", { name: "⏻ 비상" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
   });
 });
 

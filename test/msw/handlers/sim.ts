@@ -314,6 +314,31 @@ export const simHandler: CoreHandler = async (core, req) => {
     const category = url.searchParams.get("category");
     return ok({ types: state.types.filter((t) => !category || t.category === category), kits: state.kits });
   }
+  // 사용자 정의 유형(API-SIM-03, SIM-09.06): 이름 중복 409, 사용 중 삭제 SIM_TYPE_IN_USE, PUT은 baseVersion
+  if (path === "/sim/types" && method === "POST") {
+    if (need("SIM_MANAGE")) return denied();
+    const input = body as Partial<SimType> & { name: string };
+    if (state.types.some((t) => t.name === input.name)) return fail(409, "SIM_TYPE_DUPLICATED");
+    const typeId = String(900 + state.types.length);
+    const type = { ...(input as SimType), id: typeId, key: `custom-${typeId}`, builtin: false, version: 1 } as SimType & { version: number };
+    state.types.push(type);
+    return ok({ ...type, typeId }, 201);
+  }
+  const typeMatch = /^\/sim\/types\/([^/]+)$/.exec(path);
+  if (typeMatch && (method === "PUT" || method === "DELETE")) {
+    if (need("SIM_MANAGE")) return denied();
+    const type = state.types.find((t) => t.id === typeMatch[1]) as (SimType & { version?: number }) | undefined;
+    if (!type || type.builtin) return fail(404, "SIM_NOT_FOUND");
+    if (method === "DELETE") {
+      if (state.devices.some((d) => d.typeId === type.id)) return fail(409, "SIM_TYPE_IN_USE");
+      state.types.splice(state.types.indexOf(type), 1);
+      return noContent();
+    }
+    const input = body as Partial<SimType> & { baseVersion?: number };
+    if (input.baseVersion !== (type.version ?? 1)) return fail(409, "VERSION_CONFLICT");
+    Object.assign(type, input, { version: (type.version ?? 1) + 1 });
+    return ok({ ...type, typeId: type.id });
+  }
 
   // 프로필(API-SIM-08)
   if (path === "/sim/profiles") {
@@ -598,6 +623,16 @@ export const simHandler: CoreHandler = async (core, req) => {
   }
   if (path === "/sim/replays" && method === "POST") {
     if (need("SIM_RUN")) return denied();
+    const raw = body.source as { type?: string; deviceIds?: string[] };
+    if (raw?.type === "RAW") {
+      // 보관된 원본 재생(SIM-06.01): 기기당 1,440건(하루 1분 주기)으로 흉내 낸다
+      const devices = raw.deviceIds?.length ? raw.deviceIds : core.devices.filter((d) => !d.virtual).map((d) => d.id);
+      const total = devices.length * 1440;
+      if (url.searchParams.get("dryRun") === "true") return ok({ total, byDevice: Object.fromEntries(devices.map((id) => [id, 1440])) });
+      const runId = core.nextId();
+      state.runs.push({ runId, kind: "REPLAY", status: "RUNNING", scenarioId: null, accelerationRequested: Number(body.acceleration), accelerationEffective: Number(body.acceleration), throttled: false, simClock: "2026-10-04T00:00:00Z", startedAt: "2026-10-04T00:00:00Z", elapsedSec: 0, progressPct: 0, seed: 1, expectations: [], lastEvents: [] });
+      return ok({ runId, total, clones: devices.map((id) => ({ originalDeviceId: id, cloneDeviceId: `c-${id}`, name: `${id} [재생]` })) }, 201);
+    }
     const source = body.source as { fileId: string; columnMapping: { metrics: Record<string, string> } };
     const file = state.files.get(source?.fileId);
     if (!file) return fail(400, "SIM_IMPORT_INVALID");

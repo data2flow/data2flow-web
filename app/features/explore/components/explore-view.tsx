@@ -18,6 +18,7 @@ import { AddSeriesDialog, type FetchJson } from "./add-series-dialog";
 import { AnnotationForm, AnnotationList, AnnotationToggles } from "./annotations";
 import { SeriesPanel } from "./series-panel";
 import { Toolbar } from "./toolbar";
+import { RuleFromChart } from "~/features/rules/components/rule-from-chart";
 
 export interface ExploreViewProps {
   data: ExploreData;
@@ -124,6 +125,7 @@ export function ExploreView({ data, onNavigate, loading, actionResult, fetchJson
             ) : (
               <TimeseriesChart series={visibleSeries} timezone={data.timezone} annotations={data.annotations} loading={loading} factory={chartFactory} title={t("explore.title")} />
             )}
+            <RuleFromChart series={state.series} />
           </Card>
           <Card>
             <div className="flex flex-col gap-2">

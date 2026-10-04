@@ -67,7 +67,8 @@
       "props": "속성",
       "targets": "목표 환경",
       "schedule": "운영 시간",
-      "floorplan": "평면도"
+      "floorplan": "평면도",
+      "alarms": "알람"
     },
     "targets": {
       "inherit": "상위 값 사용",
@@ -155,6 +156,30 @@
       "title": "첫 사이트를 만들어 시작하세요",
       "body": "사이트 → 건물 → 층 → 실 순서로 공간을 만들고 기기를 배치합니다.",
       "askAdmin": "공간은 관리자(INTEGRATOR 이상)가 만들 수 있습니다. 관리자에게 요청하세요."
+    },
+    "alarms": {
+      "empty": "이 공간에 열린 알람이 없습니다.",
+      "failed": "알람을 불러오지 못했습니다.",
+      "openList": "알람 목록에서 보기",
+      "severityCol": "심각도",
+      "title": "알람",
+      "device": "기기",
+      "status": "상태",
+      "raisedAt": "발생 시각",
+      "flapping": "반복 발생",
+      "openN": "알람 {{n}}",
+      "severity": {
+        "CRITICAL": "위험",
+        "MAJOR": "주요",
+        "MINOR": "경미",
+        "WARNING": "주의",
+        "INFO": "정보"
+      },
+      "state": {
+        "ACTIVE": "발생",
+        "ACKNOWLEDGED": "확인됨",
+        "SUPPRESSED": "억제됨"
+      }
     }
   },
   "sites": {
@@ -163,7 +188,23 @@
     "goSpaces": "공간 화면에서 사이트 만들기",
     "stats": "기기 {{devices}} · 오프라인 {{offline}} · 알람 {{alarms}}",
     "comfort": "쾌적 {{score}}",
-    "noLocation": "위치 정보 없음"
+    "noLocation": "위치 정보 없음",
+    "enter": "들어가기",
+    "mapStats": "오프라인 {{offline}} · 알람 {{alarms}}",
+    "comfortSummary": "공간 쾌적도: {{summary}}",
+    "status": {
+      "ALARM": "열린 알람 있음",
+      "OFFLINE": "오프라인 기기 있음",
+      "OK": "정상"
+    },
+    "mapLabel": "사이트 지도",
+    "noLocations": "위치 정보가 있는 사이트가 없어 목록으로 보여 줍니다.",
+    "missingLocation": "위치 없음 {{n}}곳(목록에만 표시)",
+    "viewToggle": "보기 방식",
+    "view": {
+      "map": "지도",
+      "list": "목록"
+    }
   },
   "errors": {
     "SPACE_DEPTH_EXCEEDED": "공간 계층은 6단계까지 만들 수 있습니다.",

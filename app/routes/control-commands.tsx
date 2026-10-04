@@ -7,6 +7,7 @@ import { useRouteLoaderData, useSearchParams } from "react-router";
 import { callList } from "~/bff/api.server";
 import { bff } from "~/bff/middleware.server";
 import { Card, PageHeader } from "~/components/ui";
+import { ControlAreaTabs } from "~/features/control/area-tabs";
 import { CommandHistory, HistoryFilters } from "~/features/control/command-history";
 import { historyQuery, type Command } from "~/features/control/model/control";
 import { hasAny } from "~/lib/permissions";
@@ -36,6 +37,7 @@ export default function ControlCommands({ loaderData }: Route.ComponentProps) {
   return (
     <>
       <PageHeader crumb={t("nav.control")} title={t("control.history.title")} />
+      <ControlAreaTabs current="commands" permissions={root?.me?.permissions} />
       <Card>
         <HistoryFilters hidden={spaceId ? { spaceId } : {}} />
         <CommandHistory

@@ -39,6 +39,7 @@ export default function FlowNewPage({ loaderData }: Route.ComponentProps) {
         canWrite={hasAny(permissions, ["FLOW_WRITE"])}
         canDeployControl={hasAny(permissions, ["FLOW_DEPLOY_CONTROL"])}
         timezone={root?.timezone ?? "Asia/Seoul"}
+        me={root?.me ? { userId: root.me.id, name: root.me.name ?? root.me.loginId } : undefined}
         api={flowApi}
         onCreated={(flowId) => navigate(`/automation/flows/${encodeURIComponent(flowId)}`, { replace: true })}
         onReload={() => undefined}

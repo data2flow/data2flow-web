@@ -102,7 +102,7 @@ function detail(core: CoreState, s: FakeScript) {
     draft: s.draft,
     versions: versions.map((v) => ({ versionId: v.versionId, versionNo: v.versionNo, status: v.status, savedBy: v.savedBy, savedAt: v.savedAt, deployMemo: v.deployMemo ?? null, deployedBy: v.deployedBy ?? null, deployedAt: v.deployedAt ?? null, staticCheck: v.staticCheck, forced: Boolean(v.forced) })),
     bindings: s.bindings,
-    usage: { bindings: s.bindings.map((b) => ({ ...b, deviceCount: 3, processed24h: 17280 })), flowNodes: [] },
+    usage: { bindings: s.bindings.map((b) => ({ ...b, deviceCount: 3, processed24h: 17280 })), flowNodes: ((core.extra.scriptFlowNodes as Record<string, unknown[]> | undefined) ?? {})[s.id] ?? [] },
     config: { tempOffset: -0.5 },
     version: s.version,
   };
@@ -190,10 +190,18 @@ export const scriptsHandler: CoreHandler = (core, { method, path, url, body, can
     script.version += 1;
     return ok(detail(core, script));
   }
+  if ((rest === "/disable" || rest === "/enable") && method === "POST") {
+    // API-SCR-17 활성·비활성 전환(SCR-04.04)
+    const denied = write();
+    if (denied) return denied;
+    script.status = rest === "/disable" ? "DISABLED" : "ENABLED";
+    script.version += 1;
+    return ok(rest === "/disable" ? { id: script.id, status: script.status, version: script.version, impact: { bindings: script.bindings.length, deviceCount: script.bindings.length * 3, processed24h: script.bindings.length * 17280 } } : { id: script.id, status: script.status, version: script.version });
+  }
   if (rest === "" && method === "DELETE") {
     const denied = write();
     if (denied) return denied;
-    if (script.activeVersion) return fail(409, "SCRIPT_IN_USE");
+    if (script.activeVersion || script.bindings.length > 0) return fail(409, "SCRIPT_IN_USE");
     core.scripts.splice(core.scripts.indexOf(script), 1);
     return noContent();
   }

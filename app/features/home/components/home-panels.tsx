@@ -9,11 +9,11 @@ import { LiveBanner, useLiveStream, type UseLiveStreamOptions } from "~/componen
 import { Badge, Card, Table, Term } from "~/components/ui";
 import { liveUrl } from "~/lib/event-stream";
 import { formatDateTime, formatNumber } from "~/lib/format";
-import { causeText, comfortTone, mergeSummary, topComfort, totalAlarms, type HomeSummary } from "../model/home";
+import { causeText, comfortTone, mergeSummary, severityParts, timelineIcon, timelineLink, topComfort, totalAlarms, type HomeSummary } from "../model/home";
 
 function SummaryCard({ label, value, to }: { label: string; value: ReactNode; to?: string }) {
   const body = (
-    <div className="rounded-lg border border-line bg-panel px-4 py-3">
+    <div className="min-h-[44px] rounded-lg border border-line bg-panel px-4 py-3">
       <p className="text-[10.5px] font-semibold uppercase tracking-wide text-muted">{label}</p>
       <p className="mt-1 text-[22px] font-semibold">{value}</p>
     </div>
@@ -27,12 +27,32 @@ function SummaryCard({ label, value, to }: { label: string; value: ReactNode; to
   );
 }
 
-export function SummaryCards({ summary, lang }: { summary: HomeSummary; lang: string }) {
+/** 열린 알람 카드 값: 합계와 심각도별 기호·수(▲1 !3 ·2), 글자 설명은 화면 읽기 도구용(BR-DSH-02, AT-DSH-01.1) */
+function AlarmValue({ summary }: { summary: HomeSummary }) {
   const { t } = useTranslation();
   const a = summary.alarms ?? {};
+  const parts = severityParts(summary);
   return (
-    <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-5">
-      <SummaryCard label={t("home.cards.alarms")} value={<span title={t("home.cards.alarmsDetail", { critical: a.critical ?? 0, major: a.major ?? 0, minor: a.minor ?? 0 })}>{totalAlarms(summary)}</span>} />
+    <span className="flex flex-wrap items-baseline gap-x-3 gap-y-1" title={t("home.cards.alarmsDetail", { critical: a.critical ?? 0, major: a.major ?? 0, minor: a.minor ?? 0 })}>
+      <span>{totalAlarms(summary)}</span>
+      <span className="flex flex-wrap gap-2 text-[13px] font-normal">
+        {parts.map((p) => (
+          <span key={p.key} data-severity={p.key} className={p.key === "critical" ? "text-bad" : p.key === "major" ? "text-warn" : "text-muted"}>
+            <span aria-hidden>{p.icon}</span>
+            {p.count}
+            <span className="sr-only">{` ${t(`home.severity.${p.key}`)}`}</span>
+          </span>
+        ))}
+      </span>
+    </span>
+  );
+}
+
+export function SummaryCards({ summary, lang }: { summary: HomeSummary; lang: string }) {
+  const { t } = useTranslation();
+  return (
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+      <SummaryCard label={t("home.cards.alarms")} value={<AlarmValue summary={summary} />} to="/alarms?state=ACTIVE" />
       <SummaryCard label={t("home.cards.offline")} value={t("home.cards.devicesN", { n: summary.offlineDevices ?? 0 })} to="/devices?connectivity=OFFLINE" />
       {summary.pendingDevices !== undefined && summary.pendingDevices !== null && <SummaryCard label={t("home.cards.pending")} value={t("home.cards.devicesN", { n: summary.pendingDevices })} to="/devices/pending" />}
       <SummaryCard label={t("home.cards.ingest")} value={t("home.cards.perMinute", { n: formatNumber(summary.ingestPerMinute ?? 0, lang) })} to="/ingest/monitor" />
@@ -95,18 +115,19 @@ export function Timeline({ summary, timezone, lang }: { summary: HomeSummary; ti
       {items.length === 0 ? (
         <p className="text-[13px] text-muted">{t("home.timeline.empty")}</p>
       ) : (
-        <ul className="flex flex-col gap-1.5 text-[13px]">
+        <ul className="flex flex-col gap-1.5 text-[13px]" aria-live="polite">
           {items.slice(0, 20).map((item, index) => (
-            <li key={`${item.at}-${index}`} className="flex gap-2">
+            <li key={`${item.at}-${index}`} className="flex flex-wrap items-baseline gap-x-2" data-timeline={item.type}>
               <span className="font-mono text-[12px] text-muted">{formatDateTime(item.at, timezone, lang)}</span>
-              <span>{t(`home.timeline.type.${item.type}`, { defaultValue: item.type })}</span>
-              {item.link ? (
-                <Link to={item.link} className="text-accent hover:underline">
-                  {item.title}
-                </Link>
-              ) : (
-                <span>{item.title}</span>
-              )}
+              <span className={item.type === "ALARM_RAISED" ? "text-bad" : item.type === "ALARM_CLEARED" ? "text-good" : "text-accent"} aria-hidden>
+                {timelineIcon(item.type)}
+              </span>
+              <span className="sr-only">{t(`home.timeline.type.${item.type}`, { defaultValue: item.type })}</span>
+              <Link to={timelineLink(item)} className="min-w-0 break-words text-accent hover:underline">
+                {item.title}
+              </Link>
+              {item.severity && <span className="text-[12px] text-muted">{t(`home.severity.${item.severity.toLowerCase()}`, { defaultValue: item.severity })}</span>}
+              {item.type === "CONTROL" && item.origin && <span className="text-[12px] text-muted">{t(`home.timeline.origin.${item.origin}`, { defaultValue: item.origin })}</span>}
             </li>
           ))}
         </ul>
@@ -124,11 +145,29 @@ export function LiveHome({ initial, timezone, lang, streamOptions }: { initial: 
     <div className="flex flex-col gap-4">
       <LiveBanner status={status} />
       <SummaryCards summary={summary} lang={lang} />
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid min-w-0 gap-4 lg:grid-cols-2">
         <ComfortTable summary={summary} timezone={timezone} lang={lang} />
         <Timeline summary={summary} timezone={timezone} lang={lang} />
       </div>
-      {summary.aiSummary?.text && <Card>{summary.aiSummary.text}</Card>}
+      {summary.aiSummary?.text && <AiSummary summary={summary.aiSummary} />}
     </div>
+  );
+}
+
+/** AI 요약(일간 리포트 첫 문장 + [리포트 보기]). 없으면 영역을 그리지 않는다(AT-DSH-01.4) */
+function AiSummary({ summary }: { summary: { text: string; reportId?: string } }) {
+  const { t } = useTranslation();
+  return (
+    <Card>
+      <p className="text-[13px]">
+        <span aria-hidden>✨ </span>
+        {summary.text}
+        {summary.reportId && (
+          <Link className="ml-2 text-accent hover:underline" to={`/reports/${encodeURIComponent(summary.reportId)}`}>
+            {t("home.aiReport")}
+          </Link>
+        )}
+      </p>
+    </Card>
   );
 }

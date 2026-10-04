@@ -2,7 +2,7 @@
  * 홈 요약(DSH-01.02)·즐겨찾기(DSH-07.05) 도우미.
  */
 import { describe, expect, it } from "vitest";
-import { causeText, comfortTone, isEmptyOrganization, isFavorite, mergeSummary, toggleFavorite, topComfort, totalAlarms } from "../model/home";
+import { causeText, comfortTone, isEmptyOrganization, isFavorite, mergeSummary, mergeTimeline, severityParts, timelineIcon, timelineLink, toggleFavorite, topComfort, totalAlarms } from "../model/home";
 
 describe("TC-DSH-007 공간 쾌적도 목록", () => {
   it("나쁜 상태부터 상위 10개 + 외 N곳", () => {
@@ -53,5 +53,29 @@ describe("TC-DSH-079 즐겨찾기", () => {
     expect(toggleFavorite(on, { type: "SPACE", id: "31" })).toEqual([{ type: "DEVICE", id: "1042" }]);
     expect(toggleFavorite(undefined, { type: "SPACE", id: "1" })).toHaveLength(1);
     expect(isFavorite(undefined, "SPACE", "1")).toBe(false);
+  });
+});
+
+describe("[DSH-01.03] 타임라인 합치기", () => {
+  it("TC-DSH-009 새 항목을 위에, 같은 항목은 한 번, 시각 내림차순 20건", () => {
+    const old = Array.from({ length: 20 }, (_, i) => ({ type: "CONTROL", at: new Date(Date.UTC(2026, 0, 1, 0, i)).toISOString(), title: `c${i}` }));
+    const merged = mergeTimeline(old, [{ type: "ALARM_RAISED", at: "2026-01-01T01:00:00Z", title: "new" }, old[19]]);
+    expect(merged).toHaveLength(20);
+    expect(merged[0].title).toBe("new");
+    expect(merged.filter((m) => m.title === "c19")).toHaveLength(1);
+    expect(merged.some((m) => m.title === "c0")).toBe(false);
+    expect(mergeTimeline(undefined, undefined)).toEqual([]);
+    expect(mergeSummary({ timeline: old }, { timeline: [] }).timeline).toHaveLength(20);
+  });
+
+  it("기호·링크·심각도 표시", () => {
+    expect(timelineIcon("ALARM_RAISED")).toBe("▲");
+    expect(timelineIcon("ALARM_CLEARED")).toBe("✔");
+    expect(timelineIcon("CONTROL")).toBe("⚙");
+    expect(timelineIcon("X")).toBe("•");
+    expect(timelineLink({ type: "CONTROL", at: "", title: "" })).toBe("/control/commands");
+    expect(timelineLink({ type: "ALARM_RAISED", at: "", title: "", link: "/alarms/3" })).toBe("/alarms/3");
+    expect(timelineLink({ type: "ALARM_RAISED", at: "", title: "", link: "//evil" })).toBe("/alarms");
+    expect(severityParts({ alarms: { critical: 1, major: 3, warning: 2 } }).map((p) => `${p.icon}${p.count}`)).toEqual(["▲1", "!3", "·0", "△2"]);
   });
 });

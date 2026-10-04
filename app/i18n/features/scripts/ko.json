@@ -6,11 +6,36 @@
     "quotaReached": "조직 한도(300개)에 도달했습니다. 쓰지 않는 스크립트를 지운 뒤 만드세요.",
     "empty": "아직 스크립트가 없습니다. 템플릿으로 시작해 보세요",
     "noMatch": "조건에 맞는 스크립트가 없습니다",
-    "kind": { "label": "종류", "DECODE": "DECODE", "TRANSFORM": "TRANSFORM" },
-    "status": { "label": "상태", "ENABLED": "활성", "DISABLED": "비활성", "AUTO_DISABLED": "자동 비활성", "checkFailed": "검사 실패" },
+    "kind": {
+      "label": "종류",
+      "DECODE": "DECODE",
+      "TRANSFORM": "TRANSFORM"
+    },
+    "status": {
+      "label": "상태",
+      "ENABLED": "활성",
+      "DISABLED": "비활성",
+      "AUTO_DISABLED": "자동 비활성",
+      "checkFailed": "검사 실패"
+    },
     "keyword": "이름 검색",
-    "col": { "name": "이름", "kind": "종류", "targets": "대상", "active": "활성 버전", "draft": "DRAFT", "processed": "24h 처리", "errorRate": "오류율", "p95": "p95(ms)", "lastDeploy": "마지막 배포" },
-    "targets": { "sources": "소스 {{n}}", "models": "모델 {{n}}", "devices": "기기 {{n}}", "none": "연결 없음" },
+    "col": {
+      "name": "이름",
+      "kind": "종류",
+      "targets": "대상",
+      "active": "활성 버전",
+      "draft": "DRAFT",
+      "processed": "24h 처리",
+      "errorRate": "오류율",
+      "p95": "p95(ms)",
+      "lastDeploy": "마지막 배포"
+    },
+    "targets": {
+      "sources": "소스 {{n}}",
+      "models": "모델 {{n}}",
+      "devices": "기기 {{n}}",
+      "none": "연결 없음"
+    },
     "hasDraft": "저장된 DRAFT 있음",
     "create": {
       "open": "새 스크립트",
@@ -49,7 +74,11 @@
       "tooLarge": "코드가 64KB를 넘었습니다",
       "readOnly": "조회 전용입니다. 작성·배포는 INTEGRATOR 이상만 할 수 있습니다.",
       "leaveWarning": "저장하지 않은 변경이 있습니다. 떠나시겠습니까?",
-      "tabs": { "code": "코드", "versions": "버전" }
+      "tabs": {
+        "code": "코드",
+        "versions": "버전",
+        "usage": "사용처"
+      }
     },
     "problems": {
       "title": "문제",
@@ -94,7 +123,12 @@
       "context": "컨텍스트(ctx.device.attributes · ctx.last · ctx.config)",
       "run": "실행",
       "running": "실행 중…",
-      "tabs": { "output": "출력", "diff": "차이", "logs": "로그", "info": "정보" },
+      "tabs": {
+        "output": "출력",
+        "diff": "차이",
+        "logs": "로그",
+        "info": "정보"
+      },
       "timeout": "시간 초과",
       "failed": "실행 오류",
       "duration": "실행 {{ms}}ms",
@@ -116,6 +150,37 @@
       "view": "코드 보기",
       "forced": "강제",
       "empty": "버전이 없습니다"
+    },
+    "usageTab": {
+      "title": "사용처",
+      "status": {
+        "ENABLED": "활성",
+        "DISABLED": "비활성",
+        "AUTO_DISABLED": "자동 비활성"
+      },
+      "enable": "활성화",
+      "disable": "비활성화",
+      "delete": "삭제",
+      "deleteBlocked": "사용 중인 스크립트는 지울 수 없습니다. 연결 대상과 플로우 노드 참조를 먼저 해제하세요.",
+      "noBindings": "연결된 소스·모델·기기가 없습니다.",
+      "type": "유형",
+      "name": "이름",
+      "devices": "기기",
+      "processed24h": "24시간 처리",
+      "failurePolicy": "실패 정책",
+      "target": {
+        "SOURCE": "소스",
+        "MODEL": "모델",
+        "DEVICE": "기기"
+      },
+      "flowNodes": "플로우 노드 참조",
+      "noFlowNodes": "이 스크립트를 쓰는 플로우 노드가 없습니다.",
+      "disableTitle": "스크립트 비활성화",
+      "disableImpact": "연결 {{bindings}}곳, 기기 {{devices}}대, 24시간 {{n}}건이 이 스크립트 없이 처리됩니다.",
+      "disableFlows": "플로우 노드 {{n}}곳도 이 스크립트를 참조합니다.",
+      "disableNote": "다음 메시지부터 건너뜁니다. 언제든 다시 활성화할 수 있습니다.",
+      "disabled": "비활성화했습니다. 기기 {{devices}}대, 24시간 {{n}}건에 영향이 있습니다.",
+      "enabled": "활성화했습니다."
     }
   },
   "errors": {

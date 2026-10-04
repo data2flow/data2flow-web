@@ -67,7 +67,8 @@
       "pending": "承認待ち",
       "models": "デバイスモデル",
       "metrics": "測定項目",
-      "groups": "グループ"
+      "groups": "グループ",
+      "jobs": "一括作業"
     },
     "tabs": {
       "overview": "概要",
@@ -75,7 +76,9 @@
       "raw": "生メッセージ",
       "history": "変更履歴",
       "semantic": "セマンティック",
-      "credentials": "認証情報"
+      "credentials": "認証情報",
+      "rules": "ルール・アラーム",
+      "operation": "稼働"
     },
     "overview": {
       "title": "現在の状態"
@@ -88,7 +91,8 @@
       "decodeOk": "デコード",
       "rulesApplied": "ルール",
       "done": "完了",
-      "todo": "未完了"
+      "todo": "未完了",
+      "fix": "対応する"
     },
     "data": {
       "title": "測定データ",
@@ -117,7 +121,23 @@
       "at": "時刻",
       "actor": "誰が",
       "action": "何を",
-      "changes": "変更"
+      "changes": "変更",
+      "unavailable": "変更履歴を読み込めませんでした",
+      "actions": {
+        "CREATED": "登録",
+        "UPDATED": "更新",
+        "APPROVED": "承認",
+        "MOVED": "空間移動",
+        "ACTIVATED": "有効化",
+        "DEACTIVATED": "無効化",
+        "REPLACED": "交換",
+        "TAGGED": "タグ変更",
+        "TAGS_CHANGED": "タグ変更",
+        "ATTRIBUTE_CHANGED": "属性変更",
+        "IMPORTED": "インポート",
+        "REJECTED": "却下",
+        "DELETED": "削除"
+      }
     },
     "semantic": {
       "title": "セマンティック",
@@ -203,7 +223,116 @@
       "intervalRange": "10〜86,400秒で入力してください",
       "multiplierRange": "倍数は1.5〜10で入力してください",
       "fileRequired": "CSVファイルを選んでください"
-    }
+    },
+    "jobs": {
+      "title": "一括作業",
+      "fromSelection": "一括作業",
+      "new": "新しい一括作業",
+      "empty": "一括作業がありません",
+      "wizard": "一括作業ウィザード",
+      "step1": "1. 対象",
+      "step2": "2. 作業と値",
+      "step3": "3. プレビュー",
+      "targetKind": "対象",
+      "targetDevices": "選択したデバイス {{n}}台",
+      "targetGroup": "グループ",
+      "group": "グループ",
+      "chooseGroup": "グループを選択",
+      "targetEmpty": "対象デバイスを選択してください",
+      "targetLimit": "一度に実行できるのは5,000台までです",
+      "concurrentLimit": "実行中の作業が終わってから再試行してください",
+      "type": "作業種別",
+      "types": {
+        "SET_MODEL": "モデル変更",
+        "SET_SPACE": "空間移動",
+        "SET_STATUS": "有効・無効",
+        "ADD_TAGS": "タグ追加",
+        "REMOVE_TAGS": "タグ削除",
+        "SET_ATTRIBUTES": "属性設定",
+        "SEND_COMMAND": "コマンド送信"
+      },
+      "attrScope": "属性の種類",
+      "attributes": "属性(JSON)",
+      "capability": "機能",
+      "command": "コマンド",
+      "args": "引数(JSON)",
+      "valueRequired": "値を入力してください",
+      "jsonRequired": "JSONオブジェクトで入力してください",
+      "preview": "プレビュー",
+      "previewFirst": "実行前にプレビューで対象数と例を確認してください",
+      "previewSummary": "対象 {{n}}台 · {{type}}",
+      "denied": "権限外のデバイス {{n}}台は失敗になります",
+      "run": "実行",
+      "detailTitle": "#{{id}} {{type}}",
+      "progress": "進捗",
+      "progressLine": "成功 {{succeeded}} · 失敗 {{failed}} / {{total}}",
+      "retryOf": "#{{id}} の失敗分の再実行",
+      "failedOnly": "失敗のみ表示",
+      "retryFailed": "失敗分を再実行",
+      "noItems": "表示するデバイスがありません",
+      "error": "エラー",
+      "finishedAt": "終了時刻",
+      "createdBy": "開始者",
+      "createdAt": "時刻",
+      "statuses": {
+        "QUEUED": "待機",
+        "RUNNING": "実行中",
+        "COMPLETED": "完了",
+        "PARTIALLY_FAILED": "一部失敗",
+        "FAILED": "失敗",
+        "CANCELLED": "キャンセル"
+      },
+      "itemStatuses": {
+        "PENDING": "待機",
+        "SUCCEEDED": "成功",
+        "FAILED": "失敗",
+        "SKIPPED": "スキップ"
+      }
+    },
+    "controlButton": "制御",
+    "rules": {
+      "openAlarms": "未解決アラーム {{n}}件",
+      "alarmsUnavailable": "アラームを読み込めませんでした",
+      "noAlarms": "未解決のアラームはありません",
+      "severity": "重大度",
+      "alarm": "アラーム",
+      "alarmStatus": "状態",
+      "raisedAt": "発生",
+      "applied": "このデバイスに適用されるルール {{n}}件",
+      "applyTemplate": "ルールテンプレートを適用",
+      "rulesUnavailable": "ルールを読み込めませんでした",
+      "noRules": "適用されるルールはありません",
+      "rule": "ルール",
+      "condition": "条件",
+      "via": "適用経路",
+      "viaKind": {
+        "DEVICE": "直接",
+        "SPACE": "空間経由",
+        "MODEL": "モデル経由",
+        "TAG": "タグ経由"
+      },
+      "ruleStatus": "ルール状態",
+      "severities": {
+        "CRITICAL": "重大",
+        "MAJOR": "主要",
+        "MINOR": "軽微",
+        "WARNING": "注意",
+        "INFO": "情報"
+      },
+      "alarmStatuses": {
+        "ACTIVE": "発生中",
+        "ACKNOWLEDGED": "確認済み",
+        "SUPPRESSED": "抑制",
+        "CLEARED": "解除"
+      },
+      "ruleStatuses": {
+        "ACTIVE": "動作中",
+        "INACTIVE": "オフ",
+        "ERROR": "エラー",
+        "DRAFT": "下書き"
+      }
+    },
+    "commandBands": "コマンド区間帯"
   },
   "errors": {
     "DEVICE_DUPLICATE": "同じ外部IDのデバイスがすでにあります",
@@ -214,6 +343,9 @@
     "DEVICE_TAG_LIMIT": "タグはデバイスごとに20個までです",
     "DEVICE_IN_USE": "他で使用中のため削除できません。",
     "DEVICE_IMPORT_TOO_LARGE": "CSVファイルは5MB以下にしてください。",
-    "SEMANTIC_TAG_UNKNOWN": "不明なセマンティックタグです。"
+    "SEMANTIC_TAG_UNKNOWN": "不明なセマンティックタグです。",
+    "JOB_LIMIT_EXCEEDED": "実行中の作業が終わってから再試行してください",
+    "JOB_NOT_FOUND": "作業が見つかりません",
+    "JOB_STATE_CONFLICT": "現在の状態ではできません"
   }
 }

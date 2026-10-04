@@ -134,6 +134,23 @@ describe("UI-DSH-02 공간 보기(DSH-01.02, DSH-07.05)", () => {
     expect(sent("PUT", "/api/v1/core/accounts/me/preferences")[1].body).toEqual({ favorites: [], baseVersion: 2 });
   });
 
+  it("[DSH-02.01][AT-DSH-02.1] TC-DSH-013 기기 카드에 열린 알람 배지, 알람 탭은 하위 포함 열린 알람(API-RUL-10 spaceId)", async () => {
+    app.gateway.m2.extra.spaceOpenAlarms = { "31": [{ id: "9", severity: "CRITICAL", status: "ACTIVE", title: "실습실 고CO2", device: { id: "1042", name: "AM107-067999" }, space: { id: "31", path: "본관 › 3층 › 실습실" }, raisedAt: "2026-10-03T02:42:00Z" }] };
+    const browser = await viewer();
+    const page = await browser.get("/spaces/31");
+    expect(page.body).toContain("알람 1");
+    expect(page.body).toContain('href="/spaces/31?tab=alarms"');
+    const tab = await browser.get("/spaces/3?tab=alarms");
+    expect(tab.response.status).toBe(200);
+    expect(sent("GET", "/api/v1/core/alarms").at(-1)?.path).toContain("spaceId=3");
+  });
+
+  it("[DSH-07.01] TC-DSH-073 360px: 공간 보기 격자는 좁은 화면에서 한 열(min-w-0로 가로 넘침 없음)", async () => {
+    const page = await (await viewer()).get("/spaces/31");
+    expect(page.body).toContain("grid min-w-0 gap-4 md:grid-cols-[260px_1fr]");
+    expect(page.body).toContain("grid gap-3 sm:grid-cols-2 md:grid-cols-3");
+  });
+
   it("기기 탭은 하위 포함 기기 목록(API-DEV-11 spaceId)", async () => {
     const page = await (await viewer()).get("/spaces/3?tab=devices");
     expect(page.response.status).toBe(200);
@@ -248,5 +265,25 @@ describe("DEV-10.01 사이트(UI-DEV-15)", () => {
     expect(page.body).toContain("35.15, 126.85");
     app.gateway.m2.spaces = [];
     expect((await (await viewer()).get("/sites")).body).toContain("아직 사이트가 없습니다");
+  });
+
+  it("[DSH-09.01][AT-DSH-09.1] TC-DSH-087 지도 마커 상태 색(알람)·카드 요약·[지도/목록] 토글, 지도 API 실패면 요약만으로", async () => {
+    app.gateway.m2.extra.siteAlarms = { "1": 2 };
+    const browser = await viewer();
+    const page = await browser.get("/sites");
+    expect(sent("GET", "/api/v1/core/sites/map")).toHaveLength(1);
+    expect(page.body).toContain('aria-label="사이트 지도"');
+    expect(page.body).toContain('data-marker="1"');
+    expect(page.body).toContain('data-site-status="ALARM"');
+    expect(page.body).toContain("열린 알람 있음");
+    expect(page.body).toContain("공간 쾌적도: NORMAL 1 · WARNING 0");
+    expect(page.body).toContain('href="/sites?view=list"');
+    const list = await browser.get("/sites?view=list");
+    expect(list.body).not.toContain('aria-label="사이트 지도"');
+    expect(list.body).toContain("기기 1 · 오프라인 0 · 알람 2");
+    app.gateway.m2.extra.siteMapFails = true;
+    const fallback = await browser.get("/sites");
+    expect(fallback.response.status).toBe(200);
+    expect(fallback.body).toContain("기기 1 · 오프라인 0 · 알람 0");
   });
 });

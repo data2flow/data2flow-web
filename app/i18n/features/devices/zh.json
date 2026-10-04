@@ -67,7 +67,8 @@
       "pending": "待审批",
       "models": "设备型号",
       "metrics": "测量项",
-      "groups": "分组"
+      "groups": "分组",
+      "jobs": "批量作业"
     },
     "tabs": {
       "overview": "概览",
@@ -75,7 +76,9 @@
       "raw": "原始消息",
       "history": "变更历史",
       "semantic": "语义",
-      "credentials": "凭据"
+      "credentials": "凭据",
+      "rules": "规则与告警",
+      "operation": "运行"
     },
     "overview": {
       "title": "当前状态"
@@ -88,7 +91,8 @@
       "decodeOk": "解码",
       "rulesApplied": "规则",
       "done": "已完成",
-      "todo": "未完成"
+      "todo": "未完成",
+      "fix": "去处理"
     },
     "data": {
       "title": "测量数据",
@@ -117,7 +121,23 @@
       "at": "时间",
       "actor": "操作人",
       "action": "操作",
-      "changes": "变更"
+      "changes": "变更",
+      "unavailable": "无法加载变更历史",
+      "actions": {
+        "CREATED": "创建",
+        "UPDATED": "修改",
+        "APPROVED": "批准",
+        "MOVED": "移动空间",
+        "ACTIVATED": "启用",
+        "DEACTIVATED": "停用",
+        "REPLACED": "更换",
+        "TAGGED": "标签变更",
+        "TAGS_CHANGED": "标签变更",
+        "ATTRIBUTE_CHANGED": "属性变更",
+        "IMPORTED": "导入",
+        "REJECTED": "拒绝",
+        "DELETED": "删除"
+      }
     },
     "semantic": {
       "title": "语义",
@@ -203,7 +223,116 @@
       "intervalRange": "请输入 10~86,400 秒之间的值",
       "multiplierRange": "倍数须在 1.5~10 之间",
       "fileRequired": "请选择 CSV 文件"
-    }
+    },
+    "jobs": {
+      "title": "批量作业",
+      "fromSelection": "批量作业",
+      "new": "新建批量作业",
+      "empty": "暂无批量作业",
+      "wizard": "批量作业向导",
+      "step1": "1. 目标",
+      "step2": "2. 操作与值",
+      "step3": "3. 预览",
+      "targetKind": "目标",
+      "targetDevices": "已选设备 {{n}}台",
+      "targetGroup": "分组",
+      "group": "分组",
+      "chooseGroup": "选择分组",
+      "targetEmpty": "请选择目标设备",
+      "targetLimit": "一次最多可对5,000台设备执行",
+      "concurrentLimit": "请在正在运行的作业结束后重试",
+      "type": "作业类型",
+      "types": {
+        "SET_MODEL": "更改型号",
+        "SET_SPACE": "移动空间",
+        "SET_STATUS": "启用/停用",
+        "ADD_TAGS": "添加标签",
+        "REMOVE_TAGS": "移除标签",
+        "SET_ATTRIBUTES": "设置属性",
+        "SEND_COMMAND": "发送命令"
+      },
+      "attrScope": "属性类别",
+      "attributes": "属性(JSON)",
+      "capability": "功能",
+      "command": "命令",
+      "args": "参数(JSON)",
+      "valueRequired": "请输入值",
+      "jsonRequired": "请输入JSON对象",
+      "preview": "预览",
+      "previewFirst": "执行前请先预览目标数和示例",
+      "previewSummary": "目标 {{n}}台 · {{type}}",
+      "denied": "权限范围外的 {{n}} 台设备将失败",
+      "run": "执行",
+      "detailTitle": "#{{id}} {{type}}",
+      "progress": "进度",
+      "progressLine": "成功 {{succeeded}} · 失败 {{failed}} / {{total}}",
+      "retryOf": "#{{id}} 失败部分的重新执行",
+      "failedOnly": "仅显示失败",
+      "retryFailed": "重新执行失败项",
+      "noItems": "没有可显示的设备",
+      "error": "错误",
+      "finishedAt": "结束时间",
+      "createdBy": "发起人",
+      "createdAt": "时间",
+      "statuses": {
+        "QUEUED": "排队",
+        "RUNNING": "运行中",
+        "COMPLETED": "已完成",
+        "PARTIALLY_FAILED": "部分失败",
+        "FAILED": "失败",
+        "CANCELLED": "已取消"
+      },
+      "itemStatuses": {
+        "PENDING": "等待",
+        "SUCCEEDED": "成功",
+        "FAILED": "失败",
+        "SKIPPED": "跳过"
+      }
+    },
+    "controlButton": "控制",
+    "rules": {
+      "openAlarms": "未关闭告警 {{n}}条",
+      "alarmsUnavailable": "无法加载告警",
+      "noAlarms": "没有未关闭的告警",
+      "severity": "严重程度",
+      "alarm": "告警",
+      "alarmStatus": "状态",
+      "raisedAt": "发生",
+      "applied": "适用于此设备的规则 {{n}}条",
+      "applyTemplate": "应用规则模板",
+      "rulesUnavailable": "无法加载规则",
+      "noRules": "没有适用的规则",
+      "rule": "规则",
+      "condition": "条件",
+      "via": "适用途径",
+      "viaKind": {
+        "DEVICE": "直接",
+        "SPACE": "经由空间",
+        "MODEL": "经由型号",
+        "TAG": "经由标签"
+      },
+      "ruleStatus": "规则状态",
+      "severities": {
+        "CRITICAL": "严重",
+        "MAJOR": "主要",
+        "MINOR": "次要",
+        "WARNING": "警告",
+        "INFO": "信息"
+      },
+      "alarmStatuses": {
+        "ACTIVE": "活动",
+        "ACKNOWLEDGED": "已确认",
+        "SUPPRESSED": "已抑制",
+        "CLEARED": "已清除"
+      },
+      "ruleStatuses": {
+        "ACTIVE": "运行中",
+        "INACTIVE": "停用",
+        "ERROR": "错误",
+        "DRAFT": "草稿"
+      }
+    },
+    "commandBands": "命令区间带"
   },
   "errors": {
     "DEVICE_DUPLICATE": "已有相同外部 ID 的设备",
@@ -214,6 +343,9 @@
     "DEVICE_TAG_LIMIT": "每台设备最多 20 个标签",
     "DEVICE_IN_USE": "正在其他地方使用，无法删除。",
     "DEVICE_IMPORT_TOO_LARGE": "CSV 文件不能超过 5MB。",
-    "SEMANTIC_TAG_UNKNOWN": "未知的语义标签。"
+    "SEMANTIC_TAG_UNKNOWN": "未知的语义标签。",
+    "JOB_LIMIT_EXCEEDED": "请在正在运行的作业结束后重试",
+    "JOB_NOT_FOUND": "未找到作业",
+    "JOB_STATE_CONFLICT": "当前状态下无法执行"
   }
 }

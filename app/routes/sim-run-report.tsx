@@ -8,6 +8,8 @@ import { callApi, orThrow } from "~/bff/api.server";
 import { bff } from "~/bff/middleware.server";
 import { Badge, Card, PageHeader, Table } from "~/components/ui";
 import { SimAreaTabs, VirtualBadge } from "~/features/sim/components/common";
+import { ReportExpectations } from "~/features/sim/components/report-expectations";
+import { scenarioExpectations } from "~/features/sim/model/report";
 import { formatElapsed } from "~/features/sim/model/sim";
 import type { SimReport } from "~/features/sim/model/types";
 import { formatDateTime } from "~/lib/format";
@@ -62,21 +64,7 @@ export default function SimRunReportPage({ loaderData }: Route.ComponentProps) {
       </Card>
       <div className="mt-4 grid gap-4 md:grid-cols-2">
         <Card title={t("sim.run.expectations")}>
-          <Table>
-            <tbody>
-              {report.expectations.map((x) => (
-                <tr key={x.id}>
-                  <td>{t(`sim.expectation.${x.kind}`, { defaultValue: x.kind })}</td>
-                  <td>
-                    <Badge tone={x.passed ? "success" : "danger"}>{x.passed ? t("sim.expectationState.PASSED") : t("sim.expectationState.FAILED")}</Badge>
-                  </td>
-                  <td className="font-mono text-[12px]">
-                    {x.evidence?.at ? formatDateTime(x.evidence.at, timezone, i18n.language) : ""} {x.evidence?.value !== undefined ? String(x.evidence.value) : ""} {x.evidence?.actual !== undefined ? String(x.evidence.actual) : ""}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
+          <ReportExpectations items={report.expectations} definitions={scenarioExpectations(report)} timezone={timezone} lang={i18n.language} />
         </Card>
         <Card title={t("sim.report.metrics")}>
           <dl className="grid grid-cols-2 gap-2 text-[13px]">

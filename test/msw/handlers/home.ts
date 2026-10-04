@@ -34,7 +34,10 @@ export const homeHandler: CoreHandler = (core, { method, path, body, user, can }
       ...(can("SRC_READ") ? { sources: { connected: core.sources.filter((s) => s.state === "CONNECTED").length, total: core.sources.length } } : {}),
       comfort,
       comfortTotal: comfort.length,
-      timeline: [{ type: "ALARM_RAISED", at: "2026-10-03T02:42:00Z", title: "실습실 고CO2", severity: "MAJOR", link: "/alarms/1" }],
+      timeline: [
+        { type: "CONTROL", at: "2026-10-03T02:43:00Z", title: "환기 2단", origin: "FLOW", link: "/control/commands" },
+        { type: "ALARM_RAISED", at: "2026-10-03T02:42:00Z", title: "실습실 고CO2", severity: "MAJOR", link: "/alarms/1" },
+      ],
       aiSummary: null,
     });
   }

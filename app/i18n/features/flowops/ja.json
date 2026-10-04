@@ -1,0 +1,402 @@
+{
+  "flowops": {
+    "areas": {
+      "flows": "フロー",
+      "snapshots": "スナップショット",
+      "pipelines": "昇格パイプライン",
+      "packages": "拡張ノード",
+      "sinks": "Sink 接続"
+    },
+    "checks": {
+      "passed": "合格",
+      "failed": "不合格",
+      "names": {
+        "testRun": "テスト実行",
+        "replayCommands": "再生制御回数",
+        "replayNotifications": "再生通知回数",
+        "scenario": "シナリオ期待結果"
+      }
+    },
+    "mapping": {
+      "kind": "種類",
+      "source": "元",
+      "target": "対象",
+      "status": "状態",
+      "choose": "選択してください",
+      "derived": "空間マッピングに従う",
+      "ok": "✓ マッピング済み",
+      "missing": "✗ 未マッピング",
+      "none": "マッピングする参照がありません",
+      "targetOf": "{{name}} の対象",
+      "unmapped": "未マッピングの対象 {{count}} 件",
+      "referencesFailed": "{{count}} 件のフローの参照を読み込めませんでした",
+      "kinds": {
+        "SPACE": "空間",
+        "DEVICE": "デバイス",
+        "RELATION": "関係",
+        "SINK_CONNECTION": "Sink 接続",
+        "NOTIFICATION_CHANNEL": "通知チャネル",
+        "SCRIPT": "スクリプト"
+      }
+    },
+    "sinks": {
+      "title": "Sink 保存先接続",
+      "new": "新しい接続",
+      "newTitle": "新しい Sink 接続",
+      "editTitle": "接続の編集: {{name}}",
+      "name": "名前",
+      "type": "種類",
+      "types": {
+        "POSTGRESQL": "PostgreSQL",
+        "MYSQL": "MySQL",
+        "INFLUXDB": "InfluxDB"
+      },
+      "host": "ホスト",
+      "port": "ポート",
+      "database": "データベース",
+      "bucket": "バケット",
+      "org": "組織 (org)",
+      "username": "ユーザー",
+      "password": "パスワード",
+      "token": "トークン",
+      "tls": "TLS を使用",
+      "secretKept": "空欄のままなら保存済みの値を使います",
+      "passwordHint": "保存後は再表示しません",
+      "test": "接続テスト",
+      "testOk": "接続しました ({{ms}}ms)",
+      "testFailed": "接続できません: {{reason}}",
+      "kinds": {
+        "AUTH": "認証失敗",
+        "DNS": "ホストが見つかりません (DNS)",
+        "TLS": "TLS エラー",
+        "TIMEOUT": "タイムアウト",
+        "OTHER": "その他のエラー"
+      },
+      "errors": {
+        "required": "必須項目です",
+        "invalid": "形式が正しくありません",
+        "range": "1〜65535 の範囲で入力してください"
+      },
+      "saved": "接続を保存しました",
+      "deleted": "接続を削除しました",
+      "status": "状態",
+      "statuses": {
+        "OK": "正常",
+        "ERROR": "エラー",
+        "UNTESTED": "未テスト"
+      },
+      "lastError": "最近のエラー",
+      "usedFlows": "使用フロー",
+      "updatedAt": "更新日時",
+      "empty": "Sink 接続がありません",
+      "emptyBody": "フローの Sink ノードが外部 DB (PostgreSQL・MySQL・InfluxDB) に書き込むには、先に接続を登録してください。",
+      "target": "対象テーブル・メジャメント",
+      "targetHint": "例: room_temp",
+      "checkSchema": "スキーマ確認",
+      "schemaExists": "{{target}}: 列 {{count}} 個",
+      "schemaMissing": "{{target}} がありません。適用前の検証で警告 (SINK_SCHEMA_MISSING) が出ます",
+      "deadLetters": "失敗保管箱",
+      "deadLettersOf": "失敗保管箱: {{name}}",
+      "deadLettersEmpty": "失敗記録はありません",
+      "dlTarget": "対象",
+      "dlError": "エラー",
+      "dlAttempts": "試行",
+      "dlFailedAt": "失敗日時",
+      "dlRecord": "レコード",
+      "dlSelect": "{{id}} を選択",
+      "resendSelected": "選択を再送",
+      "resendAll": "すべて再送",
+      "resendResult": "再送要求 {{requested}} 件: 成功 {{resent}}、失敗 {{failed}}"
+    },
+    "snapshots": {
+      "title": "スナップショット",
+      "new": "新しいスナップショット",
+      "newTitle": "新しいスナップショット",
+      "name": "名前",
+      "memo": "メモ",
+      "flows": "フロー",
+      "flowCount": "フロー",
+      "createdBy": "作成者",
+      "createdAt": "作成日時",
+      "compare": "比較",
+      "compareRun": "選択した 2 件を比較",
+      "compareSelect": "{{name}} を比較に追加",
+      "compareTitle": "比較: {{a}} → {{b}}",
+      "compareSummary": "ノード追加 {{added}}、削除 {{removed}}、設定変更 {{changed}}、スクリプト版の差 {{scripts}}",
+      "noDiff": "差分はありません",
+      "nodeAdded": "ノード追加: {{node}}",
+      "nodeRemoved": "ノード削除: {{node}}",
+      "nodeChanged": "{{node}} {{field}}: {{from}} → {{to}}",
+      "scriptVersion": "スクリプト {{id}}: {{from}} → {{to}}",
+      "subflowVersion": "サブフロー {{id}}: {{from}} → {{to}}",
+      "pickTwo": "比較するスナップショットを 2 件選んでください",
+      "restore": "復元",
+      "restoreTitle": "復元の確認: {{name}}",
+      "restoreFlows": "変わるフロー {{count}} 件",
+      "restoreFlowLine": "{{name}}: v{{from}} → v{{to}}",
+      "restoreReset": "初期化されるノード状態 {{count}} 件: {{nodes}}",
+      "restoreNoReset": "初期化されるノード状態はありません",
+      "restoreLive": "フローごとにスナップショットの定義で新しい版を作り、ライブ適用します (停止しません)。",
+      "restoreConfirm": "復元を適用",
+      "restored": "復元しました: {{versions}}",
+      "approvalRequired": "制御ノードがあるため承認待ちとして要求しました",
+      "created": "スナップショットを作成しました: フロー {{flows}}、スクリプト {{scripts}}、Sink 接続 {{sinks}}",
+      "create": "作成",
+      "noActiveFlows": "適用済みのフローがありません",
+      "bundleHint": "フローが参照するスクリプト・サブフローの版、変数値、Sink 接続 (秘密値を除く) も一緒にまとめます。",
+      "empty": "保存されたスナップショットはありません",
+      "scripts": "スクリプト",
+      "subflows": "サブフロー",
+      "variables": "変数",
+      "sinkConnections": "Sink 接続",
+      "errors": {
+        "name": {
+          "required": "名前を入力してください",
+          "tooLong": "80 文字以内で入力してください",
+          "duplicated": "同じ名前のスナップショットがあります"
+        },
+        "memo": "500 文字以内で入力してください",
+        "flowIds": {
+          "required": "フローを 1 件以上選んでください",
+          "tooMany": "フローは 50 件まで選べます"
+        }
+      }
+    },
+    "pipelines": {
+      "title": "昇格パイプライン",
+      "titleOf": "昇格パイプライン: {{name}}",
+      "list": "パイプライン一覧",
+      "create": "パイプラインを作成",
+      "edit": "定義を編集",
+      "editTitle": "パイプライン定義: {{name}}",
+      "newTitle": "新しいパイプライン",
+      "name": "名前",
+      "stages": "段階",
+      "stageKey": "段階キー",
+      "stageKeyOf": "{{n}} 段階目のキー",
+      "env": "環境",
+      "envOf": "{{n}} 段階目の環境",
+      "envs": {
+        "TEST": "テスト",
+        "VERIFY": "検証",
+        "PROD": "本番"
+      },
+      "approverRoles": "承認ロール",
+      "approverUsers": "承認ユーザー ID",
+      "approverUsersOf": "{{n}} 段階目の承認ユーザー ID",
+      "approvers": "承認: {{list}}",
+      "noApproval": "承認なし",
+      "checks": "自動チェック",
+      "checkTestRun": "テスト実行合格",
+      "checkCommands": "再生制御 ≤ {{n}}",
+      "checkNotifications": "再生通知 ≤ {{n}}",
+      "replayDays": "再生日数",
+      "maxCommands": "制御上限",
+      "maxNotifications": "通知上限",
+      "stageHint": "段階は 2〜5 個です。キーが空の行は保存しません。",
+      "errors": {
+        "name": {
+          "required": "名前を入力してください",
+          "tooLong": "80 文字以内で入力してください"
+        },
+        "stages": "段階は 2〜5 個必要です",
+        "key": {
+          "required": "キーを入力してください",
+          "invalid": "英小文字で始まる 30 文字以内 (小文字・数字・-)",
+          "duplicated": "同じキーがあります"
+        },
+        "checks": "チェック値は 0 以上の整数 (再生日数 ≤ 7) です"
+      },
+      "saved": "パイプラインを保存しました",
+      "empty": "パイプラインがありません",
+      "emptyAdmin": "[パイプラインを作成] でテスト → 検証 → 本番の段階を定義してください。",
+      "emptyOther": "管理者がパイプラインを定義すると昇格を要求できます。",
+      "request": "昇格を要求",
+      "requestTitle": "昇格要求",
+      "snapshot": "スナップショット",
+      "loadMapping": "対象マッピングを読み込む",
+      "fromStage": "現在の段階",
+      "toStage": "次の段階",
+      "requestSubmit": "要求",
+      "requested": "昇格を要求しました",
+      "requestCheckFailed": "自動チェックに合格しなかったため承認できません (CHECK_FAILED)",
+      "requests": "昇格要求",
+      "noRequests": "昇格要求はありません",
+      "stageMove": "段階",
+      "status": "状態",
+      "statuses": {
+        "PENDING": "承認待ち",
+        "CHECK_FAILED": "チェック失敗",
+        "APPROVED": "承認済み",
+        "REJECTED": "却下",
+        "APPLIED": "適用済み"
+      },
+      "requestedBy": "要求者",
+      "detail": "詳細",
+      "requestDetail": "要求の詳細: {{name}}",
+      "decided": "{{name}} · {{at}}",
+      "checkFailedBlock": "自動チェックに合格しなかった要求は承認できません",
+      "approve": "承認",
+      "reject": "却下",
+      "reason": "却下理由",
+      "reasonRequired": "却下理由を 500 文字以内で入力してください",
+      "approved": "昇格を承認しました",
+      "rejected": "昇格を却下しました"
+    },
+    "promote": {
+      "sectionTitle": "テストフローを本番へ昇格",
+      "sectionBody": "仮想空間につないだテスト (TEST) フローを実際の対象にマッピングして本番フローへ昇格します。",
+      "noTestFlows": "テスト環境のフローがありません",
+      "flow": "フロー",
+      "version": "バージョン",
+      "control": "制御ノード",
+      "open": "本番へ昇格",
+      "title": "本番へ昇格: {{name}} (テスト v{{version}})",
+      "scenario": "昇格条件 (シナリオ)",
+      "noScenario": "条件なし",
+      "scenarioLast": "{{name}} — 前回の結果 {{status}}",
+      "runStatus": {
+        "PASSED": "合格",
+        "FAILED": "不合格",
+        "RUNNING": "実行中",
+        "COMPLETED": "完了"
+      },
+      "controlApproval": "制御ノードを含む → ADMIN の承認が必要",
+      "submit": "昇格を要求",
+      "pendingApproval": "承認待ちとして要求しました",
+      "done": "本番フローへ昇格しました",
+      "openTarget": "本番フローを開く",
+      "notTestFlow": "テスト環境のフローでないか、バージョンがありません"
+    },
+    "packages": {
+      "title": "拡張ノードパッケージ",
+      "installTitle": "パッケージをインストール",
+      "file": "パッケージファイル (.d2fpkg)",
+      "fileOf": "{{name}} の新しいバージョンのファイル",
+      "registryUrl": "またはレジストリ URL",
+      "install": "インストール",
+      "upgrade": "新しいバージョンをインストール",
+      "installHint": "署名 (信頼する署名者)・ライセンス (許可リスト)・マニフェストスキーマを検査します。新しいバージョンは既存版と並べてインストールされ、フローはエディターで新しい版を適用したときだけ変わります。",
+      "readOnly": "インストール・アップグレード・無効化は管理者 (ADMIN) だけができます。",
+      "installed": "{{name}}@{{version}} をインストールしました — 署名 {{signer}}、{{license}}、{{runtime}}",
+      "nodeTypes": "ノード: {{list}}",
+      "sideBySide": "既存版を使うフローはそのまま動きます (エディターに「新しいバージョンあり」)。",
+      "disabledDone": "{{name}} を無効化しました。使用中のフロー {{count}} 件は実行中の版で動き続けます",
+      "enabledDone": "{{name}} を有効化しました (使用フロー {{count}} 件)",
+      "disableHint": "使用フロー {{count}} 件: 無効化しても実行中の版は動き続け、再適用時に警告が出ます",
+      "empty": "インストールされた拡張パッケージはありません",
+      "name": "パッケージ",
+      "version": "バージョン",
+      "versionsInstalled": "インストール済みの版: {{list}}",
+      "signer": "署名者",
+      "signed": "{{signer}} (署名確認済み)",
+      "license": "ライセンス",
+      "runtime": "実行方式",
+      "runtimes": {
+        "JS_SANDBOX": "JS サンドボックス",
+        "SERVER_PLUGIN": "サーバープラグイン"
+      },
+      "status": "状態",
+      "statuses": {
+        "ACTIVE": "有効",
+        "DISABLED": "無効"
+      },
+      "usedFlows": "使用フロー",
+      "disable": "無効化",
+      "enable": "有効化",
+      "inputErrors": {
+        "required": "ファイルかレジストリ URL のどちらかを指定してください",
+        "both": "ファイルと URL のどちらか一方だけを指定してください",
+        "extension": ".d2fpkg ファイルのみインストールできます",
+        "tooLarge": "ファイルは 10MB 以下にしてください",
+        "url": "https:// の URL を入力してください"
+      }
+    },
+    "git": {
+      "crumb": "設定",
+      "title": "Git 同期",
+      "connection": "接続",
+      "repoUrl": "リポジトリ URL",
+      "branch": "ブランチ",
+      "path": "パス",
+      "authType": "認証",
+      "authTypes": {
+        "SSH_KEY": "デプロイキー (SSH)",
+        "HTTPS_TOKEN": "トークン (HTTPS)"
+      },
+      "credentialRef": "資格情報の参照",
+      "credentialHint": "秘密値はここに入力せず、登録済みシークレットの参照名だけを書きます",
+      "targets": "対象",
+      "targetNames": {
+        "FLOW": "フロー",
+        "SOURCE": "ソース",
+        "SCRIPT": "スクリプト",
+        "RULE": "ルール"
+      },
+      "test": "接続テスト",
+      "testOk": "接続しました ({{ms}}ms、HEAD {{commit}})",
+      "testFailed": "リポジトリに接続できません: {{reason}}",
+      "saved": "Git 同期の設定を保存しました",
+      "updated": "最終変更: {{name}} · {{at}}",
+      "operations": "操作",
+      "commitMessage": "コミットメッセージ",
+      "export": "エクスポートコミット",
+      "exported": "コミット {{commit}}: ファイル {{count}} 件",
+      "preview": "取り込みプレビュー",
+      "previewSummary": "変更 {{changes}} 件、競合 {{conflicts}} 件、エラー {{errors}} 件",
+      "changeKinds": {
+        "CREATE": "新規作成",
+        "UPDATE": "更新"
+      },
+      "fileError": "{{file}}:{{line}} {{code}}",
+      "errorCodes": {
+        "FLOW_VALIDATION_FAILED": "検証失敗 (反映しません)"
+      },
+      "conflictObject": "競合オブジェクト",
+      "conflictChoose": "どちらを使いますか",
+      "conflictDetail": "プラットフォーム変更 {{at}} · Git コミット {{commit}}",
+      "sides": {
+        "PLATFORM": "プラットフォーム",
+        "GIT": "Git"
+      },
+      "draftOnly": "取り込みは下書き (DRAFT) 版だけを作ります。適用はフロー画面で別に行ってください。",
+      "apply": "取り込みを適用",
+      "applied": "下書き {{count}} 件を作成しました",
+      "resolveAll": "競合 {{count}} 件を先に解決してください",
+      "errors": {
+        "repoUrl": {
+          "required": "リポジトリのアドレスを入力してください",
+          "invalid": "リポジトリのアドレス形式が正しくありません"
+        },
+        "branch": {
+          "required": "ブランチを入力してください",
+          "tooLong": "ブランチは 100 文字以内です"
+        },
+        "path": {
+          "tooLong": "パスは 200 文字以内です"
+        },
+        "credentialRef": {
+          "required": "資格情報の参照を入力してください"
+        },
+        "message": {
+          "required": "コミットメッセージを入力してください",
+          "tooLong": "コミットメッセージは 200 文字以内です"
+        }
+      }
+    }
+  },
+  "errors": {
+    "SINK_CONNECTION_IN_USE": "使用中の接続です",
+    "SINK_CONNECTION_TEST_FAILED": "接続できません",
+    "SNAPSHOT_NAME_DUPLICATED": "同じ名前のスナップショットがあります",
+    "SNAPSHOT_DEPENDENCY_MISSING": "スナップショットに必要な項目がないため復元できません",
+    "FLOW_PROMOTION_BLOCKED": "昇格条件を満たしていません",
+    "FLOW_PROMOTION_SELF_APPROVAL": "自分が要求した昇格は承認できません",
+    "GIT_SYNC_CONFLICT": "先に競合を解決してください",
+    "GIT_SYNC_REPO_UNREACHABLE": "リポジトリに接続できません",
+    "NODE_PACKAGE_SIGNATURE_INVALID": "署名を確認できないパッケージです",
+    "NODE_PACKAGE_LICENSE_REJECTED": "ライセンスポリシーに合わないパッケージです",
+    "NODE_PACKAGE_INVALID": "パッケージ形式が正しくありません",
+    "FLOWOPS_SELECT_REQUIRED": "1 件以上選んでください"
+  }
+}

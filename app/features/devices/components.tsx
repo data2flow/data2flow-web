@@ -11,6 +11,8 @@ import { bffJson, type BffJsonResult } from "~/lib/bff-client";
 import { appendPoint, type ChartAnnotation, type ChartSeries, type SeriesPoint } from "~/lib/chart-model";
 import { liveUrl } from "~/lib/event-stream";
 import { formatDateTime, formatNumber, formatRelative, rangeOf } from "~/lib/format";
+import type { Command } from "~/features/control/model/control";
+import { commandBands } from "./model/detail";
 import { ONBOARDING_ITEMS, applyDeviceUpdate, connectivityTone, statusTone, type DeviceDetail, type LatestValue } from "./model/devices";
 
 export function DeviceStatusBadge({ status }: { status: string }) {
@@ -63,16 +65,23 @@ export function LatestValueCards({ latest, lang }: { latest: LatestValue[]; lang
   );
 }
 
-export function OnboardingChecklist({ onboarding }: { onboarding: DeviceDetail["onboarding"] }) {
+/** 온보딩 체크리스트(BR-DEV-26). `links`가 있으면 미완료 항목에 바로가기(DEV-09.01: 모델·공간 → 편집, 첫 수신·디코딩 → 소스, 규칙 → 규칙 템플릿) */
+export function OnboardingChecklist({ onboarding, links }: { onboarding: DeviceDetail["onboarding"]; links?: (item: string) => string | undefined }) {
   const { t } = useTranslation();
   return (
     <ul className="flex flex-wrap gap-3 text-[13px]" aria-label={t("devices.onboarding.title")}>
       {ONBOARDING_ITEMS.map((key) => {
         const done = Boolean(onboarding?.[key]);
+        const href = !done ? links?.(key) : undefined;
         return (
           <li key={key} className={done ? "text-good" : "text-muted"}>
             {done ? "✓" : "✗"} {t(`devices.onboarding.${key}`)}
             <span className="sr-only">{done ? t("devices.onboarding.done") : t("devices.onboarding.todo")}</span>
+            {href && (
+              <a href={href} className="ml-1 text-accent hover:underline" aria-label={`${t(`devices.onboarding.${key}`)} ${t("devices.onboarding.fix")}`}>
+                → {t("devices.onboarding.fix")}
+              </a>
+            )}
           </li>
         );
       })}
@@ -81,7 +90,7 @@ export function OnboardingChecklist({ onboarding }: { onboarding: DeviceDetail["
 }
 
 /** 개요 탭: 현재값·연결 상태를 실시간으로 갱신한다 */
-export function DeviceOverview({ device, timezone, lang, now, live }: { device: DeviceDetail; timezone: string; lang: string; now: number; live?: UseLiveStreamOptions }) {
+export function DeviceOverview({ device, timezone, lang, now, live, onboardingLinks }: { device: DeviceDetail; timezone: string; lang: string; now: number; live?: UseLiveStreamOptions; onboardingLinks?: (item: string) => string | undefined }) {
   const { t } = useTranslation();
   const [current, setCurrent] = useState({ latest: device.latest ?? [], state: device.state ?? {} });
   useEffect(() => setCurrent({ latest: device.latest ?? [], state: device.state ?? {} }), [device]);
@@ -133,7 +142,7 @@ export function DeviceOverview({ device, timezone, lang, now, live }: { device: 
         )}
       </Card>
       <Card title={t("devices.onboarding.title")}>
-        <OnboardingChecklist onboarding={device.onboarding} />
+        <OnboardingChecklist onboarding={device.onboarding} links={onboardingLinks} />
       </Card>
     </div>
   );
@@ -161,6 +170,7 @@ export function DeviceDataPanel({
   fetcher = bffJson as Fetcher,
   live,
   chartFactory,
+  showCommands = false,
 }: {
   deviceId: string;
   metrics: string[];
@@ -171,8 +181,12 @@ export function DeviceDataPanel({
   fetcher?: Fetcher;
   live?: UseLiveStreamOptions;
   chartFactory?: ChartFactory;
+  /** 액추에이터: 적용된 명령을 구간 띠로 겹친다(DEV-02.07, AT-DEV-05.2, API-ACT-02) */
+  showCommands?: boolean;
 }) {
   const { t } = useTranslation();
+  const [bandsOn, setBandsOn] = useState(showCommands);
+  const [bands, setBands] = useState<ChartAnnotation[]>([]);
   const [selected, setSelected] = useState<string[]>(metrics.slice(0, 2));
   const [period, setPeriod] = useState<(typeof PERIODS)[number]>("24h");
   const [quality, setQuality] = useState<"normal" | "all">("normal");
@@ -196,8 +210,10 @@ export function DeviceDataPanel({
     void Promise.all([
       fetcher<SeriesResponse>(`/bff/api/core/telemetry/series?${query}`),
       fetcher<{ responses?: ChartAnnotation[] } | ChartAnnotation[]>(`/bff/api/core/annotations?${new URLSearchParams({ deviceId, from, to })}`),
-    ]).then(([result, notes]) => {
+      showCommands ? fetcher<{ responses?: Command[] }>(`/bff/api/core/devices/${encodeURIComponent(deviceId)}/commands?${new URLSearchParams({ from, to, status: "APPLIED", size: "100" })}`) : Promise.resolve(null),
+    ]).then(([result, notes, commands]) => {
       if (cancelled) return;
+      setBands(commands?.ok ? commandBands(commands.data.responses ?? [], to) : []);
       setLoading(false);
       if (!result.ok) {
         setError(result.code);
@@ -212,7 +228,7 @@ export function DeviceDataPanel({
     return () => {
       cancelled = true;
     };
-  }, [deviceId, selected, period, quality, fetcher, now, expectedIntervalSec, unitOf, reload]);
+  }, [deviceId, selected, period, quality, fetcher, now, expectedIntervalSec, unitOf, reload, showCommands]);
 
   const onPoint = useCallback(
     (event: { data: unknown }) => {
@@ -251,6 +267,12 @@ export function DeviceDataPanel({
           <option value="normal">{t("devices.data.qualityNormal")}</option>
           <option value="all">{t("devices.data.qualityAll")}</option>
         </SelectField>
+        {showCommands && (
+          <label className="flex items-center gap-1 text-[13px]">
+            <input type="checkbox" checked={bandsOn} onChange={(e) => setBandsOn(e.target.checked)} />
+            {t("devices.commandBands")}
+          </label>
+        )}
       </div>
       {error && (
         <p role="alert" className="mb-2 text-[13px] text-bad">
@@ -263,7 +285,7 @@ export function DeviceDataPanel({
       {selected.length === 0 ? (
         <p className="text-muted">{t("devices.data.chooseMetric")}</p>
       ) : (
-        <TimeseriesChart series={series} timezone={timezone} annotations={annotations} loading={loading} title={t("devices.data.title")} factory={chartFactory} />
+        <TimeseriesChart series={series} timezone={timezone} annotations={bandsOn ? [...annotations, ...bands] : annotations} loading={loading} title={t("devices.data.title")} factory={chartFactory} />
       )}
     </Card>
   );

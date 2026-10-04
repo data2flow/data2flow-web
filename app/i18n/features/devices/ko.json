@@ -67,7 +67,8 @@
       "pending": "승인 대기",
       "models": "기기 모델",
       "metrics": "측정 항목",
-      "groups": "그룹"
+      "groups": "그룹",
+      "jobs": "일괄 작업"
     },
     "tabs": {
       "overview": "개요",
@@ -75,7 +76,9 @@
       "raw": "원본 메시지",
       "history": "변경 이력",
       "semantic": "시맨틱",
-      "credentials": "자격증명"
+      "credentials": "자격증명",
+      "rules": "규칙·알람",
+      "operation": "가동"
     },
     "overview": {
       "title": "현재 상태"
@@ -88,7 +91,8 @@
       "decodeOk": "디코딩",
       "rulesApplied": "규칙",
       "done": "완료",
-      "todo": "미완료"
+      "todo": "미완료",
+      "fix": "바로가기"
     },
     "data": {
       "title": "측정 데이터",
@@ -117,7 +121,23 @@
       "at": "시각",
       "actor": "누가",
       "action": "무엇을",
-      "changes": "변경"
+      "changes": "변경",
+      "unavailable": "변경 이력을 불러오지 못했습니다",
+      "actions": {
+        "CREATED": "등록",
+        "UPDATED": "수정",
+        "APPROVED": "승인",
+        "MOVED": "공간 이동",
+        "ACTIVATED": "활성화",
+        "DEACTIVATED": "비활성화",
+        "REPLACED": "교체",
+        "TAGGED": "태그 변경",
+        "TAGS_CHANGED": "태그 변경",
+        "ATTRIBUTE_CHANGED": "속성 변경",
+        "IMPORTED": "가져오기",
+        "REJECTED": "거절",
+        "DELETED": "삭제"
+      }
     },
     "semantic": {
       "title": "시맨틱",
@@ -203,7 +223,116 @@
       "intervalRange": "10~86,400초 사이로 입력하세요",
       "multiplierRange": "배수는 1.5~10 사이로 입력하세요",
       "fileRequired": "CSV 파일을 고르세요"
-    }
+    },
+    "jobs": {
+      "title": "일괄 작업",
+      "fromSelection": "일괄 작업",
+      "new": "새 일괄 작업",
+      "empty": "일괄 작업이 없습니다",
+      "wizard": "일괄 작업 마법사",
+      "step1": "1. 대상",
+      "step2": "2. 작업과 값",
+      "step3": "3. 미리 보기",
+      "targetKind": "대상",
+      "targetDevices": "선택한 기기 {{n}}대",
+      "targetGroup": "그룹",
+      "group": "그룹",
+      "chooseGroup": "그룹 선택",
+      "targetEmpty": "대상 기기를 고르세요",
+      "targetLimit": "한 번에 5,000대까지 실행할 수 있습니다",
+      "concurrentLimit": "실행 중인 작업이 끝난 뒤 다시 시도하세요",
+      "type": "작업 유형",
+      "types": {
+        "SET_MODEL": "모델 변경",
+        "SET_SPACE": "공간 이동",
+        "SET_STATUS": "활성·비활성",
+        "ADD_TAGS": "태그 추가",
+        "REMOVE_TAGS": "태그 제거",
+        "SET_ATTRIBUTES": "속성 설정",
+        "SEND_COMMAND": "명령 전송"
+      },
+      "attrScope": "속성 종류",
+      "attributes": "속성(JSON)",
+      "capability": "기능",
+      "command": "명령",
+      "args": "인자(JSON)",
+      "valueRequired": "값을 입력하세요",
+      "jsonRequired": "JSON 객체로 입력하세요",
+      "preview": "미리 보기",
+      "previewFirst": "실행 전에 미리 보기로 대상 수와 예시를 확인하세요",
+      "previewSummary": "대상 {{n}}대 · {{type}}",
+      "denied": "권한 밖 기기 {{n}}대는 실패로 끝납니다",
+      "run": "실행",
+      "detailTitle": "#{{id}} {{type}}",
+      "progress": "진행률",
+      "progressLine": "{{succeeded}} 성공 · {{failed}} 실패 / {{total}}",
+      "retryOf": "#{{id}}의 실패분 재실행",
+      "failedOnly": "실패만 보기",
+      "retryFailed": "실패분 다시 실행",
+      "noItems": "표시할 기기가 없습니다",
+      "error": "오류",
+      "finishedAt": "끝난 시각",
+      "createdBy": "시작자",
+      "createdAt": "시각",
+      "statuses": {
+        "QUEUED": "대기",
+        "RUNNING": "실행 중",
+        "COMPLETED": "완료",
+        "PARTIALLY_FAILED": "일부 실패",
+        "FAILED": "실패",
+        "CANCELLED": "취소됨"
+      },
+      "itemStatuses": {
+        "PENDING": "대기",
+        "SUCCEEDED": "성공",
+        "FAILED": "실패",
+        "SKIPPED": "건너뜀"
+      }
+    },
+    "controlButton": "제어",
+    "rules": {
+      "openAlarms": "열린 알람 {{n}}건",
+      "alarmsUnavailable": "알람을 불러오지 못했습니다",
+      "noAlarms": "열린 알람이 없습니다",
+      "severity": "심각도",
+      "alarm": "알람",
+      "alarmStatus": "상태",
+      "raisedAt": "발생",
+      "applied": "이 기기에 적용되는 규칙 {{n}}개",
+      "applyTemplate": "규칙 템플릿 적용",
+      "rulesUnavailable": "규칙을 불러오지 못했습니다",
+      "noRules": "적용되는 규칙이 없습니다",
+      "rule": "규칙",
+      "condition": "조건",
+      "via": "적용 경로",
+      "viaKind": {
+        "DEVICE": "직접",
+        "SPACE": "공간 경유",
+        "MODEL": "모델 경유",
+        "TAG": "태그 경유"
+      },
+      "ruleStatus": "규칙 상태",
+      "severities": {
+        "CRITICAL": "심각",
+        "MAJOR": "주요",
+        "MINOR": "경미",
+        "WARNING": "주의",
+        "INFO": "정보"
+      },
+      "alarmStatuses": {
+        "ACTIVE": "발생",
+        "ACKNOWLEDGED": "확인됨",
+        "SUPPRESSED": "억제됨",
+        "CLEARED": "해제됨"
+      },
+      "ruleStatuses": {
+        "ACTIVE": "동작 중",
+        "INACTIVE": "꺼짐",
+        "ERROR": "오류",
+        "DRAFT": "초안"
+      }
+    },
+    "commandBands": "명령 구간 띠"
   },
   "errors": {
     "DEVICE_DUPLICATE": "같은 외부 ID의 기기가 이미 있습니다",
@@ -214,6 +343,9 @@
     "DEVICE_TAG_LIMIT": "태그는 기기당 20개까지입니다",
     "DEVICE_IN_USE": "다른 곳에서 쓰고 있어 삭제할 수 없습니다.",
     "DEVICE_IMPORT_TOO_LARGE": "CSV 파일은 5MB 이하여야 합니다.",
-    "SEMANTIC_TAG_UNKNOWN": "알 수 없는 시맨틱 태그입니다."
+    "SEMANTIC_TAG_UNKNOWN": "알 수 없는 시맨틱 태그입니다.",
+    "JOB_LIMIT_EXCEEDED": "실행 중인 작업이 끝난 뒤 다시 시도하세요",
+    "JOB_NOT_FOUND": "작업을 찾을 수 없습니다",
+    "JOB_STATE_CONFLICT": "지금 상태에서는 할 수 없습니다"
   }
 }
