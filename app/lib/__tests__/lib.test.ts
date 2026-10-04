@@ -87,8 +87,14 @@ describe("format AT-IAM-08.1 시간대 표시", () => {
 describe("permissions IAM-04.05 메뉴 숨김", () => {
   it("권한별 메뉴, 비밀번호 변경 필요 시 메뉴 없음, 경로별 필요 권한", () => {
     expect(visibleMenu(["DEV_READ"]).map((m) => m.key)).toEqual(["home", "spaces", "devices"]);
-    expect(visibleMenu(["IAM_MANAGE", "AUDIT_READ", "OPS_MANAGE"]).map((m) => m.key)).toEqual(["home", "members", "roles", "security", "audit", "settings"]);
-    expect(visibleMenu(["IAM_MANAGE", "AUDIT_READ", "OPS_MANAGE", "DEV_READ", "TS_READ", "INGEST_READ", "FLOW_READ", "DEVICE_CONTROL", "SIM_READ", "ALARM_READ", "DEV_PLACE", "NOTIFY_CHANNEL_MANAGE"])).toHaveLength(MENU.length);
+    // M5 data: 시스템 상태(저장 지표)는 OPS_MANAGE, 데이터 보관은 TS_POLICY, 내보내기·가져오기는 데이터 탐색 메뉴 아래
+    expect(visibleMenu(["IAM_MANAGE", "AUDIT_READ", "OPS_MANAGE"]).map((m) => m.key)).toEqual(["home", "members", "roles", "security", "audit", "settings", "system"]);
+    expect(visibleMenu(["TS_POLICY"]).map((m) => m.key)).toEqual(["home", "dataRetention"]);
+    expect(requiredPermissionsFor("/exports")).toEqual(["TS_READ"]);
+    expect(requiredPermissionsFor("/imports/9")).toEqual(["TS_IMPORT"]);
+    expect(requiredPermissionsFor("/settings/data-retention")).toEqual(["TS_POLICY"]);
+    expect(isMenuActive(MENU.find((m) => m.key === "explore")!, "/imports/new")).toBe(true);
+    expect(visibleMenu(["IAM_MANAGE", "AUDIT_READ", "OPS_MANAGE", "DEV_READ", "TS_READ", "INGEST_READ", "FLOW_READ", "DEVICE_CONTROL", "SIM_READ", "ALARM_READ", "DEV_PLACE", "NOTIFY_CHANNEL_MANAGE", "TS_POLICY"])).toHaveLength(MENU.length);
     // M4: 규칙·알람(ALARM_READ, 모든 역할), 유지보수 일정(DEV_PLACE), 알림 채널(NOTIFY_CHANNEL_MANAGE)
     expect(visibleMenu(["ALARM_READ"]).map((m) => m.key)).toEqual(["home", "alarms"]);
     expect(requiredPermissionsFor("/rules/r-1")).toEqual(["RULE_READ"]);
