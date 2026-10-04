@@ -134,3 +134,12 @@ describe("SCR-01.06 TC-SCR-019 수식 항목 편집기", () => {
     expect(screen.queryByRole("button", { name: "편집" })).toBeNull();
   });
 });
+
+describe("UI-SCR 구역 탭", () => {
+  it("스크립트 목록 · 공유 모듈 · 수식 항목", async () => {
+    const { ScriptAreaTabs } = await import("../area-tabs");
+    await renderRoute(<ScriptAreaTabs current="formulas" />, { session: meOf("OPERATOR") });
+    expect(await screen.findByRole("link", { name: "공유 모듈" })).toHaveAttribute("href", "/scripts/modules");
+    expect(screen.getByRole("link", { name: "수식 항목" })).toHaveAttribute("href", "/scripts/formulas");
+  });
+});
