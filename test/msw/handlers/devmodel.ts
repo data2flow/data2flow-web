@@ -197,7 +197,6 @@ export const devModelHandler: CoreHandler = async (core, { method, path, url, bo
     s.pushes = s.pushes.filter((p) => p.id !== pushMatch[1]);
     return noContent();
   }
-  if (path === "/output-connections" && method === "GET") return list([{ id: "81", name: "FIWARE Orion" }], url);
 
   // API-DEV-60~62 게이트웨이
   if (path === "/gateways" && method === "GET") {
