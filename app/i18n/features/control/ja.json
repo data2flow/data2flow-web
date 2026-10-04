@@ -341,7 +341,8 @@
       "messageRequired": "依頼者に表示する理由を1〜200文字で入力してください",
       "staleRule": "条件データが「報告周期×3、最低5分」を超えて無い場合は安全側で遮断します",
       "saved": "インターロックを保存しました",
-      "deleteConfirm": "インターロック「{{name}}」を削除しますか?"
+      "deleteConfirm": "インターロック「{{name}}」を削除しますか?",
+      "orgWide": "組織全体"
     },
     "drivers": {
       "title": "ドライバー",
@@ -488,6 +489,11 @@
       "metric": "測定項目",
       "expected": "期待効果",
       "observed": "実際の変化"
+    },
+    "notice": {
+      "title": "新しい通知",
+      "open": "開く",
+      "dismiss": "通知を閉じる"
     }
   },
   "errors": {

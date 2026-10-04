@@ -131,7 +131,12 @@
         "ACTIVATED": "활성화",
         "DEACTIVATED": "비활성화",
         "REPLACED": "교체",
-        "TAGGED": "태그 변경"
+        "TAGGED": "태그 변경",
+        "TAGS_CHANGED": "태그 변경",
+        "ATTRIBUTE_CHANGED": "속성 변경",
+        "IMPORTED": "가져오기",
+        "REJECTED": "거절",
+        "DELETED": "삭제"
       }
     },
     "semantic": {

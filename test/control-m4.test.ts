@@ -48,7 +48,7 @@ describe("ACT-06.03 UI-ACT-07 자동화 비상 정지와 전역 띠", () => {
 
     const started = await json(op, "/bff/api/core/emergency-stops", "POST", { scope: { type: "ORG" }, reason: "냉방 오작동 점검" });
     expect(started.response.status).toBe(201);
-    const id = String(parse(started.body).response.id);
+    const id = String(parse(started.body).response.emergencyStopId);
     const again = await json(op, "/bff/api/core/emergency-stops", "POST", { scope: { type: "ORG" }, reason: "다시" });
     expect(again.response.status).toBe(409);
     expect(parse(again.body).header.resultCode).toBe("EMERGENCY_STOP_ACTIVE");
@@ -163,7 +163,8 @@ describe("ACT-02.07 UI-ACT-05 예약 제어", () => {
     const page = await int.get("/control/schedules");
     expect(page.response.status).toBe(200);
     expect(page.body).toContain("아침 준비");
-    expect(page.body).toContain("장면 수업 모드");
+    // core 목록에는 targetSummary가 없어 화면이 장면 이름으로 만든다
+    expect(page.body).toContain("수업 모드");
     expect(page.body).toContain("다음 실행: ");
     expect(page.body).toContain("성공");
     const bad = await json(int, "/bff/api/core/control-schedules", "POST", { name: "잘못", target: { sceneId: "501" }, kind: "RECURRING", cron: "매일", skipHolidays: true });
@@ -173,12 +174,12 @@ describe("ACT-02.07 UI-ACT-05 예약 제어", () => {
 });
 
 describe("ACT-06.02 UI-ACT-06 인터락", () => {
-  it("INTEGRATOR: 이름·공간(하위 포함)·금지 대상·7일 차단 수, OPERATOR 403", async () => {
+  it("INTEGRATOR: 이름·공간(하위 포함)·금지 대상(core 목록에는 7일 차단 수 없음 → 0), OPERATOR 403", async () => {
     const page = await (await integrator()).get("/control/interlocks");
     expect(page.body).toContain("창문 열림 시 냉난방 금지");
     expect(page.body).toContain("실습실");
     expect(page.body).toContain("Thermostat.set · mode ∈ {cool, heat}");
-    expect(page.body).toContain(">4<");
+    expect(page.body).toContain(">0<");
     expect((await (await operator()).get("/control/interlocks")).response.status).toBe(403);
   });
 });
@@ -361,8 +362,10 @@ describe("DEV-02.07 UI-DEV-06 기기 상세 M4 탭", () => {
     const op = await operator();
     const page = await op.get(`/devices/${AIRCON_ID}?tab=operation`);
     expect(page.response.status).toBe(200);
-    const runtime = await op.get(`/bff/api/core/devices/${AIRCON_ID}/runtime?from=2026-09-27T00:00:00Z&to=2026-10-04T00:00:00Z&step=day`);
+    // action은 from·to를 날짜로 받는다(시각이면 400)
+    const runtime = await op.get(`/bff/api/core/devices/${AIRCON_ID}/runtime?from=2026-09-28&to=2026-10-04`);
     expect((parse(runtime.body).response.items as unknown[]).length).toBe(2);
+    expect((await op.get(`/bff/api/core/devices/${AIRCON_ID}/runtime?from=2026-09-27T00:00:00Z&to=2026-10-04T00:00:00Z`)).response.status).toBe(400);
   });
 });
 

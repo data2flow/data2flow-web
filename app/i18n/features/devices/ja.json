@@ -131,7 +131,12 @@
         "ACTIVATED": "有効化",
         "DEACTIVATED": "無効化",
         "REPLACED": "交換",
-        "TAGGED": "タグ変更"
+        "TAGGED": "タグ変更",
+        "TAGS_CHANGED": "タグ変更",
+        "ATTRIBUTE_CHANGED": "属性変更",
+        "IMPORTED": "インポート",
+        "REJECTED": "却下",
+        "DELETED": "削除"
       }
     },
     "semantic": {

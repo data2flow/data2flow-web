@@ -341,7 +341,8 @@
       "messageRequired": "Enter a 1–200 character message for requesters",
       "staleRule": "If condition data is missing longer than \"report interval × 3, at least 5 minutes\", commands are blocked for safety",
       "saved": "Interlock saved",
-      "deleteConfirm": "Delete interlock \"{{name}}\"?"
+      "deleteConfirm": "Delete interlock \"{{name}}\"?",
+      "orgWide": "Whole organization"
     },
     "drivers": {
       "title": "Drivers",
@@ -488,6 +489,11 @@
       "metric": "Metric",
       "expected": "Expected",
       "observed": "Observed"
+    },
+    "notice": {
+      "title": "New notification",
+      "open": "Open",
+      "dismiss": "Dismiss notification"
     }
   },
   "errors": {

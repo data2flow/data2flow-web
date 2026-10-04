@@ -131,7 +131,12 @@
         "ACTIVATED": "启用",
         "DEACTIVATED": "停用",
         "REPLACED": "更换",
-        "TAGGED": "标签变更"
+        "TAGGED": "标签变更",
+        "TAGS_CHANGED": "标签变更",
+        "ATTRIBUTE_CHANGED": "属性变更",
+        "IMPORTED": "导入",
+        "REJECTED": "拒绝",
+        "DELETED": "删除"
       }
     },
     "semantic": {

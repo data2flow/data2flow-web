@@ -19,6 +19,7 @@ import type {
   SceneRun,
   Schedule,
 } from "./model/admin";
+import { normalizeSchedule } from "./model/admin";
 
 type R<T> = Promise<BffJsonResult<T>>;
 type ListOf<T> = { responses: T[]; totalCount?: number };
@@ -35,7 +36,7 @@ export interface ControlAdminApi {
   /** API-ACT-21 전역 띠(모든 로그인 사용자) */
   activeEmergencyStops(): R<ListOf<EmergencyStop>>;
   /** API-ACT-20 */
-  startEmergencyStop(body: { scope: EmergencyStop["scope"]; reason: string }): R<{ id: string; scope: EmergencyStop["scope"]; startedAt: string; cancelledCommands?: number }>;
+  startEmergencyStop(body: { scope: EmergencyStop["scope"]; reason: string }): R<EmergencyStop>;
   /** API-ACT-21 */
   releaseEmergencyStop(id: string, note?: string): R<EmergencyStop>;
   /** API-OPS-23 진행 중 유지보수 */
@@ -50,7 +51,7 @@ export interface ControlAdminApi {
   runScene(id: string): R<{ sceneRunId: string }>;
   sceneRun(runId: string): R<SceneRun>;
 
-  /** API-ACT-15 */
+  /** API-ACT-15. core에 단건 GET이 없어 목록(전체 모양)에서 찾는다 */
   schedule(id: string): R<Schedule>;
   createSchedule(body: Record<string, unknown>): R<Schedule>;
   updateSchedule(id: string, body: Record<string, unknown>): R<Schedule>;
@@ -62,7 +63,8 @@ export interface ControlAdminApi {
   createInterlock(body: Record<string, unknown>): R<Interlock>;
   updateInterlock(id: string, body: Record<string, unknown>): R<Interlock>;
   deleteInterlock(id: string): R<void>;
-  interlockBlocks(id: string): R<ListOf<{ at: string; commandId: string; deviceId: string; deviceName?: string; capability: string; command: string; message?: string }>>;
+  /** 최근 7일(최대 200건) `{responses:[…]}` — 기기 이름은 오지 않는다 */
+  interlockBlocks(id: string): R<ListOf<{ at: string; commandId: string; deviceId: string; deviceName?: string; capability: string; command: string; args?: Record<string, unknown>; source?: Record<string, unknown>; message?: string | null }>>;
 
   /** API-ACT-30~32 */
   driver(id: string): R<Driver>;
@@ -83,8 +85,8 @@ export interface ControlAdminApi {
   bulkRun(body: BulkRequest, idempotencyKey?: string): R<{ bulkJobId: string; total: number }>;
   bulkJob(id: string): R<BulkJob>;
 
-  /** API-ACT-35 */
-  runtime(deviceId: string, from: string, to: string, step: "day" | "month"): R<RuntimeReport>;
+  /** API-ACT-35 from·to는 날짜(YYYY-MM-DD, 양 끝 포함). 항목은 일별만 온다(월 묶음은 화면이 한다) */
+  runtime(deviceId: string, from: string, to: string): R<RuntimeReport>;
 }
 
 const base = "/bff/api/core";
@@ -104,7 +106,12 @@ export const controlAdminApi: ControlAdminApi = {
   runScene: (id) => bffJson(`${base}/scenes/${enc(id)}/run`, { method: "POST", body: {}, idempotencyKey: clientIdempotencyKey() }),
   sceneRun: (runId) => bffJson(`${base}/scene-runs/${enc(runId)}`),
 
-  schedule: (id) => bffJson(`${base}/control-schedules/${enc(id)}`),
+  schedule: async (id) => {
+    const result = await bffJson<ListOf<Schedule>>(`${base}/control-schedules?size=100`);
+    if (!result.ok) return result;
+    const found = (result.data.responses ?? []).find((s) => s.controlScheduleId === id);
+    return found ? { ...result, data: normalizeSchedule(found) } : { ok: false, status: 404, code: "RESOURCE_NOT_FOUND", message: "" };
+  },
   createSchedule: (body) => bffJson(`${base}/control-schedules`, { method: "POST", body, idempotencyKey: clientIdempotencyKey() }),
   updateSchedule: (id, body) => bffJson(`${base}/control-schedules/${enc(id)}`, { method: "PUT", body }),
   deleteSchedule: (id) => bffJson(`${base}/control-schedules/${enc(id)}`, { method: "DELETE" }),
@@ -114,7 +121,7 @@ export const controlAdminApi: ControlAdminApi = {
   createInterlock: (body) => bffJson(`${base}/interlocks`, { method: "POST", body, idempotencyKey: clientIdempotencyKey() }),
   updateInterlock: (id, body) => bffJson(`${base}/interlocks/${enc(id)}`, { method: "PUT", body }),
   deleteInterlock: (id) => bffJson(`${base}/interlocks/${enc(id)}`, { method: "DELETE" }),
-  interlockBlocks: (id) => bffJson(`${base}/interlocks/${enc(id)}/blocks?size=20`),
+  interlockBlocks: (id) => bffJson(`${base}/interlocks/${enc(id)}/blocks`),
 
   driver: (id) => bffJson(`${base}/drivers/${enc(id)}`),
   createDriver: (body) => bffJson(`${base}/drivers`, { method: "POST", body, idempotencyKey: clientIdempotencyKey() }),
@@ -132,5 +139,5 @@ export const controlAdminApi: ControlAdminApi = {
   bulkRun: (body, key) => bffJson(`${base}/commands/bulk`, { method: "POST", body: { ...body, preview: false }, idempotencyKey: key ?? clientIdempotencyKey() }),
   bulkJob: (id) => bffJson(`${base}/command-bulk-jobs/${enc(id)}`),
 
-  runtime: (deviceId, from, to, step) => bffJson(`${base}/devices/${enc(deviceId)}/runtime?${new URLSearchParams({ from, to, step })}`),
+  runtime: (deviceId, from, to) => bffJson(`${base}/devices/${enc(deviceId)}/runtime?${new URLSearchParams({ from, to })}`),
 };

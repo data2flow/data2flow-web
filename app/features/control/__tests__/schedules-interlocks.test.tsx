@@ -195,7 +195,7 @@ describe("UI-ACT-06 인터락", () => {
       name: "미세먼지 시 외기 금지",
       spaceId: "31",
       includeChildren: true,
-      condition: { kind: "metric", spaceAgg: "avg", metric: "pm2_5", op: ">", value: 75 },
+      condition: { kind: "metric", spaceAgg: true, metric: "pm2_5", op: ">", value: 75 },
       forbid: { capability: "Ventilation", command: "set" },
       message: "미세먼지가 높아 외기 환기를 막았습니다",
       enabled: true,

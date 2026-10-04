@@ -3,6 +3,10 @@
  * 드라이버 쓰기·연결 확인·지표(API-ACT-30~32), 사용자 정의 기능 쓰기(API-ACT-25), 일괄 제어(API-ACT-05), 가동·효과(API-ACT-35),
  * 기기 변경 이력(API-DEV-27), 일괄 작업(API-DEV-70~74). 상태는 core.extra.controlM4. control.ts가 먼저 이 핸들러를 부른다.
  * 규칙·알람(RUL)과 유지보수(OPS-05) 응답은 그 도메인 핸들러 몫이라 여기 두지 않는다(테스트는 server.use로 덮어쓴다).
+ * 모양은 core-api M4 실제 구현을 따른다: 장면·예약 목록은 전체 모양, 저장된 대상 ID(장면 항목 target, 예약 target·spaceHours)는 JSON 숫자,
+ * 예약 단건 GET 없음, 인터락 목록에 blocks7d 없음·차단 기록에 기기 이름 없음, 가동 현황 from·to는 날짜, 변경 이력 action은 감사 이름.
+ * `/drivers/test`(저장 전 연결 확인)는 문서(API-ACT-31)에만 있고 core에 아직 없다 — 화면 계약을 지키려고 남겨 둔다.
+ * 일괄 작업(`/device-jobs`, API-DEV-70~74)도 core M4에 아직 없다.
  */
 import { fail, list, noContent, ok, type CoreHandler, type CoreState } from "../core-fixtures";
 
@@ -38,7 +42,7 @@ export interface ControlM4State {
   bulkJobs: Map<string, { total: number; polls: number }>;
   jobs: Record<string, unknown>[];
   jobItems: Map<string, Record<string, unknown>[]>;
-  history: Map<string, { at: string; actor: { userId: string; name: string }; action: string; changes: Record<string, [unknown, unknown]> }[]>;
+  history: Map<string, { id: string; at: string; actor: { type: string; id: string; name: string }; action: string; result: string; changes: Record<string, [unknown, unknown]> }[]>;
   /** 요청 본문 기록(테스트 확인용) */
   bodies: { path: string; body: unknown }[];
 }
@@ -55,8 +59,8 @@ export function controlM4State(core: CoreState): ControlM4State {
         description: "강의 시작 전",
         spaceId: "31",
         items: [
-          { target: { spaceId: "31", relation: "controls", capability: "Thermostat", includeChildren: false }, capability: "Thermostat", desired: { mode: "cool", targetTemperature: 24 } },
-          { target: { deviceId: "2001" }, capability: "Switch", desired: { on: true } },
+          { target: { spaceId: 31, relation: "controls", capability: "Thermostat", includeChildren: false }, capability: "Thermostat", desired: { mode: "cool", targetTemperature: 24 } },
+          { target: { deviceId: 2001 }, capability: "Switch", desired: { on: true } },
         ],
         version: 3,
         updatedAt: "2026-10-02T00:00:00Z",
@@ -68,7 +72,7 @@ export function controlM4State(core: CoreState): ControlM4State {
         controlScheduleId: "601",
         name: "아침 준비",
         kind: "RECURRING",
-        target: { sceneId: "501" },
+        target: { sceneId: 501 },
         cron: "50 8 * * 1,2,3,4,5",
         at: null,
         spaceHours: null,
@@ -79,7 +83,6 @@ export function controlM4State(core: CoreState): ControlM4State {
         enabled: true,
         nextRunAt: "2026-10-05T23:50:00Z",
         lastRun: { at: "2026-10-02T23:50:00Z", status: "SUCCEEDED", commandIds: [] },
-        targetSummary: "장면 수업 모드",
         version: 2,
         updatedAt: AT,
       },
@@ -89,12 +92,12 @@ export function controlM4State(core: CoreState): ControlM4State {
         interlockId: "701",
         name: "창문 열림 시 냉난방 금지",
         spaceId: "31",
+        spaceName: "실습실 301",
         includeChildren: true,
         condition: { kind: "state", relation: "measures", capability: "Contact", attribute: "open", op: "==", value: true },
         forbid: { capability: "Thermostat", command: "set", argsMatch: { mode: { in: ["cool", "heat"] } } },
         message: "창문이 열려 있어 냉난방을 막았습니다",
         enabled: true,
-        blocks7d: 4,
         version: 1,
         updatedAt: AT,
       },
@@ -156,8 +159,8 @@ export function controlM4State(core: CoreState): ControlM4State {
       [
         "1042",
         [
-          { at: "2026-10-03T02:00:00Z", actor: { userId: "8", name: "이통합" }, action: "UPDATED", changes: { name: ["AM107", "실습실 AM107"] } },
-          { at: "2026-10-01T00:00:00Z", actor: { userId: "7", name: "김운영" }, action: "APPROVED", changes: { status: ["PENDING", "ACTIVE"], spaceId: [null, "31"] } },
+          { id: "9102", at: "2026-10-03T02:00:00Z", actor: { type: "USER", id: "8", name: "이통합" }, action: "DEVICE_UPDATED", result: "SUCCESS", changes: { name: ["AM107", "실습실 AM107"] } },
+          { id: "9101", at: "2026-10-01T00:00:00Z", actor: { type: "USER", id: "7", name: "김운영" }, action: "DEVICE_APPROVED", result: "SUCCESS", changes: { status: ["PENDING", "ACTIVE"], spaceId: [null, "31"] } },
         ],
       ],
     ]),
@@ -193,7 +196,7 @@ export const controlM4Handler: CoreHandler = (core, { method, path, url, body, c
     if (state.stops.some((s) => s.active && s.scope.type === scope?.type && s.scope.spaceId === scope?.spaceId)) return fail(409, "EMERGENCY_STOP_ACTIVE");
     const stop = { emergencyStopId: next(), scope, reason, startedBy: me, startedAt: AT, releasedBy: null, releasedAt: null, releaseNote: null, active: true };
     state.stops.push(stop);
-    return ok({ id: stop.emergencyStopId, scope, startedAt: AT, cancelledCommands: 0 }, 201);
+    return ok(stop, 201, { Location: `/api/v1/core/emergency-stops/${stop.emergencyStopId}` });
   }
   const release = /^\/emergency-stops\/([^/]+)\/release$/.exec(path);
   if (release && method === "POST") {
@@ -205,17 +208,27 @@ export const controlM4Handler: CoreHandler = (core, { method, path, url, body, c
   }
 
   // ── 장면 ──
-  const sceneView = (s: ControlM4State["scenes"][number]) => ({ ...s, itemCount: s.items.length, createdBy: { userId: "8", name: "이통합" } });
+  const sceneView = (s: ControlM4State["scenes"][number]) => ({ ...s, itemCount: s.items.length });
+  /** core SceneService.values: 대상 ID는 숫자로 저장, 관계 대상은 relation=controls·capability·includeChildren을 채운다 */
+  const storeItems = (items: ControlM4State["scenes"][number]["items"]) =>
+    items.map((i) => {
+      const t = i.target as Record<string, unknown>;
+      const target =
+        t.deviceId != null
+          ? { deviceId: Number(t.deviceId) }
+          : { spaceId: Number(t.spaceId), relation: "controls", capability: (t.capability as string) ?? i.capability, includeChildren: t.includeChildren !== false };
+      return { target, capability: i.capability, desired: i.desired };
+    });
   if (path === "/scenes" && method === "GET")
     return list(
-      state.scenes.map((s) => ({ sceneId: s.sceneId, name: s.name, spaceId: s.spaceId, itemCount: s.items.length, updatedAt: s.updatedAt })),
+      state.scenes.map((s) => sceneView(s)),
       url,
     );
   if (path === "/scenes" && method === "POST") {
     if (!can("SCENE_MANAGE")) return fail(403, "PERMISSION_DENIED");
     const items = (b.items as ControlM4State["scenes"][number]["items"]) ?? [];
     if (items.length > 100) return fail(400, "SCENE_ITEM_LIMIT_EXCEEDED");
-    const scene = { sceneId: next(), name: String(b.name), description: (b.description as string) ?? null, spaceId: (b.spaceId as string) ?? null, items, version: 1, updatedAt: AT };
+    const scene = { sceneId: next(), name: String(b.name), description: (b.description as string) ?? null, spaceId: (b.spaceId as string) ?? null, items: storeItems(items), version: 1, updatedAt: AT };
     state.scenes.push(scene);
     return ok(sceneView(scene), 201, { Location: `/api/v1/core/scenes/${scene.sceneId}` });
   }
@@ -227,7 +240,7 @@ export const controlM4Handler: CoreHandler = (core, { method, path, url, body, c
     if (!scene[3] && method === "PUT") {
       if (!can("SCENE_MANAGE")) return fail(403, "PERMISSION_DENIED");
       if (b.baseVersion !== found.version) return fail(409, "VERSION_CONFLICT");
-      Object.assign(found, { name: b.name, description: b.description ?? null, items: b.items, version: found.version + 1 });
+      Object.assign(found, { name: b.name, description: b.description ?? null, items: storeItems((b.items as ControlM4State["scenes"][number]["items"]) ?? []), version: found.version + 1 });
       return ok(sceneView(found));
     }
     if (!scene[3] && method === "DELETE") {
@@ -273,19 +286,33 @@ export const controlM4Handler: CoreHandler = (core, { method, path, url, body, c
         { deviceId: "2003", status: "SKIPPED", reason: "NO_CHANGE" },
       ];
     }
-    return ok({ status: found.status, results: found.results });
+    return ok({ sceneRunId: run[1], sceneId: "501", status: found.status, results: found.results });
   }
 
   // ── 예약 ──
-  if (path === "/control-schedules" && method === "GET")
-    return list(
-      state.schedules.map(({ controlScheduleId, name, kind, targetSummary, enabled, nextRunAt, lastRun }) => ({ controlScheduleId, name, kind, targetSummary, enabled, nextRunAt, lastRun })),
-      url,
-    );
+  /** core ScheduleService.values: 대상·운영 시간 ID는 숫자로 저장 */
+  const storeSchedule = (body: Record<string, unknown>) => {
+    const t = (body.target ?? {}) as Record<string, unknown>;
+    const target = t.sceneId != null ? { sceneId: Number(t.sceneId) } : { deviceId: Number(t.deviceId), capability: t.capability, command: t.command, args: t.args ?? {} };
+    const sh = body.spaceHours as Record<string, unknown> | undefined;
+    return {
+      name: body.name,
+      target,
+      kind: body.kind,
+      at: body.at ?? null,
+      cron: body.cron ?? null,
+      spaceHours: sh ? { spaceId: Number(sh.spaceId), edge: sh.edge ?? "START", offsetMinutes: sh.offsetMinutes ?? 0 } : null,
+      validFrom: body.validFrom ?? null,
+      validTo: body.validTo ?? null,
+      skipHolidays: Boolean(body.skipHolidays),
+      timezone: body.timezone ?? "Asia/Seoul",
+    };
+  };
+  if (path === "/control-schedules" && method === "GET") return list(state.schedules, url);
   if (path === "/control-schedules" && method === "POST") {
     if (!can("SCHEDULE_MANAGE")) return fail(403, "PERMISSION_DENIED");
     if (b.kind === "RECURRING" && !/^\S+ \S+ \S+ \S+ \S+$/.test(String(b.cron ?? ""))) return fail(400, "SCHEDULE_INVALID");
-    const created = { ...b, controlScheduleId: next(), enabled: true, nextRunAt: "2026-10-05T23:50:00Z", lastRun: null, version: 1, updatedAt: AT };
+    const created = { controlScheduleId: next(), ...storeSchedule(b), enabled: true, nextRunAt: "2026-10-05T23:50:00Z", lastRun: null, version: 1, updatedAt: AT };
     state.schedules.push(created);
     return ok(created, 201);
   }
@@ -294,9 +321,11 @@ export const controlM4Handler: CoreHandler = (core, { method, path, url, body, c
     const found = state.schedules.find((s) => s.controlScheduleId === schedule[1]);
     if (!found) return fail(404, "RESOURCE_NOT_FOUND");
     if (!can("SCHEDULE_MANAGE")) return fail(403, "PERMISSION_DENIED");
-    if (!schedule[3] && method === "GET") return ok(found);
+    // core에는 단건 GET이 없다(PUT·DELETE만 있어 405)
+    if (!schedule[3] && method === "GET") return fail(405, "METHOD_NOT_ALLOWED");
     if (!schedule[3] && method === "PUT") {
-      Object.assign(found, b, { version: Number(found.version) + 1 });
+      if (b.baseVersion != null && b.baseVersion !== found.version) return fail(409, "VERSION_CONFLICT");
+      Object.assign(found, storeSchedule(b), { version: Number(found.version) + 1 });
       return ok(found);
     }
     if (!schedule[3] && method === "DELETE") {
@@ -306,29 +335,24 @@ export const controlM4Handler: CoreHandler = (core, { method, path, url, body, c
     if (schedule[3] && method === "POST") {
       found.enabled = schedule[3] === "enable";
       found.nextRunAt = found.enabled ? "2026-10-05T23:50:00Z" : null;
-      return ok({ controlScheduleId: found.controlScheduleId, enabled: found.enabled, nextRunAt: found.nextRunAt });
+      return ok(found);
     }
   }
 
   // ── 인터락 ──
   if (path.startsWith("/interlocks") && !can("INTERLOCK_MANAGE")) return fail(403, "PERMISSION_DENIED");
-  if (path === "/interlocks" && method === "GET")
-    return list(
-      state.interlocks.map(({ interlockId, name, spaceId, includeChildren, forbid, enabled, blocks7d, updatedAt }) => ({
-        interlockId,
-        name,
-        spaceId,
-        includeChildren,
-        forbid,
-        enabled,
-        blocks7d,
-        updatedAt,
-      })),
-      url,
-    );
+  /** core SafetyService.interlockValues: metric 조건은 deviceId 또는 spaceAgg=true(boolean)만 받는다 */
+  const interlockInvalid = () => {
+    const c = (b.condition ?? {}) as Record<string, unknown>;
+    if (!(b.forbid as { capability?: string })?.capability) return fail(400, "INTERLOCK_INVALID", { errors: [{ field: "forbid.capability", code: "INVALID", message: "" }] });
+    if (c.kind === "metric" && c.deviceId == null && c.spaceAgg !== true) return fail(400, "INTERLOCK_INVALID", { errors: [{ field: "condition.metric", code: "INVALID", message: "" }] });
+    return undefined;
+  };
+  if (path === "/interlocks" && method === "GET") return list(state.interlocks, url);
   if (path === "/interlocks" && method === "POST") {
-    if (!(b.forbid as { capability?: string })?.capability) return fail(400, "INTERLOCK_INVALID");
-    const created = { ...b, interlockId: next(), blocks7d: 0, version: 1, updatedAt: AT };
+    const invalid = interlockInvalid();
+    if (invalid) return invalid;
+    const created = { ...b, interlockId: next(), version: 1, updatedAt: AT };
     state.interlocks.push(created);
     return ok(created, 201);
   }
@@ -336,14 +360,14 @@ export const controlM4Handler: CoreHandler = (core, { method, path, url, body, c
   if (interlock) {
     const found = state.interlocks.find((s) => s.interlockId === interlock[1]);
     if (!found) return fail(404, "RESOURCE_NOT_FOUND");
+    // action 중계 그대로: ApiResponse {responses:[…]}(최근 7일, 200건), 기기 이름 없음
     if (interlock[2])
-      return list(
-        [
+      return ok({
+        responses: [
           {
             at: "2026-10-03T01:10:00Z",
             commandId: "c0000000-0000-4000-8000-000000000002",
             deviceId: "2001",
-            deviceName: "AC-1 실습실 에어컨",
             capability: "Thermostat",
             command: "set",
             args: { mode: "cool" },
@@ -351,11 +375,14 @@ export const controlM4Handler: CoreHandler = (core, { method, path, url, body, c
             message: found.message,
           },
         ],
-        url,
-      );
+      });
     if (method === "GET") return ok(found);
     if (method === "PUT") {
-      Object.assign(found, b, { version: Number(found.version) + 1 });
+      const invalid = interlockInvalid();
+      if (invalid) return invalid;
+      if (b.baseVersion != null && b.baseVersion !== found.version) return fail(409, "VERSION_CONFLICT");
+      const { baseVersion: _base, ...rest } = b;
+      Object.assign(found, rest, { version: Number(found.version) + 1 });
       return ok(found);
     }
     if (method === "DELETE") {
@@ -455,16 +482,22 @@ export const controlM4Handler: CoreHandler = (core, { method, path, url, body, c
     const job = state.bulkJobs.get(bulk[1]);
     if (!job) return fail(404, "RESOURCE_NOT_FOUND");
     job.polls += 1;
-    return ok({ total: job.total, succeeded: job.total - 1, failed: 0, queued: 1, skipped: 0, items: [{ deviceId: "2001", status: "QUEUED", reason: "OFFLINE" }] });
+    return ok({ bulkJobId: bulk[1], status: "RUNNING", total: job.total, succeeded: job.total - 1, failed: 0, queued: 1, skipped: 0, items: [{ deviceId: "2001", commandId: "c0000000-0000-4000-8000-000000000003", status: "QUEUED", reason: "OFFLINE" }] });
   }
 
   // ── 가동·효과(API-ACT-35) ──
   const runtime = /^\/devices\/([^/]+)\/runtime$/.exec(path);
   if (runtime && method === "GET") {
+    // action은 from·to를 LocalDate로 받는다(시각을 보내면 400)
+    const date = /^\d{4}-\d{2}-\d{2}$/;
+    for (const key of ["from", "to"]) {
+      const v = url.searchParams.get(key);
+      if (v !== null && !date.test(v)) return fail(400, "INVALID_REQUEST", { errors: [{ field: key, code: "TYPE_MISMATCH", message: "" }] });
+    }
     return ok({
       items: [
-        { date: "2026-10-02", onSeconds: 21600, cycles: 4, energyWh: 7200, energySource: "RATED" },
-        { date: "2026-10-03", onSeconds: 10800, cycles: 2, energyWh: 3600, energySource: "RATED" },
+        { date: "2026-10-02", onSeconds: 21600, cycles: 4, energyWh: 7200, energySource: "RATED", noEffectEvents: 0 },
+        { date: "2026-10-03", onSeconds: 10800, cycles: 2, energyWh: 3600, energySource: "RATED", noEffectEvents: 1 },
       ],
       noEffectEvents: [
         {

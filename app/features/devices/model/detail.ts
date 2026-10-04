@@ -8,17 +8,25 @@ import type { DeviceDetail } from "./devices";
 
 // ── 변경 이력(API-DEV-27) ────────────────────────────────────────────────────
 
+/** core 감사 기록에서 만든 한 줄(DeviceHistoryService): actor {type, id, name}, action은 감사 이름(DEVICE_UPDATED …), changes는 {필드: [이전, 이후]} 또는 원본 상세 */
 export interface HistoryEntry {
+  id?: string;
   at: string;
-  actor?: string | { userId?: string; name?: string | null; type?: string } | null;
+  actor?: string | { id?: string | null; userId?: string; name?: string | null; type?: string | null } | null;
   action: string;
-  changes?: Record<string, [unknown, unknown]> | null;
+  result?: string | null;
+  changes?: Record<string, unknown> | null;
 }
 
 export function actorName(actor: HistoryEntry["actor"]): string {
   if (!actor) return "–";
   if (typeof actor === "string") return actor;
-  return actor.name ?? actor.userId ?? actor.type ?? "–";
+  return actor.name ?? actor.userId ?? actor.id ?? actor.type ?? "–";
+}
+
+/** 감사 이름 DEVICE_UPDATED → 화면 키 UPDATED */
+export function historyAction(action: string): string {
+  return action.replace(/^DEVICE_/, "");
 }
 
 const show = (v: unknown) => (v === null || v === undefined || v === "" ? "–" : typeof v === "object" ? JSON.stringify(v) : String(v));

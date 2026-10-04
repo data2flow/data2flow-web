@@ -12,7 +12,7 @@ import { formatDateTime } from "~/lib/format";
 import type { SpaceNode } from "~/lib/spaces";
 import { controlAdminApi, type ControlAdminApi } from "./admin-api";
 import { localToUtc } from "./model/control";
-import { emptyScheduleForm, scheduleBody, scheduleProblems, scheduleToForm, type Schedule, type ScheduleForm, type ScheduleSummary } from "./model/admin";
+import { emptyScheduleForm, scheduleBody, scheduleProblems, scheduleSummaryOf, scheduleToForm, type ScheduleForm, type ScheduleSummary } from "./model/admin";
 
 const DAYS = [1, 2, 3, 4, 5, 6, 7];
 
@@ -23,22 +23,6 @@ export function utcToLocalInput(iso: string, timezone: string): string {
   );
   const get = (type: string) => parts.find((p) => p.type === type)?.value ?? "00";
   return `${get("year")}-${get("month")}-${get("day")}T${get("hour")}:${get("minute")}`;
-}
-
-/** 저장 응답(API-ACT-15)에는 targetSummary가 없어 화면에서 대상 이름을 만든다 */
-function summaryOf(s: Schedule, scenes: { sceneId: string; name: string }[], devices: { id: string; name: string }[]): ScheduleSummary {
-  const target = s.target.sceneId
-    ? (scenes.find((x) => x.sceneId === s.target.sceneId)?.name ?? s.target.sceneId)
-    : `${devices.find((d) => d.id === s.target.deviceId)?.name ?? s.target.deviceId ?? ""} ${s.target.capability ?? ""}.${s.target.command ?? ""}`;
-  return {
-    controlScheduleId: s.controlScheduleId,
-    name: s.name,
-    kind: s.kind,
-    targetSummary: s.targetSummary ?? target,
-    enabled: s.enabled,
-    nextRunAt: s.nextRunAt ?? null,
-    lastRun: s.lastRun ?? null,
-  };
 }
 
 export interface ScheduleManagerProps {
@@ -84,7 +68,7 @@ export function ScheduleManager({ initial, failed, scenes, devices, spaces, time
       setNotice({ tone: "danger", text: errorText(t, result) ?? "" });
       return;
     }
-    const row = summaryOf(result.data, scenes, devices);
+    const row = scheduleSummaryOf(result.data, scenes, devices);
     setRows((list) => (list.some((r) => r.controlScheduleId === row.controlScheduleId) ? list.map((r) => (r.controlScheduleId === row.controlScheduleId ? row : r)) : [row, ...list]));
     setEditing(null);
     setNotice({ tone: "success", text: t("control.schedules.saved", { at: row.nextRunAt ? formatDateTime(row.nextRunAt, timezone, lang) : "–" }) });

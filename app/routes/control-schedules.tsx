@@ -7,7 +7,7 @@ import { callApi, callList } from "~/bff/api.server";
 import { bff } from "~/bff/middleware.server";
 import { PageHeader } from "~/components/ui";
 import { ControlAreaTabs } from "~/features/control/area-tabs";
-import type { SceneSummary, ScheduleSummary } from "~/features/control/model/admin";
+import { scheduleSummaryOf, type SceneSummary, type Schedule } from "~/features/control/model/admin";
 import { ScheduleManager } from "~/features/control/schedules";
 import type { SpaceNode } from "~/lib/spaces";
 import type { RootData } from "~/root";
@@ -20,16 +20,19 @@ export function meta() {
 export async function loader({ request, context }: Route.LoaderArgs) {
   const ctx = bff(context);
   const [schedules, scenes, devices, spaces] = await Promise.all([
-    callList<ScheduleSummary>(ctx, request, "/api/v1/core/control-schedules?size=100"),
+    callList<Schedule>(ctx, request, "/api/v1/core/control-schedules?size=100"),
     callList<SceneSummary>(ctx, request, "/api/v1/core/scenes?size=100"),
     callList<{ id: string; name: string }>(ctx, request, "/api/v1/core/devices?status=ACTIVE&size=100"),
     callApi<SpaceNode[]>(ctx, request, "/api/v1/core/spaces"),
   ]);
+  const sceneOptions = scenes.ok ? scenes.list.responses.map((s) => ({ sceneId: s.sceneId, name: s.name })) : [];
+  const deviceOptions = devices.ok ? devices.list.responses.map((d) => ({ id: String(d.id), name: d.name })) : [];
   return {
-    schedules: schedules.ok ? schedules.list.responses : [],
+    // core 목록은 전체 모양(targetSummary 없음, 대상 ID는 숫자) — 행 요약으로 바꾼다
+    schedules: schedules.ok ? schedules.list.responses.map((s) => scheduleSummaryOf(s, sceneOptions, deviceOptions)) : [],
     failed: !schedules.ok,
-    scenes: scenes.ok ? scenes.list.responses.map((s) => ({ sceneId: s.sceneId, name: s.name })) : [],
-    devices: devices.ok ? devices.list.responses.map((d) => ({ id: String(d.id), name: d.name })) : [],
+    scenes: sceneOptions,
+    devices: deviceOptions,
     spaces: spaces.ok ? (spaces.data ?? []) : [],
   };
 }

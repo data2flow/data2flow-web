@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { Alert, Badge, ButtonLink, Card, EmptyState, Table } from "~/components/ui";
 import { formatDateTime } from "~/lib/format";
-import { actorName, changeLines, severityTone, type AlarmRow, type HistoryEntry, type RuleRow, type RuleVia } from "./model/detail";
+import { actorName, changeLines, historyAction, severityTone, type AlarmRow, type HistoryEntry, type RuleRow, type RuleVia } from "./model/detail";
 
 export function DeviceRulesTab({
   rules,
@@ -134,10 +134,10 @@ export function DeviceHistoryTab({ entries, failed, timezone, lang, moreHref }: 
           </thead>
           <tbody>
             {entries.map((e, i) => (
-              <tr key={`${e.at}-${i}`}>
+              <tr key={e.id ?? `${e.at}-${i}`}>
                 <td className="whitespace-nowrap">{formatDateTime(e.at, timezone, lang, true)}</td>
                 <td>{actorName(e.actor)}</td>
-                <td>{t(`devices.history.actions.${e.action}`, { defaultValue: e.action })}</td>
+                <td>{t(`devices.history.actions.${historyAction(e.action)}`, { defaultValue: e.action })}</td>
                 <td>
                   <ul className="font-mono text-[12px]">
                     {changeLines(e.changes).map((line) => (

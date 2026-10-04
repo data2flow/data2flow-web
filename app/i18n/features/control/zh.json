@@ -341,7 +341,8 @@
       "messageRequired": "请输入1~200个字符的原因说明",
       "staleRule": "若条件数据缺失超过“上报周期×3,至少5分钟”,则按安全原则阻止",
       "saved": "联锁已保存",
-      "deleteConfirm": "删除联锁“{{name}}”吗?"
+      "deleteConfirm": "删除联锁“{{name}}”吗?",
+      "orgWide": "整个组织"
     },
     "drivers": {
       "title": "驱动",
@@ -488,6 +489,11 @@
       "metric": "测量项",
       "expected": "预期效果",
       "observed": "实际变化"
+    },
+    "notice": {
+      "title": "新通知",
+      "open": "打开",
+      "dismiss": "关闭通知"
     }
   },
   "errors": {

@@ -32,16 +32,18 @@ import { formatDateTime } from "~/lib/format";
 import type { RootData } from "~/root";
 import type { Route } from "./+types/sink-connections";
 
+/** dead-letter 한 묶음(action SinkConnectionService.DeadLetter, 커서 목록): 레코드 내용은 주지 않고 건수만 준다 */
 interface DeadLetter {
-  deadLetterId: string;
-  flowId: string;
-  nodeId: string;
+  id: string;
   target: string;
-  record: Record<string, unknown>;
-  error: string;
+  mode?: string | null;
+  recordCount: number;
   attempts: number;
-  failedAt: string;
-  expiresAt?: string;
+  errorKind?: string | null;
+  lastError?: string | null;
+  createdAt?: string | null;
+  deadAt?: string | null;
+  deadUntil?: string | null;
 }
 
 export function meta() {
@@ -133,8 +135,12 @@ export async function action({ request, context }: Route.ActionArgs) {
     const all = field(form, "all") === "true";
     const ids = form.getAll("ids").filter((v): v is string => typeof v === "string" && v.length > 0);
     if (!all && ids.length === 0) return fail(400, { intent, error: { code: "FLOWOPS_SELECT_REQUIRED" } });
-    const result = await callApi<{ requested: number; resent: number; failed: number }>(ctx, request, path("/dead-letters/resend"), { method: "POST", body: all ? { all: true } : { ids }, idempotencyKey: newIdempotencyKey() });
-    return result.ok ? ({ intent, done: true, resend: result.data } satisfies ActionData) : fail(result.status, { intent, error: { code: result.code, message: result.message } });
+    // action 응답은 {resent}뿐 — 요청 수·실패 수는 화면이 셈한다(전체 재전송이면 요청 = 재전송)
+    const result = await callApi<{ resent: number }>(ctx, request, path("/dead-letters/resend"), { method: "POST", body: all ? { all: true } : { ids }, idempotencyKey: newIdempotencyKey() });
+    if (!result.ok) return fail(result.status, { intent, error: { code: result.code, message: result.message } });
+    const resent = Number(result.data?.resent ?? 0);
+    const requested = all ? resent : ids.length;
+    return { intent, done: true, resend: { requested, resent, failed: Math.max(0, requested - resent) } } satisfies ActionData;
   }
   return fail(400, { intent, error: { code: "INVALID_REQUEST" } });
 }
@@ -323,15 +329,15 @@ export default function SinkConnections({ loaderData, actionData }: Route.Compon
                   </thead>
                   <tbody>
                     {deadLetters.map((d) => (
-                      <tr key={d.deadLetterId}>
+                      <tr key={d.id}>
                         <td>
-                          <input type="checkbox" name="ids" value={d.deadLetterId} aria-label={t("flowops.sinks.dlSelect", { id: d.deadLetterId })} />
+                          <input type="checkbox" name="ids" value={d.id} aria-label={t("flowops.sinks.dlSelect", { id: d.id })} />
                         </td>
                         <td>{d.target}</td>
-                        <td className="text-bad">{d.error}</td>
+                        <td className="text-bad">{[d.errorKind, d.lastError].filter(Boolean).join(": ") || "–"}</td>
                         <td>{d.attempts}</td>
-                        <td>{formatDateTime(d.failedAt, tz, i18n.language)}</td>
-                        <td className="max-w-[16rem] truncate font-mono text-[12px]">{JSON.stringify(d.record)}</td>
+                        <td>{d.deadAt ? formatDateTime(d.deadAt, tz, i18n.language) : "–"}</td>
+                        <td className="font-mono text-[12px]">{d.recordCount}</td>
                       </tr>
                     ))}
                   </tbody>

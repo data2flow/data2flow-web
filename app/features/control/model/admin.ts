@@ -56,8 +56,9 @@ export interface MaintenanceWindow {
 // ── 장면(ACT-05, UI-ACT-04) ──────────────────────────────────────────────────
 
 export interface SceneTarget {
-  deviceId?: string | null;
-  spaceId?: string | null;
+  /** core 응답은 숫자, 요청은 문자열 */
+  deviceId?: string | number | null;
+  spaceId?: string | number | null;
   relation?: string | null;
   capability?: string | null;
   includeChildren?: boolean | null;
@@ -102,6 +103,11 @@ export interface SceneRun {
 
 export const SCENE_ITEM_LIMIT = 100;
 
+/** ID 값(문자열·숫자) → 문자열. 비어 있으면 null */
+export function idText(value: unknown): string | null {
+  return value === null || value === undefined || value === "" ? null : String(value);
+}
+
 /** 장면 저장 전 검사(BR-ACT-16): 이름 1~60자, 항목 1~100개, 항목마다 대상·기능·목표 상태 */
 export function sceneProblems(name: string, items: SceneItem[]): { field: string; code: string }[] {
   const problems: { field: string; code: string }[] = [];
@@ -120,9 +126,10 @@ export function sceneProblems(name: string, items: SceneItem[]): { field: string
 
 /** 관계 대상은 기능을 target에도 넣는다(API-ACT-10 `{spaceId, relation:"controls", capability, includeChildren}`) */
 export function normalizeSceneItem(item: SceneItem): SceneItem {
-  if (item.target.deviceId) return { target: { deviceId: item.target.deviceId }, capability: item.capability, desired: item.desired };
+  // core는 저장한 대상 ID를 JSON 숫자로 돌려준다(SceneService.values) — 화면·비교는 문자열로 맞춘다
+  if (item.target.deviceId != null && item.target.deviceId !== "") return { target: { deviceId: idText(item.target.deviceId) }, capability: item.capability, desired: item.desired };
   return {
-    target: { spaceId: item.target.spaceId, relation: "controls", capability: item.capability, includeChildren: Boolean(item.target.includeChildren) },
+    target: { spaceId: idText(item.target.spaceId), relation: "controls", capability: item.capability, includeChildren: Boolean(item.target.includeChildren) },
     capability: item.capability,
     desired: item.desired,
   };
@@ -170,6 +177,36 @@ export interface ScheduleSummary {
   enabled: boolean;
   nextRunAt?: string | null;
   lastRun?: { at?: string | null; status?: string | null } | null;
+}
+
+/**
+ * core 예약 응답(API-ACT-15) 정리: 목록도 전체 모양이고, target·spaceHours 안의 ID는 JSON 숫자로 온다(ScheduleService.values).
+ * 화면은 문자열 ID로 다룬다.
+ */
+export function normalizeSchedule(s: Schedule): Schedule {
+  const target = s.target ?? {};
+  return {
+    ...s,
+    target: { ...target, sceneId: idText(target.sceneId), deviceId: idText(target.deviceId) },
+    spaceHours: s.spaceHours ? { ...s.spaceHours, spaceId: idText(s.spaceHours.spaceId) ?? "" } : (s.spaceHours ?? null),
+  };
+}
+
+/** 목록 행: core 응답에는 targetSummary가 없어 장면·기기 이름으로 만든다 */
+export function scheduleSummaryOf(raw: Schedule, scenes: { sceneId: string; name: string }[], devices: { id: string; name: string }[]): ScheduleSummary {
+  const s = normalizeSchedule(raw);
+  const target = s.target.sceneId
+    ? (scenes.find((x) => x.sceneId === s.target.sceneId)?.name ?? s.target.sceneId)
+    : `${devices.find((d) => d.id === s.target.deviceId)?.name ?? s.target.deviceId ?? ""} ${s.target.capability ?? ""}.${s.target.command ?? ""}`;
+  return {
+    controlScheduleId: s.controlScheduleId,
+    name: s.name,
+    kind: s.kind,
+    targetSummary: s.targetSummary ?? target,
+    enabled: s.enabled,
+    nextRunAt: s.nextRunAt ?? null,
+    lastRun: s.lastRun ?? null,
+  };
 }
 
 export interface Schedule extends ScheduleSummary {
@@ -322,7 +359,8 @@ export function scheduleToForm(s: Schedule, timezone: string, toLocal: (iso: str
 export interface InterlockCondition {
   kind: "metric" | "state";
   deviceId?: string | null;
-  spaceAgg?: string | null;
+  /** true면 규칙 공간의 측정 기기 평균(core SafetyService·action Interlock.Condition은 boolean) */
+  spaceAgg?: boolean | null;
   relation?: string | null;
   metric?: string | null;
   capability?: string | null;
@@ -340,7 +378,9 @@ export interface InterlockForbid {
 export interface InterlockSummary {
   interlockId: string;
   name: string;
-  spaceId: string;
+  /** 조직 전체 규칙이면 null(core는 spaceName도 준다) */
+  spaceId: string | null;
+  spaceName?: string | null;
   includeChildren: boolean;
   forbid: InterlockForbid;
   enabled: boolean;
@@ -420,7 +460,7 @@ export function interlockProblems(form: InterlockForm): string[] {
 export function interlockBody(form: InterlockForm): Record<string, unknown> {
   const condition: InterlockCondition =
     form.kind === "metric"
-      ? { kind: "metric", ...(form.deviceId ? { deviceId: form.deviceId } : { spaceAgg: "avg" }), metric: form.metric.trim(), op: form.op, value: parseScalar(form.value) }
+      ? { kind: "metric", ...(form.deviceId ? { deviceId: form.deviceId } : { spaceAgg: true }), metric: form.metric.trim(), op: form.op, value: parseScalar(form.value) }
       : {
           kind: "state",
           ...(form.deviceId ? { deviceId: form.deviceId } : { relation: "measures" }),
@@ -445,10 +485,10 @@ export function interlockToForm(i: Interlock): InterlockForm {
   const [attribute, match] = Object.entries(i.forbid.argsMatch ?? {})[0] ?? ["", undefined];
   return {
     name: i.name,
-    spaceId: i.spaceId,
+    spaceId: i.spaceId ?? "",
     includeChildren: i.includeChildren,
     kind: c.kind,
-    deviceId: c.deviceId ?? "",
+    deviceId: idText(c.deviceId) ?? "",
     metric: c.metric ?? "",
     capability: c.capability ?? "",
     attribute: c.attribute ?? "",
@@ -761,7 +801,8 @@ export function bulkDone(job: BulkJob): boolean {
 // ── 가동·효과(ACT-08, UI-ACT-11) ─────────────────────────────────────────────
 
 export interface RuntimeReport {
-  items: { date: string; onSeconds: number; cycles: number; energyWh?: number | null; energySource?: "RATED" | "REPORTED" | string | null }[];
+  /** 일별(date=YYYY-MM-DD). noEffectEvents는 그날 효과 없음 건수 */
+  items: { date: string; onSeconds: number; cycles: number; energyWh?: number | null; energySource?: "RATED" | "REPORTED" | string | null; noEffectEvents?: number }[];
   noEffectEvents: {
     at: string;
     commandId?: string | null;
@@ -769,6 +810,21 @@ export interface RuntimeReport {
     expected?: { direction?: string; withinMinutes?: number } | string | null;
     observed?: { start?: number; end?: number; delta?: number } | string | null;
   }[];
+}
+
+/** 일별 가동 항목 → 월별(YYYY-MM). 에너지 출처는 하나라도 REPORTED면 REPORTED */
+export function monthlyRuntime(items: RuntimeReport["items"]): RuntimeReport["items"] {
+  const months = new Map<string, RuntimeReport["items"][number]>();
+  for (const i of items) {
+    const key = i.date.slice(0, 7);
+    const m = months.get(key) ?? { date: key, onSeconds: 0, cycles: 0, energyWh: null, energySource: null };
+    m.onSeconds += i.onSeconds;
+    m.cycles += i.cycles;
+    if (i.energyWh != null) m.energyWh = (m.energyWh ?? 0) + i.energyWh;
+    if (i.energySource && m.energySource !== "REPORTED") m.energySource = i.energySource;
+    months.set(key, m);
+  }
+  return [...months.values()].sort((a, b) => a.date.localeCompare(b.date));
 }
 
 export function runtimeTotals(report: RuntimeReport) {

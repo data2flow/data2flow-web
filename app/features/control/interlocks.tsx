@@ -24,7 +24,7 @@ import {
   type InterlockSummary,
 } from "./model/admin";
 
-type Block = { at: string; commandId: string; deviceId: string; deviceName?: string; capability: string; command: string; message?: string };
+type Block = { at: string; commandId: string; deviceId: string; deviceName?: string; capability: string; command: string; message?: string | null };
 
 export interface InterlockManagerProps {
   initial: InterlockSummary[];
@@ -47,7 +47,7 @@ export function InterlockManager({ initial, failed, spaces, devices, timezone, l
   const problems = editing ? interlockProblems(editing.form) : [];
   const set = (patch: Partial<InterlockForm>) => setEditing((e) => (e ? { ...e, form: { ...e.form, ...patch } } : e));
   const err = (key: string, text: string) => (submitted && problems.includes(key) ? text : undefined);
-  const spaceName = (id: string) => findSpace(spaces, id)?.name ?? `#${id}`;
+  const spaceName = (row: InterlockSummary) => (row.spaceId ? (findSpace(spaces, row.spaceId)?.name ?? row.spaceName ?? `#${row.spaceId}`) : t("control.interlocks.orgWide"));
 
   const open = async (id: string | null) => {
     setNotice(null);
@@ -137,7 +137,7 @@ export function InterlockManager({ initial, failed, spaces, devices, timezone, l
                     </button>
                   </td>
                   <td>
-                    {spaceName(row.spaceId)}
+                    {spaceName(row)}
                     {row.includeChildren && <span className="text-muted"> {t("control.interlocks.withChildren")}</span>}
                   </td>
                   <td className="font-mono text-[12px]">{conditions[row.interlockId] ?? "–"}</td>
@@ -178,7 +178,7 @@ export function InterlockManager({ initial, failed, spaces, devices, timezone, l
                 {blocks.rows.map((b) => (
                   <tr key={b.commandId}>
                     <td>{formatDateTime(b.at, timezone, lang, true)}</td>
-                    <td>{b.deviceName ?? b.deviceId}</td>
+                    <td>{b.deviceName ?? devices.find((d) => d.id === b.deviceId)?.name ?? b.deviceId}</td>
                     <td className="font-mono">{`${b.capability}.${b.command}`}</td>
                     <td>{b.message ?? ""}</td>
                   </tr>

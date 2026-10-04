@@ -14,6 +14,7 @@ import { controlAdminApi, type ControlAdminApi } from "./admin-api";
 import {
   SCENE_ITEM_LIMIT,
   desiredText,
+  idText,
   normalizeSceneItem,
   parseDesired,
   previewSummary,
@@ -38,9 +39,10 @@ interface Row {
 }
 
 const toRow = (item: SceneItem): Row => ({
-  mode: item.target.deviceId ? "device" : "relation",
-  deviceId: item.target.deviceId ?? "",
-  spaceId: item.target.spaceId ?? "",
+  mode: item.target.deviceId != null && item.target.deviceId !== "" ? "device" : "relation",
+  // core는 대상 ID를 JSON 숫자로 돌려준다
+  deviceId: idText(item.target.deviceId) ?? "",
+  spaceId: idText(item.target.spaceId) ?? "",
   includeChildren: Boolean(item.target.includeChildren),
   capability: item.capability,
   desired: desiredText(item.desired),

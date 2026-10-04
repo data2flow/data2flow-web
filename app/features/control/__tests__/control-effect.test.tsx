@@ -1,6 +1,6 @@
 /**
  * ACT-08 UI-ACT-11 장비 가동·효과 — TC-ACT-133(AT-ACT-12.1): 냉방 APPLIED 뒤 15분간 +0.1℃ → 효과 없음 이벤트 1건 표시,
- * AT-ACT-12.2: 하루 6시간 가동·정격 1.2kW → 6h, 7.2kWh(정격 추정). 기간 바꾸면 step(day·month)으로 다시 조회.
+ * AT-ACT-12.2: 하루 6시간 가동·정격 1.2kW → 6h, 7.2kWh(정격 추정). 기간 바꾸면 날짜(from·to)로 다시 조회하고, 12개월은 일별 응답을 월로 묶는다.
  */
 import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -28,9 +28,12 @@ describe("TC-ACT-133 AT-ACT-12.1 AT-ACT-12.2 가동·효과", () => {
     expect(screen.getByText("정격 추정")).toBeInTheDocument();
     expect(screen.getByText("↓ 15m")).toBeInTheDocument();
     expect(screen.getByText("+0.1")).toBeInTheDocument();
-    expect(api.runtime).toHaveBeenCalledWith("2001", "2026-09-27T00:00:00.000Z", "2026-10-04T00:00:00.000Z", "day");
+    // API-ACT-35(action): from·to는 날짜, 양 끝 포함 7일
+    expect(api.runtime).toHaveBeenCalledWith("2001", "2026-09-28", "2026-10-04");
     await user.selectOptions(screen.getByLabelText("기간"), "12m");
-    await waitFor(() => expect(api.runtime).toHaveBeenLastCalledWith("2001", expect.any(String), "2026-10-04T00:00:00.000Z", "month"));
+    await waitFor(() => expect(api.runtime).toHaveBeenLastCalledWith("2001", "2025-10-05", "2026-10-04"));
+    // 일별 응답을 월로 묶는다
+    expect(await screen.findByText("2026-10")).toBeInTheDocument();
   });
 
   it("기록 없음·조회 실패 안내", async () => {

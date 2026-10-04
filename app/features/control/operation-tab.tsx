@@ -7,7 +7,7 @@ import { useTranslation } from "react-i18next";
 import { Alert, Badge, Card, EmptyState, SelectField, Table } from "~/components/ui";
 import { formatDate, formatDateTime } from "~/lib/format";
 import { controlAdminApi, type ControlAdminApi } from "./admin-api";
-import { effectText, runtimeTotals, type RuntimeReport } from "./model/admin";
+import { effectText, monthlyRuntime, runtimeTotals, type RuntimeReport } from "./model/admin";
 
 const PERIODS = { "7d": { days: 7, step: "day" }, "30d": { days: 30, step: "day" }, "12m": { days: 365, step: "month" } } as const;
 type Period = keyof typeof PERIODS;
@@ -22,12 +22,18 @@ export function OperationTab({ deviceId, timezone, lang, now = Date.now, api = c
     let cancelled = false;
     const end = now();
     const { days, step } = PERIODS[period];
-    const from = new Date(end - days * 86_400_000).toISOString();
-    const to = new Date(end).toISOString();
-    void api.runtime(deviceId, from, to, step).then((result) => {
+    // API-ACT-35 from·to는 날짜(양 끝 포함), 항목은 일별이다. 12개월은 화면에서 월로 묶는다
+    const from = new Date(end - (days - 1) * 86_400_000).toISOString().slice(0, 10);
+    const to = new Date(end).toISOString().slice(0, 10);
+    void api.runtime(deviceId, from, to).then((result) => {
       if (cancelled) return;
       setFailed(!result.ok);
-      setReport(result.ok ? { items: result.data.items ?? [], noEffectEvents: result.data.noEffectEvents ?? [] } : null);
+      if (!result.ok) {
+        setReport(null);
+        return;
+      }
+      const items = result.data.items ?? [];
+      setReport({ items: step === "month" ? monthlyRuntime(items) : items, noEffectEvents: result.data.noEffectEvents ?? [] });
     });
     return () => {
       cancelled = true;

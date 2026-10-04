@@ -131,7 +131,12 @@
         "ACTIVATED": "Activated",
         "DEACTIVATED": "Deactivated",
         "REPLACED": "Replaced",
-        "TAGGED": "Tags changed"
+        "TAGGED": "Tags changed",
+        "TAGS_CHANGED": "Tags changed",
+        "ATTRIBUTE_CHANGED": "Attribute changed",
+        "IMPORTED": "Imported",
+        "REJECTED": "Rejected",
+        "DELETED": "Deleted"
       }
     },
     "semantic": {

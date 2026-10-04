@@ -52,7 +52,8 @@ interface FakePackage {
 export interface FlowopsState {
   seq: number;
   sinks: FakeSink[];
-  deadLetters: Record<string, { deadLetterId: string; flowId: string; nodeId: string; target: string; record: Record<string, unknown>; error: string; attempts: number; failedAt: string; expiresAt: string }[]>;
+  /** action SinkConnectionService.DeadLetter 모양(커서 목록 항목) */
+  deadLetters: Record<string, { id: string; target: string; mode: string; recordCount: number; attempts: number; errorKind: string; lastError: string; createdAt: string; deadAt: string; deadUntil: string }[]>;
   snapshots: FakeSnapshot[];
   /** 복원할 때 스냅샷이 참조하는 스크립트 버전이 지워짐(SNAPSHOT_DEPENDENCY_MISSING, TC-FLW-236) */
   missingDependency: Set<string>;
@@ -84,8 +85,8 @@ export function flowopsState(core: CoreState): FlowopsState {
       ],
       deadLetters: {
         "sc-1": [
-          { deadLetterId: "dl-1", flowId: "f-7f3a", nodeId: "n-snk-1", target: "room_temp", record: { space_id: 31, temperature: 28.1 }, error: "Duplicate entry", attempts: 3, failedAt: AT, expiresAt: "2026-10-10T05:10:00Z" },
-          { deadLetterId: "dl-2", flowId: "f-7f3a", nodeId: "n-snk-1", target: "room_temp", record: { space_id: 31, temperature: 27.4 }, error: "Lock wait timeout", attempts: 3, failedAt: AT, expiresAt: "2026-10-10T05:10:00Z" },
+          { id: "dl-1", target: "room_temp", mode: "INSERT", recordCount: 1, attempts: 3, errorKind: "CONSTRAINT", lastError: "Duplicate entry", createdAt: AT, deadAt: AT, deadUntil: "2026-10-10T05:10:00Z" },
+          { id: "dl-2", target: "room_temp", mode: "INSERT", recordCount: 1, attempts: 3, errorKind: "TIMEOUT", lastError: "Lock wait timeout", createdAt: AT, deadAt: AT, deadUntil: "2026-10-10T05:10:00Z" },
         ],
       },
       snapshots: [
@@ -197,9 +198,9 @@ export const flowopsHandler: CoreHandler = async (core, req) => {
     if (sub === "/dead-letters" && method === "GET") return list(state.deadLetters[sink.sinkConnectionId] ?? [], url);
     if (sub === "/dead-letters/resend" && method === "POST") {
       const all = state.deadLetters[sink.sinkConnectionId] ?? [];
-      const ids = b.all ? all.map((d) => d.deadLetterId) : ((b.ids ?? []) as string[]);
-      state.deadLetters[sink.sinkConnectionId] = all.filter((d) => !ids.includes(d.deadLetterId));
-      return ok({ requested: ids.length, resent: ids.length, failed: 0 });
+      const ids = b.all ? all.map((d) => d.id) : ((b.ids ?? []) as string[]);
+      state.deadLetters[sink.sinkConnectionId] = all.filter((d) => !ids.includes(d.id));
+      return ok({ resent: all.filter((d) => ids.includes(d.id)).length });
     }
     return undefined;
   }

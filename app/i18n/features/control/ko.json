@@ -341,7 +341,8 @@
       "messageRequired": "요청자에게 보일 사유를 1~200자로 입력하세요",
       "staleRule": "조건 데이터가 \"보고 주기 × 3, 최소 5분\" 넘게 없으면 안전 쪽으로 막습니다",
       "saved": "인터락 규칙을 저장했습니다",
-      "deleteConfirm": "인터락 \"{{name}}\"을 삭제할까요?"
+      "deleteConfirm": "인터락 \"{{name}}\"을 삭제할까요?",
+      "orgWide": "조직 전체"
     },
     "drivers": {
       "title": "드라이버",
@@ -488,6 +489,11 @@
       "metric": "측정 항목",
       "expected": "기대 효과",
       "observed": "실제 변화"
+    },
+    "notice": {
+      "title": "새 알림",
+      "open": "열기",
+      "dismiss": "알림 닫기"
     }
   },
   "errors": {
