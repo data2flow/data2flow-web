@@ -111,3 +111,28 @@ KEEP=1 e2e/m2-demo.sh                   # 끝나도 컨테이너·프로세스�
 ```
 
 포트 31025·31883·35432·35552·35672·36379·38025·38780~38798을 씁니다.
+
+## M3 폐루프(가상) 시연 검증(e2e)
+
+`e2e/m3-demo.sh`는 plan/milestones.md §M3 시연을 실제 서비스로 끝까지 돌립니다. 정식 경로는 simulator(가상 강의실 물리 모델) → `data2flow.raw` → pipeline → `data2flow.telemetry` → flow-engine → 아웃박스 → `data2flow.actions` → action(제어 창구, virtual 드라이버) → simulator 가상 에어컨 → 물리 모델 → 다시 수집입니다.
+
+1. 관리자 로그인(BFF)과 초기 비밀번호 변경을 합니다.
+2. 조직 프로필 "강의실 천장형 에어컨 10kW"를 만듭니다(API-SIM-08). 카탈로그 기본 에어컨은 3.5kW인데, 재실 15명·외기 35℃에서는 24℃까지 내리지 못하기 때문입니다.
+3. 표준 강의실 키트로 "가상 강의실 301"을 만듭니다. 기기는 온습도 2·CO2·재실·에어컨·공기청정기·환기, 모두 7대입니다.
+4. 키트가 제안한 묶음으로 "고온이면 냉방"(`hot-then-cool`) 플로우를 만들고, 검증한 뒤 적용합니다. 이어서 flow-engine 적용 확인(`applyStatus.converged`)을 기다립니다.
+5. "폭염 오후" 시나리오를 x60으로 실행합니다. 조건은 8/10 12:00 KST 시작, 외기 최고 35℃, 12:20부터 재실 15명입니다.
+6. 27℃ 이상이 5분 이어지면 플로우가 `Thermostat.set {mode: cool, targetTemperature: 24}`를 냅니다(출처 FLOW). 명령은 `APPLIED`까지 가고, 가상 온도가 내려가 명령 60~90분 뒤(시뮬레이션) 24±1℃를 유지하는지 봅니다.
+7. 확인은 BFF SSE(`/bff/stream/live?topics=commands:{에어컨},space:{공간}`)의 `command-status`·`device-update`와 명령 이력, 기기 상세 화면으로 합니다.
+8. 플로우를 일시정지한 뒤, 같은 시드로 "폭염 오후(재현)" 1시간을 x60으로 두 번 실행합니다. 두 실행 결과 리포트의 `dataSha256`(SIM-08.03 결정적 재현)이 같아야 합니다.
+
+- 공용 인프라(s3·s4·`iot-data.java21.net`)는 쓰지 않습니다. PostgreSQL 18·Valkey 8·RabbitMQ 4(stream 플러그인)·Mailpit을 임시 컨테이너로 띄웁니다. MQTT는 전혀 쓰지 않습니다: simulator는 `data2flow.raw`에 직접 넣고, action의 MQTT 드라이버는 끕니다. 끝나면 컨테이너와 프로세스를 모두 지웁니다.
+- 형제 디렉터리의 `data2flow-auth`·`api-gateway`·`core-api`·`pipeline`·`flow-engine`·`action`·`simulator`를 빌드해 프로필 `e2e`로 실행합니다. 이 시연에서만 flow-engine 실행과 action 큐 소비를 켭니다. `data2flow-contracts`는 로컬 저장소에 설치돼 있어야 합니다(`./mvnw install`, 공용 모듈 `data2flow-script-sandbox` 포함).
+- 키와 비밀번호는 실행마다 새로 만들어 `WORK_DIR/keys.env`(권한 600)에만 둡니다. 남는 기록은 다음과 같습니다: 결과 `WORK_DIR/results.txt`, 실행 기록(실제 초·시뮬레이션 시각·공간 온도) `WORK_DIR/trace.tsv`, SSE 기록 `WORK_DIR/sse-live.txt`.
+
+```bash
+e2e/m3-demo.sh                          # 빌드 + 시연(약 12분)
+SKIP_BUILD=1 WORK_DIR=/tmp/m3 e2e/m3-demo.sh
+SEED=7 KEEP=1 e2e/m3-demo.sh            # 재현 시드를 바꾸고, 끝나도 컨테이너·프로세스를 남긴다(디버깅)
+```
+
+포트 41025·45432·45552·45672·46379·48025·48780~48798을 씁니다. 결과 예시는 다음과 같습니다(2026-10-04 기준): 27℃ 도달 8분 뒤(시뮬레이션) 명령이 나갔고, 이때 실행 시작 후 실제 시간은 약 20초였습니다. 명령 직후 최고 28.0℃였고, 시뮬레이션 10분 뒤 24.7℃, 60~90분 뒤 24.2℃였습니다. 재현 실행 두 번의 SHA-256은 `294dbe90…34b72`로 같았습니다.
