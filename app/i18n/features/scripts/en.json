@@ -47,7 +47,9 @@
       "noTemplate": "Start with default code",
       "source": "Source to bind (DECODE: one)",
       "models": "Device models to bind",
-      "submit": "Create"
+      "submit": "Create",
+      "preview": "Template code preview",
+      "configDefaults": "Default settings: {{values}}"
     },
     "validation": {
       "name": "Enter a name of 2–80 characters.",
@@ -55,7 +57,7 @@
       "decodeOneSource": "A DECODE script can be bound to only one source",
       "transformTargets": "A TRANSFORM script is bound to models or devices",
       "memo": "Enter a deployment note",
-      "forceReason": "Enter a reason for force deployment",
+      "forceReason": "Enter a force-deploy reason of at least {{min}} characters",
       "json": "Invalid JSON ({{line}}:{{col}})",
       "jsonTooLarge": "Input is limited to 256KB",
       "jsonEmpty": "Enter input JSON"
@@ -77,7 +79,10 @@
       "tabs": {
         "code": "Code",
         "versions": "Versions",
-        "usage": "Usage"
+        "usage": "Usage",
+        "tests": "Test cases {{n}}",
+        "config": "Settings",
+        "ops": "Operations"
       }
     },
     "problems": {
@@ -110,7 +115,16 @@
       "force": "Force deploy",
       "forceReason": "Reason for force deployment",
       "applied": "Deployed. Applied on {{reported}}/{{total}} instances",
-      "blocked": "Errors block deployment. Warnings alone do not."
+      "blocked": "Errors block deployment. Warnings alone do not.",
+      "cases": "Test cases",
+      "casesUnavailable": "Could not check (the server checks again on deploy)",
+      "noCases": "No saved cases",
+      "casesFailed": "Some cases fail, so you cannot deploy. Fix the code or the cases.",
+      "casesFailedForce": "Some cases fail. An admin can force-deploy with a reason.",
+      "next": "Next steps",
+      "reprocess": "Reprocess past data",
+      "reprocessSource": "source {{id}}",
+      "unverified": "Review and approve unverified metrics"
     },
     "test": {
       "title": "Test",
@@ -181,6 +195,209 @@
       "disableNote": "Skipped from the next message. You can enable it again at any time.",
       "disabled": "Disabled. Affects {{devices}} devices and {{n}} messages per 24h.",
       "enabled": "Enabled."
+    },
+    "area": {
+      "scripts": "Scripts",
+      "modules": "Shared modules",
+      "formulas": "Formula metrics"
+    },
+    "cases": {
+      "title": "Test cases {{n}}",
+      "running": "Running…",
+      "runAll": "Run all",
+      "new": "New case",
+      "saved": "Test case saved.",
+      "confirmDelete": "Delete test case '{{name}}'?",
+      "runSummary": "{{passed}}/{{total}} test cases passed",
+      "empty": "Add one with [Save as test case] on a test run result",
+      "name": "Name",
+      "input": "Input",
+      "compareMode": "Comparison",
+      "lastResult": "Last result",
+      "actions": "Actions",
+      "passed": "Passed",
+      "failed": "Failed",
+      "editor": "Edit test case",
+      "inputJson": "Input JSON",
+      "contextJson": "Context JSON (optional)",
+      "expectedJson": "Expected output JSON",
+      "compareFields": "Fields to compare (comma-separated)",
+      "tolerance": "Tolerance",
+      "diffChanged": "{{key}} expected {{expected}} / actual {{actual}}",
+      "diffMissing": "{{key}} missing from output",
+      "diffExtra": "{{key}} not expected",
+      "modes": {
+        "EXACT": "Exact match",
+        "FIELDS": "Selected fields",
+        "TOLERANCE": "Tolerance"
+      },
+      "validation": {
+        "name": "Name must be 1–80 characters.",
+        "nameDuplicated": "A case with this name already exists",
+        "quota": "Up to {{max}} test cases per script",
+        "json": "Invalid JSON",
+        "jsonTooLarge": "JSON is limited to 256KB",
+        "fields": "Enter at least one field to compare",
+        "tolerance": "Tolerance must be a number from 0 to 1000"
+      },
+      "defaultName": "Case",
+      "saveFromRun": "Save as test case",
+      "saveNeedsDirect": "Only runs with direct input can be saved as a case",
+      "savedFromRun": "Saved the current input and output as a test case."
+    },
+    "config": {
+      "title": "Settings (ctx.config)",
+      "help": "Keep numbers out of code as settings. Changing settings applies within 10 seconds without a new version and is audited. Secrets are not allowed.",
+      "empty": "No settings.",
+      "name": "Name",
+      "type": "Type",
+      "value": "Value",
+      "add": "Add setting",
+      "saved": "Settings saved. They apply within 10 seconds.",
+      "conflict": "Someone else changed it first. Reload and save again.",
+      "types": {
+        "string": "String",
+        "number": "Number",
+        "boolean": "Boolean"
+      },
+      "validation": {
+        "name": "Letters, digits and _ up to 64 (not starting with a digit)",
+        "secret": "Names that look like secrets are not allowed (token, password, secret, _key)",
+        "duplicated": "Duplicate name",
+        "tooLarge": "Value is limited to 1KB",
+        "number": "Enter a number",
+        "boolean": "true or false",
+        "tooMany": "Up to {{max}} settings"
+      }
+    },
+    "ops": {
+      "title": "Operational metrics",
+      "period": "Period",
+      "periods": {
+        "1h": "1 hour",
+        "24h": "24 hours",
+        "7d": "7 days"
+      },
+      "warnings": "Warnings",
+      "slow": "Slow: p95 {{ms}}ms",
+      "errorRate": "Error rate {{pct}}%",
+      "hints": "Possible causes",
+      "hint": {
+        "LARGE_LOOP": "Loops with many iterations",
+        "LARGE_INPUT": "Large input"
+      },
+      "noStats": "No processing in this period",
+      "processed": "Processed",
+      "errors": "Errors",
+      "avg": "Avg (ms)",
+      "p95": "p95 (ms)",
+      "deployMark": "v{{n}} deployed",
+      "version": "Version",
+      "errorRateCol": "Error rate",
+      "errorList": "Errors (latest {{n}})",
+      "errorKeep": "Only the latest 100 errors per script are kept.",
+      "noErrors": "No errors",
+      "at": "Time",
+      "code": "Error code",
+      "message": "Message",
+      "position": "Line:col",
+      "showInput": "Show input",
+      "testWithInput": "Test with this input",
+      "logs": "Runtime logs (console.log)",
+      "logExtend": "Extend 30 min",
+      "logOn": "Start log capture",
+      "logOff": "Stop",
+      "logRemaining": "Capturing · {{time}} left",
+      "logExpired": "Turned off automatically after 30 minutes",
+      "logOffState": "Off — when on, collects up to 10 lines/s per script for 30 minutes",
+      "noLogs": "No logs captured",
+      "slowBadge": "Slow"
+    },
+    "modules": {
+      "title": "Shared modules",
+      "new": "New module",
+      "name": "Module name",
+      "nameHint": "Lowercase letters, digits and -, 3–40",
+      "description": "Description",
+      "validation": {
+        "name": "Use 3–40 lowercase letters, digits or -",
+        "nameTaken": "A module with this name already exists"
+      },
+      "latest": "Latest v{{n}}",
+      "unreleased": "No released version",
+      "saved": "Module code saved.",
+      "released": "Released v{{n}}. Only scripts importing this version are affected.",
+      "confirmDelete": "Delete v{{n}}?",
+      "inUse": "v{{n}} is used by scripts and cannot be deleted",
+      "versions": "Versions and users",
+      "noVersions": "No versions released yet",
+      "releasedAt": "Released",
+      "usedBy": "Used by",
+      "unused": "Unused",
+      "release": "Release version",
+      "releaseBody": "Creates v{{n}} from the current code. Released versions are immutable.",
+      "exportHint": "Export with export function/const and import in scripts with import { … } from 'module:name@version'.",
+      "loadFailed": "Could not load modules.",
+      "empty": "No shared modules yet",
+      "emptyBody": "Put functions shared by scripts (e.g. a Milesight channel parser) in a module and import a pinned version.",
+      "latestCol": "Latest",
+      "usedByCol": "Used by",
+      "usedByN": "{{n}} scripts",
+      "updatedAt": "Updated"
+    },
+    "formulas": {
+      "title": "Formula metrics",
+      "new": "New formula",
+      "edit": "Edit {{key}}",
+      "empty": "No formula metrics yet",
+      "emptyBody": "Create derived metrics without code, e.g. thi(temperature, humidity).",
+      "resultKey": "Result key",
+      "displayName": "Display name",
+      "unit": "Unit",
+      "expression": "Formula",
+      "target": "Target",
+      "targetType": "Target type",
+      "status": "Status",
+      "statuses": {
+        "ACTIVE": "Active",
+        "DISABLED": "Disabled"
+      },
+      "targets": {
+        "MODEL": "Model",
+        "DEVICE": "Device",
+        "SPACE": "Space (incl. children)"
+      },
+      "pickTarget": "Choose a target",
+      "suggestions": "Suggestions",
+      "chips": "Insert metric keys and functions",
+      "previewHours": "Preview range",
+      "hours": "Last {{n}} h",
+      "preview": "Preview",
+      "save": "Save & deploy",
+      "previewTitle": "Formula preview",
+      "previewEmpty": "No data to compute in this range",
+      "result": "Result",
+      "saved": "Saved {{key}}. It is computed from the next message.",
+      "confirmDelete": "Delete formula {{key}}? Stored values remain.",
+      "versionConflict": "Someone else changed it first. Reload and save again.",
+      "loadFailed": "Could not load formulas.",
+      "validation": {
+        "pattern": "Result key: 2–64 letters, digits or _, starting with a letter",
+        "conflict": "This metric already exists",
+        "displayName": "Enter a display name (1–80)",
+        "target": "Choose a target"
+      },
+      "errors": {
+        "empty": "Enter a formula",
+        "tooLong": "Formula is limited to {{max}} characters",
+        "unexpected": "Unexpected token: {{token}}",
+        "unclosed": "Incomplete formula (check parentheses)",
+        "unknownFunction": "Unknown function: {{name}}",
+        "unknownKey": "Unknown metric: {{name}}",
+        "arity": "{{name}} takes {{min}}–{{max}} arguments",
+        "window": "Window must be 1m–24h: {{token}}",
+        "keyArg": "The first argument of {{name}} must be a metric key"
+      }
     }
   },
   "errors": {
@@ -194,6 +411,12 @@
     "SCRIPT_STATIC_CHECK_FAILED": "Static check errors block deployment. Check the problem list.",
     "SCRIPT_TEST_FAILED": "Test cases failed, so it was not deployed.",
     "SCRIPT_TIMEOUT": "The execution time limit was exceeded.",
-    "SCRIPT_OUTPUT_INVALID": "The output does not match the canonical message format."
+    "SCRIPT_OUTPUT_INVALID": "The output does not match the canonical message format.",
+    "SCRIPT_MODULE_IN_USE": "Scripts use this module version, so it cannot be deleted",
+    "SCRIPT_MODULE_NOT_FOUND": "The imported module version was not found",
+    "SCRIPT_FORMULA_INVALID": "Invalid formula",
+    "SCRIPT_FORMULA_KEY_CONFLICT": "This metric already exists",
+    "SCRIPT_FORMULA_NOT_FOUND": "Formula not found",
+    "SCRIPT_CONFIG_SECRET_FORBIDDEN": "Secrets cannot be stored as settings"
   }
 }

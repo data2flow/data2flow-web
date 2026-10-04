@@ -5,12 +5,15 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { CodeEditor, type EditorApi, type EditorFactory } from "~/components/code-editor";
+import { Link } from "react-router";
 import { Alert, Badge, Button, Dialog, TextArea, TextField } from "~/components/ui";
 import { errorText } from "~/lib/error-text";
 import { latestVersionNo, type ScriptApi, type ScriptDetail } from "./api";
 import { CONTRACT_TYPES } from "./model/contract-types";
+import { FORCE_REASON_MIN, checkForceReason, nextCaseName, reprocessLink, type ReprocessSuggestion, type RunCasesResult } from "./model/m5";
 import { CODE_LIMIT_BYTES, byteSize, canDeploy, checkMemo, createDebouncer, requiredFunctionProblem, type Problem } from "./model/script-model";
 import { ProblemsList } from "./problems-list";
+import { CaseDiff } from "./test-cases";
 import { TestPanel, type RawMessageOption } from "./test-panel";
 
 export interface ScriptEditorProps {
@@ -25,6 +28,8 @@ export interface ScriptEditorProps {
   editorFactory?: EditorFactory;
   /** 정적 검사 대기(ms) */
   debounceMs?: number;
+  /** 운영 탭 오류 목록에서 넘어온 입력(SCR-05.01) */
+  injected?: { input: unknown; seq: number } | null;
 }
 
 /** 서버 결과에 필수 함수 검사(화면 쪽)를 더한다. 서버가 같은 문제를 주면 하나만 */
@@ -34,7 +39,7 @@ function withRequired(kind: ScriptDetail["kind"], code: string, problems: Proble
   return required ? [{ ...required, message: missingMessage(required.message) }, ...server] : server;
 }
 
-export function ScriptEditor({ script, canWrite, canForce, recent, recentFailed, timezone, api, editorFactory, debounceMs = 500 }: ScriptEditorProps) {
+export function ScriptEditor({ script, canWrite, canForce, recent, recentFailed, timezone, api, editorFactory, debounceMs = 500, injected }: ScriptEditorProps) {
   const { t } = useTranslation();
   const missing = useCallback((fn: string) => t("scripts.problems.missingFunction", { fn }), [t]);
   const initialCode = script.draft?.code ?? script.activeVersion?.code ?? "";
@@ -51,6 +56,16 @@ export function ScriptEditor({ script, canWrite, canForce, recent, recentFailed,
   const [deployTarget, setDeployTarget] = useState<{ versionId: string; versionNo: number } | null>(null);
   const editorApi = useRef<EditorApi | null>(null);
   const dirty = code !== savedCode;
+  const savedCases = useRef<{ name: string }[]>(script.tests ?? []);
+  const saveCase = api.saveCase
+    ? async (payload: { input: unknown; context: unknown; expected: unknown }) => {
+        const name = nextCaseName(t("scripts.cases.defaultName"), savedCases.current);
+        const result = await api.saveCase!(script.id, { name, input: payload.input, ...(payload.context === undefined ? {} : { context: payload.context }), expected: payload.expected, compareMode: "EXACT" });
+        if (!result.ok) return errorText(t, result) ?? "";
+        savedCases.current = [...savedCases.current, { name }];
+        return null;
+      }
+    : undefined;
 
   const checkSeq = useRef(0);
   const debouncer = useMemo(
@@ -149,7 +164,7 @@ export function ScriptEditor({ script, canWrite, canForce, recent, recentFailed,
         </div>
         <ProblemsList problems={problems} checking={checking} onSelect={(p) => editorApi.current?.reveal(p.line, p.col)} />
       </div>
-      {canWrite && <TestPanel kind={script.kind} code={code} scriptId={script.id} recent={recent} recentFailed={recentFailed} defaultContext={{ device: { attributes: {} }, last: {}, config: script.config ?? {} }} api={api} timezone={timezone} />}
+      {canWrite && <TestPanel kind={script.kind} code={code} scriptId={script.id} recent={recent} recentFailed={recentFailed} defaultContext={{ device: { attributes: {} }, last: {}, config: script.config ?? {} }} api={api} timezone={timezone} injected={injected} onSaveCase={saveCase} />}
 
       <Dialog title={t("scripts.conflict.title")} open={conflict !== null} onClose={() => setConflict(null)}>
         <p className="text-[13px]">{t("scripts.conflict.body")}</p>
@@ -228,7 +243,7 @@ function DeployDialog({
   dirty: boolean;
   processed: number;
   canForce: boolean;
-  api: Pick<ScriptApi, "deploy">;
+  api: Pick<ScriptApi, "deploy" | "runCases">;
   onClose: () => void;
   onDeployed: (versionId: string) => void;
 }) {
@@ -240,12 +255,30 @@ function DeployDialog({
   const [memoError, setMemoError] = useState(false);
   const [reasonError, setReasonError] = useState(false);
   const [applied, setApplied] = useState<{ reported: number; total: number } | null>(null);
+  const [suggestion, setSuggestion] = useState<ReprocessSuggestion | null>(null);
   const [busy, setBusy] = useState(false);
+  const [cases, setCases] = useState<RunCasesResult | null>(null);
+  const [casesState, setCasesState] = useState<"idle" | "running" | "done" | "unavailable">(api.runCases ? "running" : "idle");
   const hasErrors = problems.some((p) => p.severity === "ERROR");
+  const casesFailed = (cases?.failed ?? 0) > 0;
+
+  const runCases = useCallback(async () => {
+    if (!api.runCases) return;
+    setCasesState("running");
+    const result = await api.runCases(script.id, { versionId: draft.versionId });
+    if (result.ok) {
+      setCases(result.data);
+      setCasesState("done");
+    } else setCasesState("unavailable");
+  }, [api, script.id, draft.versionId]);
+
+  useEffect(() => {
+    void runCases();
+  }, [runCases]);
 
   const submit = async (forced: boolean) => {
     const memoOk = checkMemo(memo);
-    const reasonOk = !forced || reason.trim().length >= 2;
+    const reasonOk = !forced || checkForceReason(reason);
     setMemoError(!memoOk);
     setReasonError(!reasonOk);
     if (!memoOk || !reasonOk) return;
@@ -253,8 +286,13 @@ function DeployDialog({
     setError(null);
     const result = await api.deploy(script.id, { versionId: draft.versionId, memo: memo.trim(), baseActiveVersionId: activeVersionId, ...(forced ? { force: true, forceReason: reason.trim() } : {}) });
     setBusy(false);
-    if (!result.ok) return setError(errorText(t, result) ?? null);
+    if (!result.ok) {
+      setError(errorText(t, result) ?? null);
+      if (result.code === "SCRIPT_TEST_FAILED") void runCases();
+      return;
+    }
     setApplied(result.data.applied ?? { reported: 0, total: 0 });
+    setSuggestion(result.data.reprocessSuggestion ?? null);
     onDeployed(result.data.activeVersionId);
   };
 
@@ -265,9 +303,55 @@ function DeployDialog({
         {t("scripts.deploy.check")}: <span className={hasErrors ? "text-bad" : "text-good"}>{hasErrors ? `✖ ${t("scripts.deploy.checkFail")}` : `✔ ${t("scripts.deploy.checkOk")}`}</span>
       </p>
       <p className="text-[12.5px] text-muted">{t("scripts.deploy.impact", { bindings: script.bindings?.length ?? 0, processed })}</p>
+      {casesState !== "idle" && (
+        <div className="text-[13px]" data-testid="deploy-cases">
+          {t("scripts.deploy.cases")}:{" "}
+          {casesState === "running" ? (
+            <span className="text-muted">{t("scripts.cases.running")}</span>
+          ) : casesState === "unavailable" ? (
+            <span className="text-muted">{t("scripts.deploy.casesUnavailable")}</span>
+          ) : (cases?.passed ?? 0) + (cases?.failed ?? 0) === 0 ? (
+            <span className="text-muted">{t("scripts.deploy.noCases")}</span>
+          ) : (
+            <span className={casesFailed ? "text-bad" : "text-good"}>{`${casesFailed ? "✖" : "✔"} ${t("scripts.cases.runSummary", { passed: cases?.passed ?? 0, total: (cases?.passed ?? 0) + (cases?.failed ?? 0) })}`}</span>
+          )}
+          {casesFailed && (
+            <ul className="mt-1">
+              {(cases?.results ?? [])
+                .filter((r) => !r.passed)
+                .map((r) => (
+                  <li key={r.caseId}>
+                    <span className="font-semibold">{r.name ?? r.caseId}</span>
+                    <CaseDiff diff={r.diff} />
+                    {r.error?.message && <p className="text-[12px] text-bad">{r.error.message}</p>}
+                  </li>
+                ))}
+            </ul>
+          )}
+          {casesFailed && <p className="text-[12px] text-muted">{canForce ? t("scripts.deploy.casesFailedForce") : t("scripts.deploy.casesFailed")}</p>}
+        </div>
+      )}
       {dirty && <Alert tone="warning">{t("scripts.deploy.unsavedNote")}</Alert>}
       {applied ? (
-        <Alert tone="success">{t("scripts.deploy.applied", applied)}</Alert>
+        <>
+          <Alert tone="success">{t("scripts.deploy.applied", applied)}</Alert>
+          <div className="flex flex-col gap-1 text-[13px]" aria-label={t("scripts.deploy.next")}>
+            <p className="font-semibold">{t("scripts.deploy.next")}</p>
+            {(suggestion?.requests ?? []).map((request, i) => (
+              <Link key={i} to={reprocessLink(request)} className="text-accent hover:underline">
+                {`↻ ${t("scripts.deploy.reprocess")}${(suggestion?.requests?.length ?? 0) > 1 ? ` (${t("scripts.deploy.reprocessSource", { id: request.sourceId ?? "–" })})` : ""}`}
+              </Link>
+            ))}
+            {(suggestion?.requests ?? []).length === 0 && (
+              <Link to="/ingest/reprocess" className="text-accent hover:underline">
+                {`↻ ${t("scripts.deploy.reprocess")}`}
+              </Link>
+            )}
+            <Link to="/metrics?tab=unverified" className="text-accent hover:underline">
+              {`✓ ${t("scripts.deploy.unverified")}`}
+            </Link>
+          </div>
+        </>
       ) : (
         <>
           <TextArea label={t("scripts.deploy.memo")} value={memo} onChange={(e) => setMemo(e.target.value)} rows={2} error={memoError ? t("scripts.validation.memo") : undefined} />
@@ -277,7 +361,7 @@ function DeployDialog({
               {t("scripts.deploy.force")}
             </label>
           )}
-          {canForce && force && <TextField label={t("scripts.deploy.forceReason")} value={reason} onChange={(e) => setReason(e.target.value)} error={reasonError ? t("scripts.validation.forceReason") : undefined} />}
+          {canForce && force && <TextField label={t("scripts.deploy.forceReason")} value={reason} onChange={(e) => setReason(e.target.value)} error={reasonError ? t("scripts.validation.forceReason", { min: FORCE_REASON_MIN }) : undefined} />}
           {error && <Alert tone="danger">{error}</Alert>}
           <div className="flex justify-end gap-2">
             <Button onClick={onClose}>{t("common.cancel")}</Button>
@@ -286,7 +370,7 @@ function DeployDialog({
                 {t("scripts.deploy.force")}
               </Button>
             ) : (
-              <Button variant="primary" disabled={busy || hasErrors} onClick={() => void submit(false)}>
+              <Button variant="primary" disabled={busy || hasErrors || casesFailed || casesState === "running"} onClick={() => void submit(false)}>
                 {t("scripts.deploy.submit")}
               </Button>
             )}

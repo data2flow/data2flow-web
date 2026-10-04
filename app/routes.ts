@@ -148,5 +148,11 @@ export default [
     route("scan", "routes/m-scan.tsx"),
     route("devices/:deviceId", "routes/m-device.tsx"),
     route("commission", "routes/m-commission.tsx"),
+    // M5 scripts: 스크립트 공유 모듈·수식 항목(UI-SCR-06·07), 재처리(UI-ING-05)·데이터 품질(UI-ING-06) — spec/detail/00-navigation.md §2
+    route("scripts/modules", "routes/script-modules.tsx"),
+    route("scripts/modules/:moduleId", "routes/script-module-detail.tsx"),
+    route("scripts/formulas", "routes/script-formulas.tsx"),
+    route("ingest/reprocess", "routes/ingest-reprocess.tsx"),
+    route("ingest/quality", "routes/ingest-quality.tsx"),
   ]),
 ] satisfies RouteConfig;

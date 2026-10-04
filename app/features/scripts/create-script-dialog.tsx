@@ -13,6 +13,9 @@ export interface ScriptTemplate {
   kind: ScriptKind;
   name: string;
   description?: string;
+  /** API-SCR-15 미리보기 코드(SCR-01.05) */
+  code?: string;
+  configDefaults?: Record<string, unknown> | null;
 }
 
 export function CreateScriptDialog({
@@ -39,7 +42,9 @@ export function CreateScriptDialog({
   const { t } = useTranslation();
   const initial = templates.find((tpl) => tpl.key === initialTemplate);
   const [kind, setKind] = useState<ScriptKind>(initial?.kind ?? "TRANSFORM");
+  const [templateKey, setTemplateKey] = useState(initial?.key ?? "");
   const usable = templates.filter((tpl) => tpl.kind === kind);
+  const selected = usable.find((tpl) => tpl.key === templateKey);
   return (
     <Dialog title={t("scripts.create.title")} open={open} onClose={onClose}>
       <Form method="post" className="flex flex-col gap-3">
@@ -48,12 +53,15 @@ export function CreateScriptDialog({
         <input type="hidden" name="idempotencyKey" value={idempotencyKey} />
         {error && <Alert tone="danger">{error}</Alert>}
         <TextField label={t("scripts.create.name")} name="name" required minLength={2} maxLength={80} error={fieldErrors?.name ? t("scripts.validation.name") : undefined} />
-        <SelectField label={t("scripts.kind.label")} name="kind" value={kind} onChange={(e) => setKind(e.target.value as ScriptKind)} error={fieldErrors?.kind ? t("scripts.validation.kind") : undefined}>
+        <SelectField label={t("scripts.kind.label")} name="kind" value={kind} onChange={(e) => {
+            setKind(e.target.value as ScriptKind);
+            setTemplateKey("");
+          }} error={fieldErrors?.kind ? t("scripts.validation.kind") : undefined}>
           <option value="TRANSFORM">TRANSFORM</option>
           <option value="DECODE">DECODE</option>
         </SelectField>
         <TextField label={t("scripts.create.description")} name="description" maxLength={500} />
-        <SelectField label={t("scripts.create.template")} name="templateKey" defaultValue={initial?.key ?? ""}>
+        <SelectField label={t("scripts.create.template")} name="templateKey" value={templateKey} onChange={(e) => setTemplateKey(e.target.value)}>
           <option value="">{t("scripts.create.noTemplate")}</option>
           {usable.map((tpl) => (
             <option key={tpl.key} value={tpl.key}>
@@ -61,6 +69,17 @@ export function CreateScriptDialog({
             </option>
           ))}
         </SelectField>
+        {selected?.code && (
+          <div aria-label={t("scripts.create.preview")}>
+            <p className="text-[12.5px] font-medium text-muted">{t("scripts.create.preview")}</p>
+            <pre data-testid="template-preview" className="max-h-40 overflow-auto rounded border border-line p-2 font-mono text-[11.5px]">
+              {selected.code}
+            </pre>
+            {selected.configDefaults && Object.keys(selected.configDefaults).length > 0 && (
+              <p className="text-[12px] text-muted">{t("scripts.create.configDefaults", { values: Object.entries(selected.configDefaults).map(([k, v]) => `${k}=${String(v)}`).join(", ") })}</p>
+            )}
+          </div>
+        )}
         {kind === "DECODE" ? (
           <SelectField label={t("scripts.create.source")} name="sourceId" defaultValue="" error={fieldErrors?.bindings ? t(`scripts.validation.${fieldErrors.bindings}`) : undefined}>
             <option value="">{t("scripts.targets.none")}</option>

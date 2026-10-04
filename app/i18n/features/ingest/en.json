@@ -4,7 +4,9 @@
       "monitor": "Ingestion monitor",
       "sources": "Data sources",
       "scripts": "Scripts",
-      "failures": "Failed messages"
+      "failures": "Failed messages",
+      "reprocess": "Reprocess",
+      "quality": "Data quality"
     },
     "stage": {
       "SOURCE": "Source",
@@ -139,6 +141,104 @@
       "metric": "Metric",
       "value": "Value",
       "quality": "Quality"
+    },
+    "crumb": "Ingestion",
+    "reprocess": {
+      "title": "Reprocess",
+      "new": "New reprocess job",
+      "from": "From",
+      "to": "To",
+      "source": "Source",
+      "pickSource": "Choose a source",
+      "devices": "Devices (optional)",
+      "allDevices": "All devices",
+      "selectedDevices": "{{n}} devices",
+      "memo": "Memo",
+      "preview": "Preview",
+      "help": "Up to 31 days within raw retention (last 30 days). Results replace stored values; flows do not react again.",
+      "previewTitle": "Reprocess preview",
+      "target": "{{n}} raw messages",
+      "eta": {
+        "s": "about {{n}}s",
+        "m": "about {{n}} min",
+        "h": "about {{n}} h"
+      },
+      "decoder": "Decoder {{key}} {{version}}",
+      "script": "Script {{scope}} {{name}} v{{version}}",
+      "noTarget": "No raw messages to reprocess",
+      "start": "Start",
+      "previewFirst": "Preview the target before starting.",
+      "jobs": "Jobs",
+      "noJobs": "No reprocess jobs",
+      "job": "Job",
+      "targetCol": "Target",
+      "status": "Status",
+      "progress": "Progress",
+      "counts": "Done/failed",
+      "requestedBy": "Requested by",
+      "time": "Start–end",
+      "statuses": {
+        "PENDING": "Pending",
+        "QUEUED": "Queued",
+        "RUNNING": "Running",
+        "COMPLETED": "Completed",
+        "FAILED": "Failed",
+        "CANCELLED": "Cancelled"
+      },
+      "failedLink": "View failures",
+      "polling": "Running jobs refresh every 5 seconds.",
+      "confirmTitle": "Start reprocessing",
+      "confirmBody": "Measurements in this period will be replaced with new results. Start?",
+      "cancelTitle": "Cancel job",
+      "cancelBody": "Cancel job RJ-{{id}}? Already processed ranges stay.",
+      "cancelJob": "Cancel job",
+      "started": "Started reprocess job RJ-{{id}} ({{total}} messages).",
+      "cancelled": "Cancelled job RJ-{{id}}.",
+      "jobsFailed": "Could not load jobs.",
+      "validation": {
+        "source": "Choose a source",
+        "periodRequired": "Enter the period",
+        "periodOrder": "End must be after start",
+        "periodTooLong": "Period must be 31 days or less",
+        "memo": "Memo is limited to 200 characters"
+      }
+    },
+    "quality": {
+      "title": "Data quality",
+      "day": "Date",
+      "groupBy": "Group by",
+      "space": "Space",
+      "groups": {
+        "device": "Device",
+        "space": "Space",
+        "model": "Model"
+      },
+      "loadFailed": "Could not load quality scores. Try again later.",
+      "empty": "No quality scores yet. They are computed daily at 00:30",
+      "summary": "{{n}} targets · average score {{avg}}",
+      "ranking": "Ranking (lowest first)",
+      "score": "Score",
+      "completeness": "Completeness",
+      "timeliness": "Timeliness",
+      "validity": "Validity",
+      "stability": "Stability",
+      "gaps": "Gaps",
+      "clockSkew": "Clock skew",
+      "suspect": "Suspect",
+      "showTrend": "Trend",
+      "openChart": "{{name}} score {{score}} — open problem chart",
+      "trend": "30-day score trend · {{name}}",
+      "noTrend": "No trend data",
+      "trendTitle": "Quality score trend",
+      "distribution": "Issue types",
+      "noDistribution": "No distribution data",
+      "issues": {
+        "gaps": "Gaps",
+        "outOfRange": "Out of range",
+        "suspect": "Stuck value",
+        "late": "Late arrival"
+      },
+      "bottom10": "Bottom 10"
     }
   },
   "errors": {
@@ -147,6 +247,8 @@
     "ING_QUERY_RANGE_TOO_LARGE": "The query range must be 31 days or less.",
     "ING_REPROCESS_OUT_OF_RETENTION": "Messages past the retention period cannot be reprocessed.",
     "ING_RAW_MESSAGE_NOT_FOUND": "Raw message not found.",
-    "METRICS_UNAVAILABLE": "Could not load metrics."
+    "METRICS_UNAVAILABLE": "Could not load metrics.",
+    "ING_REPROCESS_ALREADY_RUNNING": "A reprocess job is already running for this source",
+    "ING_REPROCESS_NOT_CANCELLABLE": "Finished jobs cannot be cancelled"
   }
 }

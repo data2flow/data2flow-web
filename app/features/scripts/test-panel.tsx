@@ -2,7 +2,7 @@
  * 테스트 실행 패널(SCR-03.02, UI-SCR-02 오른쪽): 입력(최근 원본 / 직접 입력 JSON), 컨텍스트, [실행],
  * 결과 탭(출력·차이·로그·정보). 아무것도 저장하지 않는다(BR-SCR-08).
  */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Alert, Badge, Button, SelectField, cx } from "~/components/ui";
 import { errorText } from "~/lib/error-text";
@@ -29,6 +29,8 @@ export function TestPanel({
   defaultContext,
   api,
   timezone,
+  injected,
+  onSaveCase,
 }: {
   kind: ScriptKind;
   code: string;
@@ -38,6 +40,10 @@ export function TestPanel({
   defaultContext: unknown;
   api: Pick<ScriptApi, "testRun">;
   timezone: string;
+  /** 오류 목록 [이 입력으로 테스트](SCR-05.01): 직접 입력에 채운다. seq가 바뀔 때마다 다시 채운다 */
+  injected?: { input: unknown; seq: number } | null;
+  /** [테스트 케이스로 저장](UI-SCR-02 → API-SCR-10). 실패하면 오류 문구를 돌려준다 */
+  onSaveCase?: (payload: { input: unknown; context: unknown; expected: unknown }) => Promise<string | null>;
 }) {
   const { t, i18n } = useTranslation();
   const [mode, setMode] = useState<"recent" | "direct">(recent.length > 0 ? "recent" : "direct");
@@ -49,6 +55,16 @@ export function TestPanel({
   const [result, setResult] = useState<TestRunResult | null>(null);
   const [failure, setFailure] = useState<string | null>(null);
   const [tab, setTab] = useState<Tab>("output");
+  const [lastRun, setLastRun] = useState<{ input: unknown; context: unknown } | null>(null);
+  const [caseNotice, setCaseNotice] = useState<{ tone: "success" | "danger"; text: string } | null>(null);
+
+  useEffect(() => {
+    if (!injected) return;
+    setMode("direct");
+    setInput(JSON.stringify(injected.input, null, 2));
+    setResult(null);
+    setCaseNotice(null);
+  }, [injected]);
 
   const jsonMessage = (text: string) => {
     const parsed = parseJsonInput(text);
@@ -74,6 +90,8 @@ export function TestPanel({
       ctx = parsed.value;
     }
     setRunning(true);
+    setCaseNotice(null);
+    setLastRun("input" in payload ? { input: payload.input, context: ctx } : null);
     const response = await api.testRun({ kind, code, scriptId, context: ctx, ...payload });
     setRunning(false);
     if (!response.ok) {
@@ -133,6 +151,26 @@ export function TestPanel({
         </Button>
       </div>
       {failure && <Alert tone="danger">{failure}</Alert>}
+      {onSaveCase && result?.ok && (
+        <div className="flex flex-col gap-1">
+          <div>
+            <Button
+              disabled={!lastRun}
+              title={lastRun ? undefined : t("scripts.cases.saveNeedsDirect")}
+              onClick={() => {
+                if (!lastRun) return;
+                void onSaveCase({ input: lastRun.input, context: lastRun.context, expected: result.output ?? null }).then((error) =>
+                  setCaseNotice(error ? { tone: "danger", text: error } : { tone: "success", text: t("scripts.cases.savedFromRun") }),
+                );
+              }}
+            >
+              {t("scripts.cases.saveFromRun")}
+            </Button>
+          </div>
+          {!lastRun && <p className="text-[12px] text-muted">{t("scripts.cases.saveNeedsDirect")}</p>}
+          {caseNotice && <Alert tone={caseNotice.tone}>{caseNotice.text}</Alert>}
+        </div>
+      )}
       {result && (
         <div className="rounded-md border border-line">
           <div className="flex items-center gap-1 border-b border-line px-2" role="tablist">

@@ -110,6 +110,9 @@ export const ROUTE_GUARDS: { prefix: string; anyOf: string[] }[] = [
   { prefix: "/m/devices", anyOf: ["DEV_READ"] },
   { prefix: "/m/scan", anyOf: ["DEV_READ"] },
   { prefix: "/m/commission", anyOf: ["DEV_PLACE"] },
+  // M5 scripts: 재처리 INTEGRATOR·ADMIN(UI-ING-05), 데이터 품질 OPERATOR·ANALYST 이상(UI-ING-06)
+  { prefix: "/ingest/reprocess", anyOf: ["INGEST_REPROCESS"] },
+  { prefix: "/ingest/quality", anyOf: ["INGEST_READ", "ANALYTICS_READ"] },
 ];
 
 export function hasAny(permissions: readonly string[] | undefined, required: readonly string[]): boolean {

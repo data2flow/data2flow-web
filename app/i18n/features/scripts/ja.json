@@ -47,7 +47,9 @@
       "noTemplate": "既定のコードで開始",
       "source": "接続するソース（DECODEは1つ）",
       "models": "接続するデバイスモデル",
-      "submit": "作成"
+      "submit": "作成",
+      "preview": "テンプレートコードのプレビュー",
+      "configDefaults": "既定の設定値: {{values}}"
     },
     "validation": {
       "name": "名前は2〜80文字で入力してください。",
@@ -55,7 +57,7 @@
       "decodeOneSource": "DECODEスクリプトは1つのソースにのみ接続できます",
       "transformTargets": "TRANSFORMスクリプトはモデルまたはデバイスに接続します",
       "memo": "デプロイメモを入力してください",
-      "forceReason": "強制デプロイの理由を入力してください",
+      "forceReason": "強制デプロイの理由を{{min}}文字以上入力してください",
       "json": "JSONの形式が正しくありません（{{line}}:{{col}}）",
       "jsonTooLarge": "入力は256KBまでです",
       "jsonEmpty": "入力JSONを入れてください"
@@ -77,7 +79,10 @@
       "tabs": {
         "code": "コード",
         "versions": "バージョン",
-        "usage": "使用先"
+        "usage": "使用先",
+        "tests": "テストケース {{n}}",
+        "config": "設定",
+        "ops": "運用"
       }
     },
     "problems": {
@@ -110,7 +115,16 @@
       "force": "強制デプロイ",
       "forceReason": "強制デプロイの理由",
       "applied": "デプロイしました。インスタンス適用 {{reported}}/{{total}}",
-      "blocked": "エラーがあるためデプロイできません。警告のみならデプロイできます。"
+      "blocked": "エラーがあるためデプロイできません。警告のみならデプロイできます。",
+      "cases": "テストケース",
+      "casesUnavailable": "確認できませんでした(デプロイ時にサーバーが再確認します)",
+      "noCases": "保存されたケースなし",
+      "casesFailed": "失敗したケースがあるためデプロイできません。コードかケースを修正してください。",
+      "casesFailedForce": "失敗したケースがあります。管理者は理由を記録して強制デプロイできます。",
+      "next": "次のステップ",
+      "reprocess": "過去データを再処理",
+      "reprocessSource": "ソース {{id}}",
+      "unverified": "未検証の測定項目を確認・承認"
     },
     "test": {
       "title": "テスト",
@@ -181,6 +195,209 @@
       "disableNote": "次のメッセージからスキップします。いつでも再度有効化できます。",
       "disabled": "無効化しました。デバイス {{devices}} 台、24時間 {{n}} 件に影響します。",
       "enabled": "有効化しました。"
+    },
+    "area": {
+      "scripts": "スクリプト一覧",
+      "modules": "共有モジュール",
+      "formulas": "数式項目"
+    },
+    "cases": {
+      "title": "テストケース {{n}}",
+      "running": "実行中…",
+      "runAll": "すべて実行",
+      "new": "新しいケース",
+      "saved": "テストケースを保存しました。",
+      "confirmDelete": "ケース「{{name}}」を削除しますか?",
+      "runSummary": "テストケース {{passed}}/{{total}} 合格",
+      "empty": "テスト実行結果の[テストケースとして保存]で追加してください",
+      "name": "名前",
+      "input": "入力の要約",
+      "compareMode": "比較方式",
+      "lastResult": "最後の結果",
+      "actions": "操作",
+      "passed": "合格",
+      "failed": "不合格",
+      "editor": "テストケースの編集",
+      "inputJson": "入力 JSON",
+      "contextJson": "コンテキスト JSON(任意)",
+      "expectedJson": "期待出力 JSON",
+      "compareFields": "比較フィールド(カンマ区切り)",
+      "tolerance": "許容誤差",
+      "diffChanged": "{{key}} 期待 {{expected}} / 実際 {{actual}}",
+      "diffMissing": "{{key}} が出力にありません",
+      "diffExtra": "{{key}} は期待にない出力です",
+      "modes": {
+        "EXACT": "完全一致",
+        "FIELDS": "フィールド指定",
+        "TOLERANCE": "許容誤差"
+      },
+      "validation": {
+        "name": "名前は1〜80文字で入力してください。",
+        "nameDuplicated": "同じ名前のケースがすでにあります",
+        "quota": "テストケースはスクリプトごとに{{max}}件までです",
+        "json": "JSON の形式が正しくありません",
+        "jsonTooLarge": "JSON は256KBまでです",
+        "fields": "比較するフィールドを1つ以上入力してください",
+        "tolerance": "許容誤差は0〜1000の数値です"
+      },
+      "defaultName": "ケース",
+      "saveFromRun": "テストケースとして保存",
+      "saveNeedsDirect": "直接入力で実行した結果のみケースとして保存できます",
+      "savedFromRun": "現在の入力と出力をテストケースとして保存しました。"
+    },
+    "config": {
+      "title": "設定値(ctx.config)",
+      "help": "コードに数値を直接書かず設定値にしてください。設定値だけの変更は新しいバージョンなしで10秒以内に反映され、監査ログが残ります。秘密値は入れられません。",
+      "empty": "設定値はありません。",
+      "name": "名前",
+      "type": "型",
+      "value": "値",
+      "add": "設定値を追加",
+      "saved": "設定値を保存しました。10秒以内に反映されます。",
+      "conflict": "他のユーザーが先に変更しました。再読み込みしてから保存してください。",
+      "types": {
+        "string": "文字列",
+        "number": "数値",
+        "boolean": "真偽値"
+      },
+      "validation": {
+        "name": "英数字と_で64文字まで(数字で始められません)",
+        "secret": "秘密値に見える名前は使えません(token・password・secret・_key)",
+        "duplicated": "名前が重複しています",
+        "tooLarge": "値は1KBまでです",
+        "number": "数値を入力してください",
+        "boolean": "true または false",
+        "tooMany": "設定値は{{max}}件までです"
+      }
+    },
+    "ops": {
+      "title": "運用指標",
+      "period": "期間",
+      "periods": {
+        "1h": "1時間",
+        "24h": "24時間",
+        "7d": "7日"
+      },
+      "warnings": "警告",
+      "slow": "性能警告 p95 {{ms}}ms",
+      "errorRate": "エラー率 {{pct}}%",
+      "hints": "原因の候補",
+      "hint": {
+        "LARGE_LOOP": "反復回数の多いループ",
+        "LARGE_INPUT": "大きな入力"
+      },
+      "noStats": "この期間の処理記録はありません",
+      "processed": "処理件数",
+      "errors": "エラー数",
+      "avg": "平均(ms)",
+      "p95": "p95(ms)",
+      "deployMark": "v{{n}} デプロイ",
+      "version": "バージョン",
+      "errorRateCol": "エラー率",
+      "errorList": "エラー(直近{{n}}件)",
+      "errorKeep": "スクリプトごとに直近100件のみ保管します。",
+      "noErrors": "エラーはありません",
+      "at": "時刻",
+      "code": "エラーコード",
+      "message": "メッセージ",
+      "position": "行:列",
+      "showInput": "入力を表示",
+      "testWithInput": "この入力でテスト",
+      "logs": "運用ログ(console.log)",
+      "logExtend": "30分延長",
+      "logOn": "ログ収集をオン",
+      "logOff": "オフ",
+      "logRemaining": "収集中・残り {{time}}",
+      "logExpired": "30分経過したため自動でオフになりました",
+      "logOffState": "オフ — オンにすると30分間、スクリプトごとに毎秒10件まで収集します",
+      "noLogs": "収集されたログはありません",
+      "slowBadge": "低速"
+    },
+    "modules": {
+      "title": "共有モジュール",
+      "new": "新しいモジュール",
+      "name": "モジュール名",
+      "nameHint": "小文字・数字・- で3〜40文字",
+      "description": "説明",
+      "validation": {
+        "name": "名前は小文字・数字・- で3〜40文字です",
+        "nameTaken": "同じ名前のモジュールがすでにあります"
+      },
+      "latest": "最新 v{{n}}",
+      "unreleased": "リリース済みバージョンなし",
+      "saved": "モジュールコードを保存しました。",
+      "released": "v{{n}} をリリースしました。このバージョンを読み込むスクリプトだけが影響を受けます。",
+      "confirmDelete": "v{{n}} を削除しますか?",
+      "inUse": "v{{n}} を使うスクリプトがあるため削除できません",
+      "versions": "バージョンと利用スクリプト",
+      "noVersions": "まだリリースしたバージョンはありません",
+      "releasedAt": "リリース日時",
+      "usedBy": "利用スクリプト",
+      "unused": "未使用",
+      "release": "バージョンをリリース",
+      "releaseBody": "現在のコードで v{{n}} を作成します。リリースしたバージョンは変更できません。",
+      "exportHint": "export function・export const で公開し、スクリプトでは import { … } from 'module:名前@バージョン' で読み込みます。",
+      "loadFailed": "モジュール一覧を読み込めませんでした。",
+      "empty": "まだ共有モジュールはありません",
+      "emptyBody": "複数のスクリプトで使う関数(例: Milesight チャネルパーサー)をモジュールにし、バージョンを指定して読み込みましょう。",
+      "latestCol": "最新",
+      "usedByCol": "利用スクリプト",
+      "usedByN": "{{n}}件",
+      "updatedAt": "更新日時"
+    },
+    "formulas": {
+      "title": "数式項目",
+      "new": "新しい数式",
+      "edit": "{{key}} を編集",
+      "empty": "まだ数式項目はありません",
+      "emptyBody": "thi(temperature, humidity) のようにコードなしで派生測定項目を作りましょう。",
+      "resultKey": "結果キー",
+      "displayName": "表示名",
+      "unit": "単位",
+      "expression": "数式",
+      "target": "適用対象",
+      "targetType": "対象の種類",
+      "status": "状態",
+      "statuses": {
+        "ACTIVE": "有効",
+        "DISABLED": "無効"
+      },
+      "targets": {
+        "MODEL": "モデル",
+        "DEVICE": "機器",
+        "SPACE": "空間(配下すべて)"
+      },
+      "pickTarget": "対象を選択",
+      "suggestions": "入力候補",
+      "chips": "測定キー・関数を挿入",
+      "previewHours": "プレビュー期間",
+      "hours": "直近{{n}}時間",
+      "preview": "プレビュー",
+      "save": "保存・デプロイ",
+      "previewTitle": "数式プレビュー",
+      "previewEmpty": "この期間に計算できるデータはありません",
+      "result": "結果",
+      "saved": "{{key}} を保存しました。次のメッセージから計算します。",
+      "confirmDelete": "数式 {{key}} を削除しますか?保存済みの値は残ります。",
+      "versionConflict": "他のユーザーが先に変更しました。再読み込みしてから保存してください。",
+      "loadFailed": "数式一覧を読み込めませんでした。",
+      "validation": {
+        "pattern": "結果キーは英字で始まる2〜64文字(英数字・_)です",
+        "conflict": "すでにある測定項目です",
+        "displayName": "表示名を1〜80文字で入力してください",
+        "target": "適用対象を選択してください"
+      },
+      "errors": {
+        "empty": "数式を入力してください",
+        "tooLong": "数式は{{max}}文字までです",
+        "unexpected": "想定外の文字: {{token}}",
+        "unclosed": "数式が終わっていません(括弧を確認してください)",
+        "unknownFunction": "不明な関数: {{name}}",
+        "unknownKey": "不明な測定項目: {{name}}",
+        "arity": "関数 {{name}} の引数は{{min}}〜{{max}}個です",
+        "window": "期間は1m〜24hです: {{token}}",
+        "keyArg": "{{name}} の最初の引数は測定キーです"
+      }
     }
   },
   "errors": {
@@ -194,6 +411,12 @@
     "SCRIPT_STATIC_CHECK_FAILED": "静的検査のエラーがあるためデプロイできません。問題一覧を確認してください。",
     "SCRIPT_TEST_FAILED": "テストケースが失敗したためデプロイしませんでした。",
     "SCRIPT_TIMEOUT": "実行時間の上限を超えました。",
-    "SCRIPT_OUTPUT_INVALID": "出力が標準メッセージの形式に合いません。"
+    "SCRIPT_OUTPUT_INVALID": "出力が標準メッセージの形式に合いません。",
+    "SCRIPT_MODULE_IN_USE": "このモジュールバージョンを使うスクリプトがあるため削除できません",
+    "SCRIPT_MODULE_NOT_FOUND": "読み込むモジュールのバージョンが見つかりません",
+    "SCRIPT_FORMULA_INVALID": "数式が正しくありません",
+    "SCRIPT_FORMULA_KEY_CONFLICT": "すでにある測定項目です",
+    "SCRIPT_FORMULA_NOT_FOUND": "数式項目が見つかりません",
+    "SCRIPT_CONFIG_SECRET_FORBIDDEN": "秘密値は設定値に入れられません"
   }
 }

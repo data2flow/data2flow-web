@@ -183,7 +183,7 @@ describe("SCR-03.04 배포 대화상자(UI-SCR-02)", () => {
     expect(screen.queryByRole("dialog")).toBeNull();
   });
 
-  it("ADMIN 강제 배포는 사유 필수, force·forceReason을 보낸다", async () => {
+  it("ADMIN 강제 배포는 사유 필수(TC-SCR-049: 10자 이상), force·forceReason을 보낸다", async () => {
     const api = fakeApi();
     await renderEditor(api, { script: clean(), canForce: true });
     await userEvent.click(await screen.findByRole("button", { name: "배포" }));
@@ -191,10 +191,10 @@ describe("SCR-03.04 배포 대화상자(UI-SCR-02)", () => {
     await userEvent.type(within(dialog).getByLabelText("배포 메모(2~200자)"), "긴급 수정");
     await userEvent.click(within(dialog).getByLabelText("강제 배포"));
     await userEvent.click(within(dialog).getByRole("button", { name: "강제 배포" }));
-    expect(within(dialog).getByText("강제 배포 사유를 입력하세요")).toBeInTheDocument();
-    await userEvent.type(within(dialog).getByLabelText("강제 배포 사유"), "테스트 케이스 오탐");
+    expect(within(dialog).getByText("강제 배포 사유를 10자 이상 입력하세요")).toBeInTheDocument();
+    await userEvent.type(within(dialog).getByLabelText("강제 배포 사유"), "테스트 케이스 오탐 확인");
     await userEvent.click(within(dialog).getByRole("button", { name: "강제 배포" }));
-    expect(api.deploy).toHaveBeenCalledWith("501", { versionId: "805", memo: "긴급 수정", baseActiveVersionId: "804", force: true, forceReason: "테스트 케이스 오탐" });
+    expect(api.deploy).toHaveBeenCalledWith("501", { versionId: "805", memo: "긴급 수정", baseActiveVersionId: "804", force: true, forceReason: "테스트 케이스 오탐 확인" });
   });
 });
 
