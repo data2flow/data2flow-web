@@ -114,7 +114,7 @@ describe("DSC-09.01 UI-DSC-07 커넥터 카탈로그", () => {
     expect(page.response.status).toBe(200);
     expect(page.body).toContain('href="/sources/new/mqtt"');
     expect(page.body).toContain("Apache Kafka");
-    expect(page.body).toContain("아카데미 iot-data(WSS)");
+    expect(page.body).toContain("아카데미 iot-data (WSS)");
     expect(page.body).toContain('href="/sources/new/mqtt?template=academy-iot-data"');
     for (const name of ["MQTT 구독", "플랫폼 브로커", "HTTP Webhook", "가상 환경", "oneM2M", "OPC UA", "Modbus TCP"]) expect(page.body).toContain(name);
   });
@@ -122,7 +122,7 @@ describe("DSC-09.01 UI-DSC-07 커넥터 카탈로그", () => {
   it("TC-DSC-017 TC-DSC-233 라이선스로 막힌 커넥터는 \"사용 불가(라이선스)\"이고 링크가 없다, 확장 방식·유실 가능 표시", async () => {
     const page = await (await integrator()).get("/sources/new");
     expect(page.body).toContain("사용 불가(라이선스)");
-    expect(page.body).not.toContain('href="/sources/new/bacnet-ip"');
+    expect(page.body).not.toContain('href="/sources/new/nats-core"');
     expect(page.body).toContain("DUAL_ACTIVE");
     expect(page.body).toContain("유실 가능");
   });
@@ -191,8 +191,8 @@ describe("DSC-01.01·01.04·01.07 UI-DSC-02/08 소스 만들기", () => {
     expect(page.body).toContain("application/+/device/+/event/up");
   });
 
-  it("M2에서 만들 수 없는 커넥터는 안내만", async () => {
-    const page = await (await integrator()).get("/sources/new/kafka");
+  it("스키마가 없는(카탈로그에 없는) 커넥터는 안내만 — M5부터 카탈로그 커넥터는 스키마 폼으로 만든다", async () => {
+    const page = await (await integrator()).get("/sources/new/no-such-connector");
     expect(page.body).toContain("아직 화면에서 만들 수 없습니다");
   });
 
@@ -307,7 +307,7 @@ describe("UI-DSC-03 소스 상세", () => {
     expect(del.body).toContain("연결된 기기가 있어 삭제할 수 없습니다");
     const clone = await browser.post("/sources/7", { intent: "clone", code: "chirpstack-copy", name: "복제본" });
     expect(clone.response.status).toBe(302);
-    expect(clone.response.headers.get("Location")).toMatch(/^\/sources\/\d+\/edit$/);
+    expect(clone.response.headers.get("Location")).toMatch(/^\/sources\/\d+\/edit\?cloned=1$/);
     expect(app.gateway.m2.sources.find((s) => s.code === "chirpstack-copy")?.lifecycle).toBe("DRAFT");
   });
 

@@ -47,7 +47,7 @@ function summary(core: CoreState, s: FakeSource) {
   };
 }
 
-function detail(s: FakeSource) {
+export function detail(s: FakeSource) {
   return {
     id: s.id,
     code: s.code,
