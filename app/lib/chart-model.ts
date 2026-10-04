@@ -4,6 +4,7 @@
  * - 공백(BR-DSH-05): 보고 주기의 3배를 넘는 간격과 API `gaps[]`에 null을 넣어 선을 끊는다. 값을 보간하지 않는다
  * - 품질(BR-DSH-06): 1(범위 초과)은 삼각형, 3(의심)은 다이아몬드 점의 별도 계열. 가상 데이터는 점선 + "가상" 범례
  * - 주석(TSD-01.04): 시점은 세로선, 구간은 반투명 영역
+ * - 알람·제어 주석(DSH-05.04): 알람 발생·해제는 빨간 실선 세로선, 제어 이벤트는 아이콘 마커(핀)가 달린 파란 세로선. 툴팁에 내용과 시각(표시 시간대)
  * - 시각: 축과 툴팁은 표시 시간대(TSD-01.05). 저장·API는 UTC
  */
 import { resolveTimezone } from "./format";
@@ -31,9 +32,33 @@ export interface ChartAnnotation {
   id?: string;
   timeFrom: string;
   timeTo?: string | null;
+  /** TSD 주석 종류(ALARM·OFFLINE·SCRIPT_ERROR·ANOMALY·USER) 또는 위젯 주석(ALARM·CONTROL, ALARM_RAISED·ALARM_CLEARED) */
   type: string;
   title: string;
+  link?: string | null;
 }
+
+/** API-DSH-09 선 차트 위젯 응답의 `annotations[]{t, type: ALARM|CONTROL, label, link}` */
+export interface WidgetAnnotation {
+  t: string;
+  type: string;
+  label: string;
+  link?: string | null;
+}
+
+/** 위젯 주석을 차트 주석으로(DSH-05.04). 시각이 잘못된 항목은 버린다 */
+export function fromWidgetAnnotations(items: WidgetAnnotation[] | null | undefined): ChartAnnotation[] {
+  return (items ?? []).filter((a) => !Number.isNaN(Date.parse(a.t))).map((a, i) => ({ id: `w${i}`, timeFrom: a.t, type: a.type, title: a.label, link: a.link ?? null }));
+}
+
+/** 이 주석이 알람 이벤트(빨간 실선)인지, 제어 이벤트(아이콘 마커)인지 */
+export function annotationKind(type: string): "alarm" | "control" | "note" {
+  if (type === "ALARM" || type === "ALARM_RAISED" || type === "ALARM_CLEARED") return "alarm";
+  if (type === "CONTROL") return "control";
+  return "note";
+}
+
+const ANNOTATION_ICON: Record<string, string> = { ALARM: "▲", ALARM_RAISED: "▲", ALARM_CLEARED: "✔", CONTROL: "⚙" };
 
 export interface ChartLabels {
   outOfRange: string;
@@ -180,8 +205,19 @@ function markings(series: ChartSeries[], options: ChartOptions): Record<string, 
     }
   }
   for (const a of options.annotations ?? []) {
-    if (a.timeTo) areas.push([{ name: a.title, xAxis: Date.parse(a.timeFrom), itemStyle: { color: "rgba(32,107,196,0.10)" } }, { xAxis: Date.parse(a.timeTo) }]);
-    else lines.push({ name: a.title, xAxis: Date.parse(a.timeFrom), label: { formatter: a.title } });
+    const at = Date.parse(a.timeFrom);
+    if (Number.isNaN(at)) continue;
+    if (a.timeTo) {
+      areas.push([{ name: a.title, xAxis: at, itemStyle: { color: "rgba(32,107,196,0.10)" } }, { xAxis: Date.parse(a.timeTo) }]);
+      continue;
+    }
+    const kind = annotationKind(a.type);
+    const icon = ANNOTATION_ICON[a.type];
+    const text = icon ? `${icon} ${a.title}` : a.title;
+    const tooltip = { show: true, formatter: `${text} · ${axisLabel(at, options.timezone)}` };
+    if (kind === "alarm") lines.push({ name: a.title, xAxis: at, label: { formatter: text }, lineStyle: { type: "solid", color: "#d63939", width: 1.5 }, tooltip });
+    else if (kind === "control") lines.push({ name: a.title, xAxis: at, symbol: ["none", "pin"], symbolSize: 14, label: { formatter: text, position: "end" }, lineStyle: { type: "dashed", color: "#206bc4" }, itemStyle: { color: "#206bc4" }, tooltip });
+    else lines.push({ name: a.title, xAxis: at, label: { formatter: a.title }, tooltip });
   }
   const result: Record<string, unknown> = {};
   if (areas.length) result.markArea = { silent: true, data: areas };
