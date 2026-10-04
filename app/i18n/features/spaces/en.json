@@ -67,7 +67,8 @@
       "props": "Properties",
       "targets": "Target environment",
       "schedule": "Operating hours",
-      "floorplan": "Floor plan"
+      "floorplan": "Floor plan",
+      "alarms": "Alarms"
     },
     "targets": {
       "inherit": "Use parent values",
@@ -155,6 +156,30 @@
       "title": "Create your first site to get started",
       "body": "Create spaces as site → building → floor → room and place devices in them.",
       "askAdmin": "Spaces are created by an administrator (INTEGRATOR or above). Please ask an administrator."
+    },
+    "alarms": {
+      "empty": "No open alarms in this space.",
+      "failed": "Could not load alarms.",
+      "openList": "Open in alarm list",
+      "severityCol": "Severity",
+      "title": "Alarm",
+      "device": "Device",
+      "status": "Status",
+      "raisedAt": "Raised at",
+      "flapping": "Flapping",
+      "openN": "{{n}} alarms",
+      "severity": {
+        "CRITICAL": "Critical",
+        "MAJOR": "Major",
+        "MINOR": "Minor",
+        "WARNING": "Warning",
+        "INFO": "Info"
+      },
+      "state": {
+        "ACTIVE": "Active",
+        "ACKNOWLEDGED": "Acknowledged",
+        "SUPPRESSED": "Suppressed"
+      }
     }
   },
   "sites": {

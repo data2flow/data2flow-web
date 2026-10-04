@@ -134,6 +134,23 @@ describe("UI-DSH-02 공간 보기(DSH-01.02, DSH-07.05)", () => {
     expect(sent("PUT", "/api/v1/core/accounts/me/preferences")[1].body).toEqual({ favorites: [], baseVersion: 2 });
   });
 
+  it("[DSH-02.01][AT-DSH-02.1] TC-DSH-013 기기 카드에 열린 알람 배지, 알람 탭은 하위 포함 열린 알람(API-RUL-10 spaceId)", async () => {
+    app.gateway.m2.extra.spaceOpenAlarms = { "31": [{ id: "9", severity: "CRITICAL", status: "ACTIVE", title: "실습실 고CO2", device: { id: "1042", name: "AM107-067999" }, space: { id: "31", path: "본관 › 3층 › 실습실" }, raisedAt: "2026-10-03T02:42:00Z" }] };
+    const browser = await viewer();
+    const page = await browser.get("/spaces/31");
+    expect(page.body).toContain("알람 1");
+    expect(page.body).toContain('href="/spaces/31?tab=alarms"');
+    const tab = await browser.get("/spaces/3?tab=alarms");
+    expect(tab.response.status).toBe(200);
+    expect(sent("GET", "/api/v1/core/alarms").at(-1)?.path).toContain("spaceId=3");
+  });
+
+  it("[DSH-07.01] TC-DSH-073 360px: 공간 보기 격자는 좁은 화면에서 한 열(min-w-0로 가로 넘침 없음)", async () => {
+    const page = await (await viewer()).get("/spaces/31");
+    expect(page.body).toContain("grid min-w-0 gap-4 md:grid-cols-[260px_1fr]");
+    expect(page.body).toContain("grid gap-3 sm:grid-cols-2 md:grid-cols-3");
+  });
+
   it("기기 탭은 하위 포함 기기 목록(API-DEV-11 spaceId)", async () => {
     const page = await (await viewer()).get("/spaces/3?tab=devices");
     expect(page.response.status).toBe(200);

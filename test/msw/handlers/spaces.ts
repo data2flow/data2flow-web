@@ -149,7 +149,8 @@ export const spacesHandler: CoreHandler = (core, { method, path, url, body, can 
       space: { id: space.id, name: space.name, type: space.type, path: core.spacePath(space.id), targetEnv: effectiveTargets(core, space.id).items },
       comfort: comfortOf(core, space.id),
       devices: devices.map((d) => ({ id: d.id, name: d.name, modelId: d.modelId, modelName: core.model(d.modelId)?.name ?? null, status: d.status, connection: d.connectivity, lastSeenAt: d.lastSeenAt, battery: d.battery ?? null, rssi: d.rssi ?? null, virtual: d.virtual, metrics: d.latest.map((l) => ({ key: l.metricKey, value: l.value, unit: l.unit, quality: l.quality, at: l.measuredAt })) })),
-      openAlarms: [],
+      // 열린 알람(M4, API-RUL-10 Alarm 모양). 테스트가 core.extra.spaceOpenAlarms[공간 ID]로 넣는다
+      openAlarms: ((core.extra.spaceOpenAlarms as Record<string, unknown[]> | undefined) ?? {})[space.id] ?? [],
       hasFloorplan: Boolean(extra.floorplans[space.id]),
       children: core.spaces.filter((c) => c.parentId === space.id).map((c) => ({ id: c.id, name: c.name, type: c.type, comfortState: comfortOf(core, c.id).state })),
     });

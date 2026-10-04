@@ -67,7 +67,8 @@
       "props": "属性",
       "targets": "目标环境",
       "schedule": "运营时间",
-      "floorplan": "平面图"
+      "floorplan": "平面图",
+      "alarms": "告警"
     },
     "targets": {
       "inherit": "使用上级值",
@@ -155,6 +156,30 @@
       "title": "创建第一个站点即可开始",
       "body": "按站点 → 建筑 → 楼层 → 房间的顺序创建空间并放置设备。",
       "askAdmin": "空间由管理员（INTEGRATOR 及以上）创建，请联系管理员。"
+    },
+    "alarms": {
+      "empty": "此空间没有未关闭的告警。",
+      "failed": "无法加载告警。",
+      "openList": "在告警列表中查看",
+      "severityCol": "严重程度",
+      "title": "告警",
+      "device": "设备",
+      "status": "状态",
+      "raisedAt": "发生时间",
+      "flapping": "频繁抖动",
+      "openN": "告警 {{n}}",
+      "severity": {
+        "CRITICAL": "严重",
+        "MAJOR": "主要",
+        "MINOR": "次要",
+        "WARNING": "警告",
+        "INFO": "信息"
+      },
+      "state": {
+        "ACTIVE": "活动",
+        "ACKNOWLEDGED": "已确认",
+        "SUPPRESSED": "已抑制"
+      }
     }
   },
   "sites": {
