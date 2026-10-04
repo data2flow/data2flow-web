@@ -5,13 +5,14 @@ import { act, fireEvent, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { checkSettings, modeOf, ownerMissing, modeProblem, parseInitial, settingsFormOf, settingsPatch, toMode, variableProblems, variablesOf } from "../model/settings";
+import type { FakeSocket } from "./fake-socket";
 import { coolingGraph, detailOf, fakeApi, renderEditor, stubReactFlowDom } from "./helpers";
 
 beforeEach(() => stubReactFlowDom());
 afterEach(() => vi.useRealTimers());
 
 const nodeEl = (container: HTMLElement, id: string) => container.querySelector(`.react-flow__node[data-id="${id}"]`) as HTMLElement;
-const presenceSocket = (sockets: { sockets: { url: string }[] }) => sockets.sockets.find((s) => s.url.endsWith("/presence")) as unknown as import("./fake-socket").FakeSocket;
+const presenceSocket = (sockets: { sockets: FakeSocket[] }) => sockets.sockets.find((s) => s.url.endsWith("/presence"))!;
 const A = { userId: "21", name: "A", color: "#e5484d", readOnly: false, selected: [] as string[] };
 
 describe("FLW-11.01 TC-FLW-222 AT-FLW-25.1 다른 사람이 고른 노드 표시", () => {
