@@ -9,7 +9,7 @@ import { Outlet, useNavigate, useRouteLoaderData } from "react-router";
 import { callApi, callList } from "~/bff/api.server";
 import { bff } from "~/bff/middleware.server";
 import { guardUser } from "~/bff/user.server";
-import { AppShell } from "~/components/app-shell";
+import { AppShell, headerBrand, type HeaderBrand } from "~/components/app-shell";
 import { EmergencyStopButton, GlobalBands } from "~/features/control/emergency-stop";
 import type { EmergencyStop, MaintenanceWindow } from "~/features/control/model/admin";
 import { hasAny } from "~/lib/permissions";
@@ -27,10 +27,12 @@ export const middleware: Route.MiddlewareFunction[] = [
 
 export async function loader({ request, context }: Route.LoaderArgs) {
   const ctx = bff(context);
-  if (!ctx.session.authenticated) return { stops: [] as EmergencyStop[], maintenance: [] as MaintenanceWindow[], spaces: [] as SpaceNode[] };
-  const [stops, maintenance] = await Promise.all([
+  if (!ctx.session.authenticated) return { stops: [] as EmergencyStop[], maintenance: [] as MaintenanceWindow[], spaces: [] as SpaceNode[], brand: null };
+  const [stops, maintenance, branding] = await Promise.all([
     callList<EmergencyStop>(ctx, request, "/api/v1/core/emergency-stops?active=true", { noGuards: true }),
     callList<MaintenanceWindow>(ctx, request, "/api/v1/core/maintenance-windows?status=ACTIVE", { noGuards: true }),
+    // 브랜딩(DSH-13.01, API-DSH-25): 웹 헤더 로고·주 색상. 실패하면 기본 모양
+    callApi<HeaderBrand & Record<string, unknown>>(ctx, request, "/api/v1/core/branding", { noGuards: true }),
   ]);
   const activeStops = stops.ok ? stops.list.responses.filter((s) => s.active !== false) : [];
   // 공간 범위 비상 정지가 있을 때만 공간 이름을 찾으려고 트리를 읽는다
@@ -39,6 +41,7 @@ export async function loader({ request, context }: Route.LoaderArgs) {
     stops: activeStops,
     maintenance: maintenance.ok ? maintenance.list.responses.filter((m) => m.status === "ACTIVE") : [],
     spaces: spaces?.ok ? (spaces.data ?? []) : [],
+    brand: branding.ok && branding.data ? headerBrand(branding.data) : null,
   };
 }
 
@@ -61,6 +64,7 @@ export default function AppLayout({ loaderData }: Route.ComponentProps) {
     <AppShell
       me={root?.me ?? null}
       theme={root?.theme}
+      brand={loaderData?.brand ?? null}
       headerActions={hasAny(permissions, ["EMERGENCY_STOP"]) ? <EmergencyStopButton onStarted={() => setRefreshKey((n) => n + 1)} /> : undefined}
       bands={
         <GlobalBands

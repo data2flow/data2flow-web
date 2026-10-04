@@ -2,7 +2,7 @@
 
 data2flow 화면과 BFF입니다. React Router v8 프레임워크 모드(SSR, Vite) + React 19 + TypeScript로 만들고, 브라우저는 토큰 없이 HttpOnly 세션 쿠키(`data2flow_session`)만 갖습니다. Access·Refresh 토큰은 BFF가 서버 쪽에 보관하고, 브라우저의 API 호출은 `/bff/api/{svc}/**`로 받아 내부 gateway에 Bearer로 중계합니다(ADR-024, design/auth.md §9). 화면 문구는 한국어·영어·일본어·중국어 4개 언어입니다(ADR-037).
 
-- 관련 스펙: IAM(로그인·세션·회원·권한·감사), OPS-07(조직·외부 서비스 설정), M2 수집 경로 화면(DSC·DEV·DSH·ING·SCR·TSD), M3 폐루프(가상) 화면(FLW·ACT·SIM·DEV-03.03), M4 자동화 완성 화면(RUL·FLW·ACT·OPS-05·06·DSH·DEV-02.07·02.09) (정본은 비공개 저장소 `data2flow-docs`)
+- 관련 스펙: IAM(로그인·세션·회원·권한·감사), OPS-07(조직·외부 서비스 설정), M2 수집 경로 화면(DSC·DEV·DSH·ING·SCR·TSD), M3 폐루프(가상) 화면(FLW·ACT·SIM·DEV-03.03), M4 자동화 완성 화면(RUL·FLW·ACT·OPS-05·06·DSH·DEV-02.07·02.09), M5 데이터 관리 화면(DSH-04·06·08.04·11·13.01 등) (정본은 비공개 저장소 `data2flow-docs`)
 - 포트: 8080. 프로브는 `/healthz`
 
 ## 구조
@@ -150,6 +150,39 @@ data2flow 화면과 BFF입니다. React Router v8 프레임워크 모드(SSR, Vi
 - QR 스캔은 브라우저 `BarcodeDetector`(후면 카메라)를 쓰고, 없거나 카메라를 거부하면 라벨 주소·토큰을 직접 넣습니다. 새 의존성은 없습니다(QR 그림은 기존 `qrcode`, MIT).
 - `/bff/api` 중계는 multipart 업로드를 60MB까지 받습니다(첨부·자산 사진 파일당 20MB, 현장 설치 사진 5장). PDF 등 바이너리 응답은 `Content-Disposition`과 함께 그대로 넘깁니다.
 - 작업 지시 목록 API에 기기 필터가 없어 기기별 보기(`deviceId`)·모바일 기기 상세는 그 기기 공간으로 거른 뒤 대상 기기로 다시 거릅니다.
+### 대시보드·키오스크·공유 링크·브랜딩
+
+| 경로 | 화면 | 스펙 |
+|---|---|---|
+| `/dashboards?tab=mine\|shared\|favorite` | 대시보드 목록(카드·기본 표시·복제·기본으로·JSON 내보내기·가져오기·삭제, 키오스크에 넣기) | DSH-04.07 |
+| `/dashboards/{id}?var-space=31` | 대시보드 보기(변수·시간 범위·집계·새로고침, 위젯 메뉴: 데이터 표로 보기·PNG·CSV·전체 화면, 드래그 확대 동기화·[초기화], 대시보드 PNG, 기능 투어) | DSH-04.05, DSH-06.01, DSH-08.04, DSH-11.01·11.03·11.04, NFR-01.09 |
+| `/dashboards/{id}/edit` | 편집(위젯 라이브러리, 24열 격자 끌어 놓기·크기 조정·복제·삭제와 키보드 조작, 위젯 설정·옵션 스키마 폼, 대시보드 설정·변수, 저장 충돌 모달) | DSH-04.01, DSH-04.05 |
+| `/kiosk?boards=1,2&interval=60` | 키오스크(앱 틀 없음, 자동 순환·진행 막대·시계, 세션 유지) | DSH-06.02 |
+| `/share/{token}`, `/share/d/{token}` | 공유 링크 보기(로그인 없음, 읽기 전용) | DSH-06.03 |
+| `/admin/branding` | 브랜딩(로고 2종·파비콘·로그인 배경, 주 색상 대비 경고, 문구·메일 서명, 미리 보기). 웹 헤더 로고·주 색상에 적용 | DSH-13.01 |
+
+- 첫 화면(NFR-01.09): loader가 정의(API-DSH-06)와 읽는 순서로 앞쪽 위젯 12개의 데이터(API-DSH-09)를 병렬로 받아 서버에서 그린다(위젯 하나가 2초를 넘기면 그 위젯만 브라우저가 다시 받음). 이후 갱신은 위젯마다 따로(`/bff/api/core/dashboards/{id}/widgets/{wid}/data`), 변수가 바뀌면 그 변수를 쓰는 위젯만 다시 요청한다. 실시간(LIVE)은 `telemetry:{기기}.{항목}` `point`를 받으면 그 위젯만 1초 묶음으로 다시 조회한다.
+- 공유 링크: 화면은 세션을 쓰지 않고 gateway 공개 경로 `GET /api/v1/core/public/share/{token}`만 부른다. 위젯 데이터는 BFF 공개 경로 `GET /share/{token}/widgets/{wid}/data?q=`(쿠키·CSRF 없음, 범위·집계·변수만 골라 `POST …/public/share/{token}/widgets/{wid}/data`로 중계). 응답에 `Referrer-Policy: no-referrer`·`X-Robots-Tag: noindex`, hreflang·canonical 없음. 토큰 경로 레이트 리밋은 gateway 몫(TC-DSH-068). core가 주는 공유 주소는 `/share/{token}`(문서 00-navigation은 `/share/d/{token}`이라 둘 다 받는다).
+- 키오스크 세션: 화면이 4분마다 `GET /bff/api/core/accounts/me`를 보내 유휴 만료를 늦추고, Access 만료는 BFF가 Refresh로 서버 쪽에서 갱신해 화면을 다시 불러오지 않는다. 지금 보이는 대시보드 하나만 그리고 순환하면 이전 부품을 내려 차트를 dispose한다(24시간 메모리 소크 TC-DSH-064는 staging Playwright 몫).
+- 브랜딩 자산은 BFF 공개 경로 `/branding/assets/{id}`(→ `/api/v1/core/public/branding/assets/{id}`, 이미지 형식만, CSP sandbox)로 내려준다.
+- 차트 기본 팔레트(`app/lib/palette.ts`)는 색약 3종 시뮬레이션에서도 인접 색 ΔE00 ≥ 10, 배경 대비 ≥ 3:1(TC-DSH-098). 상태는 색 + 아이콘·글자.
+- 기본 대시보드로 지정하면 화면 설정 `home: DASHBOARD`도 함께 바꿔 `/`가 그 대시보드로 열린다(`/?summary`는 홈 요약).
+
+### 스크립트·수식·재처리·데이터 품질
+
+| 경로 | 화면 | 스펙 |
+|---|---|---|
+| `/scripts/{id}?tab=tests\|config\|ops` | 테스트 케이스(저장·모두 실행·차이), 설정값(`ctx.config`, 비밀값 이름 거부), 운영(버전별 처리·오류·평균·p95, 배포 시점 선, 성능 경고와 원인 후보, 오류 스냅샷 100건 → [이 입력으로 테스트], 로그 수집 30분) | SCR-03.03·03.05·04.02·05.01·05.02·05.03 |
+| `/scripts/{id}` 배포 대화상자 | 배포 전 테스트 케이스 n/n(실패하면 배포 불가, ADMIN 강제 배포 사유 10자 이상), 배포 뒤 [지난 데이터 재처리](응답 `reprocessSuggestion`으로 미리 채움)·[미검증 측정 항목 확인·승인] | SCR-03.03·03.06, 시나리오 4 |
+| `/scripts?dialog=create` | 템플릿 고르기와 코드·기본 설정값 미리보기 | SCR-01.05 |
+| `/scripts/modules`, `/scripts/modules/{id}` | 공유 모듈 목록·편집기(DRAFT 저장, 버전 배포, 버전별 사용 스크립트, 사용 중 버전 삭제 불가) | SCR-04.01 |
+| `/scripts/formulas` | 수식 항목(측정 키·함수 자동완성과 칩, 입력 중 문법 검사·오류 위치 밑줄, 24시간 미리 보기, 저장·배포) | SCR-01.06 |
+| `/ingest/reprocess` | 재처리 작업(기간 31일·소스·기기 → 미리 보기 → 확인 → 생성, 진행률, 취소). `?sourceId=&deviceIds=&from=&to=&memo=` 미리 채움 | ING-01.04, SCR-03.06 |
+| `/ingest/quality` | 데이터 품질(순위·최하위 10개·문제 유형 분포·30일 추이, 점수 → 기기 문제 구간 차트) | ING-06.02 |
+
+- API: core `ScriptM5Controller`(API-SCR-10~14·18~22), `IngestController`(API-ING-09·10·12·13), `IngestInsightController`(API-ING-14, `GET /core/ingest/quality/summary`·`/trend`).
+- 재처리 진행률은 core에 실시간 토픽이 없어 진행 중 작업이 있을 때 5초마다 목록을 다시 읽습니다(API-ING-03 `ingest.reprocess`는 대체됨).
+- 수식 문법 검사는 화면이 즉시 알려 주기 위한 것이고 정본 검사는 pipeline(API-SCR-37)입니다.
 
 ## 개발
 
@@ -241,21 +274,3 @@ KEEP=1 e2e/m4-demo.sh                   # 끝나도 컨테이너·프로세스�
 ```
 
 포트 41883·42025·46432·46552·46672·47379·49025·49780~49799를 씁니다. 결과 예시(2026-10-04, 56개 확인 모두 통과): 과거 재생은 저장된 828건으로 361회 실행하고 냉방 명령 1건(드라이런)을 셌습니다. 운영 적용 뒤 303초에 냉방 명령이 APPLIED였고, 15분 뒤 효과 확인은 29→29℃로 NO_EFFECT였습니다. 게이트웨이 다운 173초 뒤 게이트웨이 알람이 났고 하위 무수신 알람 3건이 묶였으며, 텔레그램 알림은 1건이었습니다. 복구 90초 뒤 게이트웨이·하위 알람이 함께 해제되었습니다. 라이브 뷰는 `node.stats`를 193번 받았습니다.
-
-## M5 데이터 관리 화면
-
-### 스크립트·수식·재처리·데이터 품질
-
-| 경로 | 화면 | 스펙 |
-|---|---|---|
-| `/scripts/{id}?tab=tests\|config\|ops` | 테스트 케이스(저장·모두 실행·차이), 설정값(`ctx.config`, 비밀값 이름 거부), 운영(버전별 처리·오류·평균·p95, 배포 시점 선, 성능 경고와 원인 후보, 오류 스냅샷 100건 → [이 입력으로 테스트], 로그 수집 30분) | SCR-03.03·03.05·04.02·05.01·05.02·05.03 |
-| `/scripts/{id}` 배포 대화상자 | 배포 전 테스트 케이스 n/n(실패하면 배포 불가, ADMIN 강제 배포 사유 10자 이상), 배포 뒤 [지난 데이터 재처리](응답 `reprocessSuggestion`으로 미리 채움)·[미검증 측정 항목 확인·승인] | SCR-03.03·03.06, 시나리오 4 |
-| `/scripts?dialog=create` | 템플릿 고르기와 코드·기본 설정값 미리보기 | SCR-01.05 |
-| `/scripts/modules`, `/scripts/modules/{id}` | 공유 모듈 목록·편집기(DRAFT 저장, 버전 배포, 버전별 사용 스크립트, 사용 중 버전 삭제 불가) | SCR-04.01 |
-| `/scripts/formulas` | 수식 항목(측정 키·함수 자동완성과 칩, 입력 중 문법 검사·오류 위치 밑줄, 24시간 미리 보기, 저장·배포) | SCR-01.06 |
-| `/ingest/reprocess` | 재처리 작업(기간 31일·소스·기기 → 미리 보기 → 확인 → 생성, 진행률, 취소). `?sourceId=&deviceIds=&from=&to=&memo=` 미리 채움 | ING-01.04, SCR-03.06 |
-| `/ingest/quality` | 데이터 품질(순위·최하위 10개·문제 유형 분포·30일 추이, 점수 → 기기 문제 구간 차트) | ING-06.02 |
-
-- API: core `ScriptM5Controller`(API-SCR-10~14·18~22), `IngestController`(API-ING-09·10·12·13), `IngestInsightController`(API-ING-14, `GET /core/ingest/quality/summary`·`/trend`).
-- 재처리 진행률은 core에 실시간 토픽이 없어 진행 중 작업이 있을 때 5초마다 목록을 다시 읽습니다(API-ING-03 `ingest.reprocess`는 대체됨).
-- 수식 문법 검사는 화면이 즉시 알려 주기 위한 것이고 정본 검사는 pipeline(API-SCR-37)입니다.

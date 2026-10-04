@@ -21,7 +21,10 @@ export type MenuKey =
   | "channels"
   // M5 data
   | "system"
-  | "dataRetention";
+  | "dataRetention"
+  // M5 dash
+  | "dashboards"
+  | "branding";
 
 export interface MenuItem {
   key: MenuKey;
@@ -47,6 +50,8 @@ export const MENU: MenuItem[] = [
   { key: "automation", path: "/automation/flows", anyOf: ["FLOW_READ"], group: "main", sections: ["/automation"] },
   { key: "control", path: "/control/commands", anyOf: ["DEVICE_CONTROL"], group: "main", sections: ["/control"], guard: ["DEV_READ"] },
   { key: "sim", path: "/sim", anyOf: ["SIM_READ"], group: "main" },
+  // M5 사용자 정의 대시보드(UI-DSH-04)
+  { key: "dashboards", path: "/dashboards", anyOf: ["DASHBOARD_READ"], group: "main" },
   { key: "members", path: "/admin/members", anyOf: ["IAM_MANAGE"], group: "admin" },
   { key: "roles", path: "/admin/roles", anyOf: ["IAM_MANAGE"], group: "admin" },
   { key: "security", path: "/admin/security", anyOf: ["IAM_MANAGE"], group: "admin" },
@@ -58,6 +63,8 @@ export const MENU: MenuItem[] = [
   // M5 data: 시스템 상태(저장 지표, UI-OPS-01)·데이터 보관(UI-TSD-04)
   { key: "system", path: "/admin/system", anyOf: ["OPS_MANAGE"], group: "admin" },
   { key: "dataRetention", path: "/settings/data-retention", anyOf: ["TS_POLICY"], group: "admin" },
+  // M5 브랜딩(UI-DSH-13, ADMIN)
+  { key: "branding", path: "/admin/branding", anyOf: ["BRANDING_MANAGE"], group: "admin" },
 ];
 
 /** 메뉴 밖 경로의 권한(라우트 가드). 가장 긴 접두사가 이긴다 */
@@ -113,6 +120,9 @@ export const ROUTE_GUARDS: { prefix: string; anyOf: string[] }[] = [
   // M5 scripts: 재처리 INTEGRATOR·ADMIN(UI-ING-05), 데이터 품질 OPERATOR·ANALYST 이상(UI-ING-06)
   { prefix: "/ingest/reprocess", anyOf: ["INGEST_REPROCESS"] },
   { prefix: "/ingest/quality", anyOf: ["INGEST_READ", "ANALYTICS_READ"] },
+  // M5: 키오스크(UI-DSH-06, 틀 없는 화면), 대시보드 편집은 편집 권한
+  { prefix: "/kiosk", anyOf: ["DASHBOARD_READ"] },
+  { prefix: "/dashboards", anyOf: ["DASHBOARD_READ"] },
 ];
 
 export function hasAny(permissions: readonly string[] | undefined, required: readonly string[]): boolean {

@@ -94,7 +94,7 @@ describe("permissions IAM-04.05 메뉴 숨김", () => {
     expect(requiredPermissionsFor("/imports/9")).toEqual(["TS_IMPORT"]);
     expect(requiredPermissionsFor("/settings/data-retention")).toEqual(["TS_POLICY"]);
     expect(isMenuActive(MENU.find((m) => m.key === "explore")!, "/imports/new")).toBe(true);
-    expect(visibleMenu(["IAM_MANAGE", "AUDIT_READ", "OPS_MANAGE", "DEV_READ", "TS_READ", "INGEST_READ", "FLOW_READ", "DEVICE_CONTROL", "SIM_READ", "ALARM_READ", "DEV_PLACE", "NOTIFY_CHANNEL_MANAGE", "TS_POLICY"])).toHaveLength(MENU.length);
+    expect(visibleMenu(["IAM_MANAGE", "AUDIT_READ", "OPS_MANAGE", "DEV_READ", "TS_READ", "INGEST_READ", "FLOW_READ", "DEVICE_CONTROL", "SIM_READ", "ALARM_READ", "DEV_PLACE", "NOTIFY_CHANNEL_MANAGE", "TS_POLICY", "DASHBOARD_READ", "BRANDING_MANAGE"])).toHaveLength(MENU.length);
     // M4: 규칙·알람(ALARM_READ, 모든 역할), 유지보수 일정(DEV_PLACE), 알림 채널(NOTIFY_CHANNEL_MANAGE)
     expect(visibleMenu(["ALARM_READ"]).map((m) => m.key)).toEqual(["home", "alarms"]);
     expect(requiredPermissionsFor("/rules/r-1")).toEqual(["RULE_READ"]);

@@ -1,0 +1,359 @@
+{
+  "nav": {
+    "dashboards": "Dashboards",
+    "branding": "Branding"
+  },
+  "dashboards": {
+    "title": "Dashboards",
+    "new": "New dashboard",
+    "create": "Create",
+    "delete": "Delete",
+    "deleteConfirm": "Delete dashboard \"{{name}}\"?",
+    "duplicate": "Duplicate",
+    "exportJson": "Export JSON",
+    "setDefault": "Set as default",
+    "unsetDefault": "Unset default",
+    "isDefault": "Default",
+    "favorite": "Favorite",
+    "widgetCount": "{{n}} widgets",
+    "empty": "No dashboards",
+    "emptyBody": "Use [New dashboard] to collect the widgets you need.",
+    "loadFailed": "Could not load dashboards.",
+    "tabs": {
+      "mine": "Mine",
+      "shared": "Shared",
+      "favorite": "Favorites"
+    },
+    "visibility": {
+      "PRIVATE": "Private",
+      "ORG": "Shared (organization)"
+    },
+    "types": {
+      "stat": "Current value",
+      "line": "Line chart",
+      "area": "Area chart",
+      "bar": "Bar chart",
+      "gauge": "Gauge",
+      "heatmap": "Heatmap",
+      "table": "Table",
+      "status-list": "Device status list",
+      "alarm-list": "Alarm list",
+      "floorplan": "Floor plan",
+      "markdown": "Note",
+      "control": "Control",
+      "analysis": "Analysis",
+      "kpi": "KPI"
+    },
+    "kinds": {
+      "DEVICE_METRIC": "Device metric",
+      "SPACE_AGGREGATE": "Space aggregate",
+      "DEVICE": "Device",
+      "SPACE": "Space"
+    },
+    "variableTypes": {
+      "SPACE": "Space",
+      "DEVICE": "Device",
+      "METRIC": "Metric"
+    },
+    "ranges": {
+      "1h": "Last 1 hour",
+      "6h": "Last 6 hours",
+      "24h": "Last 24 hours",
+      "7d": "Last 7 days",
+      "30d": "Last 30 days",
+      "custom": "Custom"
+    },
+    "resolutions": {
+      "AUTO": "Auto",
+      "RAW": "Raw",
+      "1h": "1 hour",
+      "1d": "1 day"
+    },
+    "refreshes": {
+      "LIVE": "Live",
+      "30s": "30 s",
+      "1m": "1 min",
+      "5m": "5 min",
+      "OFF": "Off"
+    },
+    "view": {
+      "toolbar": "Dashboard controls",
+      "choose": "Choose",
+      "range": "Time range",
+      "from": "From",
+      "to": "To",
+      "apply": "Apply",
+      "resolution": "Aggregation",
+      "refresh": "Refresh",
+      "resetZoom": "Reset zoom",
+      "empty": "No widgets. Add widgets in [Edit]."
+    },
+    "widget": {
+      "loading": "Loading",
+      "forbidden": "No access",
+      "error": "Could not load ({{code}})",
+      "retry": "Retry",
+      "menu": "{{title}} menu",
+      "showTable": "View data as table",
+      "hideTable": "Hide table",
+      "fullscreen": "Full screen",
+      "exitFullscreen": "Exit full screen",
+      "noData": "No data",
+      "noAlarms": "No open alarms",
+      "unsupported": "Unsupported widget ({{type}})"
+    },
+    "table": {
+      "copy": "Copy values",
+      "copied": "Copied",
+      "caption": "{{title}} data table",
+      "summary": "{{title}}: {{rows}} rows of data",
+      "columns": {
+        "time": "Time",
+        "value": "Value",
+        "unit": "Unit",
+        "name": "Name",
+        "connection": "Connection",
+        "battery": "Battery",
+        "rssi": "Signal (RSSI)",
+        "alarms": "Alarms",
+        "severity": "Severity",
+        "title": "Title",
+        "state": "State",
+        "device": "Device",
+        "min": "Min",
+        "max": "Max",
+        "content": "Content"
+      }
+    },
+    "tone": {
+      "good": "Normal",
+      "warn": "Caution",
+      "bad": "Warning",
+      "muted": "Unknown"
+    },
+    "trend": {
+      "up": "Up from previous",
+      "down": "Down from previous",
+      "flat": "Same as previous"
+    },
+    "connection": {
+      "ONLINE": "Online",
+      "OFFLINE": "Offline",
+      "UNKNOWN": "Unknown"
+    },
+    "severity": {
+      "CRITICAL": "Critical",
+      "MAJOR": "Major",
+      "MINOR": "Minor",
+      "WARNING": "Warning",
+      "INFO": "Info"
+    },
+    "edit": {
+      "title": "Edit",
+      "heading": "{{name}} (editing)",
+      "settings": "Dashboard settings",
+      "cancel": "Cancel",
+      "save": "Save",
+      "apply": "Apply",
+      "library": "Widget library",
+      "add": "Add {{type}} widget",
+      "count": "{{n}}/{{max}} widgets",
+      "keyboardHint": "Select a widget, then use arrows to move, Shift+arrows to resize and Delete to remove.",
+      "widgetSettings": "Widget settings",
+      "selectWidget": "Select a widget to configure.",
+      "duplicate": "Duplicate {{title}}",
+      "remove": "Remove {{title}}",
+      "removed": "Removed widget {{title}}",
+      "position": "Position {{x}},{{y}} size {{w}}×{{h}}",
+      "blocked": "Cannot move: overlaps another widget or leaves the grid"
+    },
+    "fields": {
+      "name": "Name",
+      "title": "Title",
+      "description": "Description",
+      "visibility": "Visibility",
+      "targets": "Data ({{min}}–{{max}})",
+      "kind": "Target kind",
+      "deviceId": "Device ID",
+      "spaceId": "Space ID",
+      "metricKey": "Metric",
+      "refHint": "ID or variable ${space}",
+      "addTarget": "Add data",
+      "removeTarget": "Remove this data",
+      "options": "Options",
+      "variables": "Variables",
+      "variableName": "Variable name",
+      "variableType": "Type",
+      "variableDefault": "Default",
+      "addVariable": "Add variable",
+      "removeVariable": "Remove variable {{name}}"
+    },
+    "options": {
+      "unit": "Unit",
+      "decimals": "Decimals",
+      "thresholds": "Threshold colors",
+      "trend": "Trend arrow",
+      "sparkline": "Sparkline",
+      "yMin": "Y-axis min",
+      "yMax": "Y-axis max",
+      "legend": "Legend position",
+      "showQuality": "Show quality",
+      "annotations": "Alarm/control annotations",
+      "stacked": "Stacked",
+      "orientation": "Orientation",
+      "agg": "Aggregate",
+      "groupBy": "Group by",
+      "sort": "Sort",
+      "min": "Min",
+      "max": "Max",
+      "ranges": "Color ranges",
+      "days": "Days",
+      "columns": "Columns",
+      "fields": "Fields",
+      "severities": "Severities",
+      "states": "States",
+      "maxRows": "Max rows",
+      "showAck": "Show acknowledge",
+      "metricKey": "Metric shown",
+      "heat": "Heat colors",
+      "content": "Content"
+    },
+    "optionValues": {
+      "bottom": "Bottom",
+      "right": "Right",
+      "hidden": "Hidden",
+      "vertical": "Vertical",
+      "horizontal": "Horizontal",
+      "avg": "Average",
+      "min": "Min",
+      "max": "Max",
+      "sum": "Sum",
+      "last": "Last",
+      "space": "Space",
+      "device": "Device",
+      "asc": "Ascending",
+      "desc": "Descending",
+      "none": "None"
+    },
+    "errors": {
+      "nameRequired": "Enter a name",
+      "tooMany": "You can add up to 40 widgets",
+      "targetCount": "Choose {{min}}–{{max}} data items",
+      "variableName": "Variable name format is invalid",
+      "field": "Check this value",
+      "json": "Invalid JSON",
+      "layout": {
+        "OUT_OF_GRID": "Widget {{n}} is outside the grid",
+        "OVERLAP": "Widget {{n}} overlaps another widget",
+        "DUPLICATE_ID": "Widget {{n}} has a duplicate ID",
+        "INVALID_ID": "Widget {{n}} has an invalid ID",
+        "TOO_MANY_WIDGETS": "You can add up to 40 widgets"
+      },
+      "widget": {
+        "TYPE_UNSUPPORTED": "Unsupported widget type",
+        "TARGET_COUNT": "Wrong number of data items",
+        "TARGET_KIND": "Check the target kind ({{field}})",
+        "TARGET_REF": "Check the ID or variable ({{field}})",
+        "METRIC_REQUIRED": "Choose a metric ({{field}})",
+        "AGG_INVALID": "Check the aggregate ({{field}})",
+        "OPTION_INVALID": "Check the option ({{field}})",
+        "OPTION_ORDER": "Max must be greater than min"
+      },
+      "NAME": "Enter a name",
+      "DASHBOARD_NOT_FOUND": "Dashboard not found",
+      "DASHBOARD_LAYOUT_INVALID": "The widget layout is invalid",
+      "WIDGET_TYPE_UNSUPPORTED": "Unsupported widget type",
+      "WIDGET_QUERY_INVALID": "Widget data settings are invalid",
+      "DASHBOARD_VERSION_CONFLICT": "Another user saved first",
+      "PERMISSION_DENIED": "Permission denied",
+      "INVALID_REQUEST": "Invalid request"
+    },
+    "conflict": {
+      "title": "Save conflict",
+      "body": "Another user saved first (by {{name}}). Reload the latest version or keep your changes.",
+      "reload": "Reload",
+      "keepMine": "Keep my changes"
+    },
+    "import": {
+      "button": "Import JSON",
+      "TOO_LARGE": "File too large (max 1 MB)",
+      "NOT_JSON": "Not a JSON file",
+      "NOT_DASHBOARD": "Not a dashboard export file",
+      "unmapped": "Imported, but {{n}} targets could not be mapped. Fix them in Edit."
+    },
+    "share": {
+      "title": "Share links",
+      "help": "Anyone with the link can view it read-only without signing in. Control is not possible.",
+      "days": "Expires in days ({{min}}–{{max}})",
+      "daysInvalid": "Expiry must be {{min}}–{{max}} days",
+      "create": "Create link",
+      "once": "This address is shown only once. Copy it now.",
+      "copy": "Copy address",
+      "status": "Status",
+      "expiresAt": "Expires",
+      "lastUsedAt": "Last used",
+      "revoke": "Revoke",
+      "empty": "No links yet",
+      "loadFailed": "Could not load links",
+      "createFailed": "Could not create the link",
+      "revokeFailed": "Could not revoke the link",
+      "statuses": {
+        "ACTIVE": "Active",
+        "EXPIRED": "Expired",
+        "REVOKED": "Revoked"
+      }
+    },
+    "shareView": {
+      "banner": "Read-only shared view · expires {{date}}",
+      "invalid": "This link is not valid"
+    },
+    "kiosk": {
+      "open": "Kiosk",
+      "pick": "Add to kiosk",
+      "start": "Start kiosk ({{n}})",
+      "clock": "Current time",
+      "updated": "Updated {{s}} s ago",
+      "controls": "Kiosk controls",
+      "pause": "Pause",
+      "resume": "Resume",
+      "next": "Next dashboard",
+      "exit": "Exit",
+      "nextUp": "Next: {{name}} ({{s}} s)",
+      "loadFailed": "Could not load the dashboard",
+      "sessionEnded": "Your session has ended. Please sign in again.",
+      "login": "Sign in",
+      "boardsInvalid": "Choose 1–{{max}} dashboards",
+      "intervalInvalid": "Rotation interval must be {{min}}–{{max}} seconds"
+    },
+    "tour": {
+      "s1": {
+        "title": "Dashboard tour",
+        "body": "Change variables (space, device, metric) and the time range in the top bar to update every widget."
+      },
+      "s2": {
+        "title": "Zoom charts",
+        "body": "Drag over a chart to zoom; all charts on the dashboard follow. [Reset zoom] goes back."
+      },
+      "s3": {
+        "title": "Widget menu",
+        "body": "Use the ⋯ menu to view data as a table, download PNG/CSV or go full screen."
+      },
+      "s4": {
+        "title": "Sharing and kiosk",
+        "body": "Share read-only links without sign-in, or rotate dashboards on a TV with kiosk mode."
+      }
+    }
+  },
+  "tour": {
+    "step": "Step {{n}} of {{total}}",
+    "next": "Next",
+    "prev": "Back",
+    "done": "Done",
+    "never": "Don't show again"
+  },
+  "errors": {
+    "DASHBOARD_NOT_FOUND": "Dashboard not found.",
+    "SHARE_LINK_INVALID": "This link is not valid.",
+    "DASHBOARD_VERSION_CONFLICT": "Another user saved first."
+  }
+}

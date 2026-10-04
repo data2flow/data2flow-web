@@ -25,6 +25,13 @@ export default [
   route(":lang?/privacy", "routes/privacy.tsx"),
   route("error/:status", "routes/error-page.tsx"),
 
+  // M5 대시보드(공개·틀 없는 화면): 공유 링크 보기(UI-DSH-07, 로그인 없음)와 위젯 데이터 공개 중계, 브랜딩 자산 공개 중계, 키오스크(UI-DSH-06)
+  route("share/:token", "routes/share.tsx"),
+  route("share/d/:token", "routes/share.tsx", { id: "routes/share-d" }),
+  route("share/:token/widgets/:widgetId/data", "routes/share-widget-data.ts"),
+  route("branding/assets/:assetId", "routes/branding-asset.ts"),
+  route("kiosk", "routes/kiosk.tsx"),
+
   // 로그인 뒤 화면
   layout("routes/app-layout.tsx", [
     index("routes/home.tsx"),
@@ -134,6 +141,17 @@ export default [
     route("work-orders/plans", "routes/work-order-plans.tsx"),
     route("work-orders/:workOrderId", "routes/work-order-detail.tsx"),
     route("devices/installation", "routes/devices-installation.tsx"),
+    // M5 scripts: 스크립트 공유 모듈·수식 항목(UI-SCR-06·07), 재처리(UI-ING-05)·데이터 품질(UI-ING-06) — spec/detail/00-navigation.md §2
+    route("scripts/modules", "routes/script-modules.tsx"),
+    route("scripts/modules/:moduleId", "routes/script-module-detail.tsx"),
+    route("scripts/formulas", "routes/script-formulas.tsx"),
+    route("ingest/reprocess", "routes/ingest-reprocess.tsx"),
+    route("ingest/quality", "routes/ingest-quality.tsx"),
+    // M5 대시보드(spec/detail/00-navigation.md §2): 사용자 정의 대시보드(DSH-04·06·11), 브랜딩(DSH-13.01)
+    route("dashboards", "routes/dashboards.tsx"),
+    route("dashboards/:dashboardId", "routes/dashboard-detail.tsx"),
+    route("dashboards/:dashboardId/edit", "routes/dashboard-edit.tsx"),
+    route("admin/branding", "routes/admin-branding.tsx"),
   ]),
 
   // M5 field: 모바일 셸(UI-DSH-14, UI-DEV-17·21)과 QR 딥링크(`/d/{qrToken}`, 로그인 필요) — 00-navigation.md §2·§3
@@ -148,11 +166,5 @@ export default [
     route("scan", "routes/m-scan.tsx"),
     route("devices/:deviceId", "routes/m-device.tsx"),
     route("commission", "routes/m-commission.tsx"),
-    // M5 scripts: 스크립트 공유 모듈·수식 항목(UI-SCR-06·07), 재처리(UI-ING-05)·데이터 품질(UI-ING-06) — spec/detail/00-navigation.md §2
-    route("scripts/modules", "routes/script-modules.tsx"),
-    route("scripts/modules/:moduleId", "routes/script-module-detail.tsx"),
-    route("scripts/formulas", "routes/script-formulas.tsx"),
-    route("ingest/reprocess", "routes/ingest-reprocess.tsx"),
-    route("ingest/quality", "routes/ingest-quality.tsx"),
   ]),
 ] satisfies RouteConfig;

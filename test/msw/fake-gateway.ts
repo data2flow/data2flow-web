@@ -5,7 +5,7 @@
  */
 import { http, HttpResponse, type HttpHandler } from "msw";
 import { CoreState, type CoreRequest } from "./core-fixtures";
-import { CORE_HANDLERS } from "./handlers";
+import { CORE_HANDLERS, PUBLIC_HANDLERS } from "./handlers";
 
 export const GATEWAY = "http://gateway.test";
 
@@ -238,6 +238,10 @@ export class FakeGateway {
   }
 
   private publicCore(request: Request, path: string, body: unknown): Response {
+    for (const handler of PUBLIC_HANDLERS) {
+      const handled = handler(this.m2, request, path, body);
+      if (handled) return handled;
+    }
     if (path === "/public/signup-settings" && request.method === "GET") {
       return HttpResponse.json(envelope({ signupRequestEnabled: this.signupRequestEnabled }));
     }

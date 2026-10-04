@@ -13,6 +13,9 @@ export interface ChartHandle {
   setOption: (option: Record<string, unknown>, notMerge?: boolean) => void;
   resize: () => void;
   dispose: () => void;
+  /** 확대 동기화(DSH-11.01): datazoom 이벤트 구독과 드래그 확대 켜기 */
+  on?: (event: string, handler: (event: unknown) => void) => void;
+  dispatchAction?: (action: Record<string, unknown>) => void;
 }
 
 export type ChartFactory = (element: HTMLDivElement, dark: boolean) => Promise<ChartHandle>;
@@ -33,14 +36,27 @@ export interface TimeseriesChartProps {
   /** 테스트에서 가짜 차트를 넣는다 */
   factory?: ChartFactory;
   title?: string;
+  /** 같은 대시보드 차트들이 함께 쓰는 x축 구간(ms). null이면 데이터 전체 */
+  zoom?: { from: number; to: number } | null;
+  /** 드래그로 구간을 고르면 알린다(DSH-11.01). 주면 드래그 확대가 켜진다 */
+  onZoom?: (window: { from: number; to: number }) => void;
+  /** 표로 보기 단추를 숨긴다(위젯 메뉴가 대신 연다) */
+  hideTableToggle?: boolean;
+  /** 위젯 메뉴에서 표로 보기를 열었는지 */
+  tableOpen?: boolean;
 }
 
-export function TimeseriesChart({ series, timezone, annotations, target, loading, height = 280, factory = defaultFactory, title }: TimeseriesChartProps) {
+export function TimeseriesChart({ series, timezone, annotations, target, loading, height = 280, factory = defaultFactory, title, zoom, onZoom, hideTableToggle, tableOpen }: TimeseriesChartProps) {
   const { t, i18n } = useTranslation();
   const element = useRef<HTMLDivElement>(null);
   const chart = useRef<ChartHandle | null>(null);
   const [ready, setReady] = useState(false);
   const [showTable, setShowTable] = useState(false);
+  const zoomHandler = useRef(onZoom);
+  useEffect(() => {
+    zoomHandler.current = onZoom;
+  }, [onZoom]);
+  const zoomable = Boolean(onZoom);
   const dark = isDarkNow();
   const option = useMemo(
     () =>
@@ -63,6 +79,13 @@ export function TimeseriesChart({ series, timezone, annotations, target, loading
       .then((handle) => {
         if (disposed) return handle.dispose();
         chart.current = handle;
+        handle.on?.("datazoom", (event) => {
+          const e = event as { batch?: { startValue?: number; endValue?: number }[] } | null;
+          const item = e?.batch?.[0];
+          const from = Number(item?.startValue);
+          const to = Number(item?.endValue);
+          if (Number.isFinite(from) && Number.isFinite(to) && from < to) zoomHandler.current?.({ from, to });
+        });
         setReady(true);
       })
       .catch(() => setReady(false));
@@ -79,8 +102,12 @@ export function TimeseriesChart({ series, timezone, annotations, target, loading
   useEffect(() => {
     if (!ready || !chart.current) return;
     const time = tooltipTime(timezone, i18n.language);
-    chart.current.setOption({ ...option, tooltip: { trigger: "axis", valueFormatter: (v: unknown) => (typeof v === "number" ? roundTo(v, series[0]?.precision) : "–"), axisPointer: { label: { formatter: (p: { value: number }) => time(p.value) } } } }, true);
-  }, [ready, option, timezone, i18n.language, series]);
+    const xAxis = zoom ? { ...(option.xAxis as Record<string, unknown>), min: zoom.from, max: zoom.to } : option.xAxis;
+    const select = zoomable ? { toolbox: { show: false, feature: { dataZoom: { yAxisIndex: "none" } } } } : {};
+    chart.current.setOption({ ...option, ...select, xAxis, tooltip: { trigger: "axis", valueFormatter: (v: unknown) => (typeof v === "number" ? roundTo(v, series[0]?.precision) : "–"), axisPointer: { label: { formatter: (p: { value: number }) => time(p.value) } } } }, true);
+    // 드래그로 구간 고르기(dataZoomSelect)를 늘 켜 둔다
+    if (zoomable) chart.current.dispatchAction?.({ type: "takeGlobalCursor", key: "dataZoomSelect", dataZoomSelectActive: true });
+  }, [ready, option, timezone, i18n.language, series, zoom, zoomable]);
 
   const empty = !loading && !hasData(series);
   const failed = series.filter((s) => s.error);
@@ -100,12 +127,14 @@ export function TimeseriesChart({ series, timezone, annotations, target, loading
           </p>
         )}
       </div>
-      <div className="mt-1 flex justify-end">
-        <Button variant="ghost" onClick={() => setShowTable((v) => !v)} aria-expanded={showTable}>
-          {showTable ? t("chart.hideTable") : t("chart.showTable")}
-        </Button>
-      </div>
-      {showTable && <ChartTable series={series} timezone={timezone} lang={i18n.language} />}
+      {!hideTableToggle && (
+        <div className="mt-1 flex justify-end">
+          <Button variant="ghost" onClick={() => setShowTable((v) => !v)} aria-expanded={showTable}>
+            {showTable ? t("chart.hideTable") : t("chart.showTable")}
+          </Button>
+        </div>
+      )}
+      {(showTable || tableOpen) && <ChartTable series={series} timezone={timezone} lang={i18n.language} />}
     </figure>
   );
 }

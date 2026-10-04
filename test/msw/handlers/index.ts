@@ -12,6 +12,7 @@ import { baseHandler } from "./base";
 import { controlHandler } from "./control";
 import { dataHandler } from "./data";
 import { fieldHandler } from "./field";
+import { dashboardsHandler, dashboardsPublicHandler } from "./dashboards";
 import { flowopsHandler } from "./flowops";
 import { floorHandler } from "./floor";
 import { flowsHandler } from "./flows";
@@ -31,4 +32,7 @@ import { spacesHandler } from "./spaces";
 import { telemetryHandler } from "./telemetry";
 
 // M5 scripts: scriptsM5Handler는 /scripts·/ingest 핸들러보다 먼저 M5 경로를 받는다
-export const CORE_HANDLERS: CoreHandler[] = [scriptsM5Handler, fieldHandler, devModelHandler, dataHandler, floorHandler, rulesHandler, notifyHandler, flowopsHandler, flowsHandler, simHandler, controlHandler, spacesHandler, devicesHandler, modelsHandler, groupsHandler, sourcesHandler, telemetryHandler, ingestHandler, scriptsHandler, homeHandler, baseHandler];
+export const CORE_HANDLERS: CoreHandler[] = [dashboardsHandler, scriptsM5Handler, fieldHandler, devModelHandler, dataHandler, floorHandler, rulesHandler, notifyHandler, flowopsHandler, flowsHandler, simHandler, controlHandler, spacesHandler, devicesHandler, modelsHandler, groupsHandler, sourcesHandler, telemetryHandler, ingestHandler, scriptsHandler, homeHandler, baseHandler];
+
+/** 공개 경로(로그인 없음, `/public/**`) 핸들러. M5: 공유 링크 보기·브랜딩(API-DSH-15·25) */
+export const PUBLIC_HANDLERS = [dashboardsPublicHandler];

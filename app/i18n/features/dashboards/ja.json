@@ -1,0 +1,359 @@
+{
+  "nav": {
+    "dashboards": "ダッシュボード",
+    "branding": "ブランディング"
+  },
+  "dashboards": {
+    "title": "ダッシュボード",
+    "new": "新規ダッシュボード",
+    "create": "作成",
+    "delete": "削除",
+    "deleteConfirm": "ダッシュボード「{{name}}」を削除しますか?",
+    "duplicate": "複製",
+    "exportJson": "JSONエクスポート",
+    "setDefault": "デフォルトに設定",
+    "unsetDefault": "デフォルト解除",
+    "isDefault": "デフォルト",
+    "favorite": "お気に入り",
+    "widgetCount": "ウィジェット {{n}} 個",
+    "empty": "ダッシュボードがありません",
+    "emptyBody": "[新規ダッシュボード]で必要なウィジェットを集めましょう。",
+    "loadFailed": "ダッシュボード一覧を読み込めませんでした。",
+    "tabs": {
+      "mine": "マイダッシュボード",
+      "shared": "共有",
+      "favorite": "お気に入り"
+    },
+    "visibility": {
+      "PRIVATE": "個人用",
+      "ORG": "共有(組織)"
+    },
+    "types": {
+      "stat": "現在値",
+      "line": "折れ線グラフ",
+      "area": "エリアチャート",
+      "bar": "棒グラフ",
+      "gauge": "ゲージ",
+      "heatmap": "ヒートマップ",
+      "table": "表",
+      "status-list": "機器状態一覧",
+      "alarm-list": "アラーム一覧",
+      "floorplan": "平面図",
+      "markdown": "メモ",
+      "control": "制御",
+      "analysis": "分析結果",
+      "kpi": "KPI"
+    },
+    "kinds": {
+      "DEVICE_METRIC": "機器の計測項目",
+      "SPACE_AGGREGATE": "空間集計",
+      "DEVICE": "機器",
+      "SPACE": "空間"
+    },
+    "variableTypes": {
+      "SPACE": "空間",
+      "DEVICE": "機器",
+      "METRIC": "計測項目"
+    },
+    "ranges": {
+      "1h": "直近1時間",
+      "6h": "直近6時間",
+      "24h": "直近24時間",
+      "7d": "直近7日",
+      "30d": "直近30日",
+      "custom": "期間指定"
+    },
+    "resolutions": {
+      "AUTO": "自動",
+      "RAW": "元データ",
+      "1h": "1時間",
+      "1d": "1日"
+    },
+    "refreshes": {
+      "LIVE": "リアルタイム",
+      "30s": "30秒",
+      "1m": "1分",
+      "5m": "5分",
+      "OFF": "オフ"
+    },
+    "view": {
+      "toolbar": "ダッシュボード条件",
+      "choose": "選択してください",
+      "range": "期間",
+      "from": "開始",
+      "to": "終了",
+      "apply": "適用",
+      "resolution": "集計",
+      "refresh": "更新",
+      "resetZoom": "リセット",
+      "empty": "ウィジェットがありません。[編集]で追加してください。"
+    },
+    "widget": {
+      "loading": "読み込み中",
+      "forbidden": "アクセス権限なし",
+      "error": "読み込めませんでした({{code}})",
+      "retry": "再試行",
+      "menu": "{{title}} メニュー",
+      "showTable": "データを表で表示",
+      "hideTable": "表を閉じる",
+      "fullscreen": "全画面",
+      "exitFullscreen": "全画面を終了",
+      "noData": "データなし",
+      "noAlarms": "未解決のアラームなし",
+      "unsupported": "未対応のウィジェット({{type}})"
+    },
+    "table": {
+      "copy": "値をコピー",
+      "copied": "コピーしました",
+      "caption": "{{title}} データ表",
+      "summary": "{{title}}: データ {{rows}} 行",
+      "columns": {
+        "time": "時刻",
+        "value": "値",
+        "unit": "単位",
+        "name": "名前",
+        "connection": "接続",
+        "battery": "バッテリー",
+        "rssi": "信号(RSSI)",
+        "alarms": "アラーム",
+        "severity": "重大度",
+        "title": "タイトル",
+        "state": "状態",
+        "device": "機器",
+        "min": "最小",
+        "max": "最大",
+        "content": "内容"
+      }
+    },
+    "tone": {
+      "good": "正常",
+      "warn": "注意",
+      "bad": "警告",
+      "muted": "不明"
+    },
+    "trend": {
+      "up": "前回より上昇",
+      "down": "前回より下降",
+      "flat": "前回と同じ"
+    },
+    "connection": {
+      "ONLINE": "オンライン",
+      "OFFLINE": "オフライン",
+      "UNKNOWN": "不明"
+    },
+    "severity": {
+      "CRITICAL": "重大",
+      "MAJOR": "主要",
+      "MINOR": "軽微",
+      "WARNING": "注意",
+      "INFO": "情報"
+    },
+    "edit": {
+      "title": "編集",
+      "heading": "{{name}}(編集)",
+      "settings": "ダッシュボード設定",
+      "cancel": "キャンセル",
+      "save": "保存",
+      "apply": "適用",
+      "library": "ウィジェットライブラリ",
+      "add": "{{type}} ウィジェットを追加",
+      "count": "ウィジェット {{n}}/{{max}}",
+      "keyboardHint": "ウィジェットを選び、矢印で移動、Shift+矢印でサイズ変更、Deleteで削除します。",
+      "widgetSettings": "ウィジェット設定",
+      "selectWidget": "設定するウィジェットを選んでください。",
+      "duplicate": "{{title}} を複製",
+      "remove": "{{title}} を削除",
+      "removed": "ウィジェット {{title}} を削除しました",
+      "position": "位置 {{x}},{{y}} サイズ {{w}}×{{h}}",
+      "blocked": "他のウィジェットと重なるかグリッド外のため移動できません"
+    },
+    "fields": {
+      "name": "名前",
+      "title": "タイトル",
+      "description": "説明",
+      "visibility": "公開範囲",
+      "targets": "データ({{min}}〜{{max}}件)",
+      "kind": "対象の種類",
+      "deviceId": "機器 ID",
+      "spaceId": "空間 ID",
+      "metricKey": "計測項目",
+      "refHint": "ID または変数 ${space}",
+      "addTarget": "データを追加",
+      "removeTarget": "このデータを外す",
+      "options": "オプション",
+      "variables": "変数",
+      "variableName": "変数名",
+      "variableType": "種類",
+      "variableDefault": "既定値",
+      "addVariable": "変数を追加",
+      "removeVariable": "変数 {{name}} を削除"
+    },
+    "options": {
+      "unit": "単位",
+      "decimals": "小数桁数",
+      "thresholds": "しきい値の色",
+      "trend": "トレンド矢印",
+      "sparkline": "スパークライン",
+      "yMin": "Y軸最小",
+      "yMax": "Y軸最大",
+      "legend": "凡例の位置",
+      "showQuality": "品質を表示",
+      "annotations": "アラーム・制御の注釈",
+      "stacked": "積み上げ",
+      "orientation": "向き",
+      "agg": "集計関数",
+      "groupBy": "グループ基準",
+      "sort": "並べ替え",
+      "min": "最小",
+      "max": "最大",
+      "ranges": "色の範囲",
+      "days": "期間(日)",
+      "columns": "列",
+      "fields": "表示項目",
+      "severities": "重大度",
+      "states": "状態",
+      "maxRows": "最大行数",
+      "showAck": "確認ボタンを表示",
+      "metricKey": "表示する計測項目",
+      "heat": "ヒートカラー",
+      "content": "内容"
+    },
+    "optionValues": {
+      "bottom": "下",
+      "right": "右",
+      "hidden": "非表示",
+      "vertical": "縦",
+      "horizontal": "横",
+      "avg": "平均",
+      "min": "最小",
+      "max": "最大",
+      "sum": "合計",
+      "last": "最新",
+      "space": "空間",
+      "device": "機器",
+      "asc": "昇順",
+      "desc": "降順",
+      "none": "なし"
+    },
+    "errors": {
+      "nameRequired": "名前を入力してください",
+      "tooMany": "ウィジェットは40個まで追加できます",
+      "targetCount": "データを{{min}}〜{{max}}件選んでください",
+      "variableName": "変数名の形式が正しくありません",
+      "field": "値を確認してください",
+      "json": "JSONの形式が正しくありません",
+      "layout": {
+        "OUT_OF_GRID": "{{n}}番目のウィジェットがグリッド外です",
+        "OVERLAP": "{{n}}番目のウィジェットが他と重なっています",
+        "DUPLICATE_ID": "{{n}}番目のウィジェットIDが重複しています",
+        "INVALID_ID": "{{n}}番目のウィジェットIDが正しくありません",
+        "TOO_MANY_WIDGETS": "ウィジェットは40個まで追加できます"
+      },
+      "widget": {
+        "TYPE_UNSUPPORTED": "未対応のウィジェット種類です",
+        "TARGET_COUNT": "データ件数が合いません",
+        "TARGET_KIND": "対象の種類を確認してください({{field}})",
+        "TARGET_REF": "IDまたは変数を確認してください({{field}})",
+        "METRIC_REQUIRED": "計測項目を選んでください({{field}})",
+        "AGG_INVALID": "集計関数を確認してください({{field}})",
+        "OPTION_INVALID": "オプション値を確認してください({{field}})",
+        "OPTION_ORDER": "最大は最小より大きくしてください"
+      },
+      "NAME": "名前を入力してください",
+      "DASHBOARD_NOT_FOUND": "ダッシュボードが見つかりません",
+      "DASHBOARD_LAYOUT_INVALID": "ウィジェット配置が正しくありません",
+      "WIDGET_TYPE_UNSUPPORTED": "未対応のウィジェット種類です",
+      "WIDGET_QUERY_INVALID": "ウィジェットのデータ条件が正しくありません",
+      "DASHBOARD_VERSION_CONFLICT": "他のユーザーが先に保存しました",
+      "PERMISSION_DENIED": "権限がありません",
+      "INVALID_REQUEST": "リクエストが正しくありません"
+    },
+    "conflict": {
+      "title": "保存の競合",
+      "body": "他のユーザーが先に保存しました(更新者: {{name}})。最新を再読み込みするか、自分の変更で上書きできます。",
+      "reload": "再読み込み",
+      "keepMine": "自分の変更を維持"
+    },
+    "import": {
+      "button": "JSONインポート",
+      "TOO_LARGE": "ファイルが大きすぎます(1MB以下)",
+      "NOT_JSON": "JSONファイルではありません",
+      "NOT_DASHBOARD": "ダッシュボードのエクスポートファイルではありません",
+      "unmapped": "インポートしましたが対象 {{n}} 件が見つかりません。編集で指定し直してください。"
+    },
+    "share": {
+      "title": "共有リンク",
+      "help": "リンクを受け取った人はログインなしで閲覧のみできます。制御はできません。",
+      "days": "有効期限(日、{{min}}〜{{max}})",
+      "daysInvalid": "有効期限は{{min}}〜{{max}}日です",
+      "create": "リンクを作成",
+      "once": "このアドレスは今回だけ表示されます。コピーしてください。",
+      "copy": "アドレスをコピー",
+      "status": "状態",
+      "expiresAt": "有効期限",
+      "lastUsedAt": "最終利用",
+      "revoke": "無効化",
+      "empty": "リンクはまだありません",
+      "loadFailed": "リンク一覧を読み込めませんでした",
+      "createFailed": "リンクを作成できませんでした",
+      "revokeFailed": "リンクを無効化できませんでした",
+      "statuses": {
+        "ACTIVE": "有効",
+        "EXPIRED": "期限切れ",
+        "REVOKED": "無効化済み"
+      }
+    },
+    "shareView": {
+      "banner": "閲覧専用の共有画面 · 期限 {{date}}",
+      "invalid": "無効なリンクです"
+    },
+    "kiosk": {
+      "open": "キオスク",
+      "pick": "キオスクに追加",
+      "start": "キオスク開始({{n}}件)",
+      "clock": "現在時刻",
+      "updated": "{{s}}秒前に更新",
+      "controls": "キオスク操作",
+      "pause": "一時停止",
+      "resume": "再開",
+      "next": "次のダッシュボード",
+      "exit": "終了",
+      "nextUp": "次: {{name}}({{s}}秒)",
+      "loadFailed": "ダッシュボードを読み込めませんでした",
+      "sessionEnded": "セッションが終了しました。再度ログインしてください。",
+      "login": "ログイン",
+      "boardsInvalid": "ダッシュボードを1〜{{max}}件選んでください",
+      "intervalInvalid": "切替間隔は{{min}}〜{{max}}秒です"
+    },
+    "tour": {
+      "s1": {
+        "title": "ダッシュボードの案内",
+        "body": "上部バーで変数(空間・機器・計測項目)と期間を変えるとすべてのウィジェットが変わります。"
+      },
+      "s2": {
+        "title": "チャートの拡大",
+        "body": "チャートで区間をドラッグすると全チャートが同じ区間に揃います。[リセット]で戻ります。"
+      },
+      "s3": {
+        "title": "ウィジェットメニュー",
+        "body": "⋯ メニューで表表示、PNG・CSVダウンロード、全画面が使えます。"
+      },
+      "s4": {
+        "title": "共有とキオスク",
+        "body": "共有リンクでログインなしの閲覧専用表示、キオスクでTVに自動切替表示ができます。"
+      }
+    }
+  },
+  "tour": {
+    "step": "ステップ {{n}}/{{total}}",
+    "next": "次へ",
+    "prev": "戻る",
+    "done": "完了",
+    "never": "今後表示しない"
+  },
+  "errors": {
+    "DASHBOARD_NOT_FOUND": "ダッシュボードが見つかりません。",
+    "SHARE_LINK_INVALID": "無効なリンクです。",
+    "DASHBOARD_VERSION_CONFLICT": "他のユーザーが先に保存しました。"
+  }
+}

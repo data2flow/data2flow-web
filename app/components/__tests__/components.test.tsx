@@ -21,12 +21,12 @@ describe("TC-IAM-008 AT-IAM-01.1 상단 메뉴(IAM-04.05 보조 숨김)", () => 
     const { unmount } = await renderRoute(<AppShell me={meOf("ADMIN")}>본문</AppShell>, { session: meOf("ADMIN") });
     await screen.findByText("본문");
     const links = screen.getByRole("navigation", { name: "주 메뉴" }).querySelectorAll("a");
-    expect([...links].map((a) => a.getAttribute("href"))).toEqual(["/", "/spaces", "/devices", "/explore", "/ingest/monitor", "/alarms", "/automation/flows", "/control/commands", "/sim", "/admin/members", "/admin/roles", "/admin/security", "/admin/audit", "/admin/settings", "/admin/maintenance", "/admin/channels", "/admin/system", "/settings/data-retention"]);
+    expect([...links].map((a) => a.getAttribute("href"))).toEqual(["/", "/spaces", "/devices", "/explore", "/ingest/monitor", "/alarms", "/automation/flows", "/control/commands", "/sim", "/dashboards", "/admin/members", "/admin/roles", "/admin/security", "/admin/audit", "/admin/settings", "/admin/maintenance", "/admin/channels", "/admin/system", "/settings/data-retention", "/admin/branding"]);
     expect(screen.getByRole("link", { name: "김운영" })).toHaveAttribute("href", "/me");
     unmount();
     await renderRoute(<AppShell me={meOf("OPERATOR")}>본문</AppShell>, { session: meOf("OPERATOR") });
     await screen.findByText("본문");
-    expect(screen.getByRole("navigation", { name: "주 메뉴" }).querySelectorAll("a")).toHaveLength(10);
+    expect(screen.getByRole("navigation", { name: "주 메뉴" }).querySelectorAll("a")).toHaveLength(11);
     expect(document.querySelector('input[name="_csrf"]')).toHaveValue("csrf-test-token");
   });
 });
