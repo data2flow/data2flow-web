@@ -76,7 +76,15 @@
       "metricRequired": "Map at least one metric column.",
       "metricKey": "Metric keys use lowercase letters, digits and _, starting with a letter.",
       "json": "Not a JSON object.",
-      "server": "Rejected by the server."
+      "server": "Rejected by the server.",
+      "metricsRequired": "Choose at least one metric.",
+      "capabilitiesRequired": "Choose at least one capability.",
+      "tooManyDefs": "Up to {{max}} properties.",
+      "propertyKey": "Keys are 2–40 letters/digits starting with a lowercase letter.",
+      "duplicateKey": "This key is already used.",
+      "minMax": "Max must be greater than or equal to min.",
+      "enumRequired": "Enter at least one value.",
+      "effectProperty": "Choose a numeric property for the effect."
     },
     "home": {
       "title": "Virtual environment",
@@ -453,6 +461,70 @@
         "metricRange": "{{metric}} within {{min}}–{{max}} {{pct}}% of the time",
         "controlMax": "{{device}} at most {{max}} controls"
       }
+    },
+    "types": {
+      "new": "New custom type",
+      "edit": "Edit",
+      "editOf": "Edit {{name}}",
+      "newTitle": "New custom device type",
+      "editTitle": "Custom type: {{name}}",
+      "back": "Back to catalog",
+      "formLabel": "Custom device type",
+      "basic": "Basics",
+      "name": "Name",
+      "category": "Category",
+      "icon": "Icon",
+      "description": "Description",
+      "linkedModel": "Linked real model",
+      "noModel": "None",
+      "metrics": "Metrics",
+      "metricSource": "{{key}} default source",
+      "source": {
+        "PHYSICS": "Physics model",
+        "GENERATOR": "Generator"
+      },
+      "capabilities": "Capabilities",
+      "defs": "Property definitions",
+      "addDef": "+ Add property",
+      "noDefs": "No properties defined.",
+      "defRow": "Property {{n}}",
+      "key": "Key",
+      "defName": "Name",
+      "type": "Type",
+      "valueType": {
+        "number": "Number",
+        "enum": "Enum",
+        "boolean": "Boolean"
+      },
+      "unit": "Unit",
+      "min": "Min",
+      "max": "Max",
+      "enumValues": "Values (comma-separated)",
+      "default": "Default",
+      "defDescription": "Description",
+      "yes": "Yes",
+      "no": "No",
+      "removeDef": "Remove property",
+      "effects": "Physical effects",
+      "addEffect": "+ Add effect",
+      "noEffects": "No physical effects.",
+      "effect": "Effect",
+      "effectProperty": "Property",
+      "removeEffect": "Remove effect",
+      "effectKind": {
+        "COOLING": "Cooling",
+        "HEATING": "Heating",
+        "VENTILATION": "Ventilation",
+        "PURIFICATION": "Air purification",
+        "HUMIDIFICATION": "Humidification",
+        "DEHUMIDIFICATION": "Dehumidification",
+        "LIGHTING": "Lighting",
+        "POWER": "Power"
+      },
+      "save": "Save",
+      "delete": "Delete type",
+      "saved": "Custom type saved and added to the catalog.",
+      "deleted": "Custom type deleted."
     }
   },
   "errors": {

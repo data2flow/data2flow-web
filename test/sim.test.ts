@@ -353,3 +353,41 @@ describe("UI-SIM-03 기기 상세 [가상] 탭(SIM-09.02)", () => {
     expect(real.body).not.toContain("?tab=virtual");
   });
 });
+
+describe("[SIM-09.06] UI-SIM-14 사용자 정의 가상 기기 유형", () => {
+  const draft = { name: "VOC 센서", category: "SENSOR", icon: "", description: "", linkedModelCode: "", metrics: [{ key: "tvoc", source: "GENERATOR" }], capabilities: [], defs: [{ key: "errorPct", name: "측정 오차", type: "number", unit: "%", min: "0", max: "50", enumValues: "", default: "10", description: "" }], effects: [] };
+
+  it("TC-SIM-102 AT-SIM-14.1 만들기 → 카탈로그에 추가(API-SIM-03 POST), 편집(PUT baseVersion), 사용 중 삭제 거부, 검사 실패 400, OPERATOR는 편집 불가", async () => {
+    const lee = await integrator();
+    const page = await lee.get("/sim/catalog?tab=sensor&type=new");
+    expect(page.response.status).toBe(200);
+    expect(page.body).toContain("새 사용자 정의 유형");
+    expect(page.body).toContain(">co2<");
+    const invalid = await lee.post("/sim/catalog?tab=sensor&type=new", { intent: "saveType", draft: JSON.stringify({ ...draft, name: "V" }) });
+    expect(invalid.response.status).toBe(400);
+    expect(invalid.body).toContain("2~80자로 입력하세요.");
+    expect((await lee.post("/sim/catalog?type=new", { intent: "saveType", draft: "{" })).response.status).toBe(400);
+    const saved = await lee.post("/sim/catalog?tab=sensor&type=new", { intent: "saveType", draft: JSON.stringify(draft) });
+    expect(saved.response.status).toBe(302);
+    expect(saved.response.headers.get("Location")).toBe("/sim/catalog?tab=sensor&saved=type");
+    expect(last("POST", "/api/v1/core/sim/types")?.body).toMatchObject({ name: "VOC 센서", category: "SENSOR", metrics: [{ key: "tvoc", defaultSource: { kind: "GENERATOR" } }], propertyDefs: [{ key: "errorPct", min: 0, max: 50, default: 10 }] });
+    const catalog = await lee.get("/sim/catalog?tab=sensor&saved=type");
+    expect(catalog.body).toContain("사용자 정의 유형을 저장했습니다");
+    expect(catalog.body).toContain("VOC 센서");
+    const typeId = /type=(\d+)"/.exec(catalog.body)?.[1] as string;
+    const edit = await lee.get(`/sim/catalog?tab=sensor&type=${typeId}`);
+    expect(edit.body).toContain("사용자 정의 유형: VOC 센서");
+    const updated = await lee.post(`/sim/catalog?tab=sensor&type=${typeId}`, { intent: "saveType", typeId, baseVersion: "1", draft: JSON.stringify({ ...draft, description: "실내 VOC" }) });
+    expect(updated.response.status).toBe(302);
+    expect(last("PUT", `/api/v1/core/sim/types/${typeId}`)?.body).toMatchObject({ description: "실내 VOC", baseVersion: 1 });
+    const conflict = await lee.post(`/sim/catalog?tab=sensor&type=${typeId}`, { intent: "saveType", typeId, baseVersion: "1", draft: JSON.stringify(draft) });
+    expect(conflict.response.status).toBe(409);
+    const deleted = await lee.post(`/sim/catalog?type=${typeId}`, { intent: "deleteType", typeId });
+    expect(deleted.response.headers.get("Location")).toBe("/sim/catalog?saved=typeDeleted");
+    const inUse = await lee.post("/sim/catalog?type=11", { intent: "deleteType", typeId: "11" });
+    expect(inUse.response.status).toBe(404);
+    const kim = await operator();
+    const opPage = await kim.get("/sim/catalog?tab=sensor");
+    expect(opPage.body).not.toContain("사용자 정의 유형 만들기");
+  });
+});

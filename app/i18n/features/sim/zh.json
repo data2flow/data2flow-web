@@ -76,7 +76,15 @@
       "metricRequired": "请至少映射一个测量列。",
       "metricKey": "测量键须以小写字母开头，仅含小写字母、数字和 _。",
       "json": "不是 JSON 对象格式。",
-      "server": "服务器已拒绝。"
+      "server": "服务器已拒绝。",
+      "metricsRequired": "请至少选择一个测量项。",
+      "capabilitiesRequired": "请至少选择一个功能。",
+      "tooManyDefs": "属性最多 {{max}} 个。",
+      "propertyKey": "键须以小写字母开头，由2~40位字母数字组成。",
+      "duplicateKey": "该键已存在。",
+      "minMax": "最大值须大于等于最小值。",
+      "enumRequired": "请至少输入一个选项。",
+      "effectProperty": "请为影响选择数值属性。"
     },
     "home": {
       "title": "虚拟环境",
@@ -453,6 +461,70 @@
         "metricRange": "{{metric}} {{min}}~{{max}} 保持 {{pct}}%",
         "controlMax": "{{device}} 控制不超过 {{max}} 次"
       }
+    },
+    "types": {
+      "new": "新建自定义类型",
+      "edit": "编辑",
+      "editOf": "编辑 {{name}}",
+      "newTitle": "新建自定义设备类型",
+      "editTitle": "自定义类型: {{name}}",
+      "back": "返回目录",
+      "formLabel": "自定义设备类型",
+      "basic": "基本信息",
+      "name": "名称",
+      "category": "分类",
+      "icon": "图标",
+      "description": "说明",
+      "linkedModel": "关联真实型号",
+      "noModel": "不关联",
+      "metrics": "测量项",
+      "metricSource": "{{key}} 默认来源",
+      "source": {
+        "PHYSICS": "物理模型",
+        "GENERATOR": "生成器"
+      },
+      "capabilities": "功能",
+      "defs": "属性定义",
+      "addDef": "+ 添加属性",
+      "noDefs": "尚未定义属性。",
+      "defRow": "属性 {{n}}",
+      "key": "键",
+      "defName": "名称",
+      "type": "类型",
+      "valueType": {
+        "number": "数字",
+        "enum": "枚举",
+        "boolean": "是/否"
+      },
+      "unit": "单位",
+      "min": "最小",
+      "max": "最大",
+      "enumValues": "选项(逗号分隔)",
+      "default": "默认值",
+      "defDescription": "说明",
+      "yes": "是",
+      "no": "否",
+      "removeDef": "删除属性",
+      "effects": "物理影响",
+      "addEffect": "+ 添加影响",
+      "noEffects": "没有物理影响。",
+      "effect": "影响类型",
+      "effectProperty": "关联属性",
+      "removeEffect": "删除影响",
+      "effectKind": {
+        "COOLING": "制冷",
+        "HEATING": "制热",
+        "VENTILATION": "通风",
+        "PURIFICATION": "净化",
+        "HUMIDIFICATION": "加湿",
+        "DEHUMIDIFICATION": "除湿",
+        "LIGHTING": "照明",
+        "POWER": "电力"
+      },
+      "save": "保存",
+      "delete": "删除类型",
+      "saved": "已保存自定义类型并加入目录。",
+      "deleted": "已删除自定义类型。"
     }
   },
   "errors": {

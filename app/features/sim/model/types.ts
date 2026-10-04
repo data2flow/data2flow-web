@@ -60,6 +60,11 @@ export interface SimType {
   propertyDefs: PropertyDef[];
   linkedModelCode?: string | null;
   summary?: string[] | null;
+  /** 사용자 정의 유형(API-SIM-03)만: 아이콘·설명·물리 영향·버전(PUT baseVersion) */
+  icon?: string | null;
+  description?: string | null;
+  physicsEffects?: { effect: string; propertyKey: string }[] | null;
+  version?: number | null;
 }
 
 export interface SimKit {
