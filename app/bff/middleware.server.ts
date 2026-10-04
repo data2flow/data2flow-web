@@ -100,6 +100,9 @@ export const bffMiddleware: MiddlewareFunction<Response> = async ({ request, con
   if (url.pathname === "/healthz") return next();
 
   const runtime = await getRuntime();
+  // 메신저 콜백(서버 간 호출)은 세션 쿠키·CSRF 대상이 아니다. 채널별 비밀값 검증은 라우트가 한다(auth.md §9.3)
+  if (url.pathname.startsWith("/hooks/")) return applySecurityHeaders(await next(), runtime.config, randomBytes(16).toString("base64"));
+
   const meta = requestMetaFrom(request, runtime.config.trustedProxyHops);
   const session = BffSession.fromRequest(request, runtime, meta);
   const nonce = randomBytes(16).toString("base64");
