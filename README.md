@@ -89,7 +89,8 @@ data2flow 화면과 BFF입니다. React Router v8 프레임워크 모드(SSR, Vi
 - 실시간 알람: `EventSource('/bff/stream/alarms')`(API-RUL-14 `alarm.raised`·`alarm.updated`·`alarm.cleared`). 홈·공간은 `/bff/stream/live?topics=home,alarms`(API-DSH-20). `/alarms?state=`는 `status`의 다른 이름이다(홈 알람 카드 링크).
 - 플로우 라이브 뷰·편집 참여는 WebSocket(`/bff/stream/flows/{id}`, `/bff/stream/flows/{id}/presence`)이고 BFF가 세션 쿠키·Origin을 확인한 뒤 gateway `/api/v1/core/stream/flows/**`에 Bearer로 중계합니다(API-FLW-40·42). 그래서 운영 서버는 `server.mjs`(react-router-serve와 같은 정적·SSR 처리 + upgrade, SIGTERM 정리)이고 `pnpm start`·Dockerfile이 이것을 씁니다. `pnpm dev`도 Vite 플러그인으로 같은 중계를 씁니다. 추가 의존성: `express`·`@react-router/express`·`ws`·`compression`(모두 MIT).
 - 메신저 콜백 `POST /hooks/messenger/{channel}`(design/auth.md §9.3, API-RUL-31): 세션·CSRF 대상이 아니고, 허용 채널은 `telegram`뿐입니다. `X-Telegram-Bot-Api-Secret-Token`을 상수 시간 비교(틀리면 본문을 읽지 않고 401), 1MB 초과 413, `update_id` 중복은 Redis `data2flow:hook:msg:telegram:{id}`(10분, Redis가 없으면 메모리)로 200 무시, 원본 본문을 action `/internal/action/notifications/callbacks/telegram`에 넘기고 기다리지 않고 200을 돌려줍니다.
-- 비상 정지·유지보수 띠는 실시간 토픽이 없어 5초마다 조회합니다(API-ACT-21, API-OPS-23).
+- 메신저 콜백 비밀값: BFF 환경 변수 `DATA2FLOW_MESSENGER_TELEGRAM_SECRET`(없으면 404)와 core 텔레그램 채널의 `webhookSecret`이 같아야 합니다. action이 같은 헤더를 채널 정의의 `webhookSecret`과 다시 비교하고, 버튼 데이터 `ACK|{alarmId}|{deliveryId}`(또는 `MUTE_30M|…`)를 연결된 계정 권한으로 core `/internal/core/alarms/{id}/ack|mute`에 넘깁니다. action 주소는 `DATA2FLOW_ACTION_URL`(기본 `http://data2flow-action`).
+- 비상 정지 띠는 `/bff/stream/live?topics=notifications` 연결로 받는 `emergency-stop` 이벤트(토픽과 관계없이 조직의 모든 연결에 옴)로 그리고 지웁니다. 같은 연결의 `notification`은 오른쪽 아래 알림으로 띄웁니다(읽음 수 없음). 유지보수 띠는 실시간 토픽이 없어 5초마다 조회합니다(API-OPS-23).
 
 ## 개발
 
