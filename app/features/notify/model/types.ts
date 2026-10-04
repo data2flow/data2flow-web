@@ -5,8 +5,8 @@
 export const SEVERITIES = ["CRITICAL", "MAJOR", "MINOR", "WARNING", "INFO"] as const;
 export type Severity = (typeof SEVERITIES)[number];
 
-/** 수신자 종류(ADR-048 NotificationRequest.recipients: USER·ROLE·ON_CALL·CHANNEL_DEFAULT) */
-export const RECIPIENT_TYPES = ["USER", "ROLE", "ON_CALL", "CHANNEL_DEFAULT"] as const;
+/** 정책 수신자 종류(core API-RUL-21 PolicyService: USER·ROLE·ON_CALL만 받는다. CHANNEL_DEFAULT는 시스템 알림 전용이라 정책에 쓰지 않는다) */
+export const RECIPIENT_TYPES = ["USER", "ROLE", "ON_CALL"] as const;
 export type RecipientType = (typeof RECIPIENT_TYPES)[number];
 
 export interface Recipient {
@@ -72,6 +72,8 @@ export interface NotificationTemplate {
   subject: string | null;
   body: string;
   builtin: boolean;
+  /** 조직이 고친 행(기본값으로 되돌리기 가능) */
+  customized: boolean;
   version: number;
   updatedAt?: string;
 }
@@ -112,6 +114,8 @@ export interface OnCallCurrent {
   userId: string | null;
   name: string | null;
   until: string | null;
+  /** 대체 근무로 정해진 당직자 */
+  substitute: boolean;
 }
 
 /** API-OPS-23 유지보수 */
@@ -127,6 +131,7 @@ export interface MaintenanceWindow {
   excludeFromAnalytics: boolean;
   reason: string;
   status: MaintenanceStatus;
+  /** core는 만든 사람의 사용자 ID(문자열)만 준다. 이름은 화면이 회원 목록에서 찾는다 */
   createdBy?: { userId: string; name: string } | null;
   version?: number;
 }
@@ -134,9 +139,12 @@ export interface MaintenanceWindow {
 /** API-OPS-34 채널 유형(채널 SPI) */
 export interface ChannelType {
   key: string;
+  /** action 채널 SPI 목록에는 없다(core 기본 목록에만). 화면 모델에서 채운다 */
   displayName: string;
   available: boolean;
   configSchema: JsonSchema | null;
+  /** core 기본 목록(action 무응답)의 비밀값 스키마. 속성은 모두 비밀값 필드 */
+  secretSchema?: JsonSchema | null;
   capabilities?: { buttons?: boolean; formats?: string[]; maxBodyLength?: number; defaultRatePerMin?: number; callbackResponseLimitSec?: number } | null;
 }
 
@@ -155,10 +163,12 @@ export interface NotificationChannel {
   updatedAt?: string;
 }
 
-/** API-RUL-27 발송 이력(커서 목록) */
+/** API-RUL-27 발송 이력(커서 목록, action DeliveryView 그대로) */
 export interface Delivery {
   deliveryId: string;
   alarmId?: string | null;
+  /** 웹 알림은 null */
+  channelId?: string | null;
   channel: string;
   recipient: string;
   status: "PENDING" | "RETRYING" | "SENT" | "FAILED" | "SKIPPED" | "DIGESTED";
@@ -166,6 +176,9 @@ export interface Delivery {
   attempts: number;
   lastError?: string | null;
   sentAt?: string | null;
+  createdAt?: string | null;
+  digestCount?: number;
+  stepNo?: number | null;
 }
 
 /** JSON Schema(2020-12) 중 채널 설정 화면이 그리는 부분 */

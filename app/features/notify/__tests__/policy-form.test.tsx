@@ -15,7 +15,7 @@ const channelTypes = [
   { key: "TELEGRAM", displayName: "Telegram", available: true, configSchema: null },
   { key: "SMS", displayName: "SMS", available: false, configSchema: null },
 ];
-const templates = [{ notificationTemplateId: "71", templateKey: "alarm.raised", channel: "TELEGRAM", locale: "ko", subject: null, body: "b", builtin: true, version: 1 }];
+const templates = [{ notificationTemplateId: "71", templateKey: "alarm.raised", channel: "TELEGRAM", locale: "ko", subject: null, body: "b", builtin: true, customized: false, version: 1 }];
 
 function hidden(name: string) {
   return [...document.querySelectorAll<HTMLInputElement>(`input[type="hidden"][name="${name}"]`)].map((i) => i.value);

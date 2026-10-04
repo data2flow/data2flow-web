@@ -180,6 +180,7 @@
         "userRequired": "{{n}}번째 근무: 담당자를 고르세요.",
         "overlap": "{{n}}번째 근무: 다른 근무와 시간이 겹칩니다.",
         "rangeInvalid": "끝은 시작보다 뒤여야 합니다.",
+        "originalRequired": "원래 담당자를 고르세요.",
         "substituteRequired": "대체자를 고르세요.",
         "sameUser": "원래 담당자와 대체자가 같습니다."
       }
@@ -189,10 +190,7 @@
       "severityTitle": "받을 알람",
       "minSeverity": "최소 심각도",
       "minSeverityHint": "이보다 낮은 심각도의 알람은 나에게 보내지 않습니다.",
-      "pushAlarm": "알람",
-      "pushWorkOrder": "작업 지시 배정",
-      "pushApproval": "승인 요청",
-      "categories": "받을 알림 종류",
+      "categories": "받을 채널",
       "saved": "저장했습니다.",
       "dndTitle": "방해 금지 시간",
       "dndEnabled": "방해 금지 시간 사용",

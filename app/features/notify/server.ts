@@ -50,7 +50,7 @@ export async function loadUsers(ctx: BffRequestContext, request: Request): Promi
 
 /** 등록된 채널 유형(API-OPS-34). 받지 못하면 문서의 기본값(TELEGRAM만 가능, ADR-033) */
 export const FALLBACK_CHANNEL_TYPES: ChannelType[] = [
-  { key: "TELEGRAM", displayName: "Telegram", available: true, configSchema: null, capabilities: { buttons: true, maxBodyLength: 4096, defaultRatePerMin: 20 } },
+  { key: "TELEGRAM", displayName: "Telegram", available: true, configSchema: null, capabilities: { buttons: true, maxBodyLength: 4000, defaultRatePerMin: 20 } },
   { key: "EMAIL", displayName: "Email", available: false, configSchema: null },
   { key: "SLACK", displayName: "Slack", available: false, configSchema: null },
   { key: "KAKAO_ALIMTALK", displayName: "KakaoTalk", available: false, configSchema: null },
@@ -68,10 +68,26 @@ export async function loadRows<T>(ctx: BffRequestContext, request: Request, path
   return { ok: true, rows, nextCursor, status: result.status };
 }
 
+/**
+ * API-OPS-34 `{header, responses, totalCount}`. action이 응답하면 등록된 SPI(지금은 TELEGRAM 하나, displayName 없음)만 오므로
+ * 문서의 "준비 중" 유형을 뒤에 붙이고 이름은 기본 목록에서 채운다. 비어 있으면 기본값
+ */
+export function mergeChannelTypes(rows: Partial<ChannelType>[]): ChannelType[] {
+  if (!rows.length) return FALLBACK_CHANNEL_TYPES;
+  const received = rows
+    .filter((r) => r.key)
+    .map((r) => {
+      const key = String(r.key);
+      const fallback = FALLBACK_CHANNEL_TYPES.find((f) => f.key === key);
+      return { ...r, key, displayName: r.displayName || fallback?.displayName || key, available: r.available === true, configSchema: r.configSchema ?? null } as ChannelType;
+    });
+  const upcoming = FALLBACK_CHANNEL_TYPES.filter((f) => !f.available && !received.some((r) => r.key === f.key));
+  return [...received, ...upcoming];
+}
+
 export async function loadChannelTypes(ctx: BffRequestContext, request: Request): Promise<ChannelType[]> {
-  const result = await loadRows<ChannelType>(ctx, request, "/api/v1/core/notification-channel-types");
-  const rows = result.rows;
-  return rows.length ? rows.map((r) => ({ ...r, key: String(r.key), available: r.available === true })) : FALLBACK_CHANNEL_TYPES;
+  const result = await loadRows<Partial<ChannelType>>(ctx, request, "/api/v1/core/notification-channel-types");
+  return mergeChannelTypes(result.rows);
 }
 
 export function str(form: FormData, name: string): string {

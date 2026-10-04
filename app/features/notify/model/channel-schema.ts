@@ -30,12 +30,14 @@ export interface SchemaField {
 export const TELEGRAM_BOT_TOKEN = "^\\d{3,20}:[A-Za-z0-9_-]{20,}$";
 export const TELEGRAM_WEBHOOK_SECRET = "^[A-Za-z0-9_-]{1,256}$";
 
-/** API-OPS-34가 스키마를 주지 않을 때 쓰는 텔레그램 스키마(OPS domain-model §채널 설정) */
+/** API-OPS-34가 스키마를 주지 않을 때 쓰는 텔레그램 스키마(action TelegramChannel.configSchema와 같다: chat_id는 숫자 문자열) */
 export const TELEGRAM_FALLBACK_SCHEMA: JsonSchema = {
   type: "object",
   required: ["chatIds"],
   properties: {
-    chatIds: { type: "array", items: { type: "integer" }, minItems: 1, maxItems: 20 },
+    chatIds: { type: "array", items: { type: "string", pattern: "^-?[0-9]+$" }, minItems: 1, maxItems: 20 },
+    botUsername: { type: "string", pattern: "^[A-Za-z0-9_]{5,32}$" },
+    parseMode: { enum: ["MarkdownV2", "PLAIN"], default: "MarkdownV2" },
   },
 };
 
@@ -64,14 +66,23 @@ function fieldOf(name: string, schema: JsonSchema, required: boolean): SchemaFie
   return undefined;
 }
 
-/** 스키마 → 폼 필드 목록(속성 순서 그대로). 비밀값 필드는 뒤에 */
-export function schemaFields(type: string, schema: JsonSchema | null | undefined): SchemaField[] {
+/**
+ * 스키마 → 폼 필드 목록(속성 순서 그대로). 비밀값 필드는 뒤에.
+ * `secretSchema`(core 기본 유형 목록)가 있으면 그 속성은 모두 비밀값이다. 텔레그램은 같은 이름의 형식 규칙(TELEGRAM_SECRETS)을 쓴다.
+ */
+export function schemaFields(type: string, schema: JsonSchema | null | undefined, secretSchema?: JsonSchema | null): SchemaField[] {
   const source = schema?.properties ? schema : type === "TELEGRAM" ? TELEGRAM_FALLBACK_SCHEMA : { properties: {} };
   const required = new Set(source.required ?? []);
   const fields = Object.entries(source.properties ?? {})
     .map(([name, prop]) => fieldOf(name, prop, required.has(name)))
     .filter((f): f is SchemaField => Boolean(f));
-  if (type === "TELEGRAM" && !fields.some((f) => f.kind === "secret")) fields.push(...TELEGRAM_SECRETS);
+  const secretRequired = new Set(secretSchema?.required ?? []);
+  for (const [name, prop] of Object.entries(secretSchema?.properties ?? {})) {
+    if (fields.some((f) => f.name === name)) continue;
+    const known = type === "TELEGRAM" ? TELEGRAM_SECRETS.find((f) => f.name === name) : undefined;
+    fields.push(known ?? { name, kind: "secret", title: prop.title, description: prop.description, required: secretRequired.has(name), minLength: prop.minLength, maxLength: prop.maxLength, pattern: prop.pattern });
+  }
+  if (type === "TELEGRAM") for (const secret of TELEGRAM_SECRETS) if (!fields.some((f) => f.name === secret.name)) fields.push(secret);
   return [...fields.filter((f) => f.kind !== "secret"), ...fields.filter((f) => f.kind === "secret")];
 }
 

@@ -29,9 +29,13 @@ describe("notify server helpers", () => {
     expect(callList).toHaveBeenCalledWith(ctx, request, "/x", { noGuards: true });
   });
 
-  it("채널 유형: 받으면 그대로(available은 참일 때만), 없으면 텔레그램만 가능한 기본값", async () => {
+  it("채널 유형: 받으면 그대로(available은 참일 때만) + 준비 중 유형, 이름이 없으면(action SPI) 기본 이름, 없으면 텔레그램만 가능한 기본값", async () => {
     callList.mockResolvedValueOnce(list([{ key: "TELEGRAM", displayName: "Telegram", available: true }, { key: "SMS", displayName: "SMS" }]));
-    expect((await loadChannelTypes(ctx, request)).map((t) => `${t.key}:${t.available}`)).toEqual(["TELEGRAM:true", "SMS:false"]);
+    expect((await loadChannelTypes(ctx, request)).map((t) => `${t.key}:${t.available}`)).toEqual(["TELEGRAM:true", "SMS:false", "EMAIL:false", "SLACK:false", "KAKAO_ALIMTALK:false", "WEBHOOK:false"]);
+    callList.mockResolvedValueOnce(list([{ key: "TELEGRAM", available: true, configSchema: { properties: {} } }]));
+    const fromAction = await loadChannelTypes(ctx, request);
+    expect(fromAction[0]).toMatchObject({ key: "TELEGRAM", displayName: "Telegram", available: true });
+    expect(fromAction.filter((t) => !t.available)).toHaveLength(5);
     callList.mockResolvedValueOnce({ ok: false, status: 404, code: "RESOURCE_NOT_FOUND", message: "" });
     expect(await loadChannelTypes(ctx, request)).toBe(FALLBACK_CHANNEL_TYPES);
     expect(FALLBACK_CHANNEL_TYPES.filter((t) => t.available).map((t) => t.key)).toEqual(["TELEGRAM"]);

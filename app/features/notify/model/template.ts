@@ -3,11 +3,11 @@
  */
 import { idOf, rowsOf, type NotificationTemplate, type TemplateVariable } from "./types";
 
-/** 문서에 적힌 기본 변수(UI-RUL-07). 서버 변수 목록(API-RUL-22 variables)을 받지 못할 때 쓴다 */
-export const DEFAULT_VARIABLES = ["alarm.severity", "alarm.title", "device.name", "space.path", "value", "threshold", "rule.name", "link", "occurredAt"];
+/** core 변수 목록(TemplateVariables.KNOWN, API-RUL-22 variables)과 같다. 서버 목록을 받지 못할 때 쓴다 */
+export const DEFAULT_VARIABLES = ["alarm.severity", "alarm.title", "alarm.id", "alarm.status", "device.name", "space.path", "space.name", "value", "threshold", "metric", "rule.name", "link", "occurredAt", "occurrenceCount"];
 
-/** 텔레그램 본문 한도 4,096자(채널 SPI capabilities.maxBodyLength). 다른 채널은 유형 정보의 값 */
-export const DEFAULT_MAX_LENGTH: Record<string, number> = { TELEGRAM: 4096 };
+/** 메신저 본문 한도 4,000자(core TemplateService, 텔레그램 SPI capabilities.maxBodyLength). 다른 채널은 유형 정보의 값 */
+export const DEFAULT_MAX_LENGTH: Record<string, number> = { TELEGRAM: 4000 };
 export const SUBJECT_MAX = 200;
 
 const VARIABLE = /\{\{\s*([A-Za-z_][\w.]*)\s*\}\}/g;
@@ -44,12 +44,13 @@ export function insertVariable(text: string, start: number, end: number, name: s
 export function normalizeTemplate(raw: Record<string, unknown>): NotificationTemplate {
   return {
     notificationTemplateId: idOf(raw, "notificationTemplateId"),
-    templateKey: String(raw.templateKey ?? ""),
+    templateKey: String(raw.key ?? raw.templateKey ?? ""),
     channel: String(raw.channel ?? ""),
     locale: String(raw.locale ?? "ko"),
     subject: raw.subject === undefined || raw.subject === null ? null : String(raw.subject),
     body: String(raw.body ?? ""),
     builtin: raw.builtin === true,
+    customized: raw.customized === true,
     version: Number(raw.version ?? 0),
     updatedAt: raw.updatedAt as string | undefined,
   };
@@ -64,7 +65,7 @@ export function normalizeVariables(value: unknown): TemplateVariable[] {
   return out.length ? out : DEFAULT_VARIABLES.map((name) => ({ name }));
 }
 
-/** 저장 경고(TEMPLATE_VARIABLE_UNKNOWN)의 변수 이름 */
+/** 저장 경고(TEMPLATE_VARIABLE_UNKNOWN)의 변수 이름. core 응답은 `{template, warnings}`(200, resultCode TEMPLATE_VARIABLE_UNKNOWN) */
 export function warningNames(value: unknown): string[] {
   const warnings = (value as { warnings?: { code?: string; name?: string }[] } | null | undefined)?.warnings ?? [];
   return warnings.filter((w) => w.code === "TEMPLATE_VARIABLE_UNKNOWN" && w.name).map((w) => String(w.name));

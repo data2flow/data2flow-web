@@ -68,7 +68,7 @@ export interface ChannelFieldsProps {
 /** 공통 필드(이름·분당 한도·묶음 창·켜기) + 설정 스키마 필드 */
 export function ChannelFields({ type, channel, problems = {} }: ChannelFieldsProps) {
   const { t } = useTranslation();
-  const fields = schemaFields(type.key, type.configSchema);
+  const fields = schemaFields(type.key, type.configSchema, type.secretSchema);
   const hasSecret = Boolean(channel?.secretConfigured);
   const problem = (name: string) => (problems[name] ? t(`ops.channels.problems.${problems[name]}`) : undefined);
   return (

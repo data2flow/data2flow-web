@@ -180,6 +180,7 @@
         "userRequired": "第{{n}}个班次：请选择值班人员。",
         "overlap": "第{{n}}个班次：与其他班次时间重叠。",
         "rangeInvalid": "结束必须晚于开始。",
+        "originalRequired": "请选择原值班人。",
         "substituteRequired": "请选择代班人员。",
         "sameUser": "原值班人员与代班人员相同。"
       }
@@ -189,10 +190,7 @@
       "severityTitle": "接收的告警",
       "minSeverity": "最低严重级别",
       "minSeverityHint": "低于此严重级别的告警不会发送给您。",
-      "pushAlarm": "告警",
-      "pushWorkOrder": "工单分配",
-      "pushApproval": "审批请求",
-      "categories": "接收的通知类型",
+      "categories": "接收渠道",
       "saved": "已保存。",
       "dndTitle": "免打扰时间",
       "dndEnabled": "启用免打扰时间",

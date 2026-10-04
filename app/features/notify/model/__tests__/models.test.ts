@@ -25,7 +25,8 @@ describe("RUL-05.01 알림 템플릿", () => {
   it("커서 위치에 변수 넣기, 응답 정규화", () => {
     expect(insertVariable("ab", 1, 1, "value")).toEqual({ text: "a{{value}}b", cursor: 10 });
     expect(insertVariable("abc", 5, 9, "x").text).toBe("abc{{x}}");
-    expect(normalizeTemplate({ id: 3, templateKey: "alarm.raised", channel: "TELEGRAM", locale: "ko", subject: null, body: "b", builtin: true, version: 2 })).toMatchObject({ notificationTemplateId: "3", subject: null, builtin: true });
+    expect(normalizeTemplate({ id: 3, templateKey: "alarm.raised", channel: "TELEGRAM", locale: "ko", subject: null, body: "b", builtin: true, version: 2 })).toMatchObject({ notificationTemplateId: "3", subject: null, builtin: true, customized: false });
+    expect(normalizeTemplate({ notificationTemplateId: "9", key: "alarm.cleared", channel: "WEB", locale: "en", body: "b", builtin: false, customized: true, version: 1 })).toMatchObject({ notificationTemplateId: "9", templateKey: "alarm.cleared", customized: true });
     expect(normalizeTemplate({})).toMatchObject({ locale: "ko", body: "", builtin: false, version: 0 });
     expect(normalizeVariables(["a", { name: "b", description: "B" }, { name: "" }])).toEqual([{ name: "a" }, { name: "b", description: "B" }]);
     expect(normalizeVariables(null).map((v) => v.name)).toEqual(DEFAULT_VARIABLES);
@@ -59,7 +60,8 @@ describe("RUL-05.03 당직 일정", () => {
   it("대체 근무 검증과 근무표 JSON", () => {
     expect(checkOverride({ startsAt: "2026-10-03T09:00:00Z", endsAt: "2026-10-04T00:00:00Z", substituteUserId: "9", originalUserId: "8" })).toBeUndefined();
     expect(checkOverride({ startsAt: "2026-10-03T09:00:00Z", endsAt: "2026-10-03T09:00:00Z", substituteUserId: "9" })).toBe("rangeInvalid");
-    expect(checkOverride({ startsAt: "2026-10-03T09:00:00Z", endsAt: "2026-10-04T00:00:00Z" })).toBe("substituteRequired");
+    expect(checkOverride({ startsAt: "2026-10-03T09:00:00Z", endsAt: "2026-10-04T00:00:00Z", substituteUserId: "9" })).toBe("originalRequired");
+    expect(checkOverride({ startsAt: "2026-10-03T09:00:00Z", endsAt: "2026-10-04T00:00:00Z", originalUserId: "8" })).toBe("substituteRequired");
     expect(checkOverride({ startsAt: "2026-10-03T09:00:00Z", endsAt: "2026-10-04T00:00:00Z", substituteUserId: "9", originalUserId: "9" })).toBe("sameUser");
     expect(parseShifts('[{"dayOfWeek":"1","from":"09:00","to":"18:00","userId":" 7 "}]')).toEqual([{ dayOfWeek: 1, from: "09:00", to: "18:00", userId: "7" }]);
     expect(parseShifts("{")).toBeUndefined();
@@ -73,8 +75,11 @@ describe("RUL-05.03 당직 일정", () => {
     expect(s.overrides[0]).toMatchObject({ overrideId: "3", originalUserId: "8", substituteUserId: "9" });
     expect(normalizeSchedule(null)).toEqual({ name: "", timezone: "Asia/Seoul", shifts: [], overrides: [], version: 0 });
     expect(normalizeSchedule({ overrides: [{ overrideId: 1 }] }).overrides[0]).toMatchObject({ originalUserId: null, substituteUserId: "", startsAt: "" });
-    expect(normalizeCurrent({ userId: 8, name: "이통합", until: "2026-10-04T09:00:00Z" })).toEqual({ userId: "8", name: "이통합", until: "2026-10-04T09:00:00Z" });
-    expect(normalizeCurrent(null)).toEqual({ userId: null, name: null, until: null });
+    // core 모양: originalUser·substituteUser {userId, name}
+    const core = normalizeSchedule({ overrides: [{ overrideId: "91", startsAt: "a", endsAt: "b", originalUser: { userId: "8", name: "이통합" }, substituteUser: { userId: "1", name: "홍길동" } }] });
+    expect(core.overrides[0]).toEqual({ overrideId: "91", startsAt: "a", endsAt: "b", originalUserId: "8", originalUserName: "이통합", substituteUserId: "1", substituteUserName: "홍길동" });
+    expect(normalizeCurrent({ userId: 8, name: "이통합", until: "2026-10-04T09:00:00Z", substitute: true })).toEqual({ userId: "8", name: "이통합", until: "2026-10-04T09:00:00Z", substitute: true });
+    expect(normalizeCurrent(null)).toEqual({ userId: null, name: null, until: null, substitute: false });
   });
 });
 
@@ -105,6 +110,8 @@ describe("OPS-05.01 유지보수 일정", () => {
     expect(maintenanceActions("SCHEDULED")).toEqual(["cancel"]);
     expect(maintenanceActions("ENDED")).toEqual([]);
     expect(normalizeMaintenance({ id: 1, targetType: "DEVICE", targetId: 5, status: "ACTIVE", pauseAutomation: false, createdBy: { userId: 7, name: "김" } })).toMatchObject({ id: "1", targetType: "DEVICE", targetId: "5", pauseAutomation: false, excludeFromAnalytics: true, createdBy: { userId: "7", name: "김" } });
+    // core는 만든 사람의 사용자 ID 문자열만 준다
+    expect(normalizeMaintenance({ id: "2", createdBy: "7" }).createdBy).toEqual({ userId: "7", name: "" });
     expect(normalizeMaintenance({})).toMatchObject({ targetType: "SPACE", status: "SCHEDULED", createdBy: null, startsAt: null, version: undefined });
   });
 });
@@ -160,13 +167,16 @@ describe("OPS-06.06 채널 설정 스키마 폼", () => {
 
   it("TC-OPS-143 스키마로 필드를 만든다(그리지 못하는 모양은 건너뛰고 비밀값은 뒤로)", () => {
     const fields = schemaFields("TELEGRAM", schema);
-    expect(fields.map((f) => `${f.name}:${f.kind}`)).toEqual(["chatIds:integerList", "format:enum", "label:string", "retries:integer", "ratio:number", "silent:boolean", "tags:stringList", "botToken:secret"]);
+    expect(fields.map((f) => `${f.name}:${f.kind}`)).toEqual(["chatIds:integerList", "format:enum", "label:string", "retries:integer", "ratio:number", "silent:boolean", "tags:stringList", "botToken:secret", "webhookSecret:secret"]);
     expect(fields[0].required).toBe(true);
   });
 
-  it("스키마가 없거나 비밀값이 없는 텔레그램은 봇 토큰·웹훅 시크릿·chat_id를 더한다", () => {
+  it("스키마가 없거나 비밀값이 없는 텔레그램은 봇 토큰·웹훅 시크릿·chat_id를 더한다, core 기본 유형의 secretSchema는 비밀값", () => {
     const fields = schemaFields("TELEGRAM", null);
-    expect(fields.map((f) => f.name)).toEqual(["chatIds", "botToken", "webhookSecret"]);
+    expect(fields.map((f) => f.name)).toEqual(["chatIds", "botUsername", "parseMode", "botToken", "webhookSecret"]);
+    const builtin = schemaFields("TELEGRAM", { type: "object", required: ["chatIds"], properties: { chatIds: { type: "array", minItems: 1 } } }, { type: "object", required: ["botToken"], properties: { botToken: { type: "string" }, webhookSecret: { type: "string" } } });
+    expect(builtin.filter((f) => f.kind === "secret").map((f) => `${f.name}:${f.pattern ? "p" : "-"}`)).toEqual(["botToken:p", "webhookSecret:p"]);
+    expect(schemaFields("SLACK", { properties: {} }, { required: ["token"], properties: { token: { type: "string", minLength: 3 } } })).toEqual([expect.objectContaining({ name: "token", kind: "secret", required: true, minLength: 3 })]);
     expect(schemaFields("TELEGRAM", TELEGRAM_FALLBACK_SCHEMA).filter((f) => f.kind === "secret")).toHaveLength(2);
     expect(schemaFields("FAKE", null)).toEqual([]);
     expect(schemaFields("FAKE", { properties: { room: { type: "string", minLength: 1 } }, required: ["room"] })).toEqual([expect.objectContaining({ name: "room", kind: "string", required: true })]);
@@ -177,7 +187,7 @@ describe("OPS-06.06 채널 설정 스키마 폼", () => {
     const values: Record<string, string> = { "cfg.chatIds": "-1001234567890\n42", "secret.botToken": "123456789:AAH-abcdefghijklmnopqrstuvwxyz", "secret.webhookSecret": "s3cr3t_token" };
     const ok = parseChannelForm(fields, (n) => values[n] ?? "", { editing: false, hasSecret: false });
     expect(ok.errors).toEqual({});
-    expect(ok.config).toEqual({ chatIds: [-1001234567890, 42] });
+    expect(ok.config).toEqual({ chatIds: ["-1001234567890", "42"] });
     expect(ok.secret).toEqual({ botToken: "123456789:AAH-abcdefghijklmnopqrstuvwxyz", webhookSecret: "s3cr3t_token" });
     const bad = parseChannelForm(fields, (n) => ({ "cfg.chatIds": Array.from({ length: 21 }, (_, i) => String(i)).join(","), "secret.botToken": "nope" })[n] ?? "", { editing: false, hasSecret: false });
     expect(bad.errors).toEqual({ chatIds: "tooManyItems", botToken: "pattern", webhookSecret: "required" });
@@ -185,7 +195,7 @@ describe("OPS-06.06 채널 설정 스키마 폼", () => {
     const editing = parseChannelForm(fields, (n) => ({ "cfg.chatIds": "1" })[n] ?? "", { editing: true, hasSecret: true });
     expect(editing.errors).toEqual({});
     expect(editing.secret).toEqual({});
-    expect(parseChannelForm(fields, (n) => ({ "cfg.chatIds": "abc" })[n] ?? "", { editing: true, hasSecret: true }).errors.chatIds).toBe("notInteger");
+    expect(parseChannelForm(fields, (n) => ({ "cfg.chatIds": "abc" })[n] ?? "", { editing: true, hasSecret: true }).errors.chatIds).toBe("pattern");
     expect(parseChannelForm(fields, () => "", { editing: true, hasSecret: true }).errors.chatIds).toBe("required");
   });
 

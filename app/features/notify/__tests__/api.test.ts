@@ -21,7 +21,7 @@ describe("notifyApi", () => {
     expect(calls).toEqual([
       { url: "/bff/api/core/accounts/me/messenger-links/start", method: "POST", body: '{"channel":"TELEGRAM"}' },
       { url: "/bff/api/core/accounts/me/messenger-links/TELEGRAM", method: "DELETE", body: undefined },
-      { url: "/bff/api/core/accounts/me/messenger-links", method: "GET", body: undefined },
+      { url: "/bff/api/core/accounts/me/notify-preferences", method: "GET", body: undefined },
       { url: "/bff/api/core/notification-templates/71/preview", method: "POST", body: '{"alarmId":"501"}' },
     ]);
   });

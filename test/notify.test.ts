@@ -5,7 +5,7 @@
 import { http, HttpResponse } from "msw";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { ORIGIN, TestBrowser, startApp, type AppContext } from "./app-harness";
-import { notifyState } from "./msw/handlers/notify";
+import { DELIVERY_FAILED, notifyState } from "./msw/handlers/notify";
 
 let app: AppContext;
 
@@ -87,7 +87,7 @@ describe("UI-RUL-06 알림 정책(RUL-03.02·03.03·03.06)", () => {
     expect(saved.response.status).toBe(302);
     const created = state().policies.at(-1)!;
     expect(saved.response.headers.get("Location")).toBe(`/notifications/policies/${created.notificationPolicyId}?saved=1`);
-    expect(created).toMatchObject({ name: "야간 경영진", minSeverity: "CRITICAL", spaceId: null, includeChildren: true, recipients: [{ type: "ROLE", id: "ADMIN" }, { type: "ON_CALL", id: null }], channels: ["WEB"], renotifyMinutes: 60, notifyOnClear: true, steps: [{ stepNo: 1, waitMinutes: 15, recipients: [{ type: "USER", id: "1" }] }] });
+    expect(created).toMatchObject({ name: "야간 경영진", minSeverity: "CRITICAL", spaceId: null, includeChildren: true, recipients: [{ type: "ROLE", id: "ADMIN" }, { type: "ON_CALL" }], channels: ["WEB"], renotifyMinutes: 60, notifyOnClear: true, steps: [{ stepNo: 1, waitMinutes: 15, recipients: [{ type: "USER", id: "1" }] }] });
     const post = sent("/api/v1/core/notification-policies").find((r) => r.method === "POST")!;
     expect(post.headers["idempotency-key"]).toBeTruthy();
     const detail = await browser.get(saved.response.headers.get("Location")!);
@@ -145,12 +145,13 @@ describe("UI-RUL-07 알림 템플릿(RUL-05.01, RUL-03.04)", () => {
     expect(warned.response.status).toBe(200);
     expect(warned.body).toContain("저장했습니다. 알 수 없는 변수: foo");
     expect(state().templates[0].body).toBe("{{alarm.title}} {{foo}}");
-    const tooLong = await browser.post("/notifications/templates?channel=TELEGRAM&locale=ko&id=71", { intent: "save", id: "71", subject: "", body: "a".repeat(4097), baseVersion: "2" });
+    expect(state().templates[0]).toMatchObject({ customized: true, builtin: false });
+    const tooLong = await browser.post("/notifications/templates?channel=TELEGRAM&locale=ko&id=71", { intent: "save", id: "71", subject: "", body: "a".repeat(4001), baseVersion: "1" });
     expect(tooLong.response.status).toBe(400);
-    expect(tooLong.body).toContain("본문은 4096자까지입니다");
+    expect(tooLong.body).toContain("본문은 4000자까지입니다");
     const reset = await browser.post("/notifications/templates?channel=TELEGRAM&locale=ko&id=71", { intent: "reset", id: "71" });
     expect(reset.body).toContain("기본값으로 되돌렸습니다");
-    expect(state().templates[0].body).toBe("[{{alarm.severity}}] {{alarm.title}}\n{{link}}");
+    expect(state().templates[0]).toMatchObject({ body: "[{{alarm.severity}}] {{alarm.title}}\n{{link}}", customized: false });
   });
 
   it("미리 보기는 브라우저에서 BFF로(API-RUL-22 preview)", async () => {
@@ -208,27 +209,30 @@ describe("UI-IAM-04 알림 수신 탭(OPS-06.05, UI-RUL-11, RUL-05.04)", () => {
     expect(page.body).toContain('href="/me/notifications"');
     expect(page.body).toContain("최소 심각도");
     expect(page.body).toContain("연결되지 않음");
-    const severity = await browser.post("/me/notifications", { intent: "severity", minSeverity: "MAJOR", pushAlarm: "on" });
+    expect(page.body).toMatch(/name="channel.TELEGRAM"[^>]*checked/);
+    const severity = await browser.post("/me/notifications", { intent: "severity", minSeverity: "MAJOR", "channel.WEB": "on" });
     expect(severity.response.status).toBe(200);
-    expect(state().pushPrefs["9"]).toMatchObject({ minSeverity: "MAJOR", push: { alarm: true, workOrderAssigned: false, approvalRequest: false } });
+    expect(sent("/api/v1/core/accounts/me/notify-preferences").filter((r) => r.method === "PUT").at(-1)!.body).toEqual({ minSeverity: "MAJOR", channels: ["WEB"] });
+    expect(state().prefs["9"]).toMatchObject({ minSeverity: "MAJOR", channels: ["WEB"] });
     const badDnd = await browser.post("/me/notifications", { intent: "dnd", dndEnabled: "on", dndFrom: "22:00", dndTo: "22:00", locale: "ko" });
     expect(badDnd.response.status).toBe(400);
     expect(badDnd.body).toContain("시작과 끝이 같을 수 없습니다");
     const dnd = await browser.post("/me/notifications", { intent: "dnd", dndEnabled: "on", dndFrom: "22:00", dndTo: "07:00", dndAllowCritical: "on", locale: "ko" });
     expect(dnd.response.status).toBe(200);
-    expect(state().dnd["9"]).toEqual({ dndFrom: "22:00", dndTo: "07:00", dndAllowCritical: true, locale: "ko" });
+    expect(state().prefs["9"]).toMatchObject({ dndFrom: "22:00", dndTo: "07:00", dndAllowCritical: true, locale: "ko", minSeverity: "MAJOR", channels: ["WEB"] });
     const again = await browser.get("/me/notifications");
     expect(again.body).toContain('value="22:00"');
   });
 
-  it("메신저 연결 상태: 연결됨이면 연결 시각, 상태 API가 없으면 '확인하지 못함'", async () => {
-    state().links["7"] = [{ channel: "TELEGRAM", linkedAt: "2026-10-03T01:00:00Z" }];
+  it("메신저 연결 상태는 수신 설정의 links(연결됨이면 연결 시각), 설정을 읽지 못하면 '확인하지 못함'", async () => {
+    state().links["7"] = [{ channel: "TELEGRAM", externalUserId: "****7001", linkedAt: "2026-10-03T01:00:00Z" }];
     const browser = await operator();
     expect((await browser.get("/me/notifications")).body).toContain("연결됨");
-    state().linkStatusApi = false;
+    expect(sent("/api/v1/core/accounts/me/messenger-links").filter((r) => r.method === "GET")).toHaveLength(0);
+    state().prefsApi = false;
     expect((await browser.get("/me/notifications")).body).toContain("연결 상태를 확인하지 못했습니다");
     const start = await browser.request("/bff/api/core/accounts/me/messenger-links/start", { method: "POST", headers: { "Content-Type": "application/json", "X-CSRF-TOKEN": browser.csrf }, body: JSON.stringify({ channel: "TELEGRAM" }) });
-    expect(start.body).toContain("K7Q2-9XPA");
+    expect(start.body).toContain("K7Q29XPAHM");
   });
 });
 
@@ -290,6 +294,9 @@ describe("UI-OPS-06 알림 채널(OPS-06.01·06.03·06.06)", () => {
     expect(edit.body).toContain("●●●● 저장됨");
     expect(edit.body).not.toContain("AAH-abcdefghijklmnopqrstuvwxyz");
     expect(edit.body).toContain("-1001234567890");
+    // action 스키마에는 비밀값이 없어도 텔레그램 봇 토큰·웹훅 시크릿 입력이 있다
+    expect(edit.body).toContain('name="secret.botToken"');
+    expect(edit.body).toContain('name="secret.webhookSecret"');
   });
 
   it("TC-OPS-055 TC-OPS-057 테스트 발송: 성공 (0.8초), 잘못된 봇 토큰은 502 CHANNEL_TEST_FAILED(401 Unauthorized)", async () => {
@@ -308,22 +315,22 @@ describe("UI-OPS-06 알림 채널(OPS-06.01·06.03·06.06)", () => {
     await browser.get("/admin/channels?new=TELEGRAM");
     const bad = await browser.post("/admin/channels?new=TELEGRAM", { intent: "save", type: "TELEGRAM", name: "경영진", rateLimitPerMin: "20", digestWindowSec: "60", "cfg.chatIds": "abc", "secret.botToken": "nope" });
     expect(bad.response.status).toBe(400);
-    expect(bad.body).toContain("정수를 입력하세요");
     expect(bad.body).toContain("형식이 맞지 않습니다");
     const created = await browser.post("/admin/channels?new=TELEGRAM", { intent: "save", type: "TELEGRAM", name: "경영진", rateLimitPerMin: "20", digestWindowSec: "60", enabled: "on", "cfg.chatIds": "-100777", "secret.botToken": "123456789:AAH-abcdefghijklmnopqrstuvwxyz", "secret.webhookSecret": "exec_secret" });
     expect(created.response.status).toBe(302);
     const channel = state().channels.at(-1)!;
-    expect(channel).toMatchObject({ name: "경영진", config: { chatIds: [-100777] }, secret: { botToken: "123456789:AAH-abcdefghijklmnopqrstuvwxyz", webhookSecret: "exec_secret" } });
-    const updated = await browser.post(`/admin/channels?edit=${channel.id}`, { intent: "save", id: channel.id, type: "TELEGRAM", name: "경영진 방", rateLimitPerMin: "30", digestWindowSec: "0", enabled: "on", "cfg.chatIds": "-100777\n-100778", baseVersion: "1" });
+    expect(channel).toMatchObject({ name: "경영진", config: { chatIds: ["-100777"] }, secret: { botToken: "123456789:AAH-abcdefghijklmnopqrstuvwxyz", webhookSecret: "exec_secret" } });
+    const updated = await browser.post(`/admin/channels?edit=${channel.id}`, { intent: "save", id: channel.id, type: "TELEGRAM", name: "경영진 방", rateLimitPerMin: "30", digestWindowSec: "0", enabled: "on", "cfg.chatIds": "-100777\n-100778", hasSecret: "true", baseVersion: "1" });
     expect(updated.response.status).toBe(200);
-    expect(state().channels.at(-1)).toMatchObject({ name: "경영진 방", rateLimitPerMin: 30, config: { chatIds: [-100777, -100778] }, secret: { webhookSecret: "exec_secret" } });
+    expect(state().channels.at(-1)).toMatchObject({ name: "경영진 방", rateLimitPerMin: 30, config: { chatIds: ["-100777", "-100778"] }, secret: { webhookSecret: "exec_secret" } });
     const put = sent("/api/v1/core/notification-channels/").filter((r) => r.method === "PUT").at(-1)!.body as Record<string, unknown>;
     expect(put).not.toHaveProperty("secret");
+    // core: 정책이 쓰는 유형의 마지막 켜진 채널만 409 CHANNEL_IN_USE(같은 유형의 다른 채널이 있으면 지울 수 있다)
+    const removed = await browser.post(`/admin/channels?edit=${channel.id}`, { intent: "delete", id: channel.id });
+    expect(removed.response.status).toBe(302);
     const inUse = await browser.post("/admin/channels?edit=51", { intent: "delete", id: "51" });
     expect(inUse.response.status).toBe(409);
     expect(inUse.body).toContain("지울 수 없습니다");
-    const removed = await browser.post(`/admin/channels?edit=${channel.id}`, { intent: "delete", id: channel.id });
-    expect(removed.response.status).toBe(302);
   });
 
   it("발송 이력(API-RUL-27 커서 목록, channelId)과 실패 건 다시 보내기(API-OPS-33), 채널 유형 API가 없으면 기본값", async () => {
@@ -331,7 +338,7 @@ describe("UI-OPS-06 알림 채널(OPS-06.01·06.03·06.06)", () => {
     const history = await browser.get("/admin/channels?edit=51&tab=deliveries");
     expect(history.body).toContain("429 Too Many Requests");
     expect(sent("/api/v1/core/notification-deliveries?").at(-1)!.path).toContain("channelId=51");
-    const resent = await browser.post("/admin/channels?edit=51&tab=deliveries", { intent: "resend", deliveryId: "d-2" });
+    const resent = await browser.post("/admin/channels?edit=51&tab=deliveries", { intent: "resend", deliveryId: DELIVERY_FAILED });
     expect(resent.body).toContain("다시 보냈습니다");
     expect(state().deliveries[0].status).toBe("PENDING");
     state().channelTypes = null;
@@ -355,7 +362,7 @@ describe("API-RUL-31 메신저 콜백(auth.md §9.3, RUL-05.02)", () => {
         return new HttpResponse(null, { status: 202 });
       }),
     );
-    const body = JSON.stringify({ update_id: 900001, callback_query: { id: "cq", from: { id: 7001 }, data: "ACK:501:d-1" } });
+    const body = JSON.stringify({ update_id: 900001, callback_query: { id: "cq", from: { id: 7001 }, data: "ACK|501|7d3f6a52-1c2b-4e8a-9a51-0c1d2e3f4a5b" } });
     const response = await app.handler(new Request(`${ORIGIN}/hooks/messenger/telegram`, { method: "POST", headers: { "Content-Type": "application/json", "X-Telegram-Bot-Api-Secret-Token": SECRET }, body }));
     expect(response.status).toBe(200);
     expect(response.headers.getSetCookie()).toEqual([]);

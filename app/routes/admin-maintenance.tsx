@@ -15,7 +15,7 @@ import { SpaceSelect } from "~/components/space-picker";
 import { localToUtc } from "~/features/explore/model/time";
 import { ResultAlert } from "~/features/notify/components/common";
 import { MAINTENANCE_TABS, REASON_MAX, checkMaintenance, maintenanceActions, maintenanceBody, normalizeMaintenance, statusesOf, tabOf, type MaintenanceErrors } from "~/features/notify/model/maintenance";
-import { done, failed, invalid, loadSpaces, type NotifyActionResult } from "~/features/notify/server";
+import { done, failed, invalid, loadSpaces, loadUsers, type NotifyActionResult } from "~/features/notify/server";
 import { formatDateTime } from "~/lib/format";
 import type { SpaceNode } from "~/lib/spaces";
 import type { RootData } from "~/root";
@@ -30,15 +30,20 @@ export async function loader({ request, context }: Route.LoaderArgs) {
   const url = new URL(request.url);
   const tab = tabOf(url.searchParams.get("tab"));
   const creating = url.searchParams.get("new") === "1";
-  const [list, spaces, devices] = await Promise.all([
+  const [list, spaces, devices, users] = await Promise.all([
     callList<Record<string, unknown>>(ctx, request, `/api/v1/core/maintenance-windows?status=${statusesOf(tab).join(",")}&size=100`),
     creating ? loadSpaces(ctx, request) : Promise.resolve([] as SpaceNode[]),
     creating ? callList<{ id: string | number; name: string }>(ctx, request, "/api/v1/core/devices?size=100") : null,
+    // 만든 사람 이름(core는 사용자 ID만 준다). 회원 목록은 관리자만 볼 수 있어 실패하면 ID를 보인다
+    loadUsers(ctx, request),
   ]);
+  const nameOf = new Map(users.users.map((u) => [u.id, u.name]));
   return {
     tab,
     creating,
-    windows: listOrThrow(list).responses.map(normalizeMaintenance),
+    windows: listOrThrow(list)
+      .responses.map(normalizeMaintenance)
+      .map((w) => (w.createdBy ? { ...w, createdBy: { ...w.createdBy, name: w.createdBy.name || nameOf.get(w.createdBy.userId) || w.createdBy.userId } } : w)),
     spaces,
     devices: devices?.ok ? devices.list.responses.map((d) => ({ id: String(d.id), name: d.name })) : [],
     idempotencyKey: newIdempotencyKey(),

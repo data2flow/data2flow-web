@@ -65,7 +65,8 @@ export function maintenanceBody(input: MaintenanceInput) {
 }
 
 export function normalizeMaintenance(raw: Record<string, unknown>): MaintenanceWindow {
-  const createdBy = raw.createdBy as { userId?: unknown; name?: string } | null | undefined;
+  // core(MaintenanceDtos.Window)는 만든 사람의 사용자 ID 문자열만 준다
+  const createdBy = (typeof raw.createdBy === "string" || typeof raw.createdBy === "number" ? { userId: raw.createdBy } : raw.createdBy) as { userId?: unknown; name?: string } | null | undefined;
   return {
     id: idOf(raw, "maintenanceWindowId"),
     targetType: raw.targetType === "DEVICE" ? "DEVICE" : "SPACE",

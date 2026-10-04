@@ -180,6 +180,7 @@
         "userRequired": "{{n}}番目の勤務: 担当者を選んでください。",
         "overlap": "{{n}}番目の勤務: 他の勤務と時間が重なります。",
         "rangeInvalid": "終了は開始より後にしてください。",
+        "originalRequired": "元の担当者を選んでください。",
         "substituteRequired": "代替者を選んでください。",
         "sameUser": "元の担当者と代替者が同じです。"
       }
@@ -189,10 +190,7 @@
       "severityTitle": "受け取るアラーム",
       "minSeverity": "最低重大度",
       "minSeverityHint": "これより低い重大度のアラームは送られません。",
-      "pushAlarm": "アラーム",
-      "pushWorkOrder": "作業指示の割り当て",
-      "pushApproval": "承認依頼",
-      "categories": "受け取る通知の種類",
+      "categories": "受け取るチャネル",
       "saved": "保存しました。",
       "dndTitle": "おやすみ時間",
       "dndEnabled": "おやすみ時間を使う",

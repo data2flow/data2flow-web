@@ -47,7 +47,7 @@ export function decodeRecipient(raw: string): Recipient | undefined {
   const id = index < 0 ? "" : raw.slice(index + 1).trim();
   if (!(RECIPIENT_TYPES as readonly string[]).includes(type)) return undefined;
   if ((type === "USER" || type === "ROLE") && !id) return undefined;
-  return type === "ON_CALL" || type === "CHANNEL_DEFAULT" ? { type } : { type, id };
+  return type === "ON_CALL" ? { type } : { type, id };
 }
 
 /** 같은 수신자는 한 번만 */

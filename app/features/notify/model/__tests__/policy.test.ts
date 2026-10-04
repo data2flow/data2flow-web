@@ -100,11 +100,11 @@ describe("RUL-03.02 알림 정책 폼", () => {
     expect(parsePolicyForm(form([["steps", ""]])).input.steps).toEqual([]);
   });
 
-  it("수신자 인코딩: 사용자·역할은 ID 필수, 당직자·채널 기본 수신자는 ID 없음", () => {
+  it("수신자 인코딩: 사용자·역할은 ID 필수, 당직자는 ID 없음, core가 받지 않는 CHANNEL_DEFAULT는 버린다", () => {
     expect(decodeRecipient("USER:7")).toEqual({ type: "USER", id: "7" });
     expect(decodeRecipient("USER:")).toBeUndefined();
     expect(decodeRecipient("ON_CALL")).toEqual({ type: "ON_CALL" });
-    expect(decodeRecipient("CHANNEL_DEFAULT:x")).toEqual({ type: "CHANNEL_DEFAULT" });
+    expect(decodeRecipient("CHANNEL_DEFAULT:x")).toBeUndefined();
     expect(decodeRecipient("WEBHOOK:1")).toBeUndefined();
     expect(encodeRecipient({ type: "ON_CALL" })).toBe("ON_CALL:");
     expect(uniqueRecipients([{ type: "ON_CALL" }, { type: "ON_CALL", id: null }])).toHaveLength(1);

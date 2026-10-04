@@ -180,6 +180,7 @@
         "userRequired": "Shift {{n}}: choose a person.",
         "overlap": "Shift {{n}}: overlaps another shift.",
         "rangeInvalid": "End must be after start.",
+        "originalRequired": "Choose the original on-call person.",
         "substituteRequired": "Choose a substitute.",
         "sameUser": "The original person and the substitute are the same."
       }
@@ -189,10 +190,7 @@
       "severityTitle": "Alarms to receive",
       "minSeverity": "Minimum severity",
       "minSeverityHint": "Alarms below this severity are not sent to you.",
-      "pushAlarm": "Alarms",
-      "pushWorkOrder": "Work order assigned",
-      "pushApproval": "Approval requests",
-      "categories": "Notification types",
+      "categories": "Channels to receive",
       "saved": "Saved.",
       "dndTitle": "Do not disturb",
       "dndEnabled": "Use do-not-disturb hours",

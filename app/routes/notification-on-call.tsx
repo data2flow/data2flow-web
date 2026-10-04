@@ -1,7 +1,8 @@
 /**
  * UI-RUL-09 당직 일정(RUL-05.03, BR-RUL-19: 대체 근무 > 주간 교대, 비면 정책의 다른 수신자). 경로 권한 NOTIFY_POLICY_WRITE.
  * API-RUL-26: `GET|PUT /on-call {name, timezone, shifts[{dayOfWeek, from, to, userId}], baseVersion}`, `GET /on-call/current → {userId, name, until}`,
- * 대체 근무 `POST /on-call/overrides {startsAt, endsAt, originalUserId, substituteUserId}`·`DELETE /on-call/overrides/{override-id}`.
+ * 대체 근무 `POST /on-call/overrides {startsAt, endsAt, originalUserId, substituteUserId}`(core는 원래 담당자도 필수, 응답은 근무표 전체)·
+ * `DELETE /on-call/overrides/{override-id}`. 대체 근무 행은 `originalUser`·`substituteUser`({userId, name}).
  * 대체 근무 일시는 조직 시간대로 입력받아 UTC로 보낸다
  */
 import { useTranslation } from "react-i18next";
@@ -46,7 +47,7 @@ export async function action({ request, context }: Route.ActionArgs) {
     const input = { startsAt: localToUtc(field(form, "startsAt"), timezone), endsAt: localToUtc(field(form, "endsAt"), timezone), originalUserId: field(form, "originalUserId").trim(), substituteUserId: field(form, "substituteUserId").trim() };
     const problem = checkOverride(input);
     if (problem) return invalid(intent, { override: problem });
-    const result = await callApi(ctx, request, "/api/v1/core/on-call/overrides", { method: "POST", body: { ...input, originalUserId: input.originalUserId || null } });
+    const result = await callApi(ctx, request, "/api/v1/core/on-call/overrides", { method: "POST", body: input });
     return result.ok ? done(intent, "notify.onCall.overrideAdded") : failed(intent, result);
   }
   const shifts = parseShifts(field(form, "shifts"));
@@ -153,7 +154,7 @@ export default function NotificationOnCall({ loaderData, actionData }: Route.Com
             <TextField label={t("notify.onCall.to")} name="endsAt" type="datetime-local" required />
             {usersAvailable ? (
               <>
-                <SelectField label={t("notify.onCall.original")} name="originalUserId">
+                <SelectField label={t("notify.onCall.original")} name="originalUserId" required>
                   <option value="" />
                   {users.map((u) => (
                     <option key={u.id} value={u.id}>
@@ -172,7 +173,7 @@ export default function NotificationOnCall({ loaderData, actionData }: Route.Com
               </>
             ) : (
               <>
-                <TextField label={t("notify.onCall.original")} name="originalUserId" placeholder={t("notify.policy.userIdPlaceholder")} />
+                <TextField label={t("notify.onCall.original")} name="originalUserId" placeholder={t("notify.policy.userIdPlaceholder")} required />
                 <TextField label={t("notify.onCall.substitute")} name="substituteUserId" placeholder={t("notify.policy.userIdPlaceholder")} />
               </>
             )}

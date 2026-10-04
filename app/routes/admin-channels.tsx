@@ -101,7 +101,7 @@ export async function action({ request, context }: Route.ActionArgs) {
   const type = types.find((t) => t.key === field(form, "type") && t.available);
   if (!type) return invalid(intent, { type: "required" });
   const editing = Boolean(id);
-  const parsed = parseChannelForm(schemaFields(type.key, type.configSchema), (name) => field(form, name), { editing, hasSecret: field(form, "hasSecret") === "true" });
+  const parsed = parseChannelForm(schemaFields(type.key, type.configSchema, type.secretSchema), (name) => field(form, name), { editing, hasSecret: field(form, "hasSecret") === "true" });
   const common = { name: field(form, "name").trim(), rateLimitPerMin: Number(field(form, "rateLimitPerMin")), digestWindowSec: Number(field(form, "digestWindowSec")) };
   const problems = { ...checkCommon(common), ...parsed.errors };
   if (Object.keys(problems).length) return invalid(intent, problems as Record<string, string>);

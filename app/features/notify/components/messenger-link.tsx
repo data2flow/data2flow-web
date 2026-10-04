@@ -9,7 +9,6 @@ import { errorText } from "~/lib/error-text";
 import { formatDateTime } from "~/lib/format";
 import type { LinkStart, MessengerLink as Link, NotifyApi } from "../api";
 import { formatCountdown, safeDeepLink, secondsLeft } from "../model/prefs";
-import { rowsOf } from "../model/types";
 
 export interface MessengerLinkProps {
   channel: string;
@@ -50,7 +49,7 @@ export function MessengerLinkPanel({ channel, initial, api, timezone, now = Date
   const refresh = async () => {
     const result = await api.links();
     if (!result.ok) return;
-    const found = rowsOf<Link>(result.data).find((l) => l.channel === channel) ?? null;
+    const found = (result.data?.links ?? []).find((l) => l.channel === channel) ?? null;
     setLink(found);
     if (found) setPending(null);
   };

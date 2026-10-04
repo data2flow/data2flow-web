@@ -25,7 +25,7 @@ afterEach(() => {
 });
 
 describe("UI-RUL-07 템플릿 편집기", () => {
-  const template = { notificationTemplateId: "71", templateKey: "alarm.raised", channel: "TELEGRAM", locale: "ko", subject: null, body: "{{alarm.title}}", builtin: true, version: 1 };
+  const template = { notificationTemplateId: "71", templateKey: "alarm.raised", channel: "TELEGRAM", locale: "ko", subject: null, body: "{{alarm.title}}", builtin: true, customized: false, version: 1 };
   const variables = DEFAULT_VARIABLES.map((name) => ({ name }));
 
   it("TC-RUL-091 AT-RUL-08.3 입력하는 동안 알 수 없는 변수를 경고하고, 글자 수를 센다", async () => {
@@ -57,7 +57,7 @@ describe("UI-RUL-11 메신저 계정 연결(RUL-05.02)", () => {
   const api = (overrides: Partial<NotifyApi> = {}) => ({
     startLink: vi.fn().mockResolvedValue(ok({ code: "K7Q2-9XPA", deepLink: "https://t.me/data2flow_bot?start=K7Q2-9XPA", expiresAt: "2026-10-04T00:10:00Z" })),
     unlink: vi.fn().mockResolvedValue({ ok: true, status: 204, data: undefined }),
-    links: vi.fn().mockResolvedValue(ok([{ channel: "TELEGRAM", linkedAt: "2026-10-04T00:05:00Z" }])),
+    links: vi.fn().mockResolvedValue(ok({ links: [{ channel: "TELEGRAM", externalUserId: "****7001", linkedAt: "2026-10-04T00:05:00Z" }] })),
     ...overrides,
   });
 
@@ -250,7 +250,7 @@ describe("공용 부품", () => {
       <>
         <NotifyTabs current="templates" />
         <SeverityBadge severity="CRITICAL" />
-        <Labels recipients={[{ type: "USER", id: "1" }, { type: "USER", id: "2", name: "서버 이름" }, { type: "USER", id: "3" }, { type: "ROLE", id: "OPERATOR" }, { type: "CHANNEL_DEFAULT" }]} />
+        <Labels recipients={[{ type: "USER", id: "1" }, { type: "USER", id: "2", name: "서버 이름" }, { type: "USER", id: "3" }, { type: "ROLE", id: "OPERATOR" }, { type: "ON_CALL" }]} />
         <ResultAlert result={{ done: "notify.policy.saved" }} />
         <ResultAlert result={{ error: { code: "POLICY_IN_USE" } }} />
         <ResultAlert result={{}} />
@@ -265,7 +265,7 @@ describe("공용 부품", () => {
     expect(screen.getByText("서버 이름")).toBeInTheDocument();
     expect(screen.getByText("사용자 3")).toBeInTheDocument();
     expect(screen.getByText("운영자 (역할)")).toBeInTheDocument();
-    expect(screen.getByText("채널 기본 대상")).toBeInTheDocument();
+    expect(screen.getByText("현재 당직자")).toBeInTheDocument();
     expect(screen.getByText("저장했습니다.")).toBeInTheDocument();
     expect(screen.getByText("다른 곳에서 쓰는 정책이라 지울 수 없습니다.")).toBeInTheDocument();
   });

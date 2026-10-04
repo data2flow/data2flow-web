@@ -60,12 +60,14 @@ export function checkShifts(shifts: OnCallShift[]): ShiftProblem | undefined {
   return undefined;
 }
 
-export type OverrideProblem = "rangeInvalid" | "substituteRequired" | "sameUser";
+export type OverrideProblem = "rangeInvalid" | "originalRequired" | "substituteRequired" | "sameUser";
 
 export function checkOverride(input: { startsAt?: string; endsAt?: string; originalUserId?: string; substituteUserId?: string }): OverrideProblem | undefined {
   const start = input.startsAt ? Date.parse(input.startsAt) : NaN;
   const end = input.endsAt ? Date.parse(input.endsAt) : NaN;
   if (Number.isNaN(start) || Number.isNaN(end) || end <= start) return "rangeInvalid";
+  // core(API-RUL-26 OnCallService.addOverride)는 원래 담당자를 꼭 받는다
+  if (!input.originalUserId) return "originalRequired";
   if (!input.substituteUserId) return "substituteRequired";
   if (input.originalUserId && input.originalUserId === input.substituteUserId) return "sameUser";
   return undefined;
@@ -96,18 +98,24 @@ export function normalizeSchedule(raw: Record<string, unknown> | null | undefine
   };
 }
 
+type UserRef = { userId?: unknown; name?: unknown } | null | undefined;
+
+/** core 응답은 `originalUser`·`substituteUser`({userId, name}). 평평한 `originalUserId` 모양도 읽는다 */
 export function normalizeOverride(o: Record<string, unknown>): OnCallOverride {
+  const original = o.originalUser as UserRef;
+  const substitute = o.substituteUser as UserRef;
+  const originalId = original?.userId ?? o.originalUserId;
   return {
     overrideId: idOf(o, "overrideId"),
     startsAt: String(o.startsAt ?? ""),
     endsAt: String(o.endsAt ?? ""),
-    originalUserId: o.originalUserId === undefined || o.originalUserId === null ? null : String(o.originalUserId),
-    originalUserName: (o.originalUserName as string | undefined) ?? null,
-    substituteUserId: String(o.substituteUserId ?? ""),
-    substituteUserName: (o.substituteUserName as string | undefined) ?? null,
+    originalUserId: originalId === undefined || originalId === null ? null : String(originalId),
+    originalUserName: ((original?.name ?? o.originalUserName) as string | undefined) ?? null,
+    substituteUserId: String(substitute?.userId ?? o.substituteUserId ?? ""),
+    substituteUserName: ((substitute?.name ?? o.substituteUserName) as string | undefined) ?? null,
   };
 }
 
 export function normalizeCurrent(raw: Record<string, unknown> | null | undefined): OnCallCurrent {
-  return { userId: raw?.userId ? String(raw.userId) : null, name: (raw?.name as string | undefined) ?? null, until: (raw?.until as string | undefined) ?? null };
+  return { userId: raw?.userId ? String(raw.userId) : null, name: (raw?.name as string | undefined) ?? null, until: (raw?.until as string | undefined) ?? null, substitute: raw?.substitute === true };
 }
