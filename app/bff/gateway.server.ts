@@ -120,6 +120,7 @@ export function toFailure(status: number, envelope: ApiEnvelope<unknown>, retryA
     message: envelope.header?.resultMessage ?? "",
     errors: envelope.errors,
     retryAfter,
+    ...(envelope.response !== undefined && envelope.response !== null ? { detail: envelope.response } : {}),
   };
 }
 

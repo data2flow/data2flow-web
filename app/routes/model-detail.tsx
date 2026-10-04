@@ -18,6 +18,8 @@ import { MODEL_CODE_PATTERN, checkModelInput, modelBody, parseAttributeSchema, p
 import type { DeviceLite, MetricRow, ModelDetail, ModelSummary, ScriptLite } from "~/features/catalog/model/types";
 import { can, failed, invalid, outcome, type CatalogActionResult } from "~/features/catalog/server";
 import { DeviceAreaTabs } from "~/features/devices/area-tabs";
+import { devModelApi } from "~/features/devmodel/api";
+import { ModelExportButtons } from "~/features/devmodel/components/model-exchange";
 import { errorText } from "~/lib/error-text";
 import { hasAny } from "~/lib/permissions";
 import type { RootData } from "~/root";
@@ -192,6 +194,8 @@ export default function ModelDetailPage({ loaderData, actionData }: Route.Compon
           <>
             {model.builtin && <Badge tone="info">{t("catalog.models.builtinBadge")}</Badge>}
             {model.status === "DEPRECATED" && <Badge tone="neutral">DEPRECATED</Badge>}
+            {/* DEV-03.04 내보내기(data2flow/DTDL, API-DEV-44) */}
+            <ModelExportButtons modelId={model.id} code={model.code} api={devModelApi} />
             {admin && <Button onClick={() => setCloneOpen(true)}>{t("catalog.models.clone")}</Button>}
             {editable && model.status !== "DEPRECATED" && (
               <Form method="post" onSubmit={(e) => !window.confirm(t("catalog.models.confirmDeprecate")) && e.preventDefault()}>

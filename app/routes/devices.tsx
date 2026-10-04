@@ -15,9 +15,15 @@ import { CONNECTIVITIES, DEVICE_KINDS, DEVICE_STATUSES, checkTags, deviceQuery, 
 import { errorText } from "~/lib/error-text";
 import { formatRelative } from "~/lib/format";
 import { hasAny } from "~/lib/permissions";
+import { spaceName } from "~/features/devmodel/model/types";
 import type { SpaceNode } from "~/lib/spaces";
 import type { RootData } from "~/root";
 import { BulkControlDialog } from "~/features/control/bulk-control";
+import { DeviceQueryBar } from "~/features/devmodel/components/device-query-bar";
+import { StandardExportDialog } from "~/features/devmodel/components/standard-export-dialog";
+import { devModelApi } from "~/features/devmodel/api";
+import { queryCounts, queryProblem } from "~/features/devmodel/server";
+import type { SavedSearch } from "~/features/devmodel/model/types";
 import type { Route } from "./+types/devices";
 
 export function meta() {
@@ -31,15 +37,22 @@ export async function loader({ request, context }: Route.LoaderArgs) {
   const url = new URL(request.url);
   const page = Math.max(1, Number(url.searchParams.get("page")) || 1);
   const query = deviceQuery(url.searchParams, page, PAGE_SIZE);
-  const [devices, spaces, models, sources, pending] = await Promise.all([
+  const [devices, spaces, models, sources, pending, saved] = await Promise.all([
     callList<DeviceSummary>(ctx, request, `/api/v1/core/devices?${query}`),
     callApi<SpaceNode[]>(ctx, request, "/api/v1/core/spaces"),
     callList<{ id: string; code: string; name: string }>(ctx, request, "/api/v1/core/device-models?size=100"),
     callList<{ id: string; code: string; name: string }>(ctx, request, "/api/v1/core/sources?size=100"),
     callList<DeviceSummary>(ctx, request, "/api/v1/core/devices?status=PENDING&size=1"),
+    // UI-DEV-19 저장된 검색(API-DEV-134). 실패해도 목록은 그대로
+    callList<SavedSearch>(ctx, request, "/api/v1/core/saved-searches?size=100"),
   ]);
+  // DEV-13.03 검색식 오류(400 DEVICE_QUERY_INVALID·TIMEOUT)는 오류 화면 대신 입력란에 위치와 함께 보인다
+  const problem = queryProblem(devices);
   return {
-    devices: listOrThrow(devices),
+    devices: problem ? { header: { isSuccessful: false, resultCode: problem.code, resultMessage: problem.message ?? "" }, responses: [], totalPages: 1 } : listOrThrow(devices),
+    counts: devices.ok ? queryCounts(devices.list) : null,
+    problem,
+    saved: saved.ok ? saved.list.responses : [],
     page,
     now: ctx.runtime.now(),
     spaces: spaces.ok ? (spaces.data ?? []) : [],
@@ -76,9 +89,20 @@ export default function Devices({ loaderData, actionData }: Route.ComponentProps
   const canAdmin = hasAny(permissions, ["DEV_ADMIN"]);
   const [params] = useSearchParams();
   const navigate = useNavigate();
-  const { devices, spaces, models, sources, now, page, pendingCount } = loaderData;
+  const { devices, spaces, models, sources, now, page, pendingCount, counts, problem, saved } = loaderData;
   const [selected, setSelected] = useState<string[]>([]);
   const [bulkOpen, setBulkOpen] = useState(false);
+  const [exportScope, setExportScope] = useState<{ spaceIds: string[]; deviceIds: string[]; label: string } | null>(null);
+  const spaceFilter = params.get("spaceId");
+  const search = (q: string, savedId?: string) => {
+    const next = new URLSearchParams(params);
+    if (q) next.set("q", q);
+    else next.delete("q");
+    if (savedId) next.set("saved", savedId);
+    else next.delete("saved");
+    next.delete("page");
+    navigate(`/devices?${next}`);
+  };
   const canControl = hasAny(permissions, ["DEVICE_CONTROL"]);
   const result = actionData as ActionResult | undefined;
   const filtered = hasFilters(params);
@@ -99,6 +123,9 @@ export default function Devices({ loaderData, actionData }: Route.ComponentProps
             <a className="inline-flex items-center rounded-md border border-line bg-panel px-3 py-1.5 text-[13px] font-medium" href={`/bff/api/core/devices/export?${exportQuery}`}>
               {t("devices.exportCsv")}
             </a>
+            {canAdmin && spaceFilter && (
+              <Button onClick={() => setExportScope({ spaceIds: [spaceFilter], deviceIds: [], label: t("devmodel.standard.spaceScope", { name: spaceName(spaces, spaceFilter) }) })}>{t("devmodel.standard.open")}</Button>
+            )}
             {canAdmin && <ButtonLink to="/devices/new?import=1">{t("devices.importCsv")}</ButtonLink>}
             {canAdmin && (
               <ButtonLink to="/devices/new" variant="primary">
@@ -110,8 +137,19 @@ export default function Devices({ loaderData, actionData }: Route.ComponentProps
       />
       <DeviceAreaTabs current="all" pendingCount={pendingCount} />
       <Card>
+        <DeviceQueryBar
+          initial={params.get("q") ?? ""}
+          counts={counts}
+          problem={problem}
+          saved={saved}
+          savedId={params.get("saved")}
+          canSave={canPlace}
+          meId={root?.me?.id}
+          api={devModelApi}
+          onSearch={search}
+        />
         <Form method="get" className="mb-3 flex flex-wrap items-end gap-3" aria-label={t("common.filter")}>
-          <TextField label={t("common.search")} name="q" defaultValue={params.get("q") ?? ""} placeholder={t("devices.searchPlaceholder")} />
+          {params.get("q") && <input type="hidden" name="q" value={params.get("q") ?? ""} />}
           <SelectField label={t("devices.status")} name="status" defaultValue={params.get("status") ?? ""}>
             <option value="">{t("common.all")}</option>
             {DEVICE_STATUSES.map((s) => (
@@ -248,6 +286,8 @@ export default function Devices({ loaderData, actionData }: Route.ComponentProps
                 </Button>
               )}
               {canAdmin && <ButtonLink to={`/device-jobs?new=1&deviceIds=${encodeURIComponent(selected.join(","))}`}>{t("devices.jobs.fromSelection")}</ButtonLink>}
+              {/* UI-DEV-20 표준 형식 내보내기(DEV-13.04) */}
+              {canAdmin && <Button onClick={() => setExportScope({ spaceIds: [], deviceIds: selected, label: t("devmodel.standard.selectedDevices", { n: selected.length }) })}>{t("devmodel.standard.open")}</Button>}
             </>
           }
         >
@@ -267,6 +307,7 @@ export default function Devices({ loaderData, actionData }: Route.ComponentProps
           )}
         </Card>
       )}
+      {canAdmin && exportScope && <StandardExportDialog open onClose={() => setExportScope(null)} scope={{ spaceIds: exportScope.spaceIds, deviceIds: exportScope.deviceIds }} scopeLabel={exportScope.label} api={devModelApi} />}
       {canControl && <BulkControlDialog open={bulkOpen} onClose={() => setBulkOpen(false)} target={{ deviceIds: selected }} />}
     </>
   );

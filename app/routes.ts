@@ -113,5 +113,10 @@ export default [
     route("control/capabilities", "routes/control-capabilities.tsx"),
     route("device-jobs", "routes/device-jobs.tsx"),
     route("device-jobs/:jobId", "routes/device-job-detail.tsx"),
+
+    // M5 devmodel: 게이트웨이 수신 분포(UI-DEV-10, DEV-05.02). 검색식(DEV-13.03)·모델 가져오기/내보내기(DEV-03.04)·표준 내보내기(DEV-13.04)·
+    // 표시 단위(DEV-04.04)는 기존 /devices·/models·/metrics·/me/profile 화면에 붙는다
+    route("gateways", "routes/gateways.tsx"),
+    route("gateways/:gatewayId", "routes/gateway-detail.tsx"),
   ]),
 ] satisfies RouteConfig;

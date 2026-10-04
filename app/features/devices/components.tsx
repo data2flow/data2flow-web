@@ -11,6 +11,7 @@ import { bffJson, type BffJsonResult } from "~/lib/bff-client";
 import { appendPoint, type ChartAnnotation, type ChartSeries, type SeriesPoint } from "~/lib/chart-model";
 import { liveUrl } from "~/lib/event-stream";
 import { formatDateTime, formatNumber, formatRelative, rangeOf } from "~/lib/format";
+import { toDisplayLatest, toDisplaySeriesList, useTemperatureUnit } from "~/lib/units";
 import type { Command } from "~/features/control/model/control";
 import { commandBands } from "./model/detail";
 import { ONBOARDING_ITEMS, applyDeviceUpdate, connectivityTone, statusTone, type DeviceDetail, type LatestValue } from "./model/devices";
@@ -46,9 +47,11 @@ export function BatteryBar({ value }: { value?: number | null }) {
 
 export function LatestValueCards({ latest, lang }: { latest: LatestValue[]; lang: string }) {
   const { t } = useTranslation();
+  // DEV-04.04: 표시 단위(℉)로 바꿔 보여 준다. 저장값은 그대로
+  const shown = toDisplayLatest(latest, useTemperatureUnit());
   return (
     <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
-      {latest.map((m) => (
+      {shown.map((m) => (
         <li key={m.metricKey} className="rounded-md border border-line p-3">
           <p className="font-mono text-[11.5px] text-muted">
             <Term term="metric">{m.displayName || m.metricKey}</Term>
@@ -196,6 +199,7 @@ export function DeviceDataPanel({
   const [error, setError] = useState<string | null>(null);
   const [reload, setReload] = useState(0);
   const unitOf = useMemo(() => Object.fromEntries((latest ?? []).map((l) => [l.metricKey, l.unit ?? null])), [latest]);
+  const temperatureUnit = useTemperatureUnit();
 
   useEffect(() => {
     if (selected.length === 0) {
@@ -285,7 +289,7 @@ export function DeviceDataPanel({
       {selected.length === 0 ? (
         <p className="text-muted">{t("devices.data.chooseMetric")}</p>
       ) : (
-        <TimeseriesChart series={series} timezone={timezone} annotations={bandsOn ? [...annotations, ...bands] : annotations} loading={loading} title={t("devices.data.title")} factory={chartFactory} />
+        <TimeseriesChart series={toDisplaySeriesList(series, temperatureUnit)} timezone={timezone} annotations={bandsOn ? [...annotations, ...bands] : annotations} loading={loading} title={t("devices.data.title")} factory={chartFactory} />
       )}
     </Card>
   );

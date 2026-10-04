@@ -14,6 +14,7 @@ import { METRIC_KEY_PATTERN, checkMetricInput, metricBody, recommendKeys, type M
 import type { AliasRow, MetricRow } from "~/features/catalog/model/types";
 import { can, failed, invalid, outcome, type CatalogActionResult } from "~/features/catalog/server";
 import { DeviceAreaTabs } from "~/features/devices/area-tabs";
+import { UnitSettingsCard, type UnitSettings } from "~/features/devmodel/components/unit-settings";
 import { errorText } from "~/lib/error-text";
 import { formatDateTime } from "~/lib/format";
 import type { RootData } from "~/root";
@@ -31,11 +32,13 @@ export async function loader({ request, context }: Route.LoaderArgs) {
   const url = new URL(request.url);
   const tabParam = url.searchParams.get("tab");
   const tab: Tab = (TABS as readonly string[]).includes(tabParam ?? "") ? (tabParam as Tab) : "verified";
-  const [verified, unverified, ignored, aliases] = await Promise.all([
+  const [verified, unverified, ignored, aliases, units] = await Promise.all([
     callList<MetricRow>(ctx, request, "/api/v1/core/metrics?status=VERIFIED&size=100"),
     callList<MetricRow>(ctx, request, "/api/v1/core/metrics?status=UNVERIFIED&size=100"),
     callList<MetricRow>(ctx, request, "/api/v1/core/metrics?status=IGNORED&size=100"),
     tab === "aliases" ? callList<AliasRow>(ctx, request, "/api/v1/core/metric-aliases?size=100") : null,
+    // DEV-04.04 조직 기본 표시 단위(API-DEV-57)
+    tab === "verified" ? callApi<UnitSettings>(ctx, request, "/api/v1/core/settings/units") : null,
   ]);
   const v = listOrThrow(verified);
   const u = unverified.ok ? unverified.list : { responses: [], totalCount: 0 };
@@ -47,6 +50,7 @@ export async function loader({ request, context }: Route.LoaderArgs) {
     ignored: i.responses,
     counts: { verified: v.totalCount ?? v.responses.length, unverified: u.totalCount ?? u.responses.length, ignored: i.totalCount ?? i.responses.length },
     aliases: aliases?.ok ? aliases.list.responses : [],
+    units: units?.ok ? units.data : null,
     editId: url.searchParams.get("edit"),
     creating: url.searchParams.get("new") === "1",
     idempotencyKey: newIdempotencyKey(),
@@ -104,6 +108,11 @@ export async function action({ request, context }: Route.ActionArgs) {
       const alias = field(form, "alias").trim();
       if (!METRIC_KEY_PATTERN.test(alias)) return invalid(intent, { alias: "metricKey" });
       return outcome(intent, await callApi(ctx, request, "/api/v1/core/metric-aliases", { method: "POST", body: { alias, metricKey: field(form, "metricKey") } }));
+    }
+    case "units": {
+      const unit = field(form, "temperatureUnit");
+      if (unit !== "C" && unit !== "F") return invalid(intent, { temperatureUnit: "required" });
+      return outcome(intent, await callApi(ctx, request, "/api/v1/core/settings/units", { method: "PUT", body: { temperatureUnit: unit, baseVersion: Number(field(form, "baseVersion")) } }));
     }
     case "alias-delete":
       return outcome(intent, await callApi(ctx, request, `/api/v1/core/metric-aliases/${id}`, { method: "DELETE" }));
@@ -195,6 +204,7 @@ export default function Metrics({ loaderData, actionData }: Route.ComponentProps
           </Form>
         </Card>
       )}
+      {tab === "verified" && loaderData.units && <UnitSettingsCard settings={loaderData.units} canEdit={can(root?.me?.permissions, "OPS_MANAGE")} />}
       {tab === "verified" && (
         <Card>
           <Table>

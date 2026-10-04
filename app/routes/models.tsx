@@ -2,8 +2,9 @@
  * UI-DEV-08 기기 모델 목록과 새 모델(DEV-03.01, BR-DEV-15). 조회 DEV_READ, 생성 DEV_ADMIN.
  * API: 목록 API-DEV-46, 생성 API-DEV-40(측정 항목 키는 API-DEV-50 검증된 항목에서 고른다)
  */
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Form, Link, redirect, useRouteLoaderData, useSearchParams } from "react-router";
+import { Form, Link, redirect, useNavigate, useRouteLoaderData, useSearchParams } from "react-router";
 import { callApi, callList, field, listOrThrow, newIdempotencyKey } from "~/bff/api.server";
 import { bff } from "~/bff/middleware.server";
 import { Alert, Badge, Button, ButtonLink, Card, CsrfField, EmptyState, PageHeader, SelectField } from "~/components/ui";
@@ -12,6 +13,8 @@ import { ModelFields } from "~/features/catalog/components/model-fields";
 import { DEVICE_KINDS, PROTOCOLS, checkModelInput, modelBody, readModelForm } from "~/features/catalog/model/catalog";
 import type { MetricRow, ModelDetail, ModelSummary } from "~/features/catalog/model/types";
 import { can, failed, invalid, type CatalogActionResult } from "~/features/catalog/server";
+import { devModelApi } from "~/features/devmodel/api";
+import { ModelImportDialog } from "~/features/devmodel/components/model-exchange";
 import { errorText } from "~/lib/error-text";
 import type { RootData } from "~/root";
 import type { Route } from "./+types/models";
@@ -57,9 +60,26 @@ export default function Models({ loaderData, actionData }: Route.ComponentProps)
   const result = actionData as CatalogActionResult | undefined;
   const { models, metrics, creating, idempotencyKey } = loaderData;
   const filtered = ["protocol", "kind", "builtin"].some((k) => params.get(k));
+  const navigate = useNavigate();
+  const [importOpen, setImportOpen] = useState(false);
   return (
     <>
-      <PageHeader title={t("catalog.models.title")} actions={admin && !creating && <ButtonLink to="?new=1" variant="primary">{t("catalog.models.new")}</ButtonLink>} />
+      <PageHeader
+        title={t("catalog.models.title")}
+        actions={
+          admin &&
+          !creating && (
+            <>
+              {/* DEV-03.04 모델 가져오기(API-DEV-45) */}
+              <Button onClick={() => setImportOpen(true)}>{t("devmodel.models.importOpen")}</Button>
+              <ButtonLink to="?new=1" variant="primary">
+                {t("catalog.models.new")}
+              </ButtonLink>
+            </>
+          )
+        }
+      />
+      {admin && <ModelImportDialog open={importOpen} onClose={() => setImportOpen(false)} api={devModelApi} onImported={(code) => navigate(`/models/${encodeURIComponent(code)}`)} />}
       <DeviceAreaTabs current="models" />
       {result?.error && (
         <div className="mb-3">
