@@ -104,7 +104,7 @@ export async function loader({ request, context, params }: Route.LoaderArgs) {
     const info = await callApi<BrokerInfo>(ctx, request, "/api/v1/core/platform-broker");
     broker = info.ok ? info.data : null;
   }
-  return { source, canAdmin, tabs: available, tab, range, usage, runtime, stats, statsError, settings, ignore, broker, saved: url.searchParams.get("saved") === "1" };
+  return { source, canAdmin, tabs: available, tab, range, usage, runtime, stats, statsError, settings, ignore, broker, saved: url.searchParams.get("saved") === "1", secretFailed: url.searchParams.get("secretFailed") };
 }
 
 export async function action({ request, context, params }: Route.ActionArgs) {
@@ -134,7 +134,7 @@ export async function action({ request, context, params }: Route.ActionArgs) {
     }
     case "clone": {
       const result = await callApi<{ id: string }>(ctx, request, `/api/v1/core/sources/${id}/clone`, { method: "POST", body: { code: field(form, "code").trim(), name: field(form, "name").trim() } });
-      return result.ok ? redirect(`/sources/${encodeURIComponent(result.data.id)}/edit`) : fail(result);
+      return result.ok ? redirect(`/sources/${encodeURIComponent(result.data.id)}/edit?cloned=1`) : fail(result);
     }
     case "unignore": {
       const result = await callApi(ctx, request, `/api/v1/core/sources/${id}/ignore-list/${encodeURIComponent(field(form, "externalId"))}`, { method: "DELETE" });
@@ -171,6 +171,7 @@ export default function SourceDetailPage({ loaderData, actionData }: Route.Compo
       />
       {error && <Alert tone="danger">{error.code === "CONFIRM_MISMATCH" ? t("sources.confirm.mismatch") : errorText(t, error)}</Alert>}
       {loaderData.saved && <Alert tone="success">{t("sources.edit.saved")}</Alert>}
+      {loaderData.secretFailed && <Alert tone="warning">{t("sources.schema.secretSaveFailed", { kinds: loaderData.secretFailed })}</Alert>}
       <Tabs current={tab} items={tabs.map((key) => ({ key, label: t(`sources.detail.tab.${key}`), to: `?tab=${key}` }))} />
       {tab === "status" && <StatusTab runtime={runtime} stats={loaderData.stats} statsError={loaderData.statsError} range={loaderData.range} timezone={timezone} lang={i18n.language} />}
       {tab === "live" && (
@@ -257,6 +258,8 @@ function SettingsTab({ source, settings, canAdmin }: { source: SourceDetail; set
   const rows: [string, React.ReactNode][] = [
     [t("sources.form.type"), t(`sources.type.${source.type}`, { defaultValue: source.type })],
     ...(c.url ? [[t("sources.form.url"), <span className="font-mono">{String(c.url)}</span>] as [string, React.ReactNode]] : []),
+    ...(source.webhookUrl ? [[t("sources.webhook.url"), <span className="break-all font-mono">{source.webhookUrl}</span>] as [string, React.ReactNode]] : []),
+    ...(source.connectorKey && !["mqtt", "platform-broker", "simulation"].includes(source.connectorKey) ? [[t("sources.schema.connector"), <span className="font-mono">{source.connectorKey}</span>] as [string, React.ReactNode]] : []),
     ...(source.clientIds?.length ? [["client-id", <span className="font-mono">{source.clientIds.join(", ")}</span>] as [string, React.ReactNode]] : []),
     ...(source.topics?.length ? [[t("sources.form.tab.subscription"), <span className="font-mono">{source.topics.map((x) => `${x.topic} (QoS ${x.qos})`).join(", ")}</span>] as [string, React.ReactNode]] : []),
     [t("sources.form.auth"), source.secret?.configured ? `${t(`sources.auth.${source.secret.kind ?? "NONE"}`, { defaultValue: source.secret.kind })} · ${source.secret.fingerprint ?? "••••"}` : t(`sources.auth.${String(c.auth ?? "NONE")}`, { defaultValue: String(c.auth ?? "–") })],

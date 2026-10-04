@@ -185,7 +185,9 @@ describe("core-api M2 계약 맞춤(SourceConfigValidator, SourceDtos)", () => {
     expect((header.connection as Record<string, unknown>).headerScheme).toBe("Basic");
     expect(header.secret).toEqual({ kind: "HEADER", value: "abc" });
     expect(updateBody({ ...base, auth: "MTLS", secretValue: "pem" }).secret).toBeUndefined();
-    expect(validateForm({ ...base, auth: "MTLS" }).secretValue).toBeUndefined();
+    // M5(DSC-09.06): mTLS는 TLS 탭의 클라이언트 인증서·키가 있어야 한다. 한 건(`{cert, key}`)으로 보낸다
+    expect(validateForm({ ...base, auth: "MTLS" }).secretValue).toBe("secret");
+    expect(validateForm({ ...base, auth: "MTLS", tlsSecrets: { CLIENT_CERT: "c", CLIENT_KEY: "k" } }).secretValue).toBeUndefined();
     const restored = formFromSource({ id: "1", code: "x", name: "x", type: "MQTT_SUBSCRIBE", lifecycle: "DRAFT", version: 1, isDev: true, connection: { url: "wss://h", auth: "HEADER", headerScheme: "Basic" } });
     expect([restored.isDev, restored.headerScheme]).toEqual([true, "Basic"]);
   });

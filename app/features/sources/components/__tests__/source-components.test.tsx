@@ -200,6 +200,9 @@ describe("UI-DSC-09 연결 테스트 패널", () => {
     );
     expect(await screen.findByText("TLS_UNTRUSTED_CA")).toBeInTheDocument();
     expect(screen.getByText(/연결 테스트에 실패했습니다/)).toBeInTheDocument();
+    // TLS 실패 시 체인은 [서버 인증서 체인 보기]로 펼친다(TC-DSC-278)
+    expect(screen.queryByText("인증서: CN=x · 발급자 CN=x · 만료 2027-01-01")).toBeNull();
+    await userEvent.click(screen.getByRole("button", { name: "서버 인증서 체인 보기" }));
     expect(screen.getByText("인증서: CN=x · 발급자 CN=x · 만료 2027-01-01")).toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: "다시 테스트" }));
     expect(retry).toHaveBeenCalled();
@@ -382,7 +385,8 @@ describe("UI-DSC-07 커넥터 카탈로그", () => {
     await userEvent.type(screen.getByLabelText("커넥터 검색"), "zzz");
     expect(screen.getByText("조건에 맞는 커넥터가 없습니다")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "가상 환경" })).toHaveAttribute("href", "/sources/new/simulation");
-    expect(screen.getByText(/OPC UA · 준비 중/)).toBeInTheDocument();
+    // M5: 유형 카드 7종 모두 만들 수 있다(나머지는 커넥터 스키마 폼)
+    expect(screen.getByRole("link", { name: "OPC UA" })).toHaveAttribute("href", "/sources/new/opcua");
   });
 });
 

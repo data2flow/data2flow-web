@@ -6,8 +6,8 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { Alert, Badge, EmptyState, TextField, cx } from "~/components/ui";
-import { CATEGORIES, filterConnectors, isLossy, type Connector, type ConnectorTemplate } from "../model/catalog";
-import { CONNECTOR_TYPES, TYPE_CARDS } from "../model/source";
+import { CATEGORIES, TYPE_CARD_CONNECTORS, filterConnectors, isLossy, type Connector, type ConnectorTemplate } from "../model/catalog";
+import { TYPE_CARDS } from "../model/source";
 
 export function ConnectorCatalog({ connectors, templates, catalogError }: { connectors: Connector[]; templates: ConnectorTemplate[]; catalogError?: boolean }) {
   const { t } = useTranslation();
@@ -94,30 +94,20 @@ function ConnectorCard({ connector: c }: { connector: Connector }) {
   );
 }
 
-/** UI-DSC-02 1단계 유형 카드 7종(TC-DSC-015). M2는 MQTT 구독·플랫폼 브로커·가상 환경만 만들 수 있다 */
+/** UI-DSC-02 1단계 유형 카드 7종(TC-DSC-015). M5부터 모두 만들 수 있다(기본 유형 3개는 전용 폼, 나머지는 커넥터 스키마 폼) */
 function TypeCards() {
   const { t } = useTranslation();
-  const keyOf = (type: string) => Object.entries(CONNECTOR_TYPES).find(([, v]) => v === type)?.[0];
   return (
     <div>
       <p className="mb-1 text-[10.5px] font-semibold uppercase tracking-wide text-muted">{t("sources.catalog.types")}</p>
       <ul className="flex flex-wrap gap-2">
-        {TYPE_CARDS.map((type) => {
-          const key = keyOf(type);
-          return (
-            <li key={type}>
-              {key ? (
-                <Link to={`/sources/new/${key}`} className="inline-block rounded-md border border-line bg-panel px-3 py-1.5 text-[13px] hover:border-accent">
-                  {t(`sources.type.${type}`)}
-                </Link>
-              ) : (
-                <span aria-disabled="true" className="inline-block rounded-md border border-line bg-bg px-3 py-1.5 text-[13px] text-muted">
-                  {t(`sources.type.${type}`)} · {t("sources.catalog.later")}
-                </span>
-              )}
-            </li>
-          );
-        })}
+        {TYPE_CARDS.map((type) => (
+          <li key={type}>
+            <Link to={`/sources/new/${TYPE_CARD_CONNECTORS[type]}`} className="inline-block rounded-md border border-line bg-panel px-3 py-1.5 text-[13px] hover:border-accent">
+              {t(`sources.type.${type}`)}
+            </Link>
+          </li>
+        ))}
       </ul>
     </div>
   );

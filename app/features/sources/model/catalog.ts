@@ -30,7 +30,11 @@ export interface ConnectorTemplate {
   description?: string;
 }
 
-export const CATEGORIES = ["MQTT", "LORAWAN", "CLOUD", "QUEUE", "HTTP", "LIGHTWEIGHT", "INDUSTRIAL", "BUILDING", "FILE", "PLATFORM"] as const;
+/** 분류(contracts ConnectorCategory, connector_catalogs.category CHECK) */
+export const CATEGORIES = ["MQTT", "LORAWAN", "CLOUD_HUB", "QUEUE", "HTTP", "LIGHTWEIGHT", "INDUSTRIAL", "FILE", "PLATFORM"] as const;
+
+/** UI-DSC-02 1단계 유형 카드 → 커넥터 키(M5: Webhook·oneM2M·OPC UA·Modbus TCP도 카탈로그 커넥터 폼으로) */
+export const TYPE_CARD_CONNECTORS: Record<string, string> = { MQTT_SUBSCRIBE: "mqtt", PLATFORM_BROKER: "platform-broker", SIMULATION: "simulation", WEBHOOK: "webhook", ONEM2M: "onem2m", OPCUA: "opcua", MODBUS_TCP: "modbus-tcp" };
 
 /** M2 기본 유형(카탈로그 API가 없어도 보인다) */
 export const BASIC_CONNECTORS: Connector[] = [

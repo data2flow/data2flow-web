@@ -8,13 +8,16 @@ import { useTranslation } from "react-i18next";
 import { Form, useNavigation } from "react-router";
 import { SpaceSelect } from "~/components/space-picker";
 import { Alert, Badge, Button, Card, Checkbox, CsrfField, SelectField, TextField, cx } from "~/components/ui";
-import { bffJson } from "~/lib/bff-client";
 import { errorText } from "~/lib/error-text";
 import type { SpaceNode } from "~/lib/spaces";
 import { validateMapping, mappingFromConfig } from "../model/mapping";
-import { AUTH_METHODS, DECODERS, DEFAULT_MAPPING, MAX_TOPICS, TEST_TIMEOUT_RANGE, TEST_TIMEOUT_SEC, clampTestTimeout, clientIdPreview, sharedTopic, testBody, validateForm, type FieldErrors, type SourceFormValues, type TestResult } from "../model/source";
+import { EMPTY_TLS } from "../model/schema-form";
+import { AUTH_METHODS, DECODERS, DEFAULT_MAPPING, MAX_TOPICS, TEST_TIMEOUT_RANGE, TEST_TIMEOUT_SEC, clampTestTimeout, clientIdPreview, sharedTopic, testBody, validateForm, type FieldErrors, type SourceFormValues } from "../model/source";
 import { ConnectionTestPanel } from "./connection-test-panel";
 import { MappingEditor } from "./mapping-editor";
+import { TlsSettingsBlock, type StoredSecret } from "./tls-settings";
+import { TopicTemplateHelper } from "./topic-template";
+import { useConnectionTest } from "./use-connection-test";
 
 export interface Option {
   id: string;
@@ -40,32 +43,36 @@ export interface SourceFormProps {
   env?: string;
   /** 소스당 토픽 한도(API-DSC-71 maxTopicsPerSource) */
   maxTopics?: number;
+  /** 저장된 비밀값 종류별 지문·인증서 만료(API-DSC-03 secrets[]) */
+  storedSecrets?: StoredSecret[];
+  /** 복제로 만든 소스(비밀값을 다시 넣으라는 안내, TC-DSC-192) */
+  cloned?: boolean;
 }
 
-type TabKey = "basic" | "connection" | "auth" | "subscription" | "decoder" | "policy";
+type TabKey = "basic" | "connection" | "auth" | "tls" | "subscription" | "decoder" | "policy";
 
 const TAB_FIELDS: Record<TabKey, string[]> = {
   basic: ["code", "name"],
   connection: ["url", "clientIdBase", "keepaliveSec", "sessionExpirySec", "tlsInsecure"],
   auth: ["secretValue", "username", "headerName"],
+  tls: ["tls"],
   subscription: ["topics"],
   decoder: ["decodeScriptId", "decoderConfig"],
   policy: ["autoregLimitPerHour", "noDataAlarmAfterSec"],
 };
 
 function tabsFor(type: string): TabKey[] {
-  if (type === "MQTT_SUBSCRIBE") return ["basic", "connection", "auth", "subscription", "decoder", "policy"];
+  if (type === "MQTT_SUBSCRIBE") return ["basic", "connection", "auth", "tls", "subscription", "decoder", "policy"];
   return ["basic", "connection", "decoder", "policy"];
 }
 
-export function SourceForm({ initial, mode, readOnly = false, secretConfigured, secretFingerprint, models, spaces, scripts, idempotencyKey, baseVersion, testPath, serverError, serverFieldErrors, env = "prod", maxTopics = MAX_TOPICS }: SourceFormProps) {
+export function SourceForm({ initial, mode, readOnly = false, secretConfigured, secretFingerprint, models, spaces, scripts, idempotencyKey, baseVersion, testPath, serverError, serverFieldErrors, env = "prod", maxTopics = MAX_TOPICS, storedSecrets = [], cloned = false }: SourceFormProps) {
   const { t } = useTranslation();
   const navigation = useNavigation();
   const [values, setValues] = useState<SourceFormValues>(initial);
   const [tab, setTab] = useState<TabKey>("basic");
-  const [testing, setTesting] = useState(false);
-  const [result, setResult] = useState<TestResult | null>(null);
-  const [testError, setTestError] = useState<string | null>(null);
+  const test = useConnectionTest(testPath);
+  const testing = test.testing;
   const [touched, setTouched] = useState(false);
   const [timeoutSec, setTimeoutSec] = useState(TEST_TIMEOUT_SEC);
   const mappingError = useMemo(() => (values.decoderKey === "generic-json" && validateMapping(mappingFromConfig(values.decoderConfig || DEFAULT_MAPPING)).length > 0 ? "mapping" : null), [values.decoderKey, values.decoderConfig]);
@@ -88,16 +95,8 @@ export function SourceForm({ initial, mode, readOnly = false, secretConfigured, 
   const mqtt5 = values.protocolVersion === "5.0";
   const saving = navigation.state === "submitting";
 
-  async function runTest() {
-    setTesting(true);
-    setTestError(null);
-    setResult(null);
-    // 제한 시간은 쿼리 timeoutSec(기본 15초, 5~30초, API-DSC-57)
-    const response = await bffJson<TestResult>(`${testPath}?timeoutSec=${clampTestTimeout(timeoutSec)}`, { method: "POST", body: testBody(values) });
-    setTesting(false);
-    if (response.ok) setResult({ ok: response.data?.ok, stage: response.data?.stage, steps: response.data?.steps ?? [], preview: response.data?.preview ?? [], lossPossible: response.data?.lossPossible });
-    else setTestError(errorText(t, response) ?? null);
-  }
+  // 제한 시간은 쿼리 timeoutSec(기본 15초, 5~30초, API-DSC-57)
+  const runTest = () => test.start(testBody(values), timeoutSec);
 
   return (
     <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_360px]">
@@ -107,6 +106,7 @@ export function SourceForm({ initial, mode, readOnly = false, secretConfigured, 
         {idempotencyKey && <input type="hidden" name="idempotencyKey" value={idempotencyKey} />}
         {baseVersion !== undefined && <input type="hidden" name="baseVersion" value={baseVersion} />}
         {readOnly && <Alert tone="info">{t("sources.form.readOnly")}</Alert>}
+        {cloned && <Alert tone="warning">{t("sources.clone.reenterSecrets")}</Alert>}
         {serverError && <Alert tone="danger">{serverError.code === "VERSION_CONFLICT" ? t("sources.form.conflict") : errorText(t, serverError)}</Alert>}
         <nav className="flex flex-wrap gap-1 border-b border-line" aria-label={t("sources.form.tabs")}>
           {tabs.map((key) => (
@@ -175,7 +175,9 @@ export function SourceForm({ initial, mode, readOnly = false, secretConfigured, 
               </SelectField>
               {values.auth === "HEADER" && <TextField label={t("sources.form.headerName")} value={values.headerName} error={show("headerName")} onChange={(e) => set("headerName", e.target.value)} />}
               {values.auth === "USERPASS" && <TextField label={t("sources.form.username")} value={values.username} error={show("username")} onChange={(e) => set("username", e.target.value)} autoComplete="off" />}
-              {values.auth !== "NONE" && (
+              {values.auth === "MTLS" && <p className="text-[12.5px] text-muted">{t("sources.tls.mtlsHint")}</p>}
+              {show("secretValue") && values.auth === "MTLS" && <p className="text-[12px] text-bad">{t("sources.validation.secret")}</p>}
+              {(values.auth === "USERPASS" || values.auth === "HEADER") && (
                 <TextField
                   label={t(`sources.form.secret.${values.auth}`)}
                   type="password"
@@ -187,6 +189,23 @@ export function SourceForm({ initial, mode, readOnly = false, secretConfigured, 
                   onChange={(e) => set("secretValue", e.target.value)}
                 />
               )}
+            </section>
+          )}
+
+          {values.type === "MQTT_SUBSCRIBE" && (
+            <section hidden={tab !== "tls"}>
+              <TlsSettingsBlock
+                tls={values.tls ?? EMPTY_TLS}
+                onTls={(next) => set("tls", next)}
+                verifyOff={values.tlsInsecure}
+                isDev={values.isDev}
+                secrets={values.tlsSecrets ?? {}}
+                onSecret={(kind, value) => set("tlsSecrets", { ...(values.tlsSecrets ?? {}), [kind]: value })}
+                clientCert={values.auth === "MTLS"}
+                stored={storedSecrets}
+                readOnly={readOnly}
+                showErrors
+              />
             </section>
           )}
 
@@ -247,6 +266,7 @@ export function SourceForm({ initial, mode, readOnly = false, secretConfigured, 
                 ))}
               </SelectField>
             )}
+            {values.type === "MQTT_SUBSCRIBE" && <TopicTemplateHelper decoderKey={values.decoderKey} decoderConfig={values.decoderConfig} sampleTopic={values.topics[0]?.topic.includes("+") || values.topics[0]?.topic.includes("#") ? "" : (values.topics[0]?.topic ?? "")} readOnly={readOnly} onApply={(config) => set("decoderConfig", config)} />}
             <p className="text-[12px] text-muted">{t("sources.form.decoderChangeHint")}</p>
           </section>
 
@@ -305,7 +325,7 @@ export function SourceForm({ initial, mode, readOnly = false, secretConfigured, 
               onChange={(e) => setTimeoutSec(clampTestTimeout(Number(e.target.value)))}
             />
           )}
-          <ConnectionTestPanel result={result} testing={testing} error={testError} onRetry={readOnly ? undefined : runTest} timeoutSec={timeoutSec} />
+          <ConnectionTestPanel result={test.result} testing={testing} error={test.error} timedOut={test.timedOut} onRetry={readOnly ? undefined : runTest} timeoutSec={timeoutSec} />
         </div>
       </aside>
     </div>

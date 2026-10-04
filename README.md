@@ -183,6 +183,22 @@ data2flow 화면과 BFF입니다. React Router v8 프레임워크 모드(SSR, Vi
 - API: core `ScriptM5Controller`(API-SCR-10~14·18~22), `IngestController`(API-ING-09·10·12·13), `IngestInsightController`(API-ING-14, `GET /core/ingest/quality/summary`·`/trend`).
 - 재처리 진행률은 core에 실시간 토픽이 없어 진행 중 작업이 있을 때 5초마다 목록을 다시 읽습니다(API-ING-03 `ingest.reprocess`는 대체됨).
 - 수식 문법 검사는 화면이 즉시 알려 주기 위한 것이고 정본 검사는 pipeline(API-SCR-37)입니다.
+### 데이터 소스: 커넥터 카탈로그 스키마 폼·출력 연결·엣지
+
+| 경로 | 화면 | 스펙 |
+|---|---|---|
+| `/sources/new`, `/sources/new/{connectorKey}`, `/sources/{id}/edit` | 커넥터 카탈로그(분류 `CLOUD_HUB` 등 contracts ConnectorCategory, 템플릿 11종), 커넥터 설정 스키마 폼(API-DSC-56 JSON Schema → 탭·필드·검사, 조건부 필드, 배열·객체), 인증 방식 매트릭스, TLS 탭(최소 버전·SNI·인증서 고정·CA 묶음·클라이언트 인증서), 토픽 템플릿 미리 보기·디코더 적용, 단계별 연결 테스트(대기·진행 아이콘, 폴링형 "첫 폴링", 시간 초과, TLS 체인, 원문 복사) | DSC-09.01·09.05·09.06·09.08·09.11·09.12 |
+| `/sources/new/webhook` | Webhook 수신 소스: 저장 응답의 수신 URL(`https://data2flow-hook.java21.net/ingest/webhook/{key}`)과 HMAC 비밀값을 한 번만 표시, 목록은 "수신 대기" | DSC-01.03 |
+| `/sources/{id}` [복제] → `/sources/{id}/edit?cloned=1` | 복제(비밀값은 복사되지 않음 안내) | DSC-07.05 |
+| `/sources?tab=outputs`, `/outputs/new`, `/outputs/{id}` | 출력 연결 목록(분당 전송·실패·지연)·편집(토픽 템플릿 변수 4개만, 공용 브로커 금지, 비밀 헤더는 비밀값으로, 필터·형식·배치)·테스트 발송·1분 지표·실패 보관함 다시 보내기 | DSC-04.01 |
+| `/sources/edges`, `/sources/edges/{id}?tab=overview\|config\|update\|logs` | 엣지 등록(토큰·설치 명령 1회), 설정 판 저장·배포·롤백, 업데이트 승인, 재시작·로그 수집·폐기, 등록 전 토큰 재발급 | DSC-08.03 |
+
+- 카탈로그 커넥터(type `CONNECTOR`)는 `connection`을 커넥터 스키마 그대로 보내고, 저장 전에 core `JsonSchemaLite`와 같은 키워드로 브라우저와 BFF가 먼저 검사합니다. 새 커넥터가 생겨도 웹 코드를 바꾸지 않습니다.
+- 인증 방식은 스키마 `auth`(enum) 또는 `auth.type`(HTTP 폴링·SSE)에 저장하고, 없으면 지원 방식으로 비밀값 칸만 바꿉니다. API-DSC-02 `secret`은 한 건이라 첫 필수 비밀값(mTLS는 `{cert, key, ca}`)을 넣고 나머지는 저장 뒤 API-DSC-58 `PUT /core/sources/{id}/secrets/{kind}`로 보냅니다. 실패한 종류는 상세 화면에 경고합니다.
+- MQTT 구독은 `connection.tls{minVersion, sni, pinnedSha256}`을 저장하고, 다른 커넥터는 스키마에 `tls`가 있을 때만 저장합니다(지금 ingress 스키마에는 없어 CA·클라이언트 인증서만 비밀값으로).
+- 토픽 템플릿(DSC-09.08)은 서버 저장 필드가 아직 없어, 기기 ID·측정 항목 위치를 디코더 설정의 토픽 참조(`deviceIdFrom: "topic[i]"`, single-value `metricFrom`)로 옮깁니다. 공간 변수는 미리 보기만 합니다.
+- 연결 테스트는 제한 시간(5~30초) + 3초 안에 응답이 없으면 "시간 초과"로 끝냅니다. core API-DSC-57 새 설정 테스트는 기본 유형만 받으므로, 카탈로그 커넥터는 저장한 뒤 상세·편집의 [연결 테스트](`/sources/{id}/test`)로 확인합니다.
+- 가짜 core: `test/msw/handlers/sources-m5.ts`(카탈로그·템플릿·스키마는 ingress `connectors/*.schema.json`을 묶은 `test/msw/connector-schemas.json`).
 
 ## 개발
 

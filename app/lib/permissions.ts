@@ -123,6 +123,9 @@ export const ROUTE_GUARDS: { prefix: string; anyOf: string[] }[] = [
   // M5: 키오스크(UI-DSH-06, 틀 없는 화면), 대시보드 편집은 편집 권한
   { prefix: "/kiosk", anyOf: ["DASHBOARD_READ"] },
   { prefix: "/dashboards", anyOf: ["DASHBOARD_READ"] },
+  // M5 sources: 출력 연결(UI-DSC-05 조회 OPERATOR 이상, 관리 INTEGRATOR 이상). 엣지(/sources/edges)는 /sources 가드
+  { prefix: "/outputs", anyOf: ["SRC_READ"] },
+  { prefix: "/outputs/new", anyOf: ["SRC_ADMIN"] },
 ];
 
 export function hasAny(permissions: readonly string[] | undefined, required: readonly string[]): boolean {

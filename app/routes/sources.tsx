@@ -10,12 +10,16 @@ import { Form, Link, data, useRevalidator, useSearchParams } from "react-router"
 import { callApi, callList, field, listOrThrow } from "~/bff/api.server";
 import { bff } from "~/bff/middleware.server";
 import { getMe } from "~/bff/user.server";
-import { Alert, ButtonLink, Card, Checkbox, CsrfField, EmptyState, PageHeader, Pager, SelectField, Table, TextField } from "~/components/ui";
+import { Alert, Badge, ButtonLink, Card, Checkbox, CsrfField, EmptyState, PageHeader, Pager, SelectField, Table, TextField } from "~/components/ui";
 import { errorText } from "~/lib/error-text";
 import { formatRelative } from "~/lib/format";
 import { hasAny } from "~/lib/permissions";
 import { IngestTabs, LifecycleBadge, Sparkline, StateBadge } from "~/features/sources/components/common";
 import { useSourceStates } from "~/features/sources/components/source-state-live";
+import { OutputList } from "~/features/sources/components/outputs";
+import { SourcesSubTabs } from "~/features/sources/components/sub-tabs";
+import type { OutputConnection, OutputStat } from "~/features/sources/model/output";
+import type { BffRequestContext } from "~/bff/middleware.server";
 import { LIFECYCLES, TYPE_CARDS, displayState, percent, type SourceLimits, type SourceSummary } from "~/features/sources/model/source";
 import type { Route } from "./+types/sources";
 
@@ -26,6 +30,8 @@ export function meta() {
 export async function loader({ request, context }: Route.LoaderArgs) {
   const ctx = bff(context);
   const url = new URL(request.url);
+  // 출력 연결 탭(UI-DSC-05, API-DSC-31): 목록 + 연결마다 최근 1시간 1분 지표
+  const outputs = url.searchParams.get("tab") === "outputs" ? await loadOutputs(ctx, request) : null;
   const page = Math.max(1, Number(url.searchParams.get("page")) || 1);
   const query = new URLSearchParams({ page: String(page), size: "50" });
   const q = url.searchParams.get("q");
@@ -42,7 +48,16 @@ export async function loader({ request, context }: Route.LoaderArgs) {
     callApi<SourceLimits>(ctx, request, "/api/v1/core/source-limits"),
   ]);
   const permissions = me.ok ? me.data.permissions : [];
-  return { sources: listOrThrow(list), page, limits: limits.ok && limits.data ? limits.data : null, canAdmin: hasAny(permissions, ["SRC_ADMIN"]), filtered: Boolean(q || lifecycle || url.searchParams.get("type")), now: ctx.runtime.now() };
+  return { outputs, sources: listOrThrow(list), page, limits: limits.ok && limits.data ? limits.data : null, canAdmin: hasAny(permissions, ["SRC_ADMIN"]), filtered: Boolean(q || lifecycle || url.searchParams.get("type")), now: ctx.runtime.now() };
+}
+
+async function loadOutputs(ctx: BffRequestContext, request: Request) {
+  const list = await callList<OutputConnection>(ctx, request, "/api/v1/core/output-connections?size=100");
+  if (!list.ok) return { items: [] as OutputConnection[], stats: {} as Record<string, OutputStat[]>, failed: true };
+  const now = ctx.runtime.now();
+  const range = `from=${encodeURIComponent(new Date(now - 3600_000).toISOString())}&to=${encodeURIComponent(new Date(now).toISOString())}`;
+  const stats = await Promise.all(list.list.responses.map((o) => callApi<OutputStat[]>(ctx, request, `/api/v1/core/output-connections/${encodeURIComponent(o.id)}/stats?${range}`)));
+  return { items: list.list.responses, stats: Object.fromEntries(list.list.responses.map((o, i) => [o.id, stats[i].ok && Array.isArray(stats[i].data) ? stats[i].data : []])), failed: false };
 }
 
 export async function action({ request, context }: Route.ActionArgs) {
@@ -90,6 +105,13 @@ export default function Sources({ loaderData, actionData }: Route.ComponentProps
         }
       />
       {error && <Alert tone="danger">{errorText(t, error)}</Alert>}
+      <SourcesSubTabs current={loaderData.outputs ? "outputs" : "sources"} />
+      {loaderData.outputs ? (
+        <Card actions={canAdmin && <ButtonLink to="/outputs/new">{t("sources.outputs.new")}</ButtonLink>} title={t("sources.outputs.title")}>
+          {loaderData.outputs.failed && <Alert tone="warning">{t("sources.outputs.loadFailed")}</Alert>}
+          <OutputList outputs={loaderData.outputs.items} stats={loaderData.outputs.stats} canAdmin={canAdmin} />
+        </Card>
+      ) : (
       <Card>
         <Form method="get" className="mb-3 flex flex-wrap items-end gap-3">
           <TextField label={t("common.search")} name="q" defaultValue={params.get("q") ?? ""} />
@@ -143,7 +165,11 @@ export default function Sources({ loaderData, actionData }: Route.ComponentProps
               {sources.responses.map((s) => (
                 <tr key={s.id}>
                   <td>
-                    <StateBadge state={displayState(s, live.states)} />
+                    {s.type === "WEBHOOK" ? (
+                      s.lifecycle === "ACTIVE" ? <Badge tone="info">{t("sources.webhook.waiting")}</Badge> : <StateBadge state="DISABLED" />
+                    ) : (
+                      <StateBadge state={displayState(s, live.states)} />
+                    )}
                   </td>
                   <td>
                     <Link to={`/sources/${s.id}`} className="font-medium text-accent hover:underline">
@@ -193,6 +219,7 @@ export default function Sources({ loaderData, actionData }: Route.ComponentProps
         )}
         <Pager page={page} totalPages={sources.totalPages} />
       </Card>
+      )}
     </>
   );
 }

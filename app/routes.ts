@@ -152,6 +152,11 @@ export default [
     route("dashboards/:dashboardId", "routes/dashboard-detail.tsx"),
     route("dashboards/:dashboardId/edit", "routes/dashboard-edit.tsx"),
     route("admin/branding", "routes/admin-branding.tsx"),
+    // M5 sources: 출력 연결(UI-DSC-05, DSC-04.01)·엣지 게이트웨이(UI-DSC-10, DSC-08.03). 커넥터 스키마 폼은 /sources/new/:connectorKey
+    route("outputs/new", "routes/output-new.tsx"),
+    route("outputs/:outputId", "routes/output-detail.tsx"),
+    route("sources/edges", "routes/source-edges.tsx"),
+    route("sources/edges/:edgeId", "routes/source-edge-detail.tsx"),
   ]),
 
   // M5 field: 모바일 셸(UI-DSH-14, UI-DEV-17·21)과 QR 딥링크(`/d/{qrToken}`, 로그인 필요) — 00-navigation.md §2·§3
