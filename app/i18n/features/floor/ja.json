@@ -1,0 +1,279 @@
+{
+  "sources": {
+    "section": {
+      "context": "外部コンテキスト"
+    }
+  },
+  "floor": {
+    "tab3d": "3D",
+    "path": {
+      "label": "位置パス",
+      "portfolio": "ポートフォリオ"
+    },
+    "view": {
+      "title": "フロアプラン",
+      "empty": "この階にはフロアプランがありません",
+      "uploadForFloor": "この階のプランをアップロード",
+      "edit": "フロアプランを編集",
+      "noMarkers": "配置された機器がありません。[フロアプランを編集]で配置してください。",
+      "markerLabel": "{{name}} · {{state}}",
+      "legend": "マーカー記号: ✔ 正常、▲ アラーム、✕ オフライン、? 不明"
+    },
+    "state": {
+      "ALARM": "アラーム",
+      "OFFLINE": "オフライン",
+      "NORMAL": "正常",
+      "UNKNOWN": "不明"
+    },
+    "popup": {
+      "title": "{{name}} の概要",
+      "noValues": "まだ値がありません",
+      "openDevice": "機器の詳細",
+      "close": "閉じる"
+    },
+    "heat": {
+      "toggle": "ヒートカラー",
+      "metric": "測定項目",
+      "legend": "色の凡例",
+      "estimated": "補間推定(IDW) — マーカー間の値は推定です"
+    },
+    "zoom": {
+      "label": "拡大・移動",
+      "in": "拡大",
+      "out": "縮小",
+      "reset": "元に戻す"
+    },
+    "switch": {
+      "label": "階の切り替え",
+      "up": "上の階: {{name}}",
+      "down": "下の階: {{name}}",
+      "position": "{{n}} / {{total}} 階",
+      "noPlan": "プランなし"
+    }
+  },
+  "bim": {
+    "models": "3Dモデル(IFC)",
+    "empty": "3Dモデルがありません",
+    "askIntegrator": "3DモデルはINTEGRATOR以上がアップロードできます。",
+    "viewer": "{{name}} を閲覧",
+    "download": "IFCをダウンロード",
+    "editMapping": "空間の対応付けを編集",
+    "viewMode": "閲覧に戻る",
+    "failed": "モデル変換に失敗: {{error}}",
+    "processing": "モデルを変換中です。しばらくして開き直してください。",
+    "counts": "対応 {{mapped}} · 未対応 {{unmapped}}",
+    "readOnly": "閲覧専用",
+    "elements": "IFC空間要素",
+    "unmapped": "対応する空間なし",
+    "mapTo": "{{name}} の空間",
+    "noSpace": "(対応しない)",
+    "delete": "モデルを削除",
+    "upload": "IFCをアップロード",
+    "name": "名前",
+    "file": "IFCファイル",
+    "uploadButton": "アップロード",
+    "limit": ".ifcファイル、200MB以下",
+    "uploaded": "アップロードしました。変換後に閲覧できます。",
+    "problem": {
+      "REQUIRED": "ファイルを選んでください",
+      "NOT_IFC": "IFC(.ifc)ファイルのみ",
+      "TOO_LARGE": "200MB以下のファイルのみ"
+    },
+    "status": {
+      "PROCESSING": "変換中",
+      "READY": "準備完了",
+      "FAILED": "失敗"
+    },
+    "state": {
+      "ALARM": "アラーム",
+      "WARNING": "注意",
+      "NORMAL": "正常",
+      "UNMAPPED": "グレー(未対応)"
+    }
+  },
+  "calendar": {
+    "title": "カレンダー",
+    "nav": "期間の移動",
+    "prev": "前へ",
+    "next": "次へ",
+    "today": "今日",
+    "viewLabel": "表示",
+    "view": {
+      "month": "月",
+      "week": "週",
+      "list": "リスト"
+    },
+    "scope": "範囲",
+    "allScope": "すべて",
+    "applyScope": "適用",
+    "add": "+ 予定",
+    "edit": "予定を編集",
+    "delete": "削除",
+    "empty": "この期間に予定はありません",
+    "gridLabel": "カレンダー",
+    "listLabel": "予定リスト",
+    "loadFailed": "予定を読み込めませんでした。",
+    "retry": "再試行",
+    "originDeleted": "元データ削除済み",
+    "originDeletedNote": "取り込み元で削除された予定です。手動で修正したため残しています。",
+    "autoNote": "{{origin}} から取り込んだ予定です。運用モードへの影響のみ変更できます。",
+    "externalNote": "祝日・学事予定(iCal)は外部コンテキスト画面で接続します。",
+    "externalLink": "外部カレンダー接続",
+    "field": {
+      "title": "タイトル",
+      "type": "種類",
+      "startsOn": "開始日",
+      "endsOn": "終了日",
+      "startTime": "開始時刻(任意)",
+      "endTime": "終了時刻(任意)",
+      "scope": "適用範囲(空なら組織全体)",
+      "affectsMode": "運用モードへの影響"
+    },
+    "type": {
+      "HOLIDAY": "休日",
+      "CLOSURE": "休館",
+      "EVENT": "行事",
+      "VACATION": "休暇",
+      "EXAM": "試験期間",
+      "OTHER": "その他"
+    },
+    "affects": {
+      "HOLIDAY": "休日として運用",
+      "UNOCCUPIED": "非運用",
+      "NONE": "影響なし"
+    },
+    "origin": {
+      "MANUAL": "手動登録",
+      "HOLIDAY_API": "祝日",
+      "ICAL": "iCal取り込み"
+    },
+    "weekday": {
+      "0": "月",
+      "1": "火",
+      "2": "水",
+      "3": "木",
+      "4": "金",
+      "5": "土",
+      "6": "日"
+    },
+    "validation": {
+      "required": "必須項目です",
+      "tooLong": "150文字以内で入力してください",
+      "startAfterEnd": "開始日が終了日より後です",
+      "tooLong366": "期間は最大366日です",
+      "timePair": "開始・終了時刻を両方入力してください",
+      "timeOrder": "終了時刻は開始時刻より後にしてください"
+    },
+    "done": {
+      "create": "予定を追加しました。",
+      "update": "予定を更新しました。",
+      "delete": "予定を削除しました。"
+    }
+  },
+  "context": {
+    "title": "外部コンテキストデータ",
+    "siteTitle": "外部コンテキスト · {{name}}",
+    "chooseSite": "サイトを選んでください",
+    "noSites": "まだサイトがありません",
+    "loadFailed": "読み込めませんでした",
+    "locationRequired": "位置が必要: サイトの座標がないため天気・大気質を有効にできません。",
+    "openSpace": "空間画面で座標を入力",
+    "type": {
+      "KMA_WEATHER": "気象庁(韓国)天気",
+      "AIRKOREA": "大気質(AirKorea)",
+      "HOLIDAY": "祝日",
+      "ICAL": "学事予定(iCal)"
+    },
+    "off": "オフ",
+    "tone": {
+      "good": "正常",
+      "warn": "注意",
+      "bad": "エラー",
+      "muted": "オフ"
+    },
+    "simulated": "シミュレーター値",
+    "unavailable": "準備中",
+    "enabled": "有効",
+    "apiKey": "APIキー",
+    "apiKeySet": "キーは保存済みです。変更する場合のみ入力してください。",
+    "weatherNote": "超短期実況は1時間ごと、短期予報は1日4回(予報は品質5で保存)",
+    "gridAuto": "自動(サイト座標)",
+    "gridValue": "格子 nx {{nx}} ny {{ny}}",
+    "items": "収集項目",
+    "forecast": "短期予報も収集",
+    "weatherItem": {
+      "T1H": "気温",
+      "REH": "湿度",
+      "RN1": "1時間降水量",
+      "WSD": "風速",
+      "PTY": "降水形態",
+      "VEC": "風向",
+      "UUU": "東西風",
+      "VVV": "南北風"
+    },
+    "airItem": {
+      "PM10": "PM10",
+      "PM25": "PM2.5",
+      "O3": "オゾン(O3)",
+      "NO2": "二酸化窒素(NO2)",
+      "CO": "一酸化炭素(CO)",
+      "SO2": "二酸化硫黄(SO2)"
+    },
+    "station": "測定所",
+    "stationAuto": "最寄りの測定所(自動)",
+    "stationOption": "{{name}} {{km}}km",
+    "stationValue": "測定所 {{name}}",
+    "country": "国",
+    "countryKR": "韓国(KR)",
+    "icalUrl": "iCal URL(https:// または webcal://)",
+    "icalFile": "または .ics ファイル(2MB以下)",
+    "icalFileStored": "アップロード済みのファイルがあります",
+    "refreshHours": "更新間隔(時間)",
+    "typeMapping": "カテゴリ → 予定の種類",
+    "typeMappingEmpty": "対応付けがない場合、すべて「行事」として取り込みます。",
+    "category": "カテゴリ",
+    "eventType": "予定の種類",
+    "addMapping": "+ 対応付け",
+    "removeMapping": "{{category}} の対応付けを削除",
+    "dailyQuota": "1日の上限(件)",
+    "unitCost": "呼び出し単価",
+    "refreshNow": "今すぐ更新",
+    "refreshed": "更新: {{status}} {{delta}}",
+    "lastSync": "最終 {{at}}",
+    "never": "まだ収集していません",
+    "syncStatus": {
+      "SUCCESS": "✓ 成功",
+      "FAILED": "✕ 失敗",
+      "QUEUED": "待機中",
+      "RUNNING": "実行中"
+    },
+    "calls": "本日の呼び出し {{calls}}",
+    "callsQuota": "本日の呼び出し {{calls}}/{{quota}}",
+    "failures": "失敗 {{n}}",
+    "warn80": "80% に到達",
+    "exhausted": "上限に到達 — 翌日まで呼び出し停止",
+    "usageTitle": "呼び出し量(直近90日)",
+    "usageOf": "{{name}} の呼び出し量",
+    "usageChart": "直近{{days}}日の1日あたりの呼び出し",
+    "noUsage": "呼び出し記録がありません",
+    "usageFailed": "呼び出し量を読み込めませんでした",
+    "cost": "費用: 本日 {{today}} · 今月 {{month}}",
+    "fixErrors": "入力値を確認してください。",
+    "validation": {
+      "apiKeyRequired": "有効にするにはAPIキーが必要です",
+      "gridRange": "格子の範囲外です(nx 1~149, ny 1~253)",
+      "icalUrl": "https:// または webcal:// のURLのみ",
+      "icalSourceRequired": "iCal URL またはファイルが必要です",
+      "refreshRange": "1~168時間",
+      "positiveInteger": "1以上の整数",
+      "costRange": "0~1,000,000",
+      "NOT_ICS": ".ics ファイルのみ",
+      "TOO_LARGE": "2MB以下のファイルのみ"
+    }
+  },
+  "errors": {
+    "MODEL_FILE_INVALID": "IFCファイルではないか200MBを超えています(200MB以下)",
+    "CALENDAR_EVENT_INVALID": "予定の入力値が正しくありません",
+    "EXTERNAL_API_QUOTA_EXCEEDED": "外部APIの1日上限に達しました"
+  }
+}

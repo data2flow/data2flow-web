@@ -1,0 +1,279 @@
+{
+  "sources": {
+    "section": {
+      "context": "External context"
+    }
+  },
+  "floor": {
+    "tab3d": "3D",
+    "path": {
+      "label": "Location path",
+      "portfolio": "Portfolio"
+    },
+    "view": {
+      "title": "Floor plan",
+      "empty": "This floor has no floor plan",
+      "uploadForFloor": "Upload a plan for this floor",
+      "edit": "Edit floor plan",
+      "noMarkers": "No devices placed. Place devices in [Edit floor plan].",
+      "markerLabel": "{{name}} · {{state}}",
+      "legend": "Marker symbols: ✔ normal, ▲ alarm, ✕ offline, ? unknown"
+    },
+    "state": {
+      "ALARM": "Alarm",
+      "OFFLINE": "Offline",
+      "NORMAL": "Normal",
+      "UNKNOWN": "Unknown"
+    },
+    "popup": {
+      "title": "{{name}} summary",
+      "noValues": "No values yet",
+      "openDevice": "Device details",
+      "close": "Close"
+    },
+    "heat": {
+      "toggle": "Heat color",
+      "metric": "Metric",
+      "legend": "Color legend",
+      "estimated": "Interpolated estimate (IDW) — values between markers are estimates"
+    },
+    "zoom": {
+      "label": "Zoom and pan",
+      "in": "Zoom in",
+      "out": "Zoom out",
+      "reset": "Reset"
+    },
+    "switch": {
+      "label": "Switch floor",
+      "up": "Up: {{name}}",
+      "down": "Down: {{name}}",
+      "position": "Floor {{n}} of {{total}}",
+      "noPlan": "No plan"
+    }
+  },
+  "bim": {
+    "models": "3D models (IFC)",
+    "empty": "No 3D models uploaded",
+    "askIntegrator": "3D models can be uploaded by INTEGRATOR or above.",
+    "viewer": "Viewing {{name}}",
+    "download": "Download IFC",
+    "editMapping": "Edit space mapping",
+    "viewMode": "Back to view",
+    "failed": "Model conversion failed: {{error}}",
+    "processing": "Converting the model. Reopen in a moment.",
+    "counts": "Mapped {{mapped}} · unmapped {{unmapped}}",
+    "readOnly": "Read-only",
+    "elements": "IFC space elements",
+    "unmapped": "No linked space",
+    "mapTo": "Space for {{name}}",
+    "noSpace": "(not linked)",
+    "delete": "Delete model",
+    "upload": "Upload IFC",
+    "name": "Name",
+    "file": "IFC file",
+    "uploadButton": "Upload",
+    "limit": "An .ifc file up to 200MB",
+    "uploaded": "Uploaded. You can view it once conversion finishes.",
+    "problem": {
+      "REQUIRED": "Choose a file",
+      "NOT_IFC": "Only IFC (.ifc) files are allowed",
+      "TOO_LARGE": "Files must be 200MB or less"
+    },
+    "status": {
+      "PROCESSING": "Processing",
+      "READY": "Ready",
+      "FAILED": "Failed"
+    },
+    "state": {
+      "ALARM": "Alarm",
+      "WARNING": "Warning",
+      "NORMAL": "Normal",
+      "UNMAPPED": "Gray (unmapped)"
+    }
+  },
+  "calendar": {
+    "title": "Calendar",
+    "nav": "Move period",
+    "prev": "Previous",
+    "next": "Next",
+    "today": "Today",
+    "viewLabel": "View",
+    "view": {
+      "month": "Month",
+      "week": "Week",
+      "list": "List"
+    },
+    "scope": "Scope",
+    "allScope": "All",
+    "applyScope": "Apply",
+    "add": "+ Event",
+    "edit": "Edit event",
+    "delete": "Delete",
+    "empty": "No events in this period",
+    "gridLabel": "Calendar grid",
+    "listLabel": "Event list",
+    "loadFailed": "Could not load events.",
+    "retry": "Retry",
+    "originDeleted": "Source deleted",
+    "originDeletedNote": "This event was deleted at its source. It was kept because it was edited manually.",
+    "autoNote": "Imported from {{origin}}. Only the operating-mode effect can be changed.",
+    "externalNote": "Holidays and academic calendars (iCal) are connected in External context.",
+    "externalLink": "Connect external calendars",
+    "field": {
+      "title": "Title",
+      "type": "Type",
+      "startsOn": "Start date",
+      "endsOn": "End date",
+      "startTime": "Start time (optional)",
+      "endTime": "End time (optional)",
+      "scope": "Scope (empty = whole organization)",
+      "affectsMode": "Operating-mode effect"
+    },
+    "type": {
+      "HOLIDAY": "Holiday",
+      "CLOSURE": "Closure",
+      "EVENT": "Event",
+      "VACATION": "Vacation",
+      "EXAM": "Exam period",
+      "OTHER": "Other"
+    },
+    "affects": {
+      "HOLIDAY": "Run as holiday",
+      "UNOCCUPIED": "Unoccupied",
+      "NONE": "No effect"
+    },
+    "origin": {
+      "MANUAL": "Manual",
+      "HOLIDAY_API": "Public holiday",
+      "ICAL": "Imported from iCal"
+    },
+    "weekday": {
+      "0": "Mon",
+      "1": "Tue",
+      "2": "Wed",
+      "3": "Thu",
+      "4": "Fri",
+      "5": "Sat",
+      "6": "Sun"
+    },
+    "validation": {
+      "required": "Required",
+      "tooLong": "Use 150 characters or fewer",
+      "startAfterEnd": "The start date is later than the end date",
+      "tooLong366": "The period can be at most 366 days",
+      "timePair": "Enter both start and end times",
+      "timeOrder": "The end time must be after the start time"
+    },
+    "done": {
+      "create": "Event added.",
+      "update": "Event updated.",
+      "delete": "Event deleted."
+    }
+  },
+  "context": {
+    "title": "External context data",
+    "siteTitle": "External context · {{name}}",
+    "chooseSite": "Choose a site",
+    "noSites": "No sites yet",
+    "loadFailed": "Could not load",
+    "locationRequired": "Location needed: the site has no coordinates, so weather and air quality cannot be enabled.",
+    "openSpace": "Enter coordinates on the space page",
+    "type": {
+      "KMA_WEATHER": "KMA weather",
+      "AIRKOREA": "Air quality (AirKorea)",
+      "HOLIDAY": "Public holidays",
+      "ICAL": "Academic calendar (iCal)"
+    },
+    "off": "Off",
+    "tone": {
+      "good": "OK",
+      "warn": "Attention",
+      "bad": "Error",
+      "muted": "Off"
+    },
+    "simulated": "Simulated values",
+    "unavailable": "Not available yet",
+    "enabled": "Enabled",
+    "apiKey": "API key",
+    "apiKeySet": "A key is stored. Enter one only to replace it.",
+    "weatherNote": "Nowcast every hour, short-term forecast 4 times a day (forecasts stored with quality 5)",
+    "gridAuto": "Automatic (site coordinates)",
+    "gridValue": "Grid nx {{nx}} ny {{ny}}",
+    "items": "Items",
+    "forecast": "Also collect short-term forecasts",
+    "weatherItem": {
+      "T1H": "Temperature",
+      "REH": "Humidity",
+      "RN1": "1h precipitation",
+      "WSD": "Wind speed",
+      "PTY": "Precipitation type",
+      "VEC": "Wind direction",
+      "UUU": "East-west wind",
+      "VVV": "North-south wind"
+    },
+    "airItem": {
+      "PM10": "PM10",
+      "PM25": "PM2.5",
+      "O3": "Ozone (O3)",
+      "NO2": "Nitrogen dioxide (NO2)",
+      "CO": "Carbon monoxide (CO)",
+      "SO2": "Sulfur dioxide (SO2)"
+    },
+    "station": "Station",
+    "stationAuto": "Nearest station (automatic)",
+    "stationOption": "{{name}} {{km}} km",
+    "stationValue": "Station {{name}}",
+    "country": "Country",
+    "countryKR": "South Korea (KR)",
+    "icalUrl": "iCal URL (https:// or webcal://)",
+    "icalFile": "Or an .ics file (up to 2MB)",
+    "icalFileStored": "A file is stored",
+    "refreshHours": "Refresh interval (hours)",
+    "typeMapping": "Category → event type",
+    "typeMappingEmpty": "Without a mapping, all events are imported as 'Event'.",
+    "category": "Category",
+    "eventType": "Event type",
+    "addMapping": "+ Mapping",
+    "removeMapping": "Remove mapping {{category}}",
+    "dailyQuota": "Daily quota (calls)",
+    "unitCost": "Cost per call",
+    "refreshNow": "Refresh now",
+    "refreshed": "Refreshed: {{status}} {{delta}}",
+    "lastSync": "Last {{at}}",
+    "never": "Not collected yet",
+    "syncStatus": {
+      "SUCCESS": "✓ Success",
+      "FAILED": "✕ Failed",
+      "QUEUED": "Queued",
+      "RUNNING": "Running"
+    },
+    "calls": "Calls today {{calls}}",
+    "callsQuota": "Calls today {{calls}}/{{quota}}",
+    "failures": "Failures {{n}}",
+    "warn80": "80% reached",
+    "exhausted": "Quota reached — calls paused until tomorrow",
+    "usageTitle": "API usage (last 90 days)",
+    "usageOf": "{{name}} usage",
+    "usageChart": "Daily calls for the last {{days}} days",
+    "noUsage": "No usage recorded",
+    "usageFailed": "Could not load usage",
+    "cost": "Cost: today {{today}} · this month {{month}}",
+    "fixErrors": "Check the highlighted fields.",
+    "validation": {
+      "apiKeyRequired": "An API key is required to enable",
+      "gridRange": "Out of grid range (nx 1–149, ny 1–253)",
+      "icalUrl": "Only https:// or webcal:// URLs are allowed",
+      "icalSourceRequired": "An iCal URL or file is required",
+      "refreshRange": "1–168 hours",
+      "positiveInteger": "A whole number of 1 or more",
+      "costRange": "0–1,000,000",
+      "NOT_ICS": "Only .ics files are allowed",
+      "TOO_LARGE": "Files must be 2MB or less"
+    }
+  },
+  "errors": {
+    "MODEL_FILE_INVALID": "Not an IFC file or larger than 200MB (200MB or less)",
+    "CALENDAR_EVENT_INVALID": "The event input is invalid",
+    "EXTERNAL_API_QUOTA_EXCEEDED": "The external API daily quota was reached"
+  }
+}

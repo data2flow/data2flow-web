@@ -18,7 +18,7 @@ export interface MenuItem {
 
 export const MENU: MenuItem[] = [
   { key: "home", path: "/", anyOf: [], group: "main" },
-  { key: "spaces", path: "/spaces", anyOf: ["DEV_READ"], group: "main", sections: ["/sites"] },
+  { key: "spaces", path: "/spaces", anyOf: ["DEV_READ"], group: "main", sections: ["/sites", "/calendar"] },
   { key: "devices", path: "/devices", anyOf: ["DEV_READ"], group: "main", sections: ["/models", "/metrics", "/device-groups"] },
   { key: "explore", path: "/explore", anyOf: ["TS_READ"], group: "main" },
   { key: "ingest", path: "/ingest/monitor", anyOf: ["INGEST_READ"], group: "main", sections: ["/ingest", "/sources", "/scripts"] },
@@ -42,6 +42,7 @@ export const MENU: MenuItem[] = [
 export const ROUTE_GUARDS: { prefix: string; anyOf: string[] }[] = [
   ...MENU.filter((m) => m.path !== "/").map((m) => ({ prefix: m.path, anyOf: m.guard ?? m.anyOf })),
   { prefix: "/sites", anyOf: ["DEV_READ"] },
+  { prefix: "/calendar", anyOf: ["DEV_READ"] },
   { prefix: "/models", anyOf: ["DEV_READ"] },
   { prefix: "/metrics", anyOf: ["DEV_READ"] },
   { prefix: "/device-groups", anyOf: ["DEV_READ"] },

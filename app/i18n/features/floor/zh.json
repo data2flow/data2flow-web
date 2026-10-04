@@ -1,0 +1,279 @@
+{
+  "sources": {
+    "section": {
+      "context": "外部环境数据"
+    }
+  },
+  "floor": {
+    "tab3d": "3D",
+    "path": {
+      "label": "位置路径",
+      "portfolio": "资产组合"
+    },
+    "view": {
+      "title": "平面图",
+      "empty": "该楼层没有平面图",
+      "uploadForFloor": "上传该楼层平面图",
+      "edit": "编辑平面图",
+      "noMarkers": "尚未放置设备。请在[编辑平面图]中放置。",
+      "markerLabel": "{{name}} · {{state}}",
+      "legend": "标记符号：✔ 正常，▲ 告警，✕ 离线，? 未知"
+    },
+    "state": {
+      "ALARM": "告警",
+      "OFFLINE": "离线",
+      "NORMAL": "正常",
+      "UNKNOWN": "未知"
+    },
+    "popup": {
+      "title": "{{name}} 摘要",
+      "noValues": "暂无数值",
+      "openDevice": "设备详情",
+      "close": "关闭"
+    },
+    "heat": {
+      "toggle": "热力色",
+      "metric": "测量项",
+      "legend": "颜色图例",
+      "estimated": "插值估计(IDW) — 标记之间的数值为估计值"
+    },
+    "zoom": {
+      "label": "缩放与平移",
+      "in": "放大",
+      "out": "缩小",
+      "reset": "复位"
+    },
+    "switch": {
+      "label": "切换楼层",
+      "up": "上一层：{{name}}",
+      "down": "下一层：{{name}}",
+      "position": "第 {{n}} / {{total}} 层",
+      "noPlan": "无平面图"
+    }
+  },
+  "bim": {
+    "models": "3D 模型(IFC)",
+    "empty": "尚未上传 3D 模型",
+    "askIntegrator": "INTEGRATOR 及以上可上传 3D 模型。",
+    "viewer": "查看 {{name}}",
+    "download": "下载 IFC",
+    "editMapping": "编辑空间映射",
+    "viewMode": "返回查看",
+    "failed": "模型转换失败：{{error}}",
+    "processing": "正在转换模型，请稍后重新打开。",
+    "counts": "已映射 {{mapped}} · 未映射 {{unmapped}}",
+    "readOnly": "只读",
+    "elements": "IFC 空间元素",
+    "unmapped": "无关联空间",
+    "mapTo": "{{name}} 的空间",
+    "noSpace": "(不关联)",
+    "delete": "删除模型",
+    "upload": "上传 IFC",
+    "name": "名称",
+    "file": "IFC 文件",
+    "uploadButton": "上传",
+    "limit": ".ifc 文件，不超过 200MB",
+    "uploaded": "已上传，转换完成后即可查看。",
+    "problem": {
+      "REQUIRED": "请选择文件",
+      "NOT_IFC": "仅支持 IFC(.ifc) 文件",
+      "TOO_LARGE": "文件须不超过 200MB"
+    },
+    "status": {
+      "PROCESSING": "转换中",
+      "READY": "就绪",
+      "FAILED": "失败"
+    },
+    "state": {
+      "ALARM": "告警",
+      "WARNING": "注意",
+      "NORMAL": "正常",
+      "UNMAPPED": "灰色(未映射)"
+    }
+  },
+  "calendar": {
+    "title": "日历",
+    "nav": "切换期间",
+    "prev": "上一个",
+    "next": "下一个",
+    "today": "今天",
+    "viewLabel": "视图",
+    "view": {
+      "month": "月",
+      "week": "周",
+      "list": "列表"
+    },
+    "scope": "范围",
+    "allScope": "全部",
+    "applyScope": "应用",
+    "add": "+ 日程",
+    "edit": "编辑日程",
+    "delete": "删除",
+    "empty": "此期间没有日程",
+    "gridLabel": "日历表",
+    "listLabel": "日程列表",
+    "loadFailed": "无法加载日程。",
+    "retry": "重试",
+    "originDeleted": "源已删除",
+    "originDeletedNote": "该日程已在来源中删除，因为曾手动修改而保留。",
+    "autoNote": "从 {{origin}} 导入的日程，只能修改运行模式影响。",
+    "externalNote": "节假日和校历(iCal)在外部环境数据页面中连接。",
+    "externalLink": "连接外部日历",
+    "field": {
+      "title": "标题",
+      "type": "类型",
+      "startsOn": "开始日期",
+      "endsOn": "结束日期",
+      "startTime": "开始时间(可选)",
+      "endTime": "结束时间(可选)",
+      "scope": "适用范围(为空表示整个组织)",
+      "affectsMode": "运行模式影响"
+    },
+    "type": {
+      "HOLIDAY": "假日",
+      "CLOSURE": "闭馆",
+      "EVENT": "活动",
+      "VACATION": "假期",
+      "EXAM": "考试期间",
+      "OTHER": "其他"
+    },
+    "affects": {
+      "HOLIDAY": "按假日运行",
+      "UNOCCUPIED": "非运行",
+      "NONE": "无影响"
+    },
+    "origin": {
+      "MANUAL": "手动登记",
+      "HOLIDAY_API": "法定节假日",
+      "ICAL": "iCal 导入"
+    },
+    "weekday": {
+      "0": "一",
+      "1": "二",
+      "2": "三",
+      "3": "四",
+      "4": "五",
+      "5": "六",
+      "6": "日"
+    },
+    "validation": {
+      "required": "必填项",
+      "tooLong": "请输入不超过 150 个字符",
+      "startAfterEnd": "开始日期晚于结束日期",
+      "tooLong366": "期间最长 366 天",
+      "timePair": "请同时填写开始和结束时间",
+      "timeOrder": "结束时间须晚于开始时间"
+    },
+    "done": {
+      "create": "已添加日程。",
+      "update": "已更新日程。",
+      "delete": "已删除日程。"
+    }
+  },
+  "context": {
+    "title": "外部环境数据",
+    "siteTitle": "外部环境数据 · {{name}}",
+    "chooseSite": "请选择站点",
+    "noSites": "尚无站点",
+    "loadFailed": "无法加载",
+    "locationRequired": "需要位置：站点没有坐标，无法启用天气和空气质量。",
+    "openSpace": "在空间页面输入坐标",
+    "type": {
+      "KMA_WEATHER": "韩国气象厅天气",
+      "AIRKOREA": "空气质量(AirKorea)",
+      "HOLIDAY": "法定节假日",
+      "ICAL": "校历(iCal)"
+    },
+    "off": "关闭",
+    "tone": {
+      "good": "正常",
+      "warn": "注意",
+      "bad": "错误",
+      "muted": "关闭"
+    },
+    "simulated": "模拟值",
+    "unavailable": "准备中",
+    "enabled": "启用",
+    "apiKey": "API 密钥",
+    "apiKeySet": "已保存密钥，仅在更换时输入。",
+    "weatherNote": "实况每小时一次，短期预报每天 4 次(预报以质量 5 保存)",
+    "gridAuto": "自动(站点坐标)",
+    "gridValue": "网格 nx {{nx}} ny {{ny}}",
+    "items": "采集项",
+    "forecast": "同时采集短期预报",
+    "weatherItem": {
+      "T1H": "气温",
+      "REH": "湿度",
+      "RN1": "1 小时降水量",
+      "WSD": "风速",
+      "PTY": "降水类型",
+      "VEC": "风向",
+      "UUU": "东西风",
+      "VVV": "南北风"
+    },
+    "airItem": {
+      "PM10": "PM10",
+      "PM25": "PM2.5",
+      "O3": "臭氧(O3)",
+      "NO2": "二氧化氮(NO2)",
+      "CO": "一氧化碳(CO)",
+      "SO2": "二氧化硫(SO2)"
+    },
+    "station": "监测站",
+    "stationAuto": "最近的监测站(自动)",
+    "stationOption": "{{name}} {{km}} 公里",
+    "stationValue": "监测站 {{name}}",
+    "country": "国家",
+    "countryKR": "韩国(KR)",
+    "icalUrl": "iCal 地址(https:// 或 webcal://)",
+    "icalFile": "或 .ics 文件(不超过 2MB)",
+    "icalFileStored": "已有上传的文件",
+    "refreshHours": "刷新周期(小时)",
+    "typeMapping": "类别 → 日程类型",
+    "typeMappingEmpty": "没有映射时，所有日程都作为“活动”导入。",
+    "category": "类别",
+    "eventType": "日程类型",
+    "addMapping": "+ 映射",
+    "removeMapping": "删除映射 {{category}}",
+    "dailyQuota": "每日限额(次)",
+    "unitCost": "单次调用费用",
+    "refreshNow": "立即刷新",
+    "refreshed": "已刷新：{{status}} {{delta}}",
+    "lastSync": "最近 {{at}}",
+    "never": "尚未采集",
+    "syncStatus": {
+      "SUCCESS": "✓ 成功",
+      "FAILED": "✕ 失败",
+      "QUEUED": "排队中",
+      "RUNNING": "进行中"
+    },
+    "calls": "今日调用 {{calls}}",
+    "callsQuota": "今日调用 {{calls}}/{{quota}}",
+    "failures": "失败 {{n}}",
+    "warn80": "已达 80%",
+    "exhausted": "已达限额 — 暂停调用至次日",
+    "usageTitle": "调用量(最近 90 天)",
+    "usageOf": "{{name}} 调用量",
+    "usageChart": "最近 {{days}} 天每日调用",
+    "noUsage": "没有调用记录",
+    "usageFailed": "无法加载调用量",
+    "cost": "费用：今日 {{today}} · 本月 {{month}}",
+    "fixErrors": "请检查输入内容。",
+    "validation": {
+      "apiKeyRequired": "启用时需要 API 密钥",
+      "gridRange": "超出网格范围(nx 1~149，ny 1~253)",
+      "icalUrl": "仅支持 https:// 或 webcal:// 地址",
+      "icalSourceRequired": "需要 iCal 地址或文件",
+      "refreshRange": "1~168 小时",
+      "positiveInteger": "不小于 1 的整数",
+      "costRange": "0~1,000,000",
+      "NOT_ICS": "仅支持 .ics 文件",
+      "TOO_LARGE": "文件须不超过 2MB"
+    }
+  },
+  "errors": {
+    "MODEL_FILE_INVALID": "不是 IFC 文件或超过 200MB(须不超过 200MB)",
+    "CALENDAR_EVENT_INVALID": "日程输入无效",
+    "EXTERNAL_API_QUOTA_EXCEEDED": "已达到外部 API 每日限额"
+  }
+}
