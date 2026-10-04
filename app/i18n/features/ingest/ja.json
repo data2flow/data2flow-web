@@ -4,7 +4,9 @@
       "monitor": "収集モニター",
       "sources": "データソース",
       "scripts": "スクリプト",
-      "failures": "失敗メッセージ"
+      "failures": "失敗メッセージ",
+      "reprocess": "再処理",
+      "quality": "データ品質"
     },
     "stage": {
       "SOURCE": "ソース",
@@ -139,6 +141,104 @@
       "metric": "測定項目",
       "value": "値",
       "quality": "品質"
+    },
+    "crumb": "収集",
+    "reprocess": {
+      "title": "再処理",
+      "new": "新しい再処理ジョブ",
+      "from": "開始",
+      "to": "終了",
+      "source": "ソース",
+      "pickSource": "ソースを選択",
+      "devices": "機器(任意)",
+      "allDevices": "すべての機器",
+      "selectedDevices": "機器 {{n}}台",
+      "memo": "メモ",
+      "preview": "プレビュー",
+      "help": "期間は31日以内、原本の保管期間(直近30日)内である必要があります。結果の測定値は置き換えられ、フローは再反応しません。",
+      "previewTitle": "再処理プレビュー",
+      "target": "対象 {{n}}件",
+      "eta": {
+        "s": "予想 {{n}}秒",
+        "m": "予想 {{n}}分",
+        "h": "予想 {{n}}時間"
+      },
+      "decoder": "デコーダー {{key}} {{version}}",
+      "script": "スクリプト {{scope}} {{name}} v{{version}}",
+      "noTarget": "対象の原本がないため開始できません",
+      "start": "開始",
+      "previewFirst": "[プレビュー]で対象を確認してから開始できます。",
+      "jobs": "ジョブ一覧",
+      "noJobs": "再処理ジョブはありません",
+      "job": "ジョブ",
+      "targetCol": "対象",
+      "status": "状態",
+      "progress": "進捗",
+      "counts": "処理/失敗",
+      "requestedBy": "依頼者",
+      "time": "開始・終了",
+      "statuses": {
+        "PENDING": "待機",
+        "QUEUED": "キュー",
+        "RUNNING": "実行中",
+        "COMPLETED": "完了",
+        "FAILED": "失敗",
+        "CANCELLED": "取消済み"
+      },
+      "failedLink": "失敗項目を見る",
+      "polling": "実行中のジョブは5秒ごとに更新します。",
+      "confirmTitle": "再処理を開始",
+      "confirmBody": "該当期間の測定値が新しい結果に置き換わります。開始しますか?",
+      "cancelTitle": "ジョブの取消",
+      "cancelBody": "ジョブ RJ-{{id}} を取り消しますか?処理済みの区間はそのまま残ります。",
+      "cancelJob": "ジョブを取り消す",
+      "started": "再処理ジョブ RJ-{{id}} を開始しました(対象 {{total}}件)。",
+      "cancelled": "ジョブ RJ-{{id}} を取り消しました。",
+      "jobsFailed": "ジョブ一覧を読み込めませんでした。",
+      "validation": {
+        "source": "ソースを選択してください",
+        "periodRequired": "期間を入力してください",
+        "periodOrder": "終了は開始より後である必要があります",
+        "periodTooLong": "期間は31日以内です",
+        "memo": "メモは200文字までです"
+      }
+    },
+    "quality": {
+      "title": "データ品質",
+      "day": "日付",
+      "groupBy": "集計単位",
+      "space": "空間",
+      "groups": {
+        "device": "機器",
+        "space": "空間",
+        "model": "モデル"
+      },
+      "loadFailed": "品質スコアを読み込めませんでした。しばらくしてから再試行してください。",
+      "empty": "まだ計算された品質スコアはありません。毎日00:30に計算されます",
+      "summary": "対象 {{n}}件・平均スコア {{avg}}",
+      "ranking": "品質順位(低い順)",
+      "score": "スコア",
+      "completeness": "完全性",
+      "timeliness": "適時性",
+      "validity": "有効性",
+      "stability": "安定性",
+      "gaps": "欠損",
+      "clockSkew": "時刻ずれ",
+      "suspect": "疑い",
+      "showTrend": "推移",
+      "openChart": "{{name}} スコア {{score}} — 問題区間のチャートを見る",
+      "trend": "30日間のスコア推移・{{name}}",
+      "noTrend": "推移データはありません",
+      "trendTitle": "品質スコアの推移",
+      "distribution": "問題種別の分布",
+      "noDistribution": "分布データはありません",
+      "issues": {
+        "gaps": "欠損",
+        "outOfRange": "範囲外",
+        "suspect": "値の停止の疑い",
+        "late": "遅延到着"
+      },
+      "bottom10": "下位10件"
     }
   },
   "errors": {
@@ -147,6 +247,8 @@
     "ING_QUERY_RANGE_TOO_LARGE": "照会期間は31日以内にしてください。",
     "ING_REPROCESS_OUT_OF_RETENTION": "保管期間を過ぎたメッセージは再処理できません。",
     "ING_RAW_MESSAGE_NOT_FOUND": "元メッセージが見つかりません。",
-    "METRICS_UNAVAILABLE": "指標を読み込めませんでした。"
+    "METRICS_UNAVAILABLE": "指標を読み込めませんでした。",
+    "ING_REPROCESS_ALREADY_RUNNING": "このソースには実行中の再処理ジョブがあります",
+    "ING_REPROCESS_NOT_CANCELLABLE": "終了したジョブは取り消せません"
   }
 }

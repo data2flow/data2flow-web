@@ -4,7 +4,9 @@
       "monitor": "수집 모니터",
       "sources": "데이터 소스",
       "scripts": "스크립트",
-      "failures": "실패 메시지"
+      "failures": "실패 메시지",
+      "reprocess": "재처리",
+      "quality": "데이터 품질"
     },
     "stage": {
       "SOURCE": "소스",
@@ -139,6 +141,104 @@
       "metric": "측정 항목",
       "value": "값",
       "quality": "품질"
+    },
+    "crumb": "수집",
+    "reprocess": {
+      "title": "재처리",
+      "new": "새 재처리 작업",
+      "from": "시작",
+      "to": "끝",
+      "source": "소스",
+      "pickSource": "소스를 고르세요",
+      "devices": "기기(선택)",
+      "allDevices": "전체 기기",
+      "selectedDevices": "기기 {{n}}대",
+      "memo": "메모",
+      "preview": "미리 보기",
+      "help": "기간은 31일 이하, 원본이 보관된 기간(최근 30일) 안이어야 합니다. 결과 측정값은 교체되고 플로우는 다시 반응하지 않습니다.",
+      "previewTitle": "재처리 미리 보기",
+      "target": "대상 {{n}}건",
+      "eta": {
+        "s": "예상 {{n}}초",
+        "m": "예상 {{n}}분",
+        "h": "예상 {{n}}시간"
+      },
+      "decoder": "디코더 {{key}} {{version}}",
+      "script": "스크립트 {{scope}} {{name}} v{{version}}",
+      "noTarget": "대상 원본이 없어 시작할 수 없습니다",
+      "start": "시작",
+      "previewFirst": "[미리 보기]로 대상을 확인한 뒤 시작할 수 있습니다.",
+      "jobs": "작업 목록",
+      "noJobs": "재처리 작업이 없습니다",
+      "job": "작업",
+      "targetCol": "대상",
+      "status": "상태",
+      "progress": "진행률",
+      "counts": "처리/실패",
+      "requestedBy": "요청자",
+      "time": "시작·종료",
+      "statuses": {
+        "PENDING": "대기",
+        "QUEUED": "대기열",
+        "RUNNING": "실행 중",
+        "COMPLETED": "완료",
+        "FAILED": "실패",
+        "CANCELLED": "취소됨"
+      },
+      "failedLink": "실패 항목 보기",
+      "polling": "진행 중인 작업은 5초마다 새로 고칩니다.",
+      "confirmTitle": "재처리 시작",
+      "confirmBody": "해당 기간의 측정값이 새 결과로 바뀝니다. 시작할까요?",
+      "cancelTitle": "작업 취소",
+      "cancelBody": "RJ-{{id}} 작업을 취소할까요? 이미 처리한 구간은 그대로 남습니다.",
+      "cancelJob": "작업 취소",
+      "started": "재처리 작업 RJ-{{id}}을 시작했습니다(대상 {{total}}건).",
+      "cancelled": "RJ-{{id}} 작업을 취소했습니다.",
+      "jobsFailed": "작업 목록을 불러오지 못했습니다.",
+      "validation": {
+        "source": "소스를 고르세요",
+        "periodRequired": "기간을 입력하세요",
+        "periodOrder": "끝이 시작보다 뒤여야 합니다",
+        "periodTooLong": "기간은 31일 이하입니다",
+        "memo": "메모는 200자까지입니다"
+      }
+    },
+    "quality": {
+      "title": "데이터 품질",
+      "day": "날짜",
+      "groupBy": "묶음 기준",
+      "space": "공간",
+      "groups": {
+        "device": "기기",
+        "space": "공간",
+        "model": "모델"
+      },
+      "loadFailed": "품질 점수를 불러오지 못했습니다. 잠시 후 다시 시도하세요.",
+      "empty": "아직 계산된 품질 점수가 없습니다. 매일 00:30에 계산됩니다",
+      "summary": "대상 {{n}}개 · 평균 점수 {{avg}}",
+      "ranking": "품질 순위(낮은 순)",
+      "score": "점수",
+      "completeness": "완전성",
+      "timeliness": "적시성",
+      "validity": "유효성",
+      "stability": "안정성",
+      "gaps": "공백",
+      "clockSkew": "시계 오차",
+      "suspect": "의심",
+      "showTrend": "추이",
+      "openChart": "{{name}} 점수 {{score}} — 문제 구간 차트 보기",
+      "trend": "30일 점수 추이 · {{name}}",
+      "noTrend": "추이 데이터가 없습니다",
+      "trendTitle": "품질 점수 추이",
+      "distribution": "문제 유형 분포",
+      "noDistribution": "분포 데이터가 없습니다",
+      "issues": {
+        "gaps": "공백",
+        "outOfRange": "범위 초과",
+        "suspect": "값 멈춤 의심",
+        "late": "지연 도착"
+      },
+      "bottom10": "최하위 10개"
     }
   },
   "errors": {
@@ -147,6 +247,8 @@
     "ING_QUERY_RANGE_TOO_LARGE": "조회 기간은 31일 이하여야 합니다.",
     "ING_REPROCESS_OUT_OF_RETENTION": "보관 기간이 지난 메시지는 재처리할 수 없습니다.",
     "ING_RAW_MESSAGE_NOT_FOUND": "원본 메시지를 찾을 수 없습니다.",
-    "METRICS_UNAVAILABLE": "지표를 불러오지 못했습니다."
+    "METRICS_UNAVAILABLE": "지표를 불러오지 못했습니다.",
+    "ING_REPROCESS_ALREADY_RUNNING": "이 소스에 실행 중인 재처리 작업이 있습니다",
+    "ING_REPROCESS_NOT_CANCELLABLE": "이미 끝난 작업은 취소할 수 없습니다"
   }
 }

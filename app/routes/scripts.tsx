@@ -8,7 +8,9 @@ import { callApi, callList, field, listOrThrow, newIdempotencyKey } from "~/bff/
 import { bff } from "~/bff/middleware.server";
 import { Badge, Button, ButtonLink, Card, Checkbox, EmptyState, PageHeader, Pager, SelectField, Table, TextField } from "~/components/ui";
 import { IngestAreaTabs } from "~/features/ingest/area-tabs";
+import { ScriptAreaTabs } from "~/features/scripts/area-tabs";
 import { CreateScriptDialog, type ScriptTemplate } from "~/features/scripts/create-script-dialog";
+import { isSlow } from "~/features/scripts/model/m5";
 import { SCRIPT_QUOTA, bindingSummary, checkCreateInput, isHighErrorRate } from "~/features/scripts/model/script-model";
 import { errorText } from "~/lib/error-text";
 import { formatDateTime } from "~/lib/format";
@@ -132,6 +134,7 @@ export default function Scripts({ loaderData, actionData }: Route.ComponentProps
         }
       />
       <IngestAreaTabs current="scripts" />
+      <ScriptAreaTabs current="scripts" />
       {quotaReached && canWrite && <p className="mb-2 text-[12.5px] text-warn">{t("scripts.quotaReached")}</p>}
       {dialogOpen && (
         <CreateScriptDialog
@@ -219,7 +222,14 @@ export default function Scripts({ loaderData, actionData }: Route.ComponentProps
                     <td>{s.hasDraft && <span title={t("scripts.hasDraft")} aria-label={t("scripts.hasDraft")} className="text-accent">●</span>}</td>
                     <td className="font-mono">{s.stats24h?.processed == null ? "–" : s.stats24h.processed.toLocaleString(i18n.language)}</td>
                     <td className={isHighErrorRate(rate) ? "font-mono text-bad" : "font-mono"}>{rate == null ? "–" : `${(rate * 100).toFixed(1)}%`}</td>
-                    <td className="font-mono">{s.stats24h?.p95Ms ?? "–"}</td>
+                    <td className="font-mono">
+                      {s.stats24h?.p95Ms ?? "–"}
+                      {isSlow(s.stats24h?.p95Ms) && (
+                        <span className="ml-1">
+                          <Badge tone="warning">{`⚠ ${t("scripts.ops.slowBadge")}`}</Badge>
+                        </span>
+                      )}
+                    </td>
                     <td>{s.lastDeployedAt ? `${s.lastDeployedBy ?? ""} ${formatDateTime(s.lastDeployedAt, root?.timezone ?? "Asia/Seoul", i18n.language)}` : "–"}</td>
                   </tr>
                 );

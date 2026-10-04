@@ -4,7 +4,9 @@
       "monitor": "采集监控",
       "sources": "数据源",
       "scripts": "脚本",
-      "failures": "失败消息"
+      "failures": "失败消息",
+      "reprocess": "重新处理",
+      "quality": "数据质量"
     },
     "stage": {
       "SOURCE": "数据源",
@@ -139,6 +141,104 @@
       "metric": "测量项",
       "value": "值",
       "quality": "质量"
+    },
+    "crumb": "采集",
+    "reprocess": {
+      "title": "重新处理",
+      "new": "新建重新处理作业",
+      "from": "开始",
+      "to": "结束",
+      "source": "数据源",
+      "pickSource": "请选择数据源",
+      "devices": "设备(可选)",
+      "allDevices": "全部设备",
+      "selectedDevices": "{{n}} 台设备",
+      "memo": "备注",
+      "preview": "预览",
+      "help": "期间须不超过 31 天且在原始数据保留期(最近 30 天)内。结果会替换已存值,流程不会再次响应。",
+      "previewTitle": "重新处理预览",
+      "target": "目标 {{n}} 条",
+      "eta": {
+        "s": "预计 {{n}} 秒",
+        "m": "预计 {{n}} 分钟",
+        "h": "预计 {{n}} 小时"
+      },
+      "decoder": "解码器 {{key}} {{version}}",
+      "script": "脚本 {{scope}} {{name}} v{{version}}",
+      "noTarget": "没有目标原始数据,无法开始",
+      "start": "开始",
+      "previewFirst": "请先[预览]确认目标后再开始。",
+      "jobs": "作业列表",
+      "noJobs": "没有重新处理作业",
+      "job": "作业",
+      "targetCol": "目标",
+      "status": "状态",
+      "progress": "进度",
+      "counts": "处理/失败",
+      "requestedBy": "请求人",
+      "time": "开始·结束",
+      "statuses": {
+        "PENDING": "等待",
+        "QUEUED": "排队",
+        "RUNNING": "运行中",
+        "COMPLETED": "已完成",
+        "FAILED": "失败",
+        "CANCELLED": "已取消"
+      },
+      "failedLink": "查看失败项",
+      "polling": "运行中的作业每 5 秒刷新一次。",
+      "confirmTitle": "开始重新处理",
+      "confirmBody": "该期间的测量值将被新结果替换。要开始吗?",
+      "cancelTitle": "取消作业",
+      "cancelBody": "要取消作业 RJ-{{id}} 吗?已处理的区间会保留。",
+      "cancelJob": "取消作业",
+      "started": "已开始重新处理作业 RJ-{{id}}(目标 {{total}} 条)。",
+      "cancelled": "已取消作业 RJ-{{id}}。",
+      "jobsFailed": "无法加载作业列表。",
+      "validation": {
+        "source": "请选择数据源",
+        "periodRequired": "请输入期间",
+        "periodOrder": "结束时间须晚于开始时间",
+        "periodTooLong": "期间不能超过 31 天",
+        "memo": "备注最多 200 个字符"
+      }
+    },
+    "quality": {
+      "title": "数据质量",
+      "day": "日期",
+      "groupBy": "分组依据",
+      "space": "空间",
+      "groups": {
+        "device": "设备",
+        "space": "空间",
+        "model": "型号"
+      },
+      "loadFailed": "无法加载质量分数,请稍后重试。",
+      "empty": "尚无已计算的质量分数。每天 00:30 计算",
+      "summary": "{{n}} 个对象 · 平均分 {{avg}}",
+      "ranking": "质量排名(由低到高)",
+      "score": "分数",
+      "completeness": "完整性",
+      "timeliness": "及时性",
+      "validity": "有效性",
+      "stability": "稳定性",
+      "gaps": "缺口",
+      "clockSkew": "时钟偏差",
+      "suspect": "疑似",
+      "showTrend": "趋势",
+      "openChart": "{{name}} 分数 {{score}} — 查看问题区间图表",
+      "trend": "30 天分数趋势 · {{name}}",
+      "noTrend": "没有趋势数据",
+      "trendTitle": "质量分数趋势",
+      "distribution": "问题类型分布",
+      "noDistribution": "没有分布数据",
+      "issues": {
+        "gaps": "缺口",
+        "outOfRange": "超出范围",
+        "suspect": "疑似数值停滞",
+        "late": "延迟到达"
+      },
+      "bottom10": "最低 10 个"
     }
   },
   "errors": {
@@ -147,6 +247,8 @@
     "ING_QUERY_RANGE_TOO_LARGE": "查询期间不能超过 31 天。",
     "ING_REPROCESS_OUT_OF_RETENTION": "已超过保存期限的消息无法重新处理。",
     "ING_RAW_MESSAGE_NOT_FOUND": "找不到原始消息。",
-    "METRICS_UNAVAILABLE": "无法加载指标。"
+    "METRICS_UNAVAILABLE": "无法加载指标。",
+    "ING_REPROCESS_ALREADY_RUNNING": "该数据源已有正在运行的重新处理作业",
+    "ING_REPROCESS_NOT_CANCELLABLE": "已结束的作业无法取消"
   }
 }

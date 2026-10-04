@@ -17,8 +17,10 @@ import { modelsHandler } from "./models";
 import { homeHandler } from "./home";
 import { ingestHandler } from "./ingest";
 import { scriptsHandler } from "./scripts";
+import { scriptsM5Handler } from "./scripts-m5";
 import { sourcesHandler } from "./sources";
 import { spacesHandler } from "./spaces";
 import { telemetryHandler } from "./telemetry";
 
-export const CORE_HANDLERS: CoreHandler[] = [rulesHandler, notifyHandler, flowopsHandler, flowsHandler, simHandler, controlHandler, spacesHandler, devicesHandler, modelsHandler, groupsHandler, sourcesHandler, telemetryHandler, ingestHandler, scriptsHandler, homeHandler, baseHandler];
+// M5 scripts: scriptsM5Handler는 /scripts·/ingest 핸들러보다 먼저 M5 경로를 받는다
+export const CORE_HANDLERS: CoreHandler[] = [scriptsM5Handler, rulesHandler, notifyHandler, flowopsHandler, flowsHandler, simHandler, controlHandler, spacesHandler, devicesHandler, modelsHandler, groupsHandler, sourcesHandler, telemetryHandler, ingestHandler, scriptsHandler, homeHandler, baseHandler];

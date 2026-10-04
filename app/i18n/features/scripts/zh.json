@@ -47,7 +47,9 @@
       "noTemplate": "使用默认代码开始",
       "source": "绑定的数据源（DECODE 只能一个）",
       "models": "绑定的设备型号",
-      "submit": "创建"
+      "submit": "创建",
+      "preview": "模板代码预览",
+      "configDefaults": "默认设置值: {{values}}"
     },
     "validation": {
       "name": "请输入 2~80 个字符的名称。",
@@ -55,7 +57,7 @@
       "decodeOneSource": "DECODE 脚本只能绑定一个数据源",
       "transformTargets": "TRANSFORM 脚本绑定到型号或设备",
       "memo": "请输入部署说明",
-      "forceReason": "请输入强制部署的原因",
+      "forceReason": "请输入至少 {{min}} 个字符的强制部署原因",
       "json": "JSON 格式不正确（{{line}}:{{col}}）",
       "jsonTooLarge": "输入不能超过 256KB",
       "jsonEmpty": "请输入 JSON"
@@ -77,7 +79,10 @@
       "tabs": {
         "code": "代码",
         "versions": "版本",
-        "usage": "使用位置"
+        "usage": "使用位置",
+        "tests": "测试用例 {{n}}",
+        "config": "设置",
+        "ops": "运行"
       }
     },
     "problems": {
@@ -110,7 +115,16 @@
       "force": "强制部署",
       "forceReason": "强制部署的原因",
       "applied": "已部署。实例应用 {{reported}}/{{total}}",
-      "blocked": "存在错误，无法部署。只有警告时可以部署。"
+      "blocked": "存在错误，无法部署。只有警告时可以部署。",
+      "cases": "测试用例",
+      "casesUnavailable": "无法检查(部署时服务器会再次检查)",
+      "noCases": "没有已保存用例",
+      "casesFailed": "存在失败用例,无法部署。请修改代码或用例。",
+      "casesFailedForce": "存在失败用例。管理员可填写原因后强制部署。",
+      "next": "下一步",
+      "reprocess": "重新处理历史数据",
+      "reprocessSource": "数据源 {{id}}",
+      "unverified": "查看并批准未验证指标"
     },
     "test": {
       "title": "测试",
@@ -181,6 +195,209 @@
       "disableNote": "从下一条消息开始跳过，可随时重新启用。",
       "disabled": "已停用，影响 {{devices}} 台设备、24小时 {{n}} 条消息。",
       "enabled": "已启用。"
+    },
+    "area": {
+      "scripts": "脚本列表",
+      "modules": "共享模块",
+      "formulas": "公式指标"
+    },
+    "cases": {
+      "title": "测试用例 {{n}}",
+      "running": "运行中…",
+      "runAll": "全部运行",
+      "new": "新建用例",
+      "saved": "已保存测试用例。",
+      "confirmDelete": "要删除用例“{{name}}”吗?",
+      "runSummary": "测试用例 {{passed}}/{{total}} 通过",
+      "empty": "在测试运行结果中点击[保存为测试用例]来添加",
+      "name": "名称",
+      "input": "输入摘要",
+      "compareMode": "比较方式",
+      "lastResult": "最近结果",
+      "actions": "操作",
+      "passed": "通过",
+      "failed": "失败",
+      "editor": "编辑测试用例",
+      "inputJson": "输入 JSON",
+      "contextJson": "上下文 JSON(可选)",
+      "expectedJson": "期望输出 JSON",
+      "compareFields": "比较字段(逗号分隔)",
+      "tolerance": "允许误差",
+      "diffChanged": "{{key}} 期望 {{expected}} / 实际 {{actual}}",
+      "diffMissing": "输出中缺少 {{key}}",
+      "diffExtra": "{{key}} 为非期望输出",
+      "modes": {
+        "EXACT": "完全一致",
+        "FIELDS": "指定字段",
+        "TOLERANCE": "允许误差"
+      },
+      "validation": {
+        "name": "名称须为 1~80 个字符。",
+        "nameDuplicated": "已存在同名用例",
+        "quota": "每个脚本最多 {{max}} 个测试用例",
+        "json": "JSON 格式不正确",
+        "jsonTooLarge": "JSON 最大 256KB",
+        "fields": "请至少输入一个比较字段",
+        "tolerance": "允许误差须为 0~1000 之间的数字"
+      },
+      "defaultName": "用例",
+      "saveFromRun": "保存为测试用例",
+      "saveNeedsDirect": "只有直接输入运行的结果才能保存为用例",
+      "savedFromRun": "已将当前输入和输出保存为测试用例。"
+    },
+    "config": {
+      "title": "设置值(ctx.config)",
+      "help": "请勿在代码中写死数字,改用设置值。仅修改设置值时无需新版本,10 秒内生效并记录审计日志。不能放入机密值。",
+      "empty": "没有设置值。",
+      "name": "名称",
+      "type": "类型",
+      "value": "值",
+      "add": "添加设置值",
+      "saved": "已保存设置值,10 秒内生效。",
+      "conflict": "其他用户已先修改。请刷新后重新保存。",
+      "types": {
+        "string": "字符串",
+        "number": "数字",
+        "boolean": "布尔值"
+      },
+      "validation": {
+        "name": "字母、数字和 _,最多 64 个(不能以数字开头)",
+        "secret": "不能使用疑似机密值的名称(token、password、secret、_key)",
+        "duplicated": "名称重复",
+        "tooLarge": "值最大 1KB",
+        "number": "请输入数字",
+        "boolean": "true 或 false",
+        "tooMany": "最多 {{max}} 个设置值"
+      }
+    },
+    "ops": {
+      "title": "运行指标",
+      "period": "期间",
+      "periods": {
+        "1h": "1 小时",
+        "24h": "24 小时",
+        "7d": "7 天"
+      },
+      "warnings": "警告",
+      "slow": "性能警告 p95 {{ms}}ms",
+      "errorRate": "错误率 {{pct}}%",
+      "hints": "可能原因",
+      "hint": {
+        "LARGE_LOOP": "迭代次数大的循环",
+        "LARGE_INPUT": "输入过大"
+      },
+      "noStats": "此期间没有处理记录",
+      "processed": "处理条数",
+      "errors": "错误数",
+      "avg": "平均(ms)",
+      "p95": "p95(ms)",
+      "deployMark": "v{{n}} 部署",
+      "version": "版本",
+      "errorRateCol": "错误率",
+      "errorList": "错误(最近 {{n}} 条)",
+      "errorKeep": "每个脚本仅保留最近 100 条。",
+      "noErrors": "没有错误",
+      "at": "时间",
+      "code": "错误代码",
+      "message": "消息",
+      "position": "行:列",
+      "showInput": "查看输入",
+      "testWithInput": "用此输入测试",
+      "logs": "运行日志(console.log)",
+      "logExtend": "延长 30 分钟",
+      "logOn": "开启日志收集",
+      "logOff": "关闭",
+      "logRemaining": "收集中 · 剩余 {{time}}",
+      "logExpired": "已超过 30 分钟,自动关闭",
+      "logOffState": "关闭 — 开启后 30 分钟内每个脚本每秒最多收集 10 条",
+      "noLogs": "没有收集到日志",
+      "slowBadge": "慢"
+    },
+    "modules": {
+      "title": "共享模块",
+      "new": "新建模块",
+      "name": "模块名称",
+      "nameHint": "小写字母、数字和 -,3~40 个",
+      "description": "说明",
+      "validation": {
+        "name": "名称须为 3~40 个小写字母、数字或 -",
+        "nameTaken": "已存在同名模块"
+      },
+      "latest": "最新 v{{n}}",
+      "unreleased": "没有已发布版本",
+      "saved": "已保存模块代码。",
+      "released": "已发布 v{{n}}。只有导入此版本的脚本会受影响。",
+      "confirmDelete": "要删除 v{{n}} 吗?",
+      "inUse": "有脚本正在使用 v{{n}},无法删除",
+      "versions": "版本与使用脚本",
+      "noVersions": "尚未发布任何版本",
+      "releasedAt": "发布时间",
+      "usedBy": "使用脚本",
+      "unused": "未使用",
+      "release": "发布版本",
+      "releaseBody": "将用当前代码创建 v{{n}}。已发布版本不可更改。",
+      "exportHint": "用 export function/const 导出,脚本中用 import { … } from 'module:名称@版本' 导入。",
+      "loadFailed": "无法加载模块列表。",
+      "empty": "还没有共享模块",
+      "emptyBody": "将多个脚本共用的函数(如 Milesight 通道解析器)做成模块,并指定版本导入。",
+      "latestCol": "最新",
+      "usedByCol": "使用脚本",
+      "usedByN": "{{n}} 个",
+      "updatedAt": "更新时间"
+    },
+    "formulas": {
+      "title": "公式指标",
+      "new": "新建公式",
+      "edit": "编辑 {{key}}",
+      "empty": "还没有公式指标",
+      "emptyBody": "无需代码即可创建派生指标,例如 thi(temperature, humidity)。",
+      "resultKey": "结果键",
+      "displayName": "显示名称",
+      "unit": "单位",
+      "expression": "公式",
+      "target": "适用对象",
+      "targetType": "对象类型",
+      "status": "状态",
+      "statuses": {
+        "ACTIVE": "启用",
+        "DISABLED": "停用"
+      },
+      "targets": {
+        "MODEL": "型号",
+        "DEVICE": "设备",
+        "SPACE": "空间(含下级)"
+      },
+      "pickTarget": "请选择对象",
+      "suggestions": "自动补全",
+      "chips": "插入指标键和函数",
+      "previewHours": "预览范围",
+      "hours": "最近 {{n}} 小时",
+      "preview": "预览",
+      "save": "保存并部署",
+      "previewTitle": "公式预览",
+      "previewEmpty": "此期间没有可计算的数据",
+      "result": "结果",
+      "saved": "已保存 {{key}},从下一条消息开始计算。",
+      "confirmDelete": "要删除公式 {{key}} 吗?已保存的值会保留。",
+      "versionConflict": "其他用户已先修改。请刷新后重新保存。",
+      "loadFailed": "无法加载公式列表。",
+      "validation": {
+        "pattern": "结果键须以字母开头,2~64 个字母、数字或 _",
+        "conflict": "该指标已存在",
+        "displayName": "请输入 1~80 个字符的显示名称",
+        "target": "请选择适用对象"
+      },
+      "errors": {
+        "empty": "请输入公式",
+        "tooLong": "公式最多 {{max}} 个字符",
+        "unexpected": "意外的字符: {{token}}",
+        "unclosed": "公式不完整(请检查括号)",
+        "unknownFunction": "未知函数: {{name}}",
+        "unknownKey": "未知指标: {{name}}",
+        "arity": "函数 {{name}} 需要 {{min}}~{{max}} 个参数",
+        "window": "窗口须为 1m~24h: {{token}}",
+        "keyArg": "{{name}} 的第一个参数须为指标键"
+      }
     }
   },
   "errors": {
@@ -194,6 +411,12 @@
     "SCRIPT_STATIC_CHECK_FAILED": "存在静态检查错误，无法部署。请查看问题列表。",
     "SCRIPT_TEST_FAILED": "测试用例失败，未部署。",
     "SCRIPT_TIMEOUT": "超过运行时间限制。",
-    "SCRIPT_OUTPUT_INVALID": "输出不符合标准消息格式。"
+    "SCRIPT_OUTPUT_INVALID": "输出不符合标准消息格式。",
+    "SCRIPT_MODULE_IN_USE": "有脚本正在使用此模块版本,无法删除",
+    "SCRIPT_MODULE_NOT_FOUND": "找不到导入的模块版本",
+    "SCRIPT_FORMULA_INVALID": "公式无效",
+    "SCRIPT_FORMULA_KEY_CONFLICT": "该指标已存在",
+    "SCRIPT_FORMULA_NOT_FOUND": "找不到公式指标",
+    "SCRIPT_CONFIG_SECRET_FORBIDDEN": "设置值中不能放入机密值"
   }
 }
