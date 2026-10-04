@@ -11,7 +11,7 @@ import { PageHeader } from "~/components/ui";
 import { simApi } from "~/features/sim/api";
 import { SimAreaTabs, VirtualBadge } from "~/features/sim/components/common";
 import { RunPanel } from "~/features/sim/components/run-panel";
-import type { Scenario, SimOverview, SimRun } from "~/features/sim/model/types";
+import type { Scenario, SimRun, SimSpace } from "~/features/sim/model/types";
 import { hasAny } from "~/lib/permissions";
 import type { RootData } from "~/root";
 import type { Route } from "./+types/sim-run";
@@ -23,16 +23,16 @@ export function meta() {
 export async function loader({ request, context, params }: Route.LoaderArgs) {
   const ctx = bff(context);
   const run = orThrow(await callApi<SimRun>(ctx, request, `/api/v1/core/sim/runs/${encodeURIComponent(params.runId)}`));
-  const [scenario, overview, devices] = await Promise.all([
+  const [scenario, spaces, devices] = await Promise.all([
     run.scenarioId ? callApi<Scenario>(ctx, request, `/api/v1/core/sim/scenarios/${encodeURIComponent(run.scenarioId)}`) : Promise.resolve(null),
-    callApi<SimOverview>(ctx, request, "/api/v1/core/sim/overview"),
+    callList<SimSpace>(ctx, request, "/api/v1/core/sim/spaces"),
     callList<{ id: string; name: string; virtual?: boolean; kind?: string }>(ctx, request, "/api/v1/core/devices?virtual=true&size=100"),
   ]);
   const deviceRows = devices.ok ? devices.list.responses : [];
   return {
     run,
     scenarioName: scenario?.ok ? scenario.data.name : null,
-    spaceNames: overview.ok ? Object.fromEntries(overview.data.spaces.map((s) => [s.spaceId, s.name])) : {},
+    spaceNames: spaces.ok ? Object.fromEntries(spaces.list.responses.map((s) => [String(s.spaceId), s.name])) : {},
     devices: deviceRows.map((d) => ({ deviceId: d.id, name: d.name, virtual: d.virtual !== false })),
   };
 }

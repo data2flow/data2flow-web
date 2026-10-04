@@ -2,6 +2,9 @@
  * 가상 환경 가짜 API(design/api/SIM-api.md API-SIM-01~27, 부록 A). 상태는 core.extra["sim"].
  * 가상 기기는 core.devices에 virtual=true로 넣어 기기 상세(API-DEV-23)·목록(API-DEV-11 `virtual=true`)과 함께 보이게 한다.
  * 권한: 조회 SIM_READ, 실행·장애·재생 SIM_RUN, 관리 SIM_MANAGE, 샌드박스 SIM_ADMIN(아니면 403 PERMISSION_DENIED).
+ * core M3 계약을 따른다: 프로필·가상 공간·프리셋 목록은 페이징 없는 `{responses, totalCount}`(ItemsResponse), 프리셋과 overview presets에
+ * `scenarioId`(준비 전 null), SIM 오류 상세는 `errors[{field, code, message}]`. 재생(API-SIM-22·23)은 core가 M3에서 열지 않아
+ * 기본은 404(`replayEnabled`를 켜면 M4 모양으로 답한다).
  */
 import { HttpResponse } from "msw";
 import { envelope, fail, list, noContent, ok, type CoreHandler, type CoreState, type FakeDevice } from "../core-fixtures";
@@ -111,7 +114,9 @@ export interface SimState {
   scenarios: Scenario[];
   runs: Run[];
   faults: Fault[];
-  presets: { key: string; name: string; description: string; estimatedMinutes: number; state: string }[];
+  presets: { key: string; name: string; description: string; estimatedMinutes: number; state: string; scenarioId: string | null }[];
+  /** 재생 API(M4). core M3는 열지 않으므로 기본 false → 404 */
+  replayEnabled: boolean;
   devicesLimit: number;
   idempotency: Map<string, unknown>;
   files: Map<string, { columns: string[]; rows: number }>;
@@ -196,16 +201,27 @@ function initial(): SimState {
     runs: [],
     faults: [],
     presets: [
-      { key: "classroom-crowded", name: "여름 강의실 과밀", description: "CO2→환기 자동화", estimatedMinutes: 16, state: "NOT_PREPARED" },
-      { key: "heatwave-afternoon", name: "폭염 오후", description: "온도→냉방", estimatedMinutes: 8, state: "PREPARED" },
-      { key: "sensor-failure", name: "센서 고장", description: "멈춤→알람", estimatedMinutes: 6, state: "NOT_PREPARED" },
-      { key: "gateway-outage", name: "게이트웨이 장애", description: "오프라인→복구", estimatedMinutes: 6, state: "NOT_PREPARED" },
-      { key: "night-unmanned", name: "야간 무인", description: "문→알림", estimatedMinutes: 10, state: "NOT_PREPARED" },
+      { key: "classroom-crowded", name: "여름 강의실 과밀", description: "CO2→환기 자동화", estimatedMinutes: 16, state: "NOT_PREPARED", scenarioId: null },
+      { key: "heatwave-afternoon", name: "폭염 오후", description: "온도→냉방", estimatedMinutes: 8, state: "PREPARED", scenarioId: "601" },
+      { key: "sensor-failure", name: "센서 고장", description: "멈춤→알람", estimatedMinutes: 6, state: "NOT_PREPARED", scenarioId: null },
+      { key: "gateway-outage", name: "게이트웨이 장애", description: "오프라인→복구", estimatedMinutes: 6, state: "NOT_PREPARED", scenarioId: null },
+      { key: "night-unmanned", name: "야간 무인", description: "문→알림", estimatedMinutes: 10, state: "NOT_PREPARED", scenarioId: null },
     ],
+    replayEnabled: false,
     devicesLimit: 500,
     idempotency: new Map(),
     files: new Map(),
   };
+}
+
+/** 페이징 없는 작은 목록(core ItemsResponse, api-rules §3.3) */
+function items(rows: unknown[]) {
+  return HttpResponse.json({ ...envelope(undefined), responses: rows, totalCount: rows.length });
+}
+
+/** SIM 범위 오류(api-rules §5 errors 상세) */
+function outOfRangeFail(field: string) {
+  return fail(400, "SIM_PROPERTY_OUT_OF_RANGE", { errors: [{ field, code: "SIM_PROPERTY_OUT_OF_RANGE", message: "허용 범위를 벗어났습니다" }] });
 }
 
 function virtualDevice(id: string, name: string, kind: string, spaceId: string): FakeDevice {
@@ -228,11 +244,12 @@ function rows(state: SimState, type: SimType, profile: Profile | undefined, devi
   });
 }
 
-function outOfRange(type: SimType, overrides: Record<string, unknown>) {
-  return Object.entries(overrides).some(([k, v]) => {
+/** 범위 밖 특성 키(없으면 undefined) */
+function outOfRange(type: SimType, overrides: Record<string, unknown>): string | undefined {
+  return Object.entries(overrides).find(([k, v]) => {
     const def = type.propertyDefs.find((d) => d.key === k);
     return v !== null && def?.type === "number" && (typeof v !== "number" || (def.min !== undefined && v < def.min) || (def.max !== undefined && v > def.max));
-  });
+  })?.[0];
 }
 
 function deviceConfig(core: CoreState, state: SimState, cfg: DeviceCfg) {
@@ -300,7 +317,7 @@ export const simHandler: CoreHandler = async (core, req) => {
 
   // 프로필(API-SIM-08)
   if (path === "/sim/profiles") {
-    if (method === "GET") return list(state.profiles.map((p) => ({ ...p, typeName: state.types.find((t) => t.id === p.typeId)?.name, deviceCount: state.devices.filter((d) => d.profileId === p.id).length })), url);
+    if (method === "GET") return items(state.profiles.map((p) => ({ ...p, typeName: state.types.find((t) => t.id === p.typeId)?.name, deviceCount: state.devices.filter((d) => d.profileId === p.id).length })));
     if (need("SIM_MANAGE")) return denied();
     const name = String(body.name ?? "");
     if (state.profiles.some((p) => p.name === name)) return fail(409, "SIM_PROFILE_NAME_DUPLICATED");
@@ -322,7 +339,7 @@ export const simHandler: CoreHandler = async (core, req) => {
     }
     if (body.baseVersion !== undefined && body.baseVersion !== profile.version) return fail(409, "VERSION_CONFLICT");
     const overrides = (body.overrides as Record<string, unknown>) ?? {};
-    if (outOfRange(type, overrides)) return fail(400, "SIM_PROPERTY_OUT_OF_RANGE");
+    if (outOfRange(type, overrides)) return outOfRangeFail(`overrides.${outOfRange(type, overrides)}`);
     Object.assign(profile, { name: body.name ?? profile.name, overrides, version: profile.version + 1 });
     return ok({ ...profile, properties: rows(state, type, profile) });
   }
@@ -359,7 +376,7 @@ export const simHandler: CoreHandler = async (core, req) => {
     const type = state.types.find((t) => t.id === cfg.typeId) as SimType;
     if (body.overrides) {
       const overrides = body.overrides as Record<string, unknown>;
-      if (outOfRange(type, overrides)) return fail(400, "SIM_PROPERTY_OUT_OF_RANGE");
+      if (outOfRange(type, overrides)) return outOfRangeFail(`overrides.${outOfRange(type, overrides)}`);
       for (const [k, v] of Object.entries(overrides)) {
         if (v === null) delete cfg.overrides[k];
         else cfg.overrides[k] = v;
@@ -397,6 +414,9 @@ export const simHandler: CoreHandler = async (core, req) => {
   }
 
   // 가상 공간(API-SIM-10·24)
+  if (path === "/sim/spaces" && method === "GET") {
+    return items(state.spaces.map((s) => ({ ...s, type: "ROOM", virtual: true, deviceCount: core.devices.filter((d) => d.virtual && d.spaceId === s.spaceId).length, volumeM3: 198, current: { temperature: 27.1, humidity: 55, co2: 1240, pm2_5: 12, illumination: 300, noise: 40, occupancy: 0 } })));
+  }
   if (path === "/sim/spaces" && method === "POST") {
     if (need("SIM_MANAGE")) return denied();
     const space: Space = { spaceId: core.nextId(), name: String(body.name), parentId: (body.parentId as string) ?? null, preset: String(body.preset), physics: body.physics as Record<string, unknown>, sandbox: false, version: 1 };
@@ -424,7 +444,7 @@ export const simHandler: CoreHandler = async (core, req) => {
     }
     if (body.baseVersion !== space.version) return fail(409, "VERSION_CONFLICT");
     const areaM2 = (body.physics as { areaM2?: number } | undefined)?.areaM2 ?? 0;
-    if (areaM2 < 1 || areaM2 > 5000) return fail(400, "SIM_PROPERTY_OUT_OF_RANGE");
+    if (areaM2 < 1 || areaM2 > 5000) return outOfRangeFail("physics.areaM2");
     Object.assign(space, { name: body.name, preset: body.preset, physics: body.physics, parentId: body.parentId ?? null, version: space.version + 1 });
     return ok({ ...space, deviceCount: 0 });
   }
@@ -478,6 +498,7 @@ export const simHandler: CoreHandler = async (core, req) => {
   }
 
   // 프리셋(API-SIM-18)
+  if (path === "/sim/presets" && method === "GET") return items(state.presets.map((p) => ({ ...p, spaceName: p.name, spacePreset: "CLASSROOM", devices: [], flowTemplates: [] })));
   const presetMatch = /^\/sim\/presets\/([^/]+)\/prepare$/.exec(path);
   if (presetMatch && method === "POST") {
     if (need("SIM_MANAGE")) return denied();
@@ -490,6 +511,7 @@ export const simHandler: CoreHandler = async (core, req) => {
       state.scenarios.push(scenario);
     }
     preset.state = "PREPARED";
+    preset.scenarioId = scenario.scenarioId;
     return ok({ scenarioId: scenario.scenarioId, spaceIds: ["41"], deviceIds: ["2001", "2002"], flowIds: [], ruleIds: [], reused });
   }
 
@@ -557,7 +579,8 @@ export const simHandler: CoreHandler = async (core, req) => {
     return ok({ faultId: fault.faultId, kind: fault.kind, status: fault.status, simFrom: fault.simFrom, simTo: fault.simTo });
   }
 
-  // 재생(API-SIM-22·23)
+  // 재생(API-SIM-22·23): core M3는 열지 않는다
+  if ((path === "/sim/replay-files" || path === "/sim/replays") && !state.replayEnabled) return fail(404, "RESOURCE_NOT_FOUND");
   if (path === "/sim/replay-files" && method === "POST") {
     if (need("SIM_RUN")) return denied();
     const form = await req.request.formData();

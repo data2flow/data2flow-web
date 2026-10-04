@@ -1,5 +1,5 @@
 /**
- * UI-SIM-11 실제 데이터 재생 — 파일 가져오기(SIM-06.03): CSV·JSON Lines 업로드(≤100MB, API-SIM-23) → 열 매핑(시각·기기·측정 열)
+ * UI-SIM-11 실제 데이터 재생 — 파일 가져오기(SIM-06.03): CSV·JSON Lines 업로드(≤10MB, API-SIM-23) → 열 매핑(시각·기기·측정 열)
  * → 미리 보기 20행 → 대상 건수 확인(dryRun) → 재생 시작(API-SIM-22). 업로드는 같은 화면 action이 multipart로 중계하고,
  * 파일 오류(SIM_IMPORT_INVALID)는 문제 행 번호와 이유를 보인다.
  */
@@ -7,12 +7,18 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Form } from "react-router";
 import { Alert, Button, Card, CsrfField, SelectField, Table, TextField } from "~/components/ui";
-import { errorText } from "~/lib/error-text";
+import { simErrorText } from "../model/sim-error";
 import type { SimApi } from "../api";
 import { checkMapping, checkReplayFile, guessMapping, replayBody, TIME_FORMATS, type ColumnMapping } from "../model/replay";
 import type { Problem } from "../model/sim";
 import type { ReplayFile } from "../model/types";
 import { useProblemText } from "./common";
+
+/** core가 재생 경로를 아직 열지 않았을 때(M3, M4에서 열림) 오는 상태 */
+export const REPLAY_UNAVAILABLE = [404, 405, 501];
+
+const failureText = (t: ReturnType<typeof useTranslation>["t"], result: { status: number; code: string; message?: string; errors?: { field: string; code: string; message: string }[] }) =>
+  REPLAY_UNAVAILABLE.includes(result.status) && !result.code.startsWith("SIM_") ? t("errors.SIM_REPLAY_UNAVAILABLE") : simErrorText(t, result);
 
 export interface UploadError {
   code: string;
@@ -64,7 +70,7 @@ export function ReplayView({
     const body = build();
     if (!body) return;
     const result = await api.replay(body, true);
-    if (!result.ok) setError(errorText(t, result) ?? null);
+    if (!result.ok) setError(failureText(t, result) ?? null);
     else setCount(result.data.total);
   };
 
@@ -73,7 +79,7 @@ export function ReplayView({
     const body = build();
     if (!body) return;
     const result = await api.replay(body, false);
-    if (!result.ok) setError(errorText(t, result) ?? null);
+    if (!result.ok) setError(failureText(t, result) ?? null);
     else if (result.data.runId) navigate(`/sim/runs/${encodeURIComponent(result.data.runId)}`);
   };
 
@@ -112,7 +118,7 @@ export function ReplayView({
         {uploadError && (
           <div className="mt-3">
             <Alert tone="danger">
-              {errorText(t, uploadError)}
+              {simErrorText(t, uploadError)}
               {uploadError.row ? ` ${t("sim.replay.errorRow", { row: uploadError.row, reason: uploadError.reason ?? "" })}` : ""}
             </Alert>
           </div>

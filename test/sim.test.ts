@@ -66,10 +66,12 @@ describe("UI-SIM-01 가상 환경 홈(SIM-04.05, SIM-11.01)", () => {
     expect((await lee.post("/sim", { intent: "other", presetKey: "a" })).response.status).toBe(400);
   });
 
-  it("M3 시연: '폭염 오후'를 x60으로 실행 → 시나리오 ID를 찾아 API-SIM-14(Idempotency-Key) → 실행 패널", async () => {
+  it("M3 시연: '폭염 오후'를 x60으로 실행 → 프리셋 scenarioId(API-SIM-18)로 API-SIM-14(Idempotency-Key) → 실행 패널", async () => {
     const kim = await operator();
-    await kim.get("/sim");
-    const run = await kim.post("/sim", { intent: "run", presetKey: "heatwave-afternoon", acceleration: "60", idempotencyKey: "k-run" });
+    const home0 = await kim.get("/sim");
+    // overview presets의 scenarioId를 폼에 실어 보낸다(시나리오 목록을 뒤지지 않는다)
+    expect(home0.body).toContain('name="scenarioId" value="601"');
+    const run = await kim.post("/sim", { intent: "run", presetKey: "heatwave-afternoon", scenarioId: "601", acceleration: "60", idempotencyKey: "k-run" });
     expect(run.response.status).toBe(302);
     const location = run.response.headers.get("Location") as string;
     expect(location).toMatch(/^\/sim\/runs\/\d+$/);
@@ -83,11 +85,17 @@ describe("UI-SIM-01 가상 환경 홈(SIM-04.05, SIM-11.01)", () => {
     expect(panel.body).toContain("시뮬레이션 시각");
     expect(panel.body).toContain("실제 시각");
     expect(panel.body).toContain(">일시정지<");
+    expect(app.gateway.received.some((r) => r.method === "GET" && /\/sim\/scenarios(\?|$)/.test(r.path))).toBe(false);
+    // 폼에 scenarioId가 없으면 프리셋 목록(GET /core/sim/presets)에서 찾는다
+    const fallback = await kim.post("/sim", { intent: "run", presetKey: "heatwave-afternoon", acceleration: "30", idempotencyKey: "k-run-2" });
+    expect(fallback.response.status).toBe(302);
+    expect(last("GET", "/api/v1/core/sim/presets")).toBeTruthy();
+    expect(last("POST", "/api/v1/core/sim/runs")?.body).toMatchObject({ scenarioId: "601", acceleration: 30 });
     // 준비 안 된 프리셋·잘못된 가속
     expect((await kim.post("/sim", { intent: "run", presetKey: "night-unmanned", acceleration: "60" })).body).toContain("데모를 먼저 준비하세요");
     expect((await kim.post("/sim", { intent: "run", presetKey: "heatwave-afternoon", acceleration: "61" })).response.status).toBe(400);
     const home = await kim.get("/sim");
-    expect(home.body).toContain("실행 1/5");
+    expect(home.body).toContain("실행 2/5");
   });
 });
 
@@ -165,6 +173,8 @@ describe("UI-SIM-06 가상 공간과 물리 설정(SIM-01.01·01.02, SIM-07.03)"
     const lee = await integrator();
     const list = await lee.get("/sim/spaces");
     expect(list.body).toContain('href="/sim/spaces/41"');
+    // 목록은 API-SIM-10 GET(ItemsResponse)
+    expect(last("GET", "/api/v1/core/sim/spaces")?.path).toBe("/api/v1/core/sim/spaces");
     const detail = await lee.get("/sim/spaces/41");
     expect(detail.body).toContain('value="66"');
     expect(detail.body).toContain("TH-1");
@@ -273,8 +283,29 @@ describe("UI-SIM-09·10·12 실행 패널·장애 주입·결과(SIM-04.02, SIM-
 });
 
 describe("UI-SIM-11 실제 데이터 재생 — 파일 가져오기(SIM-06.03)", () => {
-  it("CSV 업로드는 multipart로 중계 → 매핑·미리 보기, 열 누락은 행 번호, 대상 건수·재생 시작", async () => {
+  it("M3: core가 재생 경로(API-SIM-22·23)를 열지 않으면(404) '아직 쓸 수 없음' 문구, 10MB 넘는 파일은 BFF에서 거부", async () => {
     const kim = await operator();
+    expect((await kim.get("/sim/replay")).body).toContain("최대 10MB");
+    const csv = "timestamp,deviceId,temperature\n2026-10-02T00:00:00Z,AM107,22";
+    const form = new FormData();
+    form.set("_csrf", kim.csrf);
+    form.set("intent", "upload");
+    form.set("file", new File([csv], "a.csv", { type: "text/csv" }));
+    const res = await kim.request("/sim/replay", { method: "POST", body: form });
+    expect(res.response.status).toBe(503);
+    expect(res.body).toContain("실제 데이터 재생은 아직 쓸 수 없습니다");
+    expect(last("POST", "/api/v1/core/sim/replay-files")).toBeTruthy();
+    const big = new FormData();
+    big.set("_csrf", kim.csrf);
+    big.set("intent", "upload");
+    big.set("file", new File([new Uint8Array(10 * 1024 * 1024 + 1)], "big.csv", { type: "text/csv" }));
+    const tooBig = await kim.request("/sim/replay", { method: "POST", body: big });
+    expect([400, 413]).toContain(tooBig.response.status);
+  });
+
+  it("CSV 업로드는 multipart로 중계 → 매핑·미리 보기, 열 누락은 행 번호, 대상 건수·재생 시작(M4 계약)", async () => {
+    const kim = await operator();
+    simState(app.gateway.m2).replayEnabled = true;
     const page = await kim.get("/sim/replay");
     expect(page.body).toContain("파일 가져오기");
     const csv = ["timestamp,deviceId,temperature,humidity", ...Array.from({ length: 30 }, (_, i) => `2026-10-02T00:${String(i).padStart(2, "0")}:00Z,AM107,22.${i},44`)].join("\n");

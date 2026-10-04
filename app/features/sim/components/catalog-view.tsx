@@ -7,7 +7,7 @@ import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { Form, Link } from "react-router";
 import { Alert, Badge, Button, ButtonLink, Card, CsrfField, Dialog, EmptyState, SelectField, Table, Tabs, TextField } from "~/components/ui";
-import { errorText } from "~/lib/error-text";
+import { simErrorText, type SimFailure } from "../model/sim-error";
 import { SPACE_PRESETS, checkPlacement, type Problem } from "../model/sim";
 import type { KitPlacement, SimCatalog, SimKit, SimProfile, SimType } from "../model/types";
 import { VirtualBadge, useProblemText } from "./common";
@@ -16,7 +16,7 @@ export type CatalogTab = "sensor" | "actuator" | "kit";
 
 export interface CatalogActionResult {
   intent?: string;
-  error?: { code: string; message?: string };
+  error?: SimFailure;
   fieldErrors?: Record<string, Problem>;
   placed?: { deviceId: string; name: string }[];
   kit?: KitPlacement;
@@ -33,6 +33,7 @@ export function CatalogView({
   profiles,
   remaining,
   canManage,
+  canWriteFlow = false,
   result,
   idempotencyKey,
 }: {
@@ -42,6 +43,8 @@ export function CatalogView({
   profiles: SimProfile[];
   remaining: number | null;
   canManage: boolean;
+  /** 추천 플로우 [플로우로 만들기]는 템플릿(API-FLW-20, FLOW_WRITE)을 쓴다. 없으면 숨긴다 */
+  canWriteFlow?: boolean;
   result?: CatalogActionResult;
   idempotencyKey: string;
 }) {
@@ -61,7 +64,7 @@ export function CatalogView({
           <Alert tone="success">{t("sim.catalog.placed", { n: result.placed.length, names: result.placed.map((d) => d.name).join(", ") })}</Alert>
         </div>
       )}
-      {result?.kit && <KitResult placement={result.kit} spaces={spaces} />}
+      {result?.kit && <KitResult placement={result.kit} spaces={spaces} canWriteFlow={canWriteFlow} />}
       {result?.error && !placing && !kit && (
         <div className="mb-3">
           <Alert tone="danger">{placementError(t, result.error, remaining)}</Alert>
@@ -118,9 +121,9 @@ export function CatalogView({
   );
 }
 
-function placementError(t: ReturnType<typeof useTranslation>["t"], error: { code: string; message?: string }, remaining: number | null) {
+function placementError(t: ReturnType<typeof useTranslation>["t"], error: SimFailure, remaining: number | null) {
   if (error.code === "SIM_DEVICE_QUOTA_EXCEEDED") return t("sim.validation.quota", { limit: 500, remaining: remaining ?? 0 });
-  return errorText(t, error);
+  return simErrorText(t, error);
 }
 
 function PlaceDialog({
@@ -246,7 +249,7 @@ function KitDialog({ kit, spaces, result, idempotencyKey, onClose }: { kit: SimK
         </Table>
         {result?.error && (
           <p role="alert" className="text-[12.5px] text-bad">
-            {errorText(t, result.error)}
+            {simErrorText(t, result.error)}
           </p>
         )}
         <div className="flex justify-end gap-2">
@@ -261,7 +264,7 @@ function KitDialog({ kit, spaces, result, idempotencyKey, onClose }: { kit: SimK
 }
 
 /** 키트 배치 결과: 만든 기기와 추천 플로우(템플릿 화면에 대상 공간을 채워 연다) */
-export function KitResult({ placement, spaces }: { placement: KitPlacement; spaces: { spaceId: string; name: string }[] }) {
+export function KitResult({ placement, spaces, canWriteFlow = false }: { placement: KitPlacement; spaces: { spaceId: string; name: string }[]; canWriteFlow?: boolean }) {
   const { t } = useTranslation();
   const spaceName = spaces.find((s) => s.spaceId === placement.spaceId)?.name ?? placement.spaceId;
   return (
@@ -275,19 +278,19 @@ export function KitResult({ placement, spaces }: { placement: KitPlacement; spac
     >
       <ul className="flex flex-wrap gap-2 text-[12.5px]">
         {placement.devices.map((d) => (
-          <li key={d.deviceId}>
-            <Link className="text-accent hover:underline" to={`/devices/${encodeURIComponent(d.deviceId)}?tab=virtual`}>
+          <li key={String(d.deviceId)}>
+            <Link className="text-accent hover:underline" to={`/devices/${encodeURIComponent(String(d.deviceId))}?tab=virtual`}>
               {d.name}
             </Link>
             {d.relation ? <span className="ml-1 text-muted">{`(${d.relation})`}</span> : null}
           </li>
         ))}
       </ul>
-      {placement.suggestedFlows.length > 0 && (
+      {canWriteFlow && (placement.suggestedFlows ?? []).length > 0 && (
         <div className="mt-3 flex flex-col gap-2">
           <p className="text-[12.5px] font-semibold">{t("sim.catalog.suggestedFlows")}</p>
           <div className="flex flex-wrap gap-2">
-            {placement.suggestedFlows.map((f) => (
+            {(placement.suggestedFlows ?? []).map((f) => (
               <ButtonLink key={f.templateKey} to={`/automation/templates?template=${encodeURIComponent(f.templateKey)}&spaceId=${encodeURIComponent(placement.spaceId)}`} variant="primary">
                 {t("sim.catalog.makeFlow", { name: f.name })}
               </ButtonLink>

@@ -1,15 +1,16 @@
 /**
- * 실제 데이터 재생(UI-SIM-11, SIM-06.03): 파일 크기 검사(≤100MB), 열 매핑 검사, 재생 요청 본문(API-SIM-22).
+ * 실제 데이터 재생(UI-SIM-11, SIM-06.03): 파일 크기 검사(≤10MB, API-SIM-23·BFF 본문 한도와 같다), 열 매핑 검사, 재생 요청 본문(API-SIM-22).
  */
 import type { Problem } from "./sim";
 
-export const MAX_REPLAY_BYTES = 100 * 1024 * 1024;
+export const MAX_REPLAY_MB = 10;
+export const MAX_REPLAY_BYTES = MAX_REPLAY_MB * 1024 * 1024;
 export const REPLAY_EXTENSIONS = [".csv", ".jsonl", ".ndjson", ".json"];
 export const TIME_FORMATS = ["ISO8601", "EPOCH_MS", "EPOCH_SEC", "yyyy-MM-dd HH:mm:ss"] as const;
 
 export function checkReplayFile(file: { name: string; size: number } | null | undefined): Problem | undefined {
   if (!file || !file.name) return { key: "fileRequired" };
-  if (file.size > MAX_REPLAY_BYTES) return { key: "fileTooLarge", values: { max: 100 } };
+  if (file.size > MAX_REPLAY_BYTES) return { key: "fileTooLarge", values: { max: MAX_REPLAY_MB } };
   const lower = file.name.toLowerCase();
   if (!REPLAY_EXTENSIONS.some((ext) => lower.endsWith(ext))) return { key: "fileType" };
   return undefined;

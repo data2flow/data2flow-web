@@ -11,8 +11,8 @@ import { bff } from "~/bff/middleware.server";
 import { Alert, Badge, Button, Card, CsrfField, EmptyState, PageHeader, SelectField, cx } from "~/components/ui";
 import { SimAreaTabs, VirtualBadge } from "~/features/sim/components/common";
 import { ACCELERATION_CHOICES, DEFAULT_DEMO_ACCELERATION, checkAcceleration, usageTone } from "~/features/sim/model/sim";
-import type { ScenarioRow, SimOverview } from "~/features/sim/model/types";
-import { errorText } from "~/lib/error-text";
+import type { SimOverview, SimPreset } from "~/features/sim/model/types";
+import { simErrorText, type SimFailure } from "~/features/sim/model/sim-error";
 import { formatDateTime } from "~/lib/format";
 import { hasAny } from "~/lib/permissions";
 import type { RootData } from "~/root";
@@ -28,34 +28,37 @@ export async function loader({ request, context }: Route.LoaderArgs) {
   return { overview, idempotencyKey: newIdempotencyKey() };
 }
 
-type ActionResult = { intent: string; presetKey?: string; error?: { code: string; message?: string }; prepared?: { reused: boolean; deviceIds?: string[] } };
+type ActionResult = { intent: string; presetKey?: string; error?: SimFailure; prepared?: { reused: boolean; deviceIds?: string[] } };
 
 export async function action({ request, context }: Route.ActionArgs) {
   const ctx = bff(context);
   const form = await request.formData();
   const intent = field(form, "intent");
   const presetKey = field(form, "presetKey");
-  const fail = (code: string, status: number, message?: string) => data<ActionResult>({ intent, presetKey, error: { code, message } }, { status });
+  const fail = (code: string, status: number, message?: string, errors?: SimFailure["errors"]) => data<ActionResult>({ intent, presetKey, error: { code, message, errors } }, { status });
   if (!/^[a-z0-9-]{1,40}$/.test(presetKey)) return fail("INVALID_REQUEST", 400);
   if (intent === "prepare") {
     const result = await callApi<{ scenarioId: string; reused: boolean; deviceIds?: string[] }>(ctx, request, `/api/v1/core/sim/presets/${encodeURIComponent(presetKey)}/prepare`, { method: "POST", idempotencyKey: field(form, "idempotencyKey") || newIdempotencyKey() });
-    if (!result.ok) return fail(result.code, result.status, result.message);
+    if (!result.ok) return fail(result.code, result.status, result.message, result.errors);
     return { intent, presetKey, prepared: { reused: result.data.reused, deviceIds: result.data.deviceIds } } satisfies ActionResult;
   }
   if (intent === "run") {
     const acceleration = Number(field(form, "acceleration"));
     if (checkAcceleration(acceleration)) return fail("INVALID_REQUEST", 400);
-    // 프리셋 시나리오 ID는 시나리오 목록의 presetKey로 찾는다(API-SIM-01 presets에는 scenarioId가 없다)
-    const scenarios = await callList<ScenarioRow>(ctx, request, "/api/v1/core/sim/scenarios?size=100");
-    if (!scenarios.ok) return fail(scenarios.code, scenarios.status, scenarios.message);
-    const scenario = scenarios.list.responses.find((s) => s.presetKey === presetKey);
-    if (!scenario) return fail("SIM_PRESET_NOT_PREPARED", 409);
+    // 프리셋 시나리오 ID는 overview·프리셋 목록(API-SIM-18 GET)의 scenarioId(준비 전이면 null)
+    let scenarioId = field(form, "scenarioId");
+    if (!/^[A-Za-z0-9_-]{1,64}$/.test(scenarioId)) {
+      const presets = await callList<SimPreset>(ctx, request, "/api/v1/core/sim/presets");
+      if (!presets.ok) return fail(presets.code, presets.status, presets.message, presets.errors);
+      scenarioId = presets.list.responses.find((p) => p.key === presetKey)?.scenarioId ?? "";
+    }
+    if (!scenarioId) return fail("SIM_PRESET_NOT_PREPARED", 409);
     const run = await callApi<{ runId: string }>(ctx, request, "/api/v1/core/sim/runs", {
       method: "POST",
       idempotencyKey: field(form, "idempotencyKey") || newIdempotencyKey(),
-      body: { scenarioId: scenario.scenarioId, acceleration, timestampPolicy: "SIMULATED", notificationPolicy: "PREFIX" },
+      body: { scenarioId, acceleration, timestampPolicy: "SIMULATED", notificationPolicy: "PREFIX" },
     });
-    if (!run.ok) return fail(run.code, run.status, run.message);
+    if (!run.ok) return fail(run.code, run.status, run.message, run.errors);
     return redirect(`/sim/runs/${encodeURIComponent(run.data.runId)}`);
   }
   return fail("INVALID_REQUEST", 400);
@@ -93,7 +96,7 @@ export default function SimHome({ loaderData, actionData }: Route.ComponentProps
       )}
       {result?.error && (
         <div className="mb-3">
-          <Alert tone="danger">{errorText(t, result.error)}</Alert>
+          <Alert tone="danger">{simErrorText(t, result.error)}</Alert>
         </div>
       )}
       {result?.prepared && (
@@ -195,6 +198,7 @@ function PresetCard({ preset, canManage, canRun, idempotencyKey, highlight }: { 
             <CsrfField />
             <input type="hidden" name="intent" value="run" />
             <input type="hidden" name="presetKey" value={preset.key} />
+            {preset.scenarioId && <input type="hidden" name="scenarioId" value={preset.scenarioId} />}
             <input type="hidden" name="idempotencyKey" value={`${idempotencyKey}-${preset.key}-run`} />
             <SelectField label={t("sim.run.acceleration")} name="acceleration" value={acceleration} onChange={(e) => setAcceleration(e.target.value)}>
               {ACCELERATION_CHOICES.map((n) => (

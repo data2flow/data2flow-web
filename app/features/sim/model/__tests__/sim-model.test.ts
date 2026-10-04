@@ -3,7 +3,8 @@
  * 실행 제어 상태(TC-SIM-047 일부), 재생 매핑(TC-SIM-075 일부).
  */
 import { describe, expect, it } from "vitest";
-import { checkMapping, checkReplayFile, guessMapping, replayBody } from "../replay";
+import { MAX_REPLAY_BYTES, checkMapping, checkReplayFile, guessMapping, replayBody } from "../replay";
+import { errorDetails, simErrorText } from "../sim-error";
 import {
   allowedControls,
   buildDeviceOutput,
@@ -164,9 +165,9 @@ describe("UI-SIM-03 가상 기기 출력 설정", () => {
 });
 
 describe("SIM-06.03 재생 파일·매핑(TC-SIM-075 일부)", () => {
-  it("파일 필수·100MB·확장자", () => {
+  it("파일 필수·10MB·확장자", () => {
     expect(checkReplayFile(null)).toEqual({ key: "fileRequired" });
-    expect(checkReplayFile({ name: "a.csv", size: 101 * 1024 * 1024 })).toEqual({ key: "fileTooLarge", values: { max: 100 } });
+    expect(checkReplayFile({ name: "a.csv", size: 11 * 1024 * 1024 })).toEqual({ key: "fileTooLarge", values: { max: 10 } });
     expect(checkReplayFile({ name: "a.xlsx", size: 1 })).toEqual({ key: "fileType" });
     expect(checkReplayFile({ name: "A.JSONL", size: 1 })).toBeUndefined();
   });
@@ -179,5 +180,24 @@ describe("SIM-06.03 재생 파일·매핑(TC-SIM-075 일부)", () => {
     expect(now.body).toEqual({ source: { type: "FILE", fileId: "f1", columnMapping: { time: "timestamp", deviceId: "deviceId", metrics: { temperature: "temperature" } }, timeFormat: "ISO8601" }, timeShift: { basis: "NOW" }, acceleration: 60, cloneSpaceId: "41", cloneSuffix: " [재생]" });
     expect(replayBody({ fileId: "f1", mapping, timeFormat: "ISO8601", basis: "AT", at: "2026-10-02T00:00:00Z", acceleration: 1, cloneSpaceId: "41" }).body?.timeShift).toEqual({ basis: "AT", at: "2026-10-02T00:00:00.000Z" });
     expect(Object.keys(replayBody({ fileId: "f1", mapping, timeFormat: "ISO8601", basis: "AT", acceleration: 0, cloneSpaceId: "" }).problems).sort()).toEqual(["acceleration", "at", "cloneSpaceId"]);
+  });
+});
+
+describe("SIM 오류 상세(api-rules §5 errors[], API-SIM-08·12·23)", () => {
+  const t = ((key: string, options?: { defaultValue?: string }) => (key === "errors.SIM_PROPERTY_OUT_OF_RANGE" ? "허용 범위를 벗어난 값입니다" : (options?.defaultValue ?? key))) as never;
+
+  it("TC-SIM-098 resultCode 문구에 field: message 상세를 붙이고 5개까지만", () => {
+    const errors = Array.from({ length: 7 }, (_, i) => ({ field: `overrides.k${i}`, code: "SIM_PROPERTY_OUT_OF_RANGE", message: "범위 밖" }));
+    expect(simErrorText(t, { code: "SIM_PROPERTY_OUT_OF_RANGE", errors: errors.slice(0, 1) })).toBe("허용 범위를 벗어난 값입니다 (overrides.k0: 범위 밖)");
+    expect(errorDetails(errors)).toHaveLength(5);
+    expect(errorDetails([{ field: null, code: "X", message: null }])).toEqual(["X"]);
+    expect(simErrorText(t, { code: "SIM_PROPERTY_OUT_OF_RANGE" })).toBe("허용 범위를 벗어난 값입니다");
+    expect(simErrorText(t, null)).toBeUndefined();
+  });
+
+  it("TC-SIM-075 재생 파일은 10MB까지(API-SIM-23, BFF 본문 한도)", () => {
+    expect(MAX_REPLAY_BYTES).toBe(10 * 1024 * 1024);
+    expect(checkReplayFile({ name: "a.csv", size: MAX_REPLAY_BYTES + 1 })).toEqual({ key: "fileTooLarge", values: { max: 10 } });
+    expect(checkReplayFile({ name: "a.csv", size: MAX_REPLAY_BYTES })).toBeUndefined();
   });
 });

@@ -10,7 +10,7 @@ import type { ChartFactory } from "~/components/charts/timeseries-chart";
 import { TimeseriesChart } from "~/components/charts/timeseries-chart";
 import { LiveBanner, useLiveStream } from "~/components/live";
 import { Alert, Badge, Button, Card, SelectField, Table } from "~/components/ui";
-import { errorText } from "~/lib/error-text";
+import { simErrorText } from "../model/sim-error";
 import type { EventSourceLike, StreamEvent } from "~/lib/event-stream";
 import { formatDateTime } from "~/lib/format";
 import type { SimApi } from "../api";
@@ -67,14 +67,14 @@ export function RunPanel({ run, title, spaceNames, actuatorNames, targets, canRu
     setError(null);
     const result = await api.control(run.runId, action);
     setBusy(false);
-    if (!result.ok) setError(errorText(t, result) ?? null);
+    if (!result.ok) setError(simErrorText(t, result) ?? null);
     else dispatch({ type: "patch", data: result.data });
   };
 
   const accelerate = async (value: number) => {
     setError(null);
     const result = await api.accelerate(run.runId, value);
-    if (!result.ok) setError(errorText(t, result) ?? null);
+    if (!result.ok) setError(simErrorText(t, result) ?? null);
     else dispatch({ type: "patch", data: result.data });
   };
 

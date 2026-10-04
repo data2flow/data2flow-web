@@ -86,6 +86,7 @@ describe("TC-SIM-092 AT-SIM-01.3 가상 기기 카탈로그", () => {
         profiles={[]}
         remaining={500}
         canManage
+        canWriteFlow
         result={{ intent: "kit", kit: { spaceId: "41", devices: [{ deviceId: "9001", name: "TH-1", typeKey: "th-sensor", relation: "MEASURES" }, { deviceId: "9003", name: "AC-1", typeKey: "aircon" }], suggestedFlows: [{ templateKey: "hot-then-cool", name: "고온이면 냉방" }] } }}
         idempotencyKey="k"
       />,
@@ -94,6 +95,24 @@ describe("TC-SIM-092 AT-SIM-01.3 가상 기기 카탈로그", () => {
     expect(await screen.findByText("데모 강의실에 키트 기기 2대를 배치했습니다")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "TH-1" })).toHaveAttribute("href", "/devices/9001?tab=virtual");
     expect(screen.getByRole("link", { name: "플로우로 만들기: 고온이면 냉방" })).toHaveAttribute("href", "/automation/templates?template=hot-then-cool&spaceId=41");
+  });
+
+  it("SIM-09.07 템플릿 권한(FLOW_WRITE)이 없으면 추천 플로우 [플로우로 만들기]를 숨기고, 배치 오류는 errors[] 상세를 함께 보인다", async () => {
+    await renderRoute(
+      <CatalogView
+        catalog={CATALOG}
+        tab="kit"
+        spaces={SPACES}
+        profiles={[]}
+        remaining={500}
+        canManage
+        result={{ intent: "kit", kit: { spaceId: "41", devices: [{ deviceId: "9001", name: "TH-1", typeKey: "th-sensor" }], suggestedFlows: [{ templateKey: "hot-then-cool", name: "고온이면 냉방" }] } }}
+        idempotencyKey="k"
+      />,
+      { session: meOf("INTEGRATOR") },
+    );
+    expect(await screen.findByText("데모 강의실에 키트 기기 1대를 배치했습니다")).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "플로우로 만들기: 고온이면 냉방" })).not.toBeInTheDocument();
   });
 
   it("빈 카탈로그·빈 키트 안내", async () => {

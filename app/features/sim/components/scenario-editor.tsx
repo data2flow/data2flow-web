@@ -7,6 +7,7 @@ import { useReducer, useRef, useState, type KeyboardEvent, type PointerEvent } f
 import { useTranslation } from "react-i18next";
 import { Alert, Button, Card, Checkbox, Dialog, SelectField, TextArea, TextField, cx } from "~/components/ui";
 import { errorText } from "~/lib/error-text";
+import { simErrorText } from "../model/sim-error";
 import type { SimApi } from "../api";
 import { EXPECTATION_KINDS, TRACKS, axisTicks, checkScenario, mapServerProblems, scenarioBody, scenarioReducer, toIso, type EditorEvent, type ScenarioState } from "../model/scenario";
 import { ACCELERATION_CHOICES, SENSOR_FAULTS, checkAcceleration, runBody, type Problem, type RunOptions } from "../model/sim";
@@ -436,7 +437,7 @@ export function RunOptionsDialog({ scenarioId, api, navigate, onClose, defaultAc
     const result = await api.startRun(runBody(scenarioId, { acceleration: Number(acceleration), timestampPolicy, notificationPolicy, seed: seed === "" ? null : Number(seed) }));
     setBusy(false);
     if (!result.ok) {
-      setError(errorText(t, result) ?? null);
+      setError(simErrorText(t, result) ?? null);
       return;
     }
     navigate(`/sim/runs/${encodeURIComponent(result.data.runId)}`);

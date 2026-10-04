@@ -381,7 +381,7 @@
       "uploadTitle": "Import file",
       "file": "CSV or JSON Lines file",
       "upload": "Upload",
-      "uploadHint": "Up to 100 MB. Needs time, device and metric columns.",
+      "uploadHint": "Up to 10MB. The file needs time, device, and metric columns.",
       "errorRow": "Row {{row}}: {{reason}}",
       "mappingTitle": "Column mapping ({{rows}} rows)",
       "timeColumn": "Time column",
@@ -451,6 +451,7 @@
     "SIM_SCENARIO_INVALID": "The scenario settings are invalid",
     "SIM_SANDBOX_VIOLATION": "Not allowed in a sandbox",
     "SIM_NOT_FOUND": "Not found",
-    "SIM_PRESET_NOT_PREPARED": "Prepare the demo first"
+    "SIM_PRESET_NOT_PREPARED": "Prepare the demo first",
+    "SIM_REPLAY_UNAVAILABLE": "Real data replay is not available yet (it opens in the next milestone)"
   }
 }

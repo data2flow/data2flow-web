@@ -8,9 +8,21 @@ export type PropertyOrigin = "CATALOG" | "PROFILE" | "DEVICE";
 export type SpacePreset = "CLASSROOM" | "OFFICE" | "MEETING" | "CUSTOM";
 
 /** API-SIM-01 */
+/** API-SIM-18 프리셋 목록 항목(overview presets에도 같은 scenarioId가 붙는다. 준비 전이면 null) */
+export interface SimPreset {
+  key: string;
+  name: string;
+  description?: string;
+  estimatedMinutes?: number;
+  state: PresetState;
+  scenarioId?: string | null;
+  spaceName?: string | null;
+  spacePreset?: string | null;
+}
+
 export interface SimOverview {
   usage: { devices: number; devicesLimit: number; runningRuns: number; runsLimit: number; virtualThroughputPct: number };
-  presets: { key: string; name: string; description?: string; estimatedMinutes?: number; state: PresetState }[];
+  presets: SimPreset[];
   runs: { runId: string; scenarioName: string; spaces?: string[] | string; accelerationEffective: number; progressPct: number; simClock: string }[];
   spaces: { spaceId: string; name: string; sensors: number; actuators: number; current?: { temperature?: number | null; co2?: number | null } | null; running: boolean }[];
   recentResults: { runId: string; passed: number; total: number; finishedAt: string }[];
@@ -105,7 +117,12 @@ export interface SimSpace {
   preset: SpacePreset;
   physics: SpacePhysics;
   sandbox: boolean;
+  type?: string;
+  virtual?: boolean;
   deviceCount?: number;
+  volumeM3?: number | null;
+  /** 목록(API-SIM-10 GET)의 현재 값. simulator가 아직 모르면 null */
+  current?: { temperature?: number | null; humidity?: number | null; co2?: number | null; pm2_5?: number | null; illumination?: number | null; noise?: number | null; occupancy?: number | null } | null;
   version: number;
   updatedAt?: string;
 }

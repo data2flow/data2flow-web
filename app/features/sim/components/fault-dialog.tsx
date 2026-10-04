@@ -6,7 +6,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Button, Dialog, SelectField, Table, TextField } from "~/components/ui";
-import { errorText } from "~/lib/error-text";
+import { simErrorText } from "../model/sim-error";
 import type { SimApi } from "../api";
 import { GATEWAY_FAULTS, SENSOR_FAULTS, buildFault, faultSpecs, type Problem } from "../model/sim";
 import type { SimFault } from "../model/types";
@@ -73,7 +73,7 @@ export function FaultDialog({
     if (!built.body) return;
     const result = await api.injectFault(built.body);
     if (!result.ok) {
-      setError(errorText(t, result) ?? null);
+      setError(simErrorText(t, result) ?? null);
       return;
     }
     setNotice(t("sim.fault.injected", { n: result.data.faultIds?.length ?? 0 }));
@@ -82,7 +82,7 @@ export function FaultDialog({
 
   const cancel = async (faultId: string) => {
     const result = await api.cancelFault(faultId);
-    if (!result.ok) setError(errorText(t, result) ?? null);
+    if (!result.ok) setError(simErrorText(t, result) ?? null);
     void load();
   };
 

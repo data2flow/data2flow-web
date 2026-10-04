@@ -381,7 +381,7 @@
       "uploadTitle": "导入文件",
       "file": "CSV 或 JSON Lines 文件",
       "upload": "上传",
-      "uploadHint": "最大 100 MB。需包含时间、设备和测量列。",
+      "uploadHint": "最大 10MB。文件需要包含时间、设备和测量列。",
       "errorRow": "第 {{row}} 行：{{reason}}",
       "mappingTitle": "列映射（{{rows}} 行）",
       "timeColumn": "时间列",
@@ -451,6 +451,7 @@
     "SIM_SCENARIO_INVALID": "场景设置不正确",
     "SIM_SANDBOX_VIOLATION": "沙箱中不允许此操作",
     "SIM_NOT_FOUND": "找不到目标",
-    "SIM_PRESET_NOT_PREPARED": "请先准备演示"
+    "SIM_PRESET_NOT_PREPARED": "请先准备演示",
+    "SIM_REPLAY_UNAVAILABLE": "真实数据回放暂不可用(将在下一阶段开放)"
   }
 }

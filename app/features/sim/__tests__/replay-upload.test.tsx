@@ -18,13 +18,13 @@ const FILE: ReplayFile = {
 };
 
 describe("TC-SIM-075 AT-SIM-12.3 실제 데이터 재생 — 파일 가져오기", () => {
-  it("업로드 전: 100MB 넘는 파일·지원하지 않는 확장자는 바로 막는다", async () => {
+  it("업로드 전: 10MB 넘는 파일·지원하지 않는 확장자는 바로 막는다", async () => {
     await renderRoute(<ReplayView spaces={SPACES} canRun api={fakeSimApi()} navigate={vi.fn()} />, { session: meOf("OPERATOR") });
     const input = (await screen.findByLabelText("CSV 또는 JSON Lines 파일")) as HTMLInputElement;
     const big = new File(["x"], "classroom.csv", { type: "text/csv" });
-    Object.defineProperty(big, "size", { value: 101 * 1024 * 1024 });
+    Object.defineProperty(big, "size", { value: 11 * 1024 * 1024 });
     fireEvent.change(input, { target: { files: [big] } });
-    expect(screen.getByRole("alert")).toHaveTextContent("파일은 100MB 이하여야 합니다.");
+    expect(screen.getByRole("alert")).toHaveTextContent("파일은 10MB 이하여야 합니다.");
     expect(screen.getByRole("button", { name: "올리기" })).toBeDisabled();
     fireEvent.change(input, { target: { files: [new File(["x"], "data.xlsx")] } });
     expect(screen.getByRole("alert")).toHaveTextContent("CSV 또는 JSON Lines 파일만 올릴 수 있습니다.");
@@ -92,5 +92,17 @@ describe("TC-SIM-075 AT-SIM-12.3 실제 데이터 재생 — 파일 가져오기
     expect(await screen.findByText("파일 형식이 올바르지 않습니다")).toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: "대상 건수 확인" }));
     expect(await screen.findAllByText("파일 형식이 올바르지 않습니다")).toHaveLength(1);
+  });
+
+  it("M3: core가 재생 경로를 열지 않아 404면 '아직 쓸 수 없음', SIM 오류는 errors[] 상세(행·이유)를 함께", async () => {
+    const api = fakeSimApi({ replay: vi.fn(() => failure(404, "RESOURCE_NOT_FOUND")) });
+    const { unmount } = await renderRoute(<ReplayView uploaded={FILE} spaces={SPACES} canRun api={api} navigate={vi.fn()} />, { session: meOf("OPERATOR") });
+    await userEvent.click(await screen.findByRole("button", { name: "재생 시작" }));
+    expect(await screen.findByText("실제 데이터 재생은 아직 쓸 수 없습니다(다음 단계에서 열립니다)")).toBeInTheDocument();
+    unmount();
+    const invalid = fakeSimApi({ replay: vi.fn(() => failure(400, "SIM_IMPORT_INVALID", [{ field: "rows[12]", code: "COLUMN_MISSING", message: "열 누락" }])) });
+    await renderRoute(<ReplayView uploaded={FILE} spaces={SPACES} canRun api={invalid} navigate={vi.fn()} />, { session: meOf("OPERATOR") });
+    await userEvent.click(await screen.findByRole("button", { name: "재생 시작" }));
+    expect(await screen.findByText("파일 형식이 올바르지 않습니다 (rows[12]: 열 누락)")).toBeInTheDocument();
   });
 });

@@ -13,7 +13,7 @@ import { SimAreaTabs, VirtualBadge, useProblemText } from "~/features/sim/compon
 import { PhysicsForm } from "~/features/sim/components/physics-form";
 import { SPACE_PRESETS, checkPhysics, physicsFromForm, presetPhysics, type Problem } from "~/features/sim/model/sim";
 import type { SimSpace, SpacePreset } from "~/features/sim/model/types";
-import { errorText } from "~/lib/error-text";
+import { simErrorText, type SimFailure } from "~/features/sim/model/sim-error";
 import { hasAny } from "~/lib/permissions";
 import { flattenSpaces, type SpaceNode } from "~/lib/spaces";
 import type { RootData } from "~/root";
@@ -46,7 +46,7 @@ export async function loader({ request, context, params }: Route.LoaderArgs) {
   };
 }
 
-type ActionResult = { intent: string; error?: { code: string; message?: string }; fieldErrors?: Record<string, Problem>; done?: boolean };
+type ActionResult = { intent: string; error?: SimFailure; fieldErrors?: Record<string, Problem>; done?: boolean };
 
 export async function action({ request, context, params }: Route.ActionArgs) {
   const ctx = bff(context);
@@ -54,7 +54,7 @@ export async function action({ request, context, params }: Route.ActionArgs) {
   const intent = field(form, "intent");
   const isNew = params.spaceId === "new";
   const path = `/api/v1/core/sim/spaces/${encodeURIComponent(params.spaceId)}`;
-  const fail = (code: string, status: number, message?: string) => data<ActionResult>({ intent, error: { code, message } }, { status });
+  const fail = (code: string, status: number, message?: string, errors?: SimFailure["errors"]) => data<ActionResult>({ intent, error: { code, message, errors } }, { status });
   if (intent === "save") {
     const preset = (SPACE_PRESETS as string[]).includes(field(form, "preset")) ? (field(form, "preset") as SpacePreset) : "CUSTOM";
     const physics = physicsFromForm(form, presetPhysics(preset));
@@ -66,18 +66,18 @@ export async function action({ request, context, params }: Route.ActionArgs) {
     if (field(form, "parentId")) body.parentId = field(form, "parentId");
     if (!isNew) body.baseVersion = Number(field(form, "baseVersion")) || 0;
     const result = await callApi<SimSpace>(ctx, request, isNew ? "/api/v1/core/sim/spaces" : path, { method: isNew ? "POST" : "PUT", body });
-    if (!result.ok) return fail(result.code, result.status, result.message);
+    if (!result.ok) return fail(result.code, result.status, result.message, result.errors);
     if (isNew) return redirect(`/sim/spaces/${encodeURIComponent(result.data.spaceId)}`);
     return { intent, done: true } satisfies ActionResult;
   }
   if (intent === "sandbox") {
     const result = await callApi(ctx, request, `${path}/sandbox`, { method: "PUT", body: { sandbox: field(form, "sandbox") === "true" } });
-    if (!result.ok) return fail(result.code, result.status, result.message);
+    if (!result.ok) return fail(result.code, result.status, result.message, result.errors);
     return { intent, done: true } satisfies ActionResult;
   }
   if (intent === "delete") {
     const result = await callApi(ctx, request, path, { method: "DELETE" });
-    if (!result.ok) return fail(result.code, result.status, result.message);
+    if (!result.ok) return fail(result.code, result.status, result.message, result.errors);
     return redirect("/sim/spaces");
   }
   return fail("INVALID_REQUEST", 400);
@@ -108,7 +108,7 @@ export default function SimSpaceDetailPage({ loaderData, actionData }: Route.Com
       <SimAreaTabs current="spaces" />
       {result?.error && (
         <div className="mb-3">
-          <Alert tone="danger">{errorText(t, result.error)}</Alert>
+          <Alert tone="danger">{simErrorText(t, result.error)}</Alert>
         </div>
       )}
       {result?.done && (

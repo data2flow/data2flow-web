@@ -381,7 +381,7 @@
       "uploadTitle": "ファイル取り込み",
       "file": "CSVまたはJSON Linesファイル",
       "upload": "アップロード",
-      "uploadHint": "最大100MB。時刻・デバイス・測定の列が必要です。",
+      "uploadHint": "最大10MB。時刻・機器・測定の列が必要です。",
       "errorRow": "{{row}}行目: {{reason}}",
       "mappingTitle": "列の対応付け（{{rows}}行）",
       "timeColumn": "時刻列",
@@ -451,6 +451,7 @@
     "SIM_SCENARIO_INVALID": "シナリオ設定が正しくありません",
     "SIM_SANDBOX_VIOLATION": "サンドボックスではできない操作です",
     "SIM_NOT_FOUND": "対象が見つかりません",
-    "SIM_PRESET_NOT_PREPARED": "先にデモを準備してください"
+    "SIM_PRESET_NOT_PREPARED": "先にデモを準備してください",
+    "SIM_REPLAY_UNAVAILABLE": "実データの再生はまだ使えません(次の段階で公開されます)"
   }
 }

@@ -13,7 +13,7 @@ import { SimAreaTabs, useProblemText } from "~/features/sim/components/common";
 import { PropertyForm } from "~/features/sim/components/property-form";
 import { checkProfileName, type Problem } from "~/features/sim/model/sim";
 import type { PropertyRow, SimCatalog, SimProfile } from "~/features/sim/model/types";
-import { errorText } from "~/lib/error-text";
+import { simErrorText, type SimFailure } from "~/features/sim/model/sim-error";
 import { hasAny } from "~/lib/permissions";
 import type { RootData } from "~/root";
 import type { Route } from "./+types/sim-profiles";
@@ -27,20 +27,20 @@ export async function loader({ request, context }: Route.LoaderArgs) {
   const url = new URL(request.url);
   const selectedId = url.searchParams.get("id");
   const [profiles, catalog, selected] = await Promise.all([
-    callList<SimProfile>(ctx, request, "/api/v1/core/sim/profiles?size=100"),
+    callList<SimProfile>(ctx, request, "/api/v1/core/sim/profiles"),
     callApi<SimCatalog>(ctx, request, "/api/v1/core/sim/catalog"),
     selectedId ? callApi<SimProfile>(ctx, request, `/api/v1/core/sim/profiles/${encodeURIComponent(selectedId)}`) : Promise.resolve(null),
   ]);
   return { profiles: listOrThrow(profiles).responses, types: catalog.ok ? catalog.data.types : [], selected: selected?.ok ? selected.data : null, selectedFailed: Boolean(selected && !selected.ok) };
 }
 
-type ActionResult = { intent: string; error?: { code: string; message?: string }; fieldErrors?: Record<string, Problem> };
+type ActionResult = { intent: string; error?: SimFailure; fieldErrors?: Record<string, Problem> };
 
 export async function action({ request, context }: Route.ActionArgs) {
   const ctx = bff(context);
   const form = await request.formData();
   const intent = field(form, "intent");
-  const fail = (code: string, status: number, message?: string) => data<ActionResult>({ intent, error: { code, message } }, { status });
+  const fail = (code: string, status: number, message?: string, errors?: SimFailure["errors"]) => data<ActionResult>({ intent, error: { code, message, errors } }, { status });
   if (intent === "create" || intent === "clone") {
     const name = field(form, "name");
     const problem = checkProfileName(name);
@@ -48,16 +48,16 @@ export async function action({ request, context }: Route.ActionArgs) {
     let overrides: Record<string, unknown> = {};
     if (intent === "clone") {
       const source = await callApi<SimProfile>(ctx, request, `/api/v1/core/sim/profiles/${encodeURIComponent(field(form, "sourceId"))}`);
-      if (!source.ok) return fail(source.code, source.status, source.message);
+      if (!source.ok) return fail(source.code, source.status, source.message, source.errors);
       overrides = source.data.overrides ?? Object.fromEntries((source.data.properties ?? []).filter((p) => p.origin === "PROFILE").map((p) => [p.key, p.value]));
     }
     const result = await callApi<SimProfile>(ctx, request, "/api/v1/core/sim/profiles", { method: "POST", body: { name: name.trim(), typeId: field(form, "typeId"), overrides } });
-    if (!result.ok) return fail(result.code, result.status, result.message);
+    if (!result.ok) return fail(result.code, result.status, result.message, result.errors);
     return redirect(`/sim/profiles?id=${encodeURIComponent(result.data.id)}`);
   }
   if (intent === "delete") {
     const result = await callApi(ctx, request, `/api/v1/core/sim/profiles/${encodeURIComponent(field(form, "id"))}`, { method: "DELETE" });
-    if (!result.ok) return fail(result.code, result.status, result.message);
+    if (!result.ok) return fail(result.code, result.status, result.message, result.errors);
     return redirect("/sim/profiles");
   }
   return fail("INVALID_REQUEST", 400);
@@ -85,7 +85,7 @@ export default function SimProfilesPage({ loaderData, actionData }: Route.Compon
       else merged[k] = v;
     }
     const response = await simApi.saveProfile(selected.id, { name: selected.name, typeId: selected.typeId, overrides: merged, baseVersion: selected.version });
-    if (!response.ok) return { ok: false, message: errorText(t, response) };
+    if (!response.ok) return { ok: false, message: simErrorText(t, response) };
     void revalidator.revalidate();
     return { ok: true };
   };
@@ -106,7 +106,7 @@ export default function SimProfilesPage({ loaderData, actionData }: Route.Compon
       <SimAreaTabs current="profiles" />
       {result?.error && (
         <div className="mb-3">
-          <Alert tone="danger">{errorText(t, result.error)}</Alert>
+          <Alert tone="danger">{simErrorText(t, result.error)}</Alert>
         </div>
       )}
       <Card>

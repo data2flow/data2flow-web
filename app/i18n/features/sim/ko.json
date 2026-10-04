@@ -381,7 +381,7 @@
       "uploadTitle": "파일 가져오기",
       "file": "CSV 또는 JSON Lines 파일",
       "upload": "올리기",
-      "uploadHint": "최대 100MB. 시각·기기·측정 열이 있어야 합니다.",
+      "uploadHint": "최대 10MB. 시각·기기·측정 열이 있어야 합니다.",
       "errorRow": "{{row}}행: {{reason}}",
       "mappingTitle": "열 매핑 ({{rows}}행)",
       "timeColumn": "시각 열",
@@ -451,6 +451,7 @@
     "SIM_SCENARIO_INVALID": "시나리오 설정이 올바르지 않습니다",
     "SIM_SANDBOX_VIOLATION": "샌드박스에서는 할 수 없는 동작입니다",
     "SIM_NOT_FOUND": "대상을 찾을 수 없습니다",
-    "SIM_PRESET_NOT_PREPARED": "데모를 먼저 준비하세요"
+    "SIM_PRESET_NOT_PREPARED": "데모를 먼저 준비하세요",
+    "SIM_REPLAY_UNAVAILABLE": "실제 데이터 재생은 아직 쓸 수 없습니다(다음 단계에서 열립니다)"
   }
 }

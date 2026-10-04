@@ -6,7 +6,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Alert, Button, Card, SelectField, TextField } from "~/components/ui";
-import { errorText } from "~/lib/error-text";
+import { simErrorText } from "../model/sim-error";
 import type { SimApi } from "../api";
 import { actuatorSummary } from "../model/run";
 import { buildDeviceOutput, type Problem } from "../model/sim";
@@ -44,7 +44,7 @@ export function VirtualDeviceTab({ deviceId, initial, failed, canManage, api }: 
 
   const saveOverrides = async (overrides: Record<string, unknown>) => {
     const result = await api.patchDevice(deviceId, { overrides });
-    if (!result.ok) return { ok: false, message: errorText(t, result) };
+    if (!result.ok) return { ok: false, message: simErrorText(t, result) };
     await reload();
     return { ok: true };
   };
@@ -55,7 +55,7 @@ export function VirtualDeviceTab({ deviceId, initial, failed, canManage, api }: 
     setProblems(built.problems);
     if (!built.body) return;
     const result = await api.patchDevice(deviceId, built.body);
-    if (!result.ok) setNotice({ tone: "danger", text: errorText(t, result) ?? "" });
+    if (!result.ok) setNotice({ tone: "danger", text: simErrorText(t, result) ?? "" });
     else {
       setNotice({ tone: "success", text: t("sim.property.saved") });
       await reload();

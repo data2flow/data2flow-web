@@ -10,7 +10,7 @@ import { PageHeader } from "~/components/ui";
 import { CatalogView, type CatalogActionResult, type CatalogTab } from "~/features/sim/components/catalog-view";
 import { SimAreaTabs } from "~/features/sim/components/common";
 import { checkPlacement } from "~/features/sim/model/sim";
-import type { KitPlacement, SimCatalog, SimOverview, SimProfile } from "~/features/sim/model/types";
+import type { KitPlacement, SimCatalog, SimOverview, SimProfile, SimSpace } from "~/features/sim/model/types";
 import { hasAny } from "~/lib/permissions";
 import type { RootData } from "~/root";
 import type { Route } from "./+types/sim-catalog";
@@ -21,15 +21,17 @@ export function meta() {
 
 export async function loader({ request, context }: Route.LoaderArgs) {
   const ctx = bff(context);
-  const [catalog, overview, profiles] = await Promise.all([
+  const [catalog, overview, profiles, spaces] = await Promise.all([
     callApi<SimCatalog>(ctx, request, "/api/v1/core/sim/catalog"),
     callApi<SimOverview>(ctx, request, "/api/v1/core/sim/overview"),
-    callList<SimProfile>(ctx, request, "/api/v1/core/sim/profiles?size=100"),
+    callList<SimProfile>(ctx, request, "/api/v1/core/sim/profiles"),
+    callList<SimSpace>(ctx, request, "/api/v1/core/sim/spaces"),
   ]);
   const usage = overview.ok ? overview.data.usage : null;
   return {
     catalog: orThrow(catalog),
-    spaces: overview.ok ? overview.data.spaces.map((s) => ({ spaceId: s.spaceId, name: s.name })) : [],
+    // 배치 대상은 가상 공간 목록(API-SIM-10 GET). 못 읽으면 요약(API-SIM-01)의 공간
+    spaces: spaces.ok ? spaces.list.responses.map((s) => ({ spaceId: String(s.spaceId), name: s.name })) : overview.ok ? overview.data.spaces.map((s) => ({ spaceId: s.spaceId, name: s.name })) : [],
     remaining: usage ? usage.devicesLimit - usage.devices : null,
     profiles: profiles.ok ? profiles.list.responses : [],
     idempotencyKey: newIdempotencyKey(),
@@ -49,7 +51,7 @@ export async function action({ request, context }: Route.ActionArgs) {
     if (input.namePrefix) body.namePrefix = input.namePrefix;
     if (field(form, "profileId")) body.profileId = field(form, "profileId");
     const result = await callApi<{ devices: { deviceId: string; name: string }[] }>(ctx, request, "/api/v1/core/sim/devices", { method: "POST", body, idempotencyKey: key });
-    if (!result.ok) return data<CatalogActionResult>({ intent, error: { code: result.code, message: result.message } }, { status: result.status });
+    if (!result.ok) return data<CatalogActionResult>({ intent, error: { code: result.code, message: result.message, errors: result.errors } }, { status: result.status });
     return { intent, placed: result.data.devices ?? [] } satisfies CatalogActionResult;
   }
   if (intent === "kit") {
@@ -64,7 +66,7 @@ export async function action({ request, context }: Route.ActionArgs) {
       body.spaceId = field(form, "spaceId");
     }
     const result = await callApi<KitPlacement>(ctx, request, `/api/v1/core/sim/kits/${encodeURIComponent(kitKey)}/place`, { method: "POST", body, idempotencyKey: key });
-    if (!result.ok) return data<CatalogActionResult>({ intent, error: { code: result.code, message: result.message } }, { status: result.status });
+    if (!result.ok) return data<CatalogActionResult>({ intent, error: { code: result.code, message: result.message, errors: result.errors } }, { status: result.status });
     return { intent, kit: result.data } satisfies CatalogActionResult;
   }
   return data<CatalogActionResult>({ intent, error: { code: "INVALID_REQUEST" } }, { status: 400 });
@@ -89,6 +91,7 @@ export default function SimCatalogPage({ loaderData, actionData }: Route.Compone
         profiles={loaderData.profiles}
         remaining={loaderData.remaining}
         canManage={hasAny(root?.me?.permissions, ["SIM_MANAGE"])}
+        canWriteFlow={hasAny(root?.me?.permissions, ["FLOW_WRITE"])}
         result={result}
         idempotencyKey={loaderData.idempotencyKey}
       />
