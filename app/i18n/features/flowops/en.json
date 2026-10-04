@@ -1,0 +1,402 @@
+{
+  "flowops": {
+    "areas": {
+      "flows": "Flows",
+      "snapshots": "Snapshots",
+      "pipelines": "Promotion pipelines",
+      "packages": "Extension nodes",
+      "sinks": "Sink connections"
+    },
+    "checks": {
+      "passed": "Passed",
+      "failed": "Failed",
+      "names": {
+        "testRun": "Test run",
+        "replayCommands": "Replay commands",
+        "replayNotifications": "Replay notifications",
+        "scenario": "Scenario expectations"
+      }
+    },
+    "mapping": {
+      "kind": "Kind",
+      "source": "Source",
+      "target": "Target",
+      "status": "Status",
+      "choose": "Choose…",
+      "derived": "Follows the space mapping",
+      "ok": "✓ Mapped",
+      "missing": "✗ Not mapped",
+      "none": "No references to map",
+      "targetOf": "Target for {{name}}",
+      "unmapped": "{{count}} target(s) not mapped",
+      "referencesFailed": "Could not read references of {{count}} flow(s)",
+      "kinds": {
+        "SPACE": "Space",
+        "DEVICE": "Device",
+        "RELATION": "Relation",
+        "SINK_CONNECTION": "Sink connection",
+        "NOTIFICATION_CHANNEL": "Notification channel",
+        "SCRIPT": "Script"
+      }
+    },
+    "sinks": {
+      "title": "Sink connections",
+      "new": "New connection",
+      "newTitle": "New sink connection",
+      "editTitle": "Edit connection: {{name}}",
+      "name": "Name",
+      "type": "Type",
+      "types": {
+        "POSTGRESQL": "PostgreSQL",
+        "MYSQL": "MySQL",
+        "INFLUXDB": "InfluxDB"
+      },
+      "host": "Host",
+      "port": "Port",
+      "database": "Database",
+      "bucket": "Bucket",
+      "org": "Organization (org)",
+      "username": "Username",
+      "password": "Password",
+      "token": "Token",
+      "tls": "Use TLS",
+      "secretKept": "Leave blank to keep the saved value",
+      "passwordHint": "It is never shown again after saving",
+      "test": "Test connection",
+      "testOk": "Connected ({{ms}} ms)",
+      "testFailed": "Cannot connect: {{reason}}",
+      "kinds": {
+        "AUTH": "authentication failed",
+        "DNS": "host not found (DNS)",
+        "TLS": "TLS error",
+        "TIMEOUT": "timed out",
+        "OTHER": "other error"
+      },
+      "errors": {
+        "required": "This field is required",
+        "invalid": "Invalid format",
+        "range": "Enter a value between 1 and 65535"
+      },
+      "saved": "Connection saved",
+      "deleted": "Connection deleted",
+      "status": "Status",
+      "statuses": {
+        "OK": "OK",
+        "ERROR": "Error",
+        "UNTESTED": "Untested"
+      },
+      "lastError": "Last error",
+      "usedFlows": "Used by flows",
+      "updatedAt": "Updated",
+      "empty": "No sink connections yet",
+      "emptyBody": "Register a connection so flow Sink nodes can write to an external database (PostgreSQL, MySQL, InfluxDB).",
+      "target": "Target table or measurement",
+      "targetHint": "e.g. room_temp",
+      "checkSchema": "Check schema",
+      "schemaExists": "{{target}}: {{count}} column(s)",
+      "schemaMissing": "{{target}} does not exist. Validation before apply will warn (SINK_SCHEMA_MISSING)",
+      "deadLetters": "Dead letters",
+      "deadLettersOf": "Dead letters: {{name}}",
+      "deadLettersEmpty": "No dead letters",
+      "dlTarget": "Target",
+      "dlError": "Error",
+      "dlAttempts": "Attempts",
+      "dlFailedAt": "Failed at",
+      "dlRecord": "Record",
+      "dlSelect": "Select {{id}}",
+      "resendSelected": "Resend selected",
+      "resendAll": "Resend all",
+      "resendResult": "Resend requested {{requested}}: {{resent}} sent, {{failed}} failed"
+    },
+    "snapshots": {
+      "title": "Snapshots",
+      "new": "New snapshot",
+      "newTitle": "New snapshot",
+      "name": "Name",
+      "memo": "Memo",
+      "flows": "Flows",
+      "flowCount": "Flows",
+      "createdBy": "Created by",
+      "createdAt": "Created at",
+      "compare": "Compare",
+      "compareRun": "Compare selected two",
+      "compareSelect": "Add {{name}} to comparison",
+      "compareTitle": "Compare: {{a}} → {{b}}",
+      "compareSummary": "Nodes added {{added}}, removed {{removed}}, settings changed {{changed}}, script versions changed {{scripts}}",
+      "noDiff": "No differences",
+      "nodeAdded": "Node added: {{node}}",
+      "nodeRemoved": "Node removed: {{node}}",
+      "nodeChanged": "{{node}} {{field}}: {{from}} → {{to}}",
+      "scriptVersion": "Script {{id}}: {{from}} → {{to}}",
+      "subflowVersion": "Subflow {{id}}: {{from}} → {{to}}",
+      "pickTwo": "Pick exactly two snapshots to compare",
+      "restore": "Restore",
+      "restoreTitle": "Confirm restore: {{name}}",
+      "restoreFlows": "{{count}} flow(s) will change",
+      "restoreFlowLine": "{{name}}: v{{from}} → v{{to}}",
+      "restoreReset": "{{count}} node state(s) will be reset: {{nodes}}",
+      "restoreNoReset": "No node state will be reset",
+      "restoreLive": "Each flow gets a new version from the snapshot and is applied live (no downtime).",
+      "restoreConfirm": "Apply restore",
+      "restored": "Restored: {{versions}}",
+      "approvalRequired": "Contains control nodes — sent for approval",
+      "created": "Snapshot created: {{flows}} flow(s), {{scripts}} script(s), {{sinks}} sink connection(s)",
+      "create": "Create",
+      "noActiveFlows": "No applied flows",
+      "bundleHint": "Script and subflow versions, variable values and sink connections (without secrets) referenced by the flows are bundled too.",
+      "empty": "No snapshots saved",
+      "scripts": "Scripts",
+      "subflows": "Subflows",
+      "variables": "Variables",
+      "sinkConnections": "Sink connections",
+      "errors": {
+        "name": {
+          "required": "Enter a name",
+          "tooLong": "Use 80 characters or fewer",
+          "duplicated": "A snapshot with the same name exists"
+        },
+        "memo": "Use 500 characters or fewer",
+        "flowIds": {
+          "required": "Choose at least one flow",
+          "tooMany": "You can choose up to 50 flows"
+        }
+      }
+    },
+    "pipelines": {
+      "title": "Promotion pipelines",
+      "titleOf": "Promotion pipeline: {{name}}",
+      "list": "Pipelines",
+      "create": "Create pipeline",
+      "edit": "Edit definition",
+      "editTitle": "Pipeline definition: {{name}}",
+      "newTitle": "New pipeline",
+      "name": "Name",
+      "stages": "Stages",
+      "stageKey": "Stage key",
+      "stageKeyOf": "Stage {{n}} key",
+      "env": "Environment",
+      "envOf": "Stage {{n}} environment",
+      "envs": {
+        "TEST": "Test",
+        "VERIFY": "Verify",
+        "PROD": "Production"
+      },
+      "approverRoles": "Approver roles",
+      "approverUsers": "Approver user IDs",
+      "approverUsersOf": "Stage {{n}} approver user IDs",
+      "approvers": "Approval: {{list}}",
+      "noApproval": "No approval",
+      "checks": "Automatic checks",
+      "checkTestRun": "Test run passed",
+      "checkCommands": "Replay commands ≤ {{n}}",
+      "checkNotifications": "Replay notifications ≤ {{n}}",
+      "replayDays": "Replay days",
+      "maxCommands": "Max commands",
+      "maxNotifications": "Max notifications",
+      "stageHint": "2 to 5 stages. Rows with an empty key are not saved.",
+      "errors": {
+        "name": {
+          "required": "Enter a name",
+          "tooLong": "Use 80 characters or fewer"
+        },
+        "stages": "A pipeline needs 2 to 5 stages",
+        "key": {
+          "required": "Enter a key",
+          "invalid": "Up to 30 chars starting with a lowercase letter (a-z, 0-9, -)",
+          "duplicated": "Duplicate key"
+        },
+        "checks": "Check values must be non-negative integers (replay days ≤ 7)"
+      },
+      "saved": "Pipeline saved",
+      "empty": "No pipelines",
+      "emptyAdmin": "Use [Create pipeline] to define Test → Verify → Production stages.",
+      "emptyOther": "You can request promotions once an administrator defines a pipeline.",
+      "request": "Request promotion",
+      "requestTitle": "Request promotion",
+      "snapshot": "Snapshot",
+      "loadMapping": "Load target mapping",
+      "fromStage": "From stage",
+      "toStage": "To stage",
+      "requestSubmit": "Request",
+      "requested": "Promotion requested",
+      "requestCheckFailed": "Automatic checks failed, so it cannot be approved (CHECK_FAILED)",
+      "requests": "Promotion requests",
+      "noRequests": "No promotion requests",
+      "stageMove": "Stages",
+      "status": "Status",
+      "statuses": {
+        "PENDING": "Pending",
+        "CHECK_FAILED": "Check failed",
+        "APPROVED": "Approved",
+        "REJECTED": "Rejected",
+        "APPLIED": "Applied"
+      },
+      "requestedBy": "Requested by",
+      "detail": "Details",
+      "requestDetail": "Request details: {{name}}",
+      "decided": "{{name}} · {{at}}",
+      "checkFailedBlock": "Requests that failed automatic checks cannot be approved",
+      "approve": "Approve",
+      "reject": "Reject",
+      "reason": "Reason",
+      "reasonRequired": "Enter a reason (up to 500 characters)",
+      "approved": "Promotion approved",
+      "rejected": "Promotion rejected"
+    },
+    "promote": {
+      "sectionTitle": "Promote test flows to production",
+      "sectionBody": "Map a TEST flow connected to virtual spaces onto real targets and promote it to production.",
+      "noTestFlows": "No test flows",
+      "flow": "Flow",
+      "version": "Version",
+      "control": "Control nodes",
+      "open": "Promote to production",
+      "title": "Promote to production: {{name}} (test v{{version}})",
+      "scenario": "Promotion gate (scenario)",
+      "noScenario": "No gate",
+      "scenarioLast": "{{name}} — last result {{status}}",
+      "runStatus": {
+        "PASSED": "passed",
+        "FAILED": "failed",
+        "RUNNING": "running",
+        "COMPLETED": "completed"
+      },
+      "controlApproval": "Contains control nodes → ADMIN approval required",
+      "submit": "Request promotion",
+      "pendingApproval": "Sent for approval",
+      "done": "Promoted to a production flow",
+      "openTarget": "Open production flow",
+      "notTestFlow": "Not a test flow, or it has no version"
+    },
+    "packages": {
+      "title": "Extension node packages",
+      "installTitle": "Install package",
+      "file": "Package file (.d2fpkg)",
+      "fileOf": "New version file for {{name}}",
+      "registryUrl": "or registry URL",
+      "install": "Install",
+      "upgrade": "Install new version",
+      "installHint": "Signature (trusted signers), license (allow list) and manifest schema are checked. New versions are installed side by side; flows change only when you apply the new version in the editor.",
+      "readOnly": "Only administrators can install, upgrade or disable packages.",
+      "installed": "Installed {{name}}@{{version}} — signed by {{signer}}, {{license}}, {{runtime}}",
+      "nodeTypes": "Nodes: {{list}}",
+      "sideBySide": "Flows using the previous version keep running (the editor shows \"new version available\").",
+      "disabledDone": "Disabled {{name}}. {{count}} flow(s) using it keep running their current version",
+      "enabledDone": "Enabled {{name}} ({{count}} flow(s))",
+      "disableHint": "{{count}} flow(s) use it: running versions keep working, but re-applying them warns",
+      "empty": "No extension packages installed",
+      "name": "Package",
+      "version": "Version",
+      "versionsInstalled": "Installed versions: {{list}}",
+      "signer": "Signer",
+      "signed": "{{signer}} (verified)",
+      "license": "License",
+      "runtime": "Runtime",
+      "runtimes": {
+        "JS_SANDBOX": "JS sandbox",
+        "SERVER_PLUGIN": "Server plugin"
+      },
+      "status": "Status",
+      "statuses": {
+        "ACTIVE": "Active",
+        "DISABLED": "Disabled"
+      },
+      "usedFlows": "Used by flows",
+      "disable": "Disable",
+      "enable": "Enable",
+      "inputErrors": {
+        "required": "Provide a file or a registry URL",
+        "both": "Provide either a file or a URL, not both",
+        "extension": "Only .d2fpkg files can be installed",
+        "tooLarge": "The file must be 10 MB or smaller",
+        "url": "Enter an https:// URL"
+      }
+    },
+    "git": {
+      "crumb": "Settings",
+      "title": "Git sync",
+      "connection": "Connection",
+      "repoUrl": "Repository URL",
+      "branch": "Branch",
+      "path": "Path",
+      "authType": "Authentication",
+      "authTypes": {
+        "SSH_KEY": "Deploy key (SSH)",
+        "HTTPS_TOKEN": "Token (HTTPS)"
+      },
+      "credentialRef": "Credential reference",
+      "credentialHint": "Do not enter the secret here — only the name of the registered secret",
+      "targets": "Targets",
+      "targetNames": {
+        "FLOW": "Flows",
+        "SOURCE": "Sources",
+        "SCRIPT": "Scripts",
+        "RULE": "Rules"
+      },
+      "test": "Test connection",
+      "testOk": "Connected ({{ms}} ms, HEAD {{commit}})",
+      "testFailed": "Cannot reach the repository: {{reason}}",
+      "saved": "Git sync settings saved",
+      "updated": "Last changed by {{name}} · {{at}}",
+      "operations": "Operations",
+      "commitMessage": "Commit message",
+      "export": "Export commit",
+      "exported": "Commit {{commit}}: {{count}} file(s)",
+      "preview": "Preview import",
+      "previewSummary": "{{changes}} change(s), {{conflicts}} conflict(s), {{errors}} error(s)",
+      "changeKinds": {
+        "CREATE": "Create",
+        "UPDATE": "Update"
+      },
+      "fileError": "{{file}}:{{line}} {{code}}",
+      "errorCodes": {
+        "FLOW_VALIDATION_FAILED": "validation failed (not imported)"
+      },
+      "conflictObject": "Conflicting object",
+      "conflictChoose": "Keep which side",
+      "conflictDetail": "Platform changed {{at}} · Git commit {{commit}}",
+      "sides": {
+        "PLATFORM": "Platform",
+        "GIT": "Git"
+      },
+      "draftOnly": "Import only creates DRAFT versions. Apply them separately from the flow screen.",
+      "apply": "Apply import",
+      "applied": "Created {{count}} draft(s)",
+      "resolveAll": "Resolve {{count}} conflict(s) first",
+      "errors": {
+        "repoUrl": {
+          "required": "Enter the repository URL",
+          "invalid": "The repository URL format is invalid"
+        },
+        "branch": {
+          "required": "Enter a branch",
+          "tooLong": "Branch must be 100 characters or fewer"
+        },
+        "path": {
+          "tooLong": "Path must be 200 characters or fewer"
+        },
+        "credentialRef": {
+          "required": "Enter a credential reference"
+        },
+        "message": {
+          "required": "Enter a commit message",
+          "tooLong": "Commit message must be 200 characters or fewer"
+        }
+      }
+    }
+  },
+  "errors": {
+    "SINK_CONNECTION_IN_USE": "This connection is in use",
+    "SINK_CONNECTION_TEST_FAILED": "Cannot connect",
+    "SNAPSHOT_NAME_DUPLICATED": "A snapshot with the same name exists",
+    "SNAPSHOT_DEPENDENCY_MISSING": "Cannot restore: items required by the snapshot are missing",
+    "FLOW_PROMOTION_BLOCKED": "Promotion conditions are not met",
+    "FLOW_PROMOTION_SELF_APPROVAL": "You cannot approve your own promotion request",
+    "GIT_SYNC_CONFLICT": "Resolve the conflicts first",
+    "GIT_SYNC_REPO_UNREACHABLE": "Cannot reach the repository",
+    "NODE_PACKAGE_SIGNATURE_INVALID": "The package signature cannot be verified",
+    "NODE_PACKAGE_LICENSE_REJECTED": "The package license is not allowed by policy",
+    "NODE_PACKAGE_INVALID": "The package format is invalid",
+    "FLOWOPS_SELECT_REQUIRED": "Select at least one item"
+  }
+}
