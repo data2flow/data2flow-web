@@ -67,7 +67,8 @@
       "pending": "Pending approval",
       "models": "Device models",
       "metrics": "Metrics",
-      "groups": "Groups"
+      "groups": "Groups",
+      "jobs": "Bulk jobs"
     },
     "tabs": {
       "overview": "Overview",
@@ -75,7 +76,9 @@
       "raw": "Raw messages",
       "history": "History",
       "semantic": "Semantics",
-      "credentials": "Credentials"
+      "credentials": "Credentials",
+      "rules": "Rules & alarms",
+      "operation": "Operation"
     },
     "overview": {
       "title": "Current state"
@@ -88,7 +91,8 @@
       "decodeOk": "Decoding",
       "rulesApplied": "Rules",
       "done": "done",
-      "todo": "not done"
+      "todo": "not done",
+      "fix": "Fix"
     },
     "data": {
       "title": "Measurements",
@@ -117,7 +121,18 @@
       "at": "Time",
       "actor": "Who",
       "action": "What",
-      "changes": "Changes"
+      "changes": "Changes",
+      "unavailable": "Could not load the change history",
+      "actions": {
+        "CREATED": "Created",
+        "UPDATED": "Updated",
+        "APPROVED": "Approved",
+        "MOVED": "Moved",
+        "ACTIVATED": "Activated",
+        "DEACTIVATED": "Deactivated",
+        "REPLACED": "Replaced",
+        "TAGGED": "Tags changed"
+      }
     },
     "semantic": {
       "title": "Semantics",
@@ -203,7 +218,116 @@
       "intervalRange": "Enter a value between 10 and 86,400 seconds",
       "multiplierRange": "Enter a multiplier between 1.5 and 10",
       "fileRequired": "Choose a CSV file"
-    }
+    },
+    "jobs": {
+      "title": "Bulk jobs",
+      "fromSelection": "Bulk job",
+      "new": "New bulk job",
+      "empty": "No bulk jobs",
+      "wizard": "Bulk job wizard",
+      "step1": "1. Targets",
+      "step2": "2. Action and value",
+      "step3": "3. Preview",
+      "targetKind": "Targets",
+      "targetDevices": "{{n}} selected devices",
+      "targetGroup": "Group",
+      "group": "Group",
+      "chooseGroup": "Choose a group",
+      "targetEmpty": "Choose target devices",
+      "targetLimit": "You can run on up to 5,000 devices at once",
+      "concurrentLimit": "Try again after running jobs finish",
+      "type": "Job type",
+      "types": {
+        "SET_MODEL": "Change model",
+        "SET_SPACE": "Move space",
+        "SET_STATUS": "Activate/deactivate",
+        "ADD_TAGS": "Add tags",
+        "REMOVE_TAGS": "Remove tags",
+        "SET_ATTRIBUTES": "Set attributes",
+        "SEND_COMMAND": "Send command"
+      },
+      "attrScope": "Attribute scope",
+      "attributes": "Attributes (JSON)",
+      "capability": "Capability",
+      "command": "Command",
+      "args": "Arguments (JSON)",
+      "valueRequired": "Enter a value",
+      "jsonRequired": "Enter a JSON object",
+      "preview": "Preview",
+      "previewFirst": "Preview targets and examples before running",
+      "previewSummary": "{{n}} devices · {{type}}",
+      "denied": "{{n}} devices outside your scope will fail",
+      "run": "Run",
+      "detailTitle": "#{{id}} {{type}}",
+      "progress": "Progress",
+      "progressLine": "{{succeeded}} succeeded · {{failed}} failed / {{total}}",
+      "retryOf": "Retry of #{{id}} failures",
+      "failedOnly": "Failed only",
+      "retryFailed": "Retry failed",
+      "noItems": "No devices to show",
+      "error": "Error",
+      "finishedAt": "Finished",
+      "createdBy": "Started by",
+      "createdAt": "Time",
+      "statuses": {
+        "QUEUED": "Queued",
+        "RUNNING": "Running",
+        "COMPLETED": "Completed",
+        "PARTIALLY_FAILED": "Partially failed",
+        "FAILED": "Failed",
+        "CANCELLED": "Cancelled"
+      },
+      "itemStatuses": {
+        "PENDING": "Pending",
+        "SUCCEEDED": "Succeeded",
+        "FAILED": "Failed",
+        "SKIPPED": "Skipped"
+      }
+    },
+    "controlButton": "Control",
+    "rules": {
+      "openAlarms": "Open alarms: {{n}}",
+      "alarmsUnavailable": "Could not load alarms",
+      "noAlarms": "No open alarms",
+      "severity": "Severity",
+      "alarm": "Alarm",
+      "alarmStatus": "Status",
+      "raisedAt": "Raised",
+      "applied": "Rules applied to this device: {{n}}",
+      "applyTemplate": "Apply a rule template",
+      "rulesUnavailable": "Could not load rules",
+      "noRules": "No rules apply",
+      "rule": "Rule",
+      "condition": "Condition",
+      "via": "Applied via",
+      "viaKind": {
+        "DEVICE": "Direct",
+        "SPACE": "Via space",
+        "MODEL": "Via model",
+        "TAG": "Via tag"
+      },
+      "ruleStatus": "Rule status",
+      "severities": {
+        "CRITICAL": "Critical",
+        "MAJOR": "Major",
+        "MINOR": "Minor",
+        "WARNING": "Warning",
+        "INFO": "Info"
+      },
+      "alarmStatuses": {
+        "ACTIVE": "Active",
+        "ACKNOWLEDGED": "Acknowledged",
+        "SUPPRESSED": "Suppressed",
+        "CLEARED": "Cleared"
+      },
+      "ruleStatuses": {
+        "ACTIVE": "Active",
+        "INACTIVE": "Inactive",
+        "ERROR": "Error",
+        "DRAFT": "Draft"
+      }
+    },
+    "commandBands": "Command bands"
   },
   "errors": {
     "DEVICE_DUPLICATE": "A device with the same external ID already exists",
@@ -214,6 +338,9 @@
     "DEVICE_TAG_LIMIT": "A device can have up to 20 tags",
     "DEVICE_IN_USE": "It is in use elsewhere and cannot be deleted.",
     "DEVICE_IMPORT_TOO_LARGE": "The CSV file must be 5 MB or smaller.",
-    "SEMANTIC_TAG_UNKNOWN": "Unknown semantic tag."
+    "SEMANTIC_TAG_UNKNOWN": "Unknown semantic tag.",
+    "JOB_LIMIT_EXCEEDED": "Try again after running jobs finish",
+    "JOB_NOT_FOUND": "Job not found",
+    "JOB_STATE_CONFLICT": "Not allowed in the current state"
   }
 }

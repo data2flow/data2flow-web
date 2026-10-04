@@ -1,7 +1,7 @@
 /**
  * UI-DEV-06 기기 상세 + UI-DEV-18 시맨틱 탭(DEV-02.01·02.03·02.10·13.01, DSH-07.05 즐겨찾기).
- * 탭: 개요(실시간 현재값) · 데이터(API-TSD-02 차트 + 실시간 점) · 원본 메시지(API-ING-05·06) · 시맨틱(API-DEV-131). 변경 이력(API-DEV-27)은 M4
- * · 자격증명(플랫폼 브로커 소스만, UI-DSC-06).
+ * 탭: 개요(실시간 현재값, 온보딩 바로가기 DEV-09.01) · 데이터(API-TSD-02 차트 + 실시간 점, 액추에이터는 명령 구간 띠 API-ACT-02) · 제어(UI-ACT-01) · 명령 이력(UI-ACT-02)
+ * · 가동(UI-ACT-11, API-ACT-35) · 원본 메시지(API-ING-05·06) · 규칙·알람(API-RUL-01·10) · 변경 이력(API-DEV-27) · 시맨틱(API-DEV-131) · 자격증명(플랫폼 브로커 소스만, UI-DSC-06).
  * 편집 API-DEV-13(baseVersion), 활성/비활성 API-DEV-16, 삭제 API-DEV-17(사용처 있으면 막음), 태그 API-DEV-21.
  * 권한: 조회 VIEWER+, 공간·태그·활성 OPERATOR+(DEV_PLACE), 이름·모델·주기·삭제·시맨틱 편집 INTEGRATOR+(DEV_ADMIN).
  */
@@ -28,15 +28,18 @@ import type { VirtualDeviceConfig } from "~/features/sim/model/types";
 import { CommandHistory, HistoryFilters } from "~/features/control/command-history";
 import { DeviceControlPanel } from "~/features/control/control-panel";
 import { historyQuery, type Command, type ControlInfo } from "~/features/control/model/control";
+import { OperationTab } from "~/features/control/operation-tab";
+import { DeviceHistoryTab, DeviceRulesTab } from "~/features/devices/detail-tabs";
+import { alarmsForDevice, onboardingLink, rulesForDevice, type AlarmRow, type HistoryEntry, type RuleRow, type RuleVia } from "~/features/devices/model/detail";
 import type { Route } from "./+types/device-detail";
 
 export function meta() {
   return [{ title: "data2flow" }];
 }
 
-// 변경 이력(API-DEV-27)은 DEV-02.07(M4, 규칙·알람·명령 이력과 함께) 범위라 M2에서는 탭을 두지 않는다
-// 제어(UI-ACT-01, ACT-02.04·04.01·04.02)·명령 이력(UI-ACT-02, ACT-04.03)은 M3
-const TABS = ["overview", "data", "control", "commands", "virtual", "raw", "semantic", "credentials"] as const;
+// 제어(UI-ACT-01)·명령 이력(UI-ACT-02)은 M3, 가동(UI-ACT-11)·규칙·알람·변경 이력(DEV-02.07)은 M4
+const TABS = ["overview", "data", "control", "commands", "operation", "virtual", "raw", "rules", "history", "semantic", "credentials"] as const;
+const ACTUATOR_KINDS = new Set(["ACTUATOR", "HYBRID"]);
 type Tab = (typeof TABS)[number];
 
 interface RawRow {
@@ -83,6 +86,8 @@ export async function loader({ request, context, params }: Route.LoaderArgs) {
   let control: ControlInfo | null | undefined;
   let commands: { rows: Command[]; nextCursor?: string | null; failed: boolean } | undefined;
   let virtualConfig: { config: VirtualDeviceConfig | null; failed: boolean } | undefined;
+  let rulesTab: { rules: { rule: RuleRow; via: RuleVia }[]; alarms: AlarmRow[]; rulesFailed: boolean; alarmsFailed: boolean } | undefined;
+  let history: { entries: HistoryEntry[]; failed: boolean; page: number; totalPages: number } | undefined;
   if (tab === "raw") {
     const from = new Date(now - 7 * 86_400_000).toISOString();
     const to = new Date(now).toISOString();
@@ -105,6 +110,23 @@ export async function loader({ request, context, params }: Route.LoaderArgs) {
     // UI-SIM-03 가상 기기 설정(API-SIM-09). 가상 기기가 아니면 탭을 보이지 않는다
     const sim = detail.virtual ? await callApi<VirtualDeviceConfig>(ctx, request, `/api/v1/core/sim/devices/${id}`) : null;
     virtualConfig = { config: sim?.ok ? sim.data : null, failed: Boolean(sim && !sim.ok) };
+  } else if (tab === "rules") {
+    // 규칙·알람(DEV-02.07): API-RUL-01에 기기 필터가 없어 규칙 범위(scope)로 이 기기에 닿는 규칙을 고르고, 알람은 공간(하위 포함)으로 읽어 이 기기 것만 남긴다
+    const [rules, alarms, spaces] = await Promise.all([
+      callList<RuleRow>(ctx, request, "/api/v1/core/rules?size=100"),
+      detail.space?.id ? callList<AlarmRow>(ctx, request, `/api/v1/core/alarms?spaceId=${encodeURIComponent(detail.space.id)}&size=100`) : Promise.resolve(null),
+      callApi<SpaceNode[]>(ctx, request, "/api/v1/core/spaces"),
+    ]);
+    rulesTab = {
+      rules: rules.ok ? rulesForDevice(rules.list.responses, detail, spaces.ok ? (spaces.data ?? []) : []) : [],
+      rulesFailed: !rules.ok && rules.status !== 403,
+      alarms: alarms?.ok ? alarmsForDevice(alarms.list.responses, detail.id) : [],
+      alarmsFailed: Boolean(alarms && !alarms.ok),
+    };
+  } else if (tab === "history") {
+    const page = Math.max(1, Number(url.searchParams.get("page")) || 1);
+    const result = await callList<HistoryEntry>(ctx, request, `/api/v1/core/devices/${id}/history?page=${page}&size=50`);
+    history = { entries: result.ok ? result.list.responses : [], failed: !result.ok, page, totalPages: result.ok ? (result.list.totalPages ?? 1) : 1 };
   } else if (tab === "semantic") {
     const result = await callApi<SemanticDoc>(ctx, request, `/api/v1/core/devices/${id}/semantic`);
     semantic = result.ok ? result.data : null;
@@ -117,7 +139,7 @@ export async function loader({ request, context, params }: Route.LoaderArgs) {
     const [models, spaces] = await Promise.all([callList<{ id: string; code: string; name: string }>(ctx, request, "/api/v1/core/device-models?size=100"), callApi<SpaceNode[]>(ctx, request, "/api/v1/core/spaces")]);
     editOptions = { models: models.ok ? models.list.responses : [], spaces: spaces.ok ? (spaces.data ?? []) : [] };
   }
-  return { device: detail, tab, now, raw, virtualConfig, semantic, control, commands, modelMetrics, editOptions, preferences: prefs.ok ? prefs.data : null };
+  return { device: detail, tab, now, raw, virtualConfig, semantic, control, commands, rulesTab, history, modelMetrics, editOptions, preferences: prefs.ok ? prefs.data : null };
 }
 
 type ActionResult = { intent: string; done?: boolean; error?: { code: string; message?: string }; references?: { type: string; id: string; name?: string }[]; fieldErrors?: Record<string, string> };
@@ -209,12 +231,14 @@ export default function DeviceDetailRoute({ loaderData, actionData }: Route.Comp
   const canPlace = hasAny(permissions, ["DEV_PLACE"]);
   const canAdmin = hasAny(permissions, ["DEV_ADMIN"]);
   const timezone = root?.timezone ?? "Asia/Seoul";
-  const { device, tab, now, raw, semantic, control, commands, modelMetrics, editOptions, preferences } = loaderData;
+  const { device, tab, now, raw, semantic, control, commands, rulesTab, history, modelMetrics, editOptions, preferences } = loaderData;
+  const actuator = ACTUATOR_KINDS.has(device.kind);
+  const canControl = hasAny(permissions, ["DEVICE_CONTROL"]);
   const result = actionData as ActionResult | undefined;
   const [deleteOpen, setDeleteOpen] = useState(false);
   const favorite = isFavorite(preferences?.favorites, "DEVICE", device.id);
   const platformBroker = device.source?.type === "PLATFORM_BROKER";
-  const tabItems = TABS.filter((k) => (k !== "credentials" || platformBroker) && (k !== "virtual" || device.virtual)).map((k) => ({ key: k, label: k === "virtual" ? t("sim.virtual") : t(`devices.tabs.${k}`), to: `?tab=${k}` }));
+  const tabItems = TABS.filter((k) => (k !== "credentials" || platformBroker) && (k !== "virtual" || device.virtual) && (k !== "operation" || actuator)).map((k) => ({ key: k, label: k === "virtual" ? t("sim.virtual") : t(`devices.tabs.${k}`), to: `?tab=${k}` }));
   const fmt = (iso?: string | null) => formatDateTime(iso ?? undefined, timezone, i18n.language, true);
   const conflict = result?.error?.code === "VERSION_CONFLICT";
 
@@ -256,6 +280,11 @@ export default function DeviceDetailRoute({ loaderData, actionData }: Route.Comp
           <>
             <DeviceStatusBadge status={device.status} />
             <ConnectivityLabel connectivity={device.state?.connectivity} />
+            {actuator && canControl && tab !== "control" && (
+              <ButtonLink to="?tab=control" variant="primary">
+                {t("devices.controlButton")}
+              </ButtonLink>
+            )}
             {canPlace && <ButtonLink to="?edit=1">{t("common.edit")}</ButtonLink>}
             {canPlace && device.status === "ACTIVE" && <PostButton intent="deactivate" label={t("devices.deactivate")} version={device.version} confirm={t("devices.deactivateConfirm")} />}
             {canPlace && device.status === "INACTIVE" && <PostButton intent="activate" label={t("devices.activate")} version={device.version} />}
@@ -304,8 +333,24 @@ export default function DeviceDetailRoute({ loaderData, actionData }: Route.Comp
 
       <Tabs items={tabItems} current={tab} />
       {tab === "virtual" && loaderData.virtualConfig && <VirtualDeviceTab deviceId={device.id} initial={loaderData.virtualConfig.config} failed={loaderData.virtualConfig.failed} canManage={hasAny(permissions, ["SIM_MANAGE"])} api={simApi} />}
-      {tab === "overview" && <DeviceOverview device={device} timezone={timezone} lang={i18n.language} now={now} />}
-      {tab === "data" && <DeviceDataPanel deviceId={device.id} metrics={metricChoices(device.latest, modelMetrics)} latest={device.latest} expectedIntervalSec={device.effective?.expectedIntervalSec} timezone={timezone} now={Date.now} />}
+      {tab === "overview" && <DeviceOverview device={device} timezone={timezone} lang={i18n.language} now={now} onboardingLinks={(item) => onboardingLink(item, device)} />}
+      {tab === "data" && <DeviceDataPanel deviceId={device.id} metrics={metricChoices(device.latest, modelMetrics)} latest={device.latest} expectedIntervalSec={device.effective?.expectedIntervalSec} timezone={timezone} now={Date.now} showCommands={actuator} />}
+      {tab === "operation" && actuator && <OperationTab deviceId={device.id} timezone={timezone} lang={i18n.language} />}
+      {tab === "rules" && rulesTab && (
+        <DeviceRulesTab
+          rules={rulesTab.rules}
+          alarms={rulesTab.alarms}
+          rulesFailed={rulesTab.rulesFailed}
+          alarmsFailed={rulesTab.alarmsFailed}
+          canReadRules={hasAny(permissions, ["RULE_READ"])}
+          canWriteRules={hasAny(permissions, ["RULE_WRITE"])}
+          deviceId={device.id}
+          spaceId={device.space?.id}
+          timezone={timezone}
+          lang={i18n.language}
+        />
+      )}
+      {tab === "history" && history && <DeviceHistoryTab entries={history.entries} failed={history.failed} timezone={timezone} lang={i18n.language} moreHref={history.page < history.totalPages ? `?tab=history&page=${history.page + 1}` : null} />}
       {tab === "raw" && raw && (
         <Card title={t("devices.raw.title")}>
           {raw.failed && <Alert tone="warning">{t("devices.raw.unavailable")}</Alert>}
@@ -351,7 +396,7 @@ export default function DeviceDetailRoute({ loaderData, actionData }: Route.Comp
           )}
         </Card>
       )}
-      {tab === "control" && <DeviceControlPanel deviceId={device.id} spaceId={device.space?.id} initial={control ?? null} canControl={hasAny(permissions, ["DEVICE_CONTROL"])} timezone={timezone} lang={i18n.language} />}
+      {tab === "control" && <DeviceControlPanel deviceId={device.id} spaceId={device.space?.id} initial={control ?? null} canControl={canControl} timezone={timezone} lang={i18n.language} />}
       {tab === "commands" && commands && (
         <Card title={t("devices.tabs.commands")}>
           <HistoryFilters hidden={{ tab: "commands" }} />

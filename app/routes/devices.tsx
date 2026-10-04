@@ -17,6 +17,7 @@ import { formatRelative } from "~/lib/format";
 import { hasAny } from "~/lib/permissions";
 import type { SpaceNode } from "~/lib/spaces";
 import type { RootData } from "~/root";
+import { BulkControlDialog } from "~/features/control/bulk-control";
 import type { Route } from "./+types/devices";
 
 export function meta() {
@@ -77,6 +78,8 @@ export default function Devices({ loaderData, actionData }: Route.ComponentProps
   const navigate = useNavigate();
   const { devices, spaces, models, sources, now, page, pendingCount } = loaderData;
   const [selected, setSelected] = useState<string[]>([]);
+  const [bulkOpen, setBulkOpen] = useState(false);
+  const canControl = hasAny(permissions, ["DEVICE_CONTROL"]);
   const result = actionData as ActionResult | undefined;
   const filtered = hasFilters(params);
   const rows = devices.responses;
@@ -232,8 +235,23 @@ export default function Devices({ loaderData, actionData }: Route.ComponentProps
         <Pager page={page} totalPages={devices.totalPages} />
       </Card>
 
-      {selected.length > 0 && canPlace && (
-        <Card title={t("devices.selectedTools", { n: selected.length })} className="mt-4">
+      {selected.length > 0 && (canPlace || canControl || canAdmin) && (
+        <Card
+          title={t("devices.selectedTools", { n: selected.length })}
+          className="mt-4"
+          actions={
+            <>
+              {/* UI-ACT-03 일괄 제어(ACT-02.06), UI-DEV-12 일괄 작업 마법사(DEV-02.09) */}
+              {canControl && (
+                <Button variant="primary" onClick={() => setBulkOpen(true)}>
+                  {t("control.bulk.open")}
+                </Button>
+              )}
+              {canAdmin && <ButtonLink to={`/device-jobs?new=1&deviceIds=${encodeURIComponent(selected.join(","))}`}>{t("devices.jobs.fromSelection")}</ButtonLink>}
+            </>
+          }
+        >
+          {canPlace && (
           <Form method="post" className="flex flex-wrap items-end gap-3">
             <CsrfField />
             <input type="hidden" name="intent" value="tag" />
@@ -246,8 +264,10 @@ export default function Devices({ loaderData, actionData }: Route.ComponentProps
               {t("devices.applyTags")}
             </Button>
           </Form>
+          )}
         </Card>
       )}
+      {canControl && <BulkControlDialog open={bulkOpen} onClose={() => setBulkOpen(false)} target={{ deviceIds: selected }} />}
     </>
   );
 }
