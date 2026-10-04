@@ -64,6 +64,10 @@ export interface FlowNode {
   config: Record<string, unknown>;
   retry?: RetryPolicy;
   position: { x: number; y: number };
+  /** 동적 출력 포트 이름(flow-definition.v1 `nodes[].outputs`). 편집기는 바꾸지 않고 그대로 저장한다 */
+  outputs?: string[];
+  /** 끈 노드(flow-definition.v1 `nodes[].disabled`) */
+  disabled?: boolean;
 }
 
 export interface Wire {
@@ -89,9 +93,14 @@ export interface FlowGraph {
   extra: Omit<FlowDefinition, "schema" | "nodes" | "wires">;
 }
 
-/** 검증 문제(API-FLW-06 errors·warnings + 화면 검증) */
+/**
+ * 검증 문제(API-FLW-06 errors·warnings + 화면 검증). 서버는 api-rules §5 모양 `{field, code, message}`만 준다(ADR-044):
+ * `field`가 `nodes[<id>]…`이면 그 노드, `wires[<i>]…`이면 i번째 연결선이다. 편집기는 `normalizeIssues`로 nodeId·path·wire를 채운다.
+ */
 export interface ValidationIssue {
   code: string;
+  /** 서버 문제 위치(`nodes[n-abc].config.value`, `wires[2].port`, `definition`) */
+  field?: string;
   nodeId?: string;
   nodeIds?: string[];
   wire?: Wire | string;

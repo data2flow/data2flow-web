@@ -45,7 +45,8 @@
       "deleteBody": "삭제하려면 플로우 이름 \"{{name}}\"을(를) 입력하세요. 되돌릴 수 없습니다.",
       "confirmName": "플로우 이름",
       "confirmMismatch": "이름이 일치하지 않습니다",
-      "deleted": "플로우를 삭제했습니다."
+      "deleted": "플로우를 삭제했습니다.",
+      "metricsNone": "지표 없음"
     },
     "editor": {
       "name": "플로우 이름",
@@ -237,7 +238,10 @@
       "TARGET_OFFLINE": "대상 기기 오프라인",
       "TARGET_EMPTY": "대상이 비어 있음",
       "SINK_SCHEMA_MISSING": "저장 대상 스키마 없음",
-      "DEPRECATED_NODE": "지원 중단 노드"
+      "DEPRECATED_NODE": "지원 중단 노드",
+      "UNKNOWN_NODE_TYPE": "모르는 노드 종류",
+      "UNKNOWN_PORT": "없는 출력 포트",
+      "INVALID_DEFINITION": "정의 형식 오류"
     },
     "bottom": {
       "label": "하단 패널",
@@ -276,7 +280,8 @@
       "confirm": "적용",
       "approvalSent": "승인 요청을 보냈습니다",
       "applied": "v{{v}}을(를) 적용했습니다",
-      "noControlPermission": "제어 노드가 있는 플로우를 적용할 권한이 없습니다"
+      "noControlPermission": "제어 노드가 있는 플로우를 적용할 권한이 없습니다",
+      "ackRequired": "위험 변경이 있습니다. 내용을 확인하고 \"이해했습니다\"를 선택한 뒤 다시 적용하세요"
     },
     "statePolicy": {
       "KEEP": "유지(KEEP)",
@@ -306,7 +311,7 @@
       "PENDING_APPROVAL": "승인 대기"
     },
     "errors": {
-      "unavailable": "지표를 불러오지 못했습니다",
+      "unavailable": "지표 없음 — 실행 엔진 지표를 아직 받을 수 없습니다",
       "summary": "최근 1시간: 실행 {{executions}}회 · 오류 {{errors}}건 · 오류율 {{rate}}%",
       "isolation": "노드 오류는 그 실행만 끝내고 오류 지표를 올립니다. 다른 플로우와 같은 기기의 다음 메시지 처리는 막지 않습니다.",
       "none": "최근 1시간 동안 오류가 없습니다",

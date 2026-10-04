@@ -4,7 +4,7 @@
  */
 import { copySelection, fromDefinition, paste, toDefinition, type Catalog, type Clipboard } from "../model/flow-graph";
 import { canRedo, canUndo, history, record, redo, undo, type History } from "../model/flow-graph-history";
-import { issueNodeIds, validateGraph } from "../model/validation";
+import { issueNodeIds, normalizeIssues, validateGraph } from "../model/validation";
 import type { FlowDetail, FlowGraph, ValidationIssue, ValidationResult, VersionDiff } from "../model/types";
 
 export type Busy = null | "saving" | "validating" | "applying";
@@ -15,7 +15,7 @@ export interface EditorState {
   history: History<FlowGraph>;
   /** 마지막으로 저장(또는 불러온) 내용. 지금 내용과 다르면 저장 안 된 변경 */
   savedKey: string;
-  /** 편집을 시작한 버전(API-FLW-03 baseVersion) */
+  /** 편집을 시작한 버전(API-FLW-03 baseVersion). 초안을 저장할 때마다 새 번호를 받으므로 응답 draftVersion으로 바꾼다(다르면 409) */
   baseVersion: number | null;
   draftVersion: number | null;
   activeVersion: number | null;
@@ -60,7 +60,7 @@ export function initialState(detail: FlowDetail | null, name = ""): EditorState 
     baseVersion: draft ?? active ?? detail?.version.version ?? null,
     draftVersion: draft,
     activeVersion: active,
-    server: detail?.version.validation ?? null,
+    server: normalizeIssues(detail?.version.validation, graph),
     selected: [],
     clipboard: null,
     diff: null,
@@ -100,11 +100,11 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
         draftVersion: action.draftVersion,
         baseVersion: action.draftVersion,
         savedKey: keyOf(state.name, state.history.present),
-        server: action.validation ?? null,
+        server: normalizeIssues(action.validation, state.history.present),
         busy: null,
       };
     case "server":
-      return { ...state, server: action.result };
+      return { ...state, server: normalizeIssues(action.result, state.history.present) };
     case "diff":
       return { ...state, diff: action.diff };
     case "busy":

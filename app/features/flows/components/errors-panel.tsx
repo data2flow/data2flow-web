@@ -8,11 +8,12 @@ import type { FlowMetrics } from "../model/types";
 
 export function ErrorsPanel({ metrics, nameOf }: { metrics: FlowMetrics | null; nameOf: (id: string) => string }) {
   const { t } = useTranslation();
-  if (!metrics) return <p className="text-[12.5px] text-muted">{t("flows.errors.unavailable")}</p>;
-  const failing = metrics.nodes.filter((n) => n.errors > 0);
+  // 엔진 지표를 아직 받을 수 없으면(503 SERVICE_UNAVAILABLE 등) 오류가 아니라 "지표 없음"으로 보여 준다
+  if (!metrics?.summary) return <p className="text-[12.5px] text-muted">{t("flows.errors.unavailable")}</p>;
+  const failing = (metrics.nodes ?? []).filter((n) => n.errors > 0);
   return (
     <div className="flex flex-col gap-2 text-[12.5px]">
-      <p>{t("flows.errors.summary", { executions: metrics.summary.executions, errors: metrics.summary.errors, rate: (metrics.summary.errorRate * 100).toFixed(1) })}</p>
+      <p>{t("flows.errors.summary", { executions: metrics.summary.executions, errors: metrics.summary.errors, rate: ((metrics.summary.errorRate ?? 0) * 100).toFixed(1) })}</p>
       <p className="text-muted">{t("flows.errors.isolation")}</p>
       {failing.length === 0 ? (
         <p>{t("flows.errors.none")}</p>

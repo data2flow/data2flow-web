@@ -20,8 +20,8 @@ import { FlowStatusBadge } from "./components/status-badge";
 import type { TargetDevice } from "./components/target-field";
 import { VersionsPanel } from "./components/versions-panel";
 import { addNode, alignToGrid, catalogOf, connect, hasThroughWires, insertOnWire, referencedSpaceIds, removeNodes, removeWire, setPosition, toDefinition, updateNode, wireUnder } from "./model/flow-graph";
-import type { FlowDetail, FlowGraph, FlowMetrics, FlowNode, NodeType, ValidateResponse, ValidationIssue, VersionDiff, Wire } from "./model/types";
-import { issueNodeIds } from "./model/validation";
+import type { FlowDetail, FlowGraph, FlowMetrics, FlowNode, NodeType, ValidateResponse, VersionDiff, Wire } from "./model/types";
+import { issueNodeIds, normalizeIssues } from "./model/validation";
 import { applyBlockReason, combinedValidation, editorReducer, graphOf, initialState, isDirty, nodeBadges, redoable, undoable } from "./store/flow-editor-store";
 
 export const FLOW_NAME_MAX = 100;
@@ -182,6 +182,7 @@ export function FlowEditor(props: FlowEditorProps) {
       }
       savedName.current = name;
     }
+    // 초안을 저장할 때마다 새 번호를 받는다: 직전 응답의 draftVersion이 다음 baseVersion(다르면 409 FLOW_VERSION_CONFLICT)
     const saved = await api.saveDraft(state.flowId, { baseVersion: state.baseVersion ?? 0, definition });
     if (!saved.ok) {
       dispatch({ type: "busy", busy: null });
@@ -201,27 +202,36 @@ export function FlowEditor(props: FlowEditorProps) {
       setNotice({ tone: "danger", text: errorText(t, result) ?? "" });
       return;
     }
-    dispatch({ type: "server", result: { errors: result.data.errors ?? [], warnings: result.data.warnings ?? [] } });
+    const issues = normalizeIssues(result.data, graph) ?? { errors: [], warnings: [] };
+    dispatch({ type: "server", result: issues });
     setApplyError(undefined);
-    setApplyCheck({ ...result.data, errors: result.data.errors ?? [], warnings: result.data.warnings ?? [] });
+    setApplyCheck({ ...result.data, ...issues });
   };
 
   const apply = async (memo: string, acknowledgedRisks: boolean) => {
     if (!state.flowId || state.draftVersion === null) return;
     dispatch({ type: "busy", busy: "applying" });
+    // baseVersion은 지금 ACTIVE 번호(없으면 0, API-FLW-07)
     const result = await api.apply(state.flowId, { version: state.draftVersion, baseVersion: state.activeVersion ?? 0, memo: memo || undefined, acknowledgedRisks });
     dispatch({ type: "busy", busy: null });
     if (!result.ok) {
       if (result.code === "FLOW_VALIDATION_FAILED" && Array.isArray(result.errors)) {
-        dispatch({ type: "server", result: { errors: result.errors as unknown as ValidationIssue[], warnings: [] } });
+        dispatch({ type: "server", result: { errors: result.errors, warnings: [] } });
         setApplyCheck(null);
         setNotice({ tone: "danger", text: errorText(t, result) ?? "" });
+        return;
+      }
+      // 위험 변경(제어 노드·실행 모드)인데 확인이 없으면 400 INVALID_REQUEST errors[{field: acknowledgedRisks}]: 위험을 보여 주고 확인을 받는다
+      if (result.status === 400 && (result.errors ?? []).some((e) => e.field === "acknowledgedRisks")) {
+        setApplyCheck((check) => (!check || check.risky?.controlNodesChanged || check.risky?.executionModeChanged ? check : { ...check, risky: { controlNodesChanged: true, executionModeChanged: false } }));
+        setApplyError(t("flows.apply.ackRequired"));
         return;
       }
       setApplyError(result.code === "PERMISSION_DENIED" ? t("flows.apply.noControlPermission") : errorText(t, result));
       return;
     }
     setApplyCheck(null);
+    // 승인 대기: 202 FLOW_APPROVAL_REQUIRED {approvalId, version}. 실행 중인 버전은 그대로다
     if (result.status === 202 || result.data.approvalId) {
       setNotice({ tone: "info", text: t("flows.apply.approvalSent") });
       return;
@@ -426,7 +436,11 @@ export function FlowEditor(props: FlowEditorProps) {
             ))}
           {tab === "versions" &&
             (state.flowId ? (
-              <VersionsPanel flowId={state.flowId} api={api} canWrite={canWrite} timezone={props.timezone} onDiff={onDiff} onRolledBack={(v) => {
+              <VersionsPanel flowId={state.flowId} api={api} canWrite={canWrite} timezone={props.timezone} onDiff={onDiff} onRolledBack={(v, approvalId) => {
+                if (approvalId) {
+                  setNotice({ tone: "info", text: t("flows.apply.approvalSent") });
+                  return;
+                }
                 setNotice({ tone: "success", text: t("flows.versions.rolledBack", { v: v ?? "" }) });
                 props.onReload();
               }} />

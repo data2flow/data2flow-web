@@ -27,6 +27,7 @@ interface FlowRow {
   draftVersion?: number | null;
   spaceIds?: string[];
   hasControlNode?: boolean;
+  /** 엔진 지표 묶음 조회가 생기기 전까지 core가 생략한다 */
   metrics1h?: { executions?: number; errorRate?: number | null; actions?: number } | null;
   updatedBy?: { userId: string; name: string } | null;
   updatedAt?: string;
@@ -174,7 +175,8 @@ export default function Flows({ loaderData, actionData }: Route.ComponentProps) 
                     <td>{t(`flows.kind.${f.kind}`, { defaultValue: f.kind })}</td>
                     <td>{(f.spaceIds ?? []).map((id) => findSpace(spaces, id)?.name ?? id).join(", ") || "–"}</td>
                     <td className="font-mono">{f.activeVersion ? `v${f.activeVersion}` : "–"}</td>
-                    <td className="font-mono">{f.metrics1h?.executions == null ? "–" : f.metrics1h.executions.toLocaleString(i18n.language)}</td>
+                    {/* metrics1h는 엔진 지표 묶음 조회가 생기기 전까지 오지 않는다(API-FLW-01): "지표 없음" */}
+                    <td className="font-mono" title={f.metrics1h ? undefined : t("flows.list.metricsNone")}>{f.metrics1h?.executions == null ? "–" : f.metrics1h.executions.toLocaleString(i18n.language)}</td>
                     <td className={rate != null && rate >= 0.1 ? "font-mono text-bad" : "font-mono"}>{rate == null ? "–" : `${Math.round(rate * 100)}%`}</td>
                     <td className="font-mono">{f.metrics1h?.actions ?? "–"}</td>
                     <td>{f.updatedAt ? `${f.updatedBy?.name ?? ""} ${formatDateTime(f.updatedAt, timezone, i18n.language)}` : "–"}</td>

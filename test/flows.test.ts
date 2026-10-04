@@ -50,7 +50,8 @@ describe("UI-FLW-01 플로우 목록", () => {
     expect(page.body.indexOf("CO2 환기 자동화")).toBeLessThan(page.body.indexOf("고온이면 냉방"));
     expect(page.body).toContain("성능 저하");
     expect(page.body).toContain("v13");
-    expect(page.body).toContain("12%");
+    // core는 목록의 metrics1h를 아직 생략한다(API-FLW-01): 오류 대신 "지표 없음"
+    expect(page.body).toContain('title="지표 없음"');
     expect(page.body).not.toContain("새 플로우");
     expect(page.body).not.toContain("템플릿에서 만들기");
     expect((await browser.get("/automation/templates")).response.status).toBe(403);
@@ -113,23 +114,25 @@ describe("UI-FLW-04 템플릿 갤러리(FLW-01.05)", () => {
     expect(gallery.body).toContain("고온이면 냉방");
     expect(gallery.body).toContain("필요: temperature, Thermostat");
     expect(gallery.body).toContain("텔레메트리 → 집계 → 임계값 → 기기 제어");
+    // core 템플릿은 hot-then-cool·co2-then-ventilate 두 개(COMFORT)
     const safety = await browser.get("/automation/templates?category=SAFETY");
-    expect(safety.body).toContain(">센서 이상 알림</h2>");
-    expect(safety.body).not.toContain(">CO2 높으면 환기</h2>");
-    expect((await browser.get("/automation/templates?q=CO2")).body).not.toContain(">센서 이상 알림</h2>");
+    expect(safety.body).toContain("템플릿이 없습니다");
+    const co2 = (await browser.get("/automation/templates?q=CO2")).body;
+    expect(co2).toContain(">CO2 높으면 환기</h2>");
+    expect(co2).not.toContain(">고온이면 냉방</h2>");
     // 가상 환경 키트 배치에서 넘어온 공간 미리 채움(FLW-03.07)
-    const form = await browser.get("/automation/templates?template=high-temp-cooling&spaceId=31");
+    const form = await browser.get("/automation/templates?template=hot-then-cool&spaceId=31");
     expect(form.body).toContain("고온이면 냉방 템플릿으로 만들기");
     expect(form.body).toMatch(/<option value="31" selected="">/);
-    const invalid = await browser.post("/automation/templates?template=high-temp-cooling", { templateKey: "high-temp-cooling", name: "", "p.spaceId": "31", "p.threshold": "50", "p.duration": "5", "p.duration.unit": "m", "p.targetTemperature": "24" });
+    const invalid = await browser.post("/automation/templates?template=hot-then-cool", { templateKey: "hot-then-cool", name: "", "p.spaceId": "31", "p.threshold": "50", "p.duration": "5", "p.duration.unit": "m", "p.targetTemperature": "24" });
     expect(invalid.response.status).toBe(400);
     expect(invalid.body).toContain("이름은 1~100자로 입력하세요");
     expect(invalid.body).toContain("40 이하여야 합니다");
-    const created = await browser.post("/automation/templates?template=high-temp-cooling", { templateKey: "high-temp-cooling", name: "실습실 냉방", idempotencyKey: "k-1", "p.spaceId": "31", "p.threshold": "27", "p.duration": "5", "p.duration.unit": "m", "p.targetTemperature": "24" });
+    const created = await browser.post("/automation/templates?template=hot-then-cool", { templateKey: "hot-then-cool", name: "실습실 냉방", idempotencyKey: "k-1", "p.spaceId": "31", "p.threshold": "27", "p.duration": "5", "p.duration.unit": "m", "p.targetTemperature": "24" });
     expect(created.response.status).toBe(302);
     const location = created.response.headers.get("Location")!;
     expect(location).toMatch(/^\/automation\/flows\/f-\d+\?from=template$/);
-    const post = app.gateway.received.filter((r) => r.path === "/api/v1/core/flow-templates/high-temp-cooling/instantiate").at(-1)!;
+    const post = app.gateway.received.filter((r) => r.path === "/api/v1/core/flow-templates/hot-then-cool/instantiate").at(-1)!;
     expect(post.body).toEqual({ name: "실습실 냉방", params: { spaceId: "31", threshold: 27, duration: "PT5M", targetTemperature: 24 } });
     expect(post.headers["idempotency-key"]).toBe("k-1");
     const flow = state().flows.at(-1)!;
@@ -139,7 +142,7 @@ describe("UI-FLW-04 템플릿 갤러리(FLW-01.05)", () => {
     const editor = await browser.get(location);
     expect(editor.response.status).toBe(200);
     expect(editor.body).toContain("대상 기기 없음");
-    const dup = await browser.post("/automation/templates", { templateKey: "high-temp-cooling", name: "실습실 냉방", "p.spaceId": "31", "p.threshold": "27", "p.duration": "5", "p.targetTemperature": "24" });
+    const dup = await browser.post("/automation/templates", { templateKey: "hot-then-cool", name: "실습실 냉방", "p.spaceId": "31", "p.threshold": "27", "p.duration": "5", "p.targetTemperature": "24" });
     expect(dup.response.status).toBe(409);
     expect(dup.body).toContain("같은 이름의 플로우가 있습니다");
     expect((await browser.post("/automation/templates", { templateKey: "nope", name: "x" })).response.status).toBe(404);
@@ -179,25 +182,33 @@ describe("UI-FLW-02 편집기·버전 배포(FLW-01.01·01.06)", () => {
     expect(parse(stale.body).header.resultCode).toBe("FLOW_VERSION_CONFLICT");
     const saved = await json(browser, "/bff/api/core/flows/f-7f3a/draft", "PUT", { baseVersion: 13, definition });
     expect(parse(saved.body).response).toMatchObject({ draftVersion: 14 });
-    const validated = parse((await json(browser, "/bff/api/core/flows/f-7f3a/validate", "POST", { version: 14 })).body).response;
+    // 저장할 때마다 새 번호: 다음 저장의 baseVersion은 직전 응답 draftVersion(14). 옛 기준(13)은 409
+    expect((await json(browser, "/bff/api/core/flows/f-7f3a/draft", "PUT", { baseVersion: 13, definition })).response.status).toBe(409);
+    const resaved = await json(browser, "/bff/api/core/flows/f-7f3a/draft", "PUT", { baseVersion: 14, definition });
+    expect(parse(resaved.body).response).toMatchObject({ draftVersion: 15 });
+    const validated = parse((await json(browser, "/bff/api/core/flows/f-7f3a/validate", "POST", { version: 15 })).body).response;
     expect(validated.changeSummary).toEqual({ added: [], removed: [], changed: [{ nodeId: "n-thr00001", statePolicy: "KEEP" }] });
-    const applied = await json(browser, "/bff/api/core/flows/f-7f3a/apply", "POST", { version: 14, baseVersion: 13, memo: "기준 28", acknowledgedRisks: false }, { "Idempotency-Key": "ap-1" });
-    expect(parse(applied.body).response).toMatchObject({ appliedVersion: 14 });
+    // baseVersion은 지금 ACTIVE 번호(13)
+    const applied = await json(browser, "/bff/api/core/flows/f-7f3a/apply", "POST", { version: 15, baseVersion: 13, memo: "기준 28", acknowledgedRisks: false }, { "Idempotency-Key": "ap-1" });
+    expect(parse(applied.body).response).toMatchObject({ appliedVersion: 15 });
     const page = await browser.get("/automation/flows/f-7f3a");
-    expect(page.body).toContain("실행 v14");
+    expect(page.body).toContain("실행 v15");
     const versions = parse((await browser.get("/bff/api/core/flows/f-7f3a/versions")).body) as unknown as { responses: { version: number; state: string }[] };
-    expect(versions.responses.map((v) => `${v.version}:${v.state}`)).toEqual(["14:ACTIVE", "13:ARCHIVED", "12:ARCHIVED"]);
-    const diff = parse((await browser.get("/bff/api/core/flows/f-7f3a/version-diff?from=13&to=14")).body).response;
+    expect(versions.responses.map((v) => `${v.version}:${v.state}`)).toEqual(["15:ACTIVE", "13:ARCHIVED", "12:ARCHIVED"]);
+    const diff = parse((await browser.get("/bff/api/core/flows/f-7f3a/version-diff?from=13&to=15")).body).response;
     expect(diff.changed).toEqual([{ nodeId: "n-thr00001", fields: ["config.value"], statePolicy: "KEEP" }]);
+    // 롤백은 보관(ARCHIVED) 버전을 다시 적용한다(새 번호 없음)
     const rollback = await json(browser, "/bff/api/core/flows/f-7f3a/rollback", "POST", { toVersion: 13, memo: "되돌림" });
-    expect(parse(rollback.body).response).toMatchObject({ appliedVersion: 15 });
-    expect(state().flows[0].versions[0].definition.nodes[2].config.value).toBe(27);
+    expect(parse(rollback.body).response).toMatchObject({ appliedVersion: 13 });
+    expect(state().flows[0].activeVersion).toBe(13);
+    expect(state().flows[0].versions.find((v) => v.state === "ACTIVE")?.definition.nodes[2].config.value).toBe(27);
   });
 
   it("TC-FLW-113 AT-FLW-03.5 OPERATOR가 제어 노드 플로우 적용 → 403 PERMISSION_DENIED", async () => {
     const browser = await operator();
     await browser.get("/automation/flows/f-7f3a");
-    const detail = parse((await browser.get("/bff/api/core/flows/f-7f3a")).body).response as { version: { definition: unknown } };
+    const detail = parse((await browser.get("/bff/api/core/flows/f-7f3a")).body).response as { version: { definition: { nodes: { config: Record<string, unknown> }[] } } };
+    detail.version.definition.nodes[3].config.args = { mode: "cool", targetTemperature: 23 };
     await json(browser, "/bff/api/core/flows/f-7f3a/draft", "PUT", { baseVersion: 13, definition: detail.version.definition });
     const denied = await json(browser, "/bff/api/core/flows/f-7f3a/apply", "POST", { version: 14, baseVersion: 13, acknowledgedRisks: true });
     expect(denied.response.status).toBe(403);
@@ -214,9 +225,14 @@ describe("UI-FLW-02 편집기·버전 배포(FLW-01.01·01.06)", () => {
     await json(browser, "/bff/api/core/flows/f-7f3a/draft", "PUT", { baseVersion: 13, definition: detail.version.definition });
     const validated = parse((await json(browser, "/bff/api/core/flows/f-7f3a/validate", "POST", { version: 14 })).body).response;
     expect(validated).toMatchObject({ risky: { controlNodesChanged: true }, approvalRequired: true });
+    // 위험 변경인데 확인이 없으면 400 INVALID_REQUEST errors[{field: acknowledgedRisks}]
+    const unacknowledged = await json(browser, "/bff/api/core/flows/f-7f3a/apply", "POST", { version: 14, baseVersion: 13 });
+    expect(unacknowledged.response.status).toBe(400);
+    expect(parse(unacknowledged.body).errors).toEqual([expect.objectContaining({ field: "acknowledgedRisks", code: "AssertTrue" })]);
     const pending = await json(browser, "/bff/api/core/flows/f-7f3a/apply", "POST", { version: 14, baseVersion: 13, acknowledgedRisks: true });
     expect(pending.response.status).toBe(202);
     expect(parse(pending.body).header).toMatchObject({ resultCode: "FLOW_APPROVAL_REQUIRED", isSuccessful: true });
+    expect(parse(pending.body).response).toEqual({ approvalId: state().approvals[0].approvalId, version: 14 });
     expect(state().flows[0].activeVersion).toBe(13);
     const own = await browser.get("/automation/approvals");
     expect(own.body).toContain("내가 보낸 요청만 보입니다");
@@ -244,9 +260,10 @@ describe("UI-FLW-02 편집기·버전 배포(FLW-01.01·01.06)", () => {
     const browser = await integrator();
     await browser.get("/automation/flows/f-7f3a");
     state().requireApproval = true;
-    const detail = parse((await browser.get("/bff/api/core/flows/f-7f3a")).body).response as { version: { definition: unknown } };
+    const detail = parse((await browser.get("/bff/api/core/flows/f-7f3a")).body).response as { version: { definition: { nodes: { config: Record<string, unknown> }[] } } };
+    detail.version.definition.nodes[3].config.validitySeconds = 300;
     await json(browser, "/bff/api/core/flows/f-7f3a/draft", "PUT", { baseVersion: 13, definition: detail.version.definition });
-    // 변경 없는 초안이라도 제어 노드가 있으면 승인 대기(가짜 규칙)
+    // 제어 노드가 바뀌면 승인 대기
     await json(browser, "/bff/api/core/flows/f-7f3a/apply", "POST", { version: 14, baseVersion: 13, acknowledgedRisks: true });
     const approvalId = state().approvals[0].approvalId;
     expect((await json(browser, `/bff/api/core/flow-approvals/${approvalId}/approve`, "POST", {})).response.status).toBe(403);
@@ -262,6 +279,10 @@ describe("UI-FLW-02 편집기·버전 배포(FLW-01.01·01.06)", () => {
     const page = await browser.get("/automation/flows/f-co2");
     expect(page.response.status).toBe(200);
     expect(app.gateway.received.some((r) => r.path === "/api/v1/core/flows/f-co2/metrics?window=1h&step=1m")).toBe(true);
+    // 엔진 지표를 받을 수 없으면(503) 화면은 열리고 오류 탭은 "지표 없음"
+    state().metricsUnavailable = true;
+    const noMetrics = await browser.get("/automation/flows/f-co2");
+    expect(noMetrics.response.status).toBe(200);
     const caps = parse((await browser.get("/bff/api/core/capabilities/Thermostat")).body).response as { attributes: { name: string }[] };
     expect(caps.attributes.map((a) => a.name)).toContain("targetTemperature");
     expect((await browser.get("/bff/api/core/capabilities/Nope")).response.status).toBe(404);

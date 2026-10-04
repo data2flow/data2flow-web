@@ -10,7 +10,7 @@ import type { FlowApi } from "../api";
 import type { VersionDiff, VersionRow } from "../model/types";
 import { MEMO_MAX } from "./apply-dialog";
 
-export function VersionsPanel({ flowId, api, canWrite, timezone, onDiff, onRolledBack }: { flowId: string; api: Pick<FlowApi, "versions" | "diff" | "rollback">; canWrite: boolean; timezone: string; onDiff: (diff: VersionDiff | null, label?: string) => void; onRolledBack: (version?: number) => void }) {
+export function VersionsPanel({ flowId, api, canWrite, timezone, onDiff, onRolledBack }: { flowId: string; api: Pick<FlowApi, "versions" | "diff" | "rollback">; canWrite: boolean; timezone: string; onDiff: (diff: VersionDiff | null, label?: string) => void; onRolledBack: (version?: number, approvalId?: string) => void }) {
   const { t, i18n } = useTranslation();
   const [rows, setRows] = useState<VersionRow[] | null>(null);
   const [failed, setFailed] = useState<string | undefined>();
@@ -58,7 +58,8 @@ export function VersionsPanel({ flowId, api, canWrite, timezone, onDiff, onRolle
     }
     setRollbackTo(null);
     setMemo("");
-    onRolledBack(result.data.appliedVersion);
+    // 롤백도 제어 노드가 바뀌면 승인 대기(202 {approvalId, version})일 수 있다
+    onRolledBack(result.data.appliedVersion, result.data.approvalId);
     void load();
   };
 
@@ -95,7 +96,7 @@ export function VersionsPanel({ flowId, api, canWrite, timezone, onDiff, onRolle
                     {comparing === row.version ? t("flows.versions.stopCompare") : t("flows.versions.compare", { v: row.version })}
                   </Button>
                 )}
-                {canWrite && row.state !== "ACTIVE" && row.state !== "DRAFT" && (
+                {canWrite && row.state === "ARCHIVED" && (
                   <Button variant="danger" onClick={() => setRollbackTo(row.version)}>
                     {t("flows.versions.rollback", { v: row.version })}
                   </Button>

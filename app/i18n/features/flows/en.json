@@ -45,7 +45,8 @@
       "deleteBody": "Type the flow name \"{{name}}\" to delete it. This cannot be undone.",
       "confirmName": "Flow name",
       "confirmMismatch": "The name does not match",
-      "deleted": "Flow deleted."
+      "deleted": "Flow deleted.",
+      "metricsNone": "No metrics"
     },
     "editor": {
       "name": "Flow name",
@@ -237,7 +238,10 @@
       "TARGET_OFFLINE": "Target device offline",
       "TARGET_EMPTY": "Target is empty",
       "SINK_SCHEMA_MISSING": "Sink schema missing",
-      "DEPRECATED_NODE": "Deprecated node"
+      "DEPRECATED_NODE": "Deprecated node",
+      "UNKNOWN_NODE_TYPE": "Unknown node type",
+      "UNKNOWN_PORT": "Unknown output port",
+      "INVALID_DEFINITION": "Invalid definition"
     },
     "bottom": {
       "label": "Bottom panel",
@@ -276,7 +280,8 @@
       "confirm": "Apply",
       "approvalSent": "Approval request sent",
       "applied": "Applied v{{v}}",
-      "noControlPermission": "You do not have permission to apply flows with control nodes"
+      "noControlPermission": "You do not have permission to apply flows with control nodes",
+      "ackRequired": "This change is risky. Review it, select \"I understand\", and apply again"
     },
     "statePolicy": {
       "KEEP": "Keep (KEEP)",
@@ -306,7 +311,7 @@
       "PENDING_APPROVAL": "Pending approval"
     },
     "errors": {
-      "unavailable": "Metrics are unavailable",
+      "unavailable": "No metrics — engine metrics are not available yet",
       "summary": "Last hour: {{executions}} runs · {{errors}} errors · {{rate}}% error rate",
       "isolation": "A node error ends only that run and raises the error count. Other flows and the next messages from the same device keep running.",
       "none": "No errors in the last hour",

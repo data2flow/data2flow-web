@@ -6,11 +6,11 @@ import { HttpResponse } from "msw";
 import { M3_NODE_TYPES } from "~/features/flows/model/__tests__/catalog-fixture";
 import { fail, list, noContent, ok, type CoreHandler, type CoreRequest, type CoreState } from "../core-fixtures";
 
+/** 검증 문제(api-rules §5 모양 {field, code, message}, ADR-044). 노드는 field `nodes[<id>]…`, 연결선은 `wires[<i>]` */
 interface Issue {
+  field: string;
   code: string;
-  nodeId?: string;
-  path?: string;
-  message?: string;
+  message: string;
 }
 interface Def {
   schema: string;
@@ -37,6 +37,7 @@ export interface FakeFlow {
   activeVersion: number | null;
   draftVersion: number | null;
   spaceIds: string[];
+  /** 가짜 엔진 지표(API-FLW-14 원천). 목록(API-FLW-01)에는 싣지 않는다(core가 아직 생략) */
   metrics1h: { executions: number; errorRate: number; actions: number };
   updatedBy: { userId: string; name: string };
   updatedAt: string;
@@ -62,6 +63,8 @@ export interface FlowsState {
   requireApproval: boolean;
   /** 공간별 제어 가능 기능(없으면 템플릿·검증에서 TARGET_MISSING 경고) */
   controllable: Map<string, string[]>;
+  /** 엔진 지표를 받을 수 없음(API-FLW-14 → 503 SERVICE_UNAVAILABLE) */
+  metricsUnavailable: boolean;
   seq: number;
 }
 
@@ -104,7 +107,7 @@ function co2Definition(): Def {
 
 const TEMPLATES = [
   {
-    key: "high-temp-cooling",
+    key: "hot-then-cool",
     name: "고온이면 냉방",
     description: "공간 평균 온도가 기준을 넘는 상태가 이어지면 에어컨을 냉방으로 켭니다",
     category: "COMFORT",
@@ -121,8 +124,24 @@ const TEMPLATES = [
     },
     preview: { nodes: [{ name: "텔레메트리" }, { name: "집계" }, { name: "임계값" }, { name: "기기 제어" }] },
   },
-  { key: "co2-ventilation", name: "CO2 높으면 환기", description: "CO2가 기준을 넘으면 환기 장치를 켭니다", category: "COMFORT", required: { metrics: ["co2"], capabilities: ["Ventilation"] }, paramsSchema: { type: "object", required: ["spaceId"], properties: { spaceId: { type: "string", "x-widget": "space", title: "대상 공간" }, threshold: { type: "number", default: 1000, title: "기준 CO2" } } }, preview: null },
-  { key: "sensor-anomaly-alert", name: "센서 이상 알림", description: "센서 값이 튀거나 멈추면 알립니다", category: "SAFETY", required: { metrics: [], capabilities: [] }, paramsSchema: { type: "object", properties: { spaceId: { type: "string", "x-widget": "space", title: "대상 공간" } } }, preview: null },
+  {
+    key: "co2-then-ventilate",
+    name: "CO2 높으면 환기",
+    description: "공간 평균 CO2가 기준을 넘은 상태가 지속되면 환기 장치를 켭니다",
+    category: "COMFORT",
+    required: { metrics: ["co2"], capabilities: ["Ventilation"] },
+    paramsSchema: {
+      type: "object",
+      required: ["spaceId", "threshold", "duration", "level"],
+      properties: {
+        spaceId: { type: "string", "x-widget": "space", title: "대상 공간" },
+        threshold: { type: "number", minimum: 600, maximum: 5000, default: 1000, title: "CO2 기준(ppm)" },
+        duration: { type: "string", format: "duration", default: "PT5M", title: "지속 시간" },
+        level: { type: "integer", minimum: 1, maximum: 3, default: 3, title: "환기 단계" },
+      },
+    },
+    preview: null,
+  },
 ];
 
 const CAPABILITIES = [
@@ -155,6 +174,7 @@ export function flowsState(core: CoreState): FlowsState {
       seq: 100,
       requireApproval: false,
       controllable: new Map(),
+      metricsUnavailable: false,
       approvals: [],
       flows: [
         { flowId: "f-7f3a", name: "고온이면 냉방", description: null, kind: "FLOW", status: "ACTIVE", environment: "PROD", activeVersion: 13, draftVersion: null, spaceIds: ["31"], metrics1h: { executions: 812, errorRate: 0, actions: 3 }, updatedBy: by, updatedAt: "2026-10-03T01:40:00Z", lock: 5, versions: [version(13, "ACTIVE", coolingDefinition("31"), "기준 온도 상향"), version(12, "ARCHIVED", coolingDefinition("31", 28), "처음 적용")] },
@@ -172,24 +192,44 @@ export function fakeValidate(state: FlowsState, def: Def): { errors: Issue[]; wa
   const errors: Issue[] = [];
   const warnings: Issue[] = [];
   const nodes = def.nodes ?? [];
-  if (nodes.length > 0 && !nodes.some((n) => n.type.startsWith("trigger."))) errors.push({ code: "NO_TRIGGER", message: "트리거가 없습니다" });
+  if (nodes.length > 0 && !nodes.some((n) => n.type.startsWith("trigger."))) errors.push({ field: "nodes", code: "NO_TRIGGER", message: "트리거 노드가 하나 이상 있어야 합니다" });
+  const ids = new Set(nodes.map((n) => n.id));
+  (def.wires ?? []).forEach((w, i) => {
+    if (!ids.has(w.from) || !ids.has(w.to)) errors.push({ field: `wires[${i}]`, code: "UNCONNECTED", message: "없는 노드를 잇습니다" });
+  });
   const incoming = new Set((def.wires ?? []).map((w) => w.to));
   for (const n of nodes) {
-    if (!n.type.startsWith("trigger.") && !incoming.has(n.id)) errors.push({ code: "UNCONNECTED", nodeId: n.id, message: "연결되지 않은 노드" });
-    if (n.type === "condition.threshold" && typeof n.config?.value !== "number") errors.push({ code: "INVALID_CONFIG", nodeId: n.id, path: "value", message: "value 필수" });
+    if (!n.type.startsWith("trigger.") && !incoming.has(n.id)) errors.push({ field: `nodes[${n.id}]`, code: "UNCONNECTED", message: "입력이 연결되지 않았습니다" });
+    if (n.type === "condition.threshold" && typeof n.config?.value !== "number") errors.push({ field: `nodes[${n.id}].config.value`, code: "INVALID_CONFIG", message: "설정이 올바르지 않습니다(NotNull)" });
     if (n.type === "action.control") {
       const target = n.config?.target as { spaceId?: string } | undefined;
       const caps = target?.spaceId ? (state.controllable.get(String(target.spaceId)) ?? []) : [];
-      if (!caps.includes(String(n.config?.capability ?? ""))) warnings.push({ code: "TARGET_MISSING", nodeId: n.id, message: "대상 기기 없음" });
+      if (!caps.includes(String(n.config?.capability ?? ""))) warnings.push({ field: `nodes[${n.id}].config.target`, code: "TARGET_EMPTY", message: "대상 기기 없음" });
     }
   }
   return { errors, warnings };
 }
 
-const hasControl = (def: Def) => (def.nodes ?? []).some((n) => n.type === "action.control" || n.type === "action.scene");
+const isControl = (type: string) => type === "action.control" || type === "action.scene";
+const hasControl = (def: Def) => (def.nodes ?? []).some((n) => isControl(n.type));
 
+/** core FlowDiff.risky: 제어·장면 노드가 더해졌거나 바뀌었거나 빠졌다 */
+function controlNodesChanged(active: Def | undefined, next: Def): boolean {
+  const before = new Map((active?.nodes ?? []).filter((n) => isControl(n.type)).map((n) => [n.id, JSON.stringify([n.type, n.config])]));
+  const after = new Map((next.nodes ?? []).filter((n) => isControl(n.type)).map((n) => [n.id, JSON.stringify([n.type, n.config])]));
+  if (before.size !== after.size) return true;
+  for (const [id, sig] of after) if (before.get(id) !== sig) return true;
+  return false;
+}
+
+/** API-FLW-01 목록 항목(core는 metrics1h를 아직 생략한다) */
 function flowRow(f: FakeFlow) {
-  return { flowId: f.flowId, name: f.name, kind: f.kind, status: f.status, environment: f.environment, activeVersion: f.activeVersion, draftVersion: f.draftVersion, spaceIds: f.spaceIds, hasControlNode: f.versions.some((v) => hasControl(v.definition)), metrics1h: f.metrics1h, updatedBy: f.updatedBy, updatedAt: f.updatedAt };
+  return { flowId: f.flowId, name: f.name, kind: f.kind, status: f.status, environment: f.environment, activeVersion: f.activeVersion, draftVersion: f.draftVersion, spaceIds: f.spaceIds, hasControlNode: f.versions.some((v) => hasControl(v.definition)), updatedBy: f.updatedBy, updatedAt: f.updatedAt };
+}
+
+/** 페이징 없는 작은 목록(api-rules §3.3, core ItemsResponse): {header, responses, totalCount} */
+function items<T>(rows: T[]) {
+  return HttpResponse.json({ header: { isSuccessful: true, resultCode: "SUCCESS", resultMessage: "SUCCESS" }, responses: rows, totalCount: rows.length });
 }
 
 function detail(state: FlowsState, f: FakeFlow, requested?: number) {
@@ -262,19 +302,20 @@ export const flowsHandler: CoreHandler = (core, req) => {
   }
   if (isCapability) return undefined;
 
-  if (path === "/flow-nodes" && method === "GET") return can("FLOW_READ") ? list(M3_NODE_TYPES, url, { size: 100 }) : denied();
+  if (path === "/flow-nodes" && method === "GET") return can("FLOW_READ") ? items(M3_NODE_TYPES) : denied();
 
   if (path === "/flow-templates" && method === "GET") {
     if (!can("FLOW_WRITE")) return denied();
     const category = url.searchParams.get("category");
-    return list(TEMPLATES.filter((tpl) => !category || tpl.category === category), url);
+    return items(TEMPLATES.filter((tpl) => !category || tpl.category === category.toUpperCase()));
   }
   const instantiate = /^\/flow-templates\/([^/]+)\/instantiate$/.exec(path);
   if (instantiate && method === "POST") {
     if (!can("FLOW_WRITE")) return denied();
     const tpl = TEMPLATES.find((x) => x.key === decodeURIComponent(instantiate[1]));
-    if (!tpl) return fail(404, "RESOURCE_NOT_FOUND");
+    if (!tpl) return fail(404, "FLOW_TEMPLATE_NOT_FOUND");
     const params = (b.params ?? {}) as Record<string, unknown>;
+    if (!/^\d{1,18}$/.test(String(params.spaceId ?? ""))) return fail(400, "INVALID_REQUEST", { errors: [{ field: "params.spaceId", code: params.spaceId ? "Pattern" : "NotNull", message: "대상 공간" }] });
     const name = String(b.name ?? tpl.name);
     if (state.flows.some((f) => f.name === name)) return fail(409, "FLOW_NAME_DUPLICATED");
     const spaceId = String(params.spaceId ?? "");
@@ -374,43 +415,46 @@ export const flowsHandler: CoreHandler = (core, req) => {
       const latest = flow.draftVersion ?? flow.activeVersion ?? 0;
       if (Number(b.baseVersion) !== latest) return fail(409, "FLOW_VERSION_CONFLICT");
       const def = b.definition as Def;
-      let draft = flow.versions.find((v) => v.version === flow.draftVersion);
-      if (draft) draft.definition = def;
-      else {
-        draft = version(nextVersion(flow), "DRAFT", def);
-        draft.baseVersion = flow.activeVersion;
-        flow.versions.unshift(draft);
-        flow.draftVersion = draft.version;
-      }
+      // 저장할 때마다 새 번호(이전 초안은 지운다). 응답 draftVersion이 다음 baseVersion
+      const draft = version(nextVersion(flow), "DRAFT", def);
+      draft.baseVersion = flow.activeVersion;
+      flow.versions = flow.versions.filter((v) => v.version !== flow.draftVersion);
+      flow.versions.unshift(draft);
+      flow.draftVersion = draft.version;
       flow.updatedAt = AT;
       return ok({ flowId: flow.flowId, draftVersion: draft.version, validation: fakeValidate(state, def) });
     }
     case "POST validate": {
-      const v = flow.versions.find((x) => x.version === Number(b.version));
-      if (!v) return fail(404, "FLOW_NOT_FOUND");
+      const v = flow.versions.find((x) => x.version === Number(b.version ?? flow.draftVersion ?? flow.activeVersion));
+      if (!v) return fail(404, "RESOURCE_NOT_FOUND");
       const active = flow.versions.find((x) => x.version === flow.activeVersion);
       const result = fakeValidate(state, v.definition);
       const diff = active ? diffOf(active.definition, v.definition) : { added: v.definition.nodes.map((n) => n.id), removed: [] as string[], changed: [] as { nodeId: string; statePolicy: string }[] };
-      const controlIds = new Set(v.definition.nodes.filter((n) => n.type === "action.control").map((n) => n.id));
-      const controlNodesChanged = [...diff.added, ...diff.changed.map((c) => c.nodeId)].some((id) => controlIds.has(id));
-      return ok({ ...result, changeSummary: { added: diff.added, removed: diff.removed.map((nodeId) => ({ nodeId, retainedState: true })), changed: diff.changed.map((c) => ({ nodeId: c.nodeId, statePolicy: c.statePolicy })) }, risky: { controlNodesChanged, executionModeChanged: false }, approvalRequired: state.requireApproval && controlNodesChanged });
+      const controlChanged = controlNodesChanged(active?.definition, v.definition);
+      return ok({ ...result, changeSummary: { added: diff.added, removed: diff.removed.map((nodeId) => ({ nodeId, retainedState: true })), changed: diff.changed.map((c) => ({ nodeId: c.nodeId, statePolicy: c.statePolicy })) }, risky: { controlNodesChanged: controlChanged, executionModeChanged: false }, approvalRequired: state.requireApproval && controlChanged });
     }
     case "POST apply": {
       if (!write()) return denied();
-      const v = flow.versions.find((x) => x.version === Number(b.version));
-      if (!v) return fail(404, "FLOW_NOT_FOUND");
-      if (Number(b.baseVersion ?? 0) !== (flow.activeVersion ?? 0)) return fail(409, "FLOW_VERSION_CONFLICT");
+      if (typeof b.version !== "number") return fail(400, "INVALID_REQUEST", { errors: [{ field: "version", code: "NotNull", message: "version" }] });
+      if (typeof b.baseVersion !== "number") return fail(400, "INVALID_REQUEST", { errors: [{ field: "baseVersion", code: "NotNull", message: "baseVersion" }] });
+      if (b.baseVersion !== (flow.activeVersion ?? 0)) return fail(409, "FLOW_VERSION_CONFLICT");
+      const v = flow.versions.find((x) => x.version === b.version);
+      if (!v) return fail(404, "RESOURCE_NOT_FOUND");
+      if (v.state !== "DRAFT") return fail(409, "FLOW_STATE_CONFLICT");
       const result = fakeValidate(state, v.definition);
-      if (result.errors.length > 0) return fail(400, "FLOW_VALIDATION_FAILED", { errors: result.errors });
-      const control = hasControl(v.definition);
-      if (control && !can("FLOW_DEPLOY_CONTROL")) return fail(403, "PERMISSION_DENIED");
-      if (control && state.requireApproval && !can("FLOW_APPROVE")) {
+      if (result.errors.length > 0) return fail(400, "FLOW_VALIDATION_FAILED", { errors: result.errors, response: result });
+      const active = flow.versions.find((x) => x.version === flow.activeVersion);
+      const controlChanged = controlNodesChanged(active?.definition, v.definition);
+      if (controlChanged && !can("FLOW_DEPLOY_CONTROL")) return fail(403, "PERMISSION_DENIED");
+      if (controlChanged && b.acknowledgedRisks !== true) return fail(400, "INVALID_REQUEST", { errors: [{ field: "acknowledgedRisks", code: "AssertTrue", message: "위험 변경 확인이 필요합니다" }] });
+      if (controlChanged && state.requireApproval) {
+        if (state.approvals.some((a) => a.flowId === flow.flowId && a.status === "PENDING")) return fail(409, "FLOW_STATE_CONFLICT");
         state.seq += 1;
-        const approvalId = `ap-${state.seq}`;
+        const approvalId = String(state.seq);
         v.state = "PENDING_APPROVAL";
         v.memo = (b.memo as string) ?? null;
         state.approvals.push({ approvalId, flowId: flow.flowId, flowName: flow.name, version: v.version, kind: "APPLY", status: "PENDING", hasControlNode: true, requestedBy: { userId: user.id, name: user.name }, requestedAt: AT });
-        return HttpResponse.json({ header: { isSuccessful: true, resultCode: "FLOW_APPROVAL_REQUIRED", resultMessage: "승인 요청을 보냈습니다" }, response: { approvalId } }, { status: 202 });
+        return HttpResponse.json({ header: { isSuccessful: true, resultCode: "FLOW_APPROVAL_REQUIRED", resultMessage: "승인 요청을 보냈습니다" }, response: { approvalId, version: v.version } }, { status: 202 });
       }
       return ok(activate(flow, v, user, (b.memo as string) ?? null));
     }
@@ -424,12 +468,13 @@ export const flowsHandler: CoreHandler = (core, req) => {
     }
     case "POST rollback": {
       if (!write()) return denied();
+      // core: 보관(ARCHIVED) 버전을 같은 절차로 다시 적용한다(새 버전을 만들지 않는다)
       const from = flow.versions.find((x) => x.version === Number(b.toVersion));
-      if (!from) return fail(404, "FLOW_NOT_FOUND");
-      if (hasControl(from.definition) && !can("FLOW_DEPLOY_CONTROL")) return fail(403, "PERMISSION_DENIED");
-      const next = version(nextVersion(flow), "DRAFT", structuredClone(from.definition));
-      flow.versions.unshift(next);
-      return ok(activate(flow, next, user, (b.memo as string) ?? `v${from.version}로 롤백`));
+      if (!from) return fail(404, "RESOURCE_NOT_FOUND");
+      if (from.state !== "ARCHIVED") return fail(409, "FLOW_STATE_CONFLICT");
+      const active = flow.versions.find((x) => x.version === flow.activeVersion);
+      if (controlNodesChanged(active?.definition, from.definition) && !can("FLOW_DEPLOY_CONTROL")) return fail(403, "PERMISSION_DENIED");
+      return ok(activate(flow, from, user, (b.memo as string) ?? `v${from.version}로 롤백`));
     }
     case "POST pause":
     case "POST resume":
@@ -438,9 +483,10 @@ export const flowsHandler: CoreHandler = (core, req) => {
       const allowed = sub === "pause" ? ["ACTIVE", "DEGRADED"] : sub === "resume" ? ["PAUSED"] : ["ACTIVE", "DEGRADED", "PAUSED"];
       if (!allowed.includes(flow.status)) return fail(409, "FLOW_STATE_CONFLICT");
       flow.status = sub === "pause" ? "PAUSED" : sub === "resume" ? "ACTIVE" : "DISABLED";
-      return ok({ status: flow.status });
+      return ok({ flowId: flow.flowId, status: flow.status });
     }
     case "GET metrics": {
+      if (state.metricsUnavailable) return fail(503, "SERVICE_UNAVAILABLE");
       const active = flow.versions.find((x) => x.version === flow.activeVersion) ?? flow.versions[0];
       const errorsByNode = (id: string, type: string) => (flow.flowId === "f-co2" && type === "transform.js" ? 145 : 0);
       const nodes = (active?.definition.nodes ?? []).map((n) => ({ nodeId: n.id, processed: flow.metrics1h.executions, errors: errorsByNode(n.id, n.type), avgMs: 0.4 }));

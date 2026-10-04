@@ -1,11 +1,12 @@
 /**
  * M3 기본 노드 카탈로그 픽스처(API-FLW-30 모양). 단위·화면 테스트와 가짜 gateway(test/msw/handlers/flows.ts)가 함께 쓴다.
+ * contracts flow-node-type.v1은 모든 노드(트리거 포함) 출력에 `error` 포트를 요구하므로 마지막에 붙인다.
  */
 import type { NodeType } from "../types";
 
 const target = { type: "object", "x-widget": "target", title: "대상" } as const;
 
-export const M3_NODE_TYPES: NodeType[] = [
+const BASE_NODE_TYPES: NodeType[] = [
   {
     type: "trigger.telemetry",
     typeVersion: 1,
@@ -136,6 +137,10 @@ export const M3_NODE_TYPES: NodeType[] = [
     configSchema: { type: "object", properties: { level: { type: "string", enum: ["DEBUG", "INFO", "WARN"], default: "INFO", title: "수준" } } },
   },
 ];
+
+const ERROR_PORT = { name: "error", type: "error" };
+
+export const M3_NODE_TYPES: NodeType[] = BASE_NODE_TYPES.map((t) => ({ ...t, outputs: [...t.outputs, ERROR_PORT] }));
 
 /** 포트 타입 검사용(BR-FLW-03): 숫자 출력 노드와 불리언 입력 노드 */
 export const TYPED_TEST_NODES: NodeType[] = [

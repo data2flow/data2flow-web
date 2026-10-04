@@ -40,7 +40,7 @@ export function isControlNode(type: string, catalog?: Catalog) {
   return type === "action.control" || type === "action.scene";
 }
 
-/** 노드의 출력 포트: 카탈로그 출력 + JS 노드의 출력 수(out1..n) + 공통 error(트리거 제외) */
+/** 노드의 출력 포트: 카탈로그 출력 + JS 노드의 출력 수(out1..n) + 공통 error(트리거 포함 모든 노드, contracts flow-node-type.v1) */
 export function outputPorts(node: Pick<FlowNode, "type" | "config">, catalog?: Catalog): PortSpec[] {
   const nodeType = catalog?.get(node.type);
   let ports: PortSpec[] = [...(nodeType?.outputs ?? [{ name: "out", type: "any" }])];
@@ -48,7 +48,9 @@ export function outputPorts(node: Pick<FlowNode, "type" | "config">, catalog?: C
     const n = Math.min(10, Math.max(1, Number(node.config?.outputs) || 1));
     ports = Array.from({ length: n }, (_, i) => ({ name: `out${i + 1}`, type: "message" }));
   }
-  if (!isTrigger(node.type, catalog) && !ports.some((p) => p.name === "error")) ports.push({ name: "error", type: "error" });
+  const error = nodeType?.outputs.find((p) => p.name === "error");
+  ports = ports.filter((p) => p.name !== "error");
+  ports.push(error ? { ...error, type: error.type ?? "error" } : { name: "error", type: "error" });
   return ports;
 }
 
@@ -85,9 +87,11 @@ export function toDefinition(graph: FlowGraph): FlowDefinition {
     schema: FLOW_DEFINITION_SCHEMA,
     ...graph.extra,
     nodes: graph.nodes.map((n) => {
-      const out: FlowNode = { id: n.id, type: n.type, typeVersion: n.typeVersion, name: n.name, config: n.config, position: n.position };
-      if (n.description) out.description = n.description;
-      if (n.retry) out.retry = n.retry;
+      // 편집기가 모르는 필드(outputs·disabled 등)도 그대로 둔다
+      const { id, type, typeVersion, name, config, position, description, retry, ...rest } = n;
+      const out: FlowNode = { id, type, typeVersion, name, config, position, ...rest };
+      if (description) out.description = description;
+      if (retry) out.retry = retry;
       return out;
     }),
     wires: graph.wires,

@@ -19,10 +19,11 @@ describe("FLW-05.03 TC-FLW-102 AT-FLW-19.3 JS 노드 예외 → 오류 지표, �
     expect(screen.getByRole("cell", { name: "145" })).toBeInTheDocument();
   });
 
-  it("지표가 없거나 오류가 없을 때", async () => {
+  it("지표가 없거나(엔진 지표 503 → 오류 대신 '지표 없음') 오류가 없을 때", async () => {
     const { unmount } = await renderEditor({ detail: detailOf(createFlowGraph(catalog).node("trigger.telemetry", "n-trg00002").build()) });
     await userEvent.click(await screen.findByRole("tab", { name: "오류" }));
-    expect(screen.getByText("지표를 불러오지 못했습니다")).toBeInTheDocument();
+    expect(screen.getByText(/^지표 없음/)).toBeInTheDocument();
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
     unmount();
     await renderEditor({ detail: detailOf(createFlowGraph(catalog).node("trigger.telemetry", "n-trg00002").build()), metrics: { summary: { executions: 3, errors: 0, errorRate: 0 }, nodes: [] } });
     await userEvent.click(await screen.findByRole("tab", { name: "오류" }));

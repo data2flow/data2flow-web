@@ -130,7 +130,42 @@ export function validateGraph(graph: FlowGraph, catalog: Catalog): ValidationRes
   return { errors, warnings: [] };
 }
 
-/** 문제 목록의 노드 ID들(nodeId 또는 nodeIds) */
+const NODE_FIELD = /^nodes\[([^\]]+)\](?:\.(.+))?$/;
+const WIRE_FIELD = /^wires\[(\d+)\](?:\.(.+))?$/;
+
+/** 서버 문제 위치(`field`)에서 노드 ID를 읽는다: `nodes[n-abc].config.value` → `n-abc`. 노드가 아니면 undefined */
+export function nodeIdOfField(field: string | undefined): string | undefined {
+  return field ? NODE_FIELD.exec(field)?.[1] : undefined;
+}
+
+/**
+ * 서버 문제(`{field, code, message}`, ADR-044)를 편집기 모양으로: `nodes[<id>].config.<p>` → nodeId + path `<p>`,
+ * `nodes[<id>].<p>` → nodeId + path `<p>`, `wires[<i>]` → 그 연결선(graph의 i번째 와이어, 저장한 정의와 순서가 같다)과 양 끝 노드.
+ * 이미 nodeId·nodeIds가 있는 문제(화면 검증)는 그대로 둔다.
+ */
+export function normalizeIssue(issue: ValidationIssue, graph?: Pick<FlowGraph, "wires">): ValidationIssue {
+  if (issue.nodeId || issue.nodeIds || !issue.field) return issue;
+  const node = NODE_FIELD.exec(issue.field);
+  if (node) {
+    const rest = node[2]?.replace(/^config\./, "");
+    return { ...issue, nodeId: node[1], path: issue.path ?? (rest && rest !== "id" ? rest : undefined) };
+  }
+  const wire = WIRE_FIELD.exec(issue.field);
+  if (wire) {
+    const w = graph?.wires[Number(wire[1])];
+    return w ? { ...issue, wire: w, nodeIds: [w.from, w.to], path: issue.path ?? wire[2] } : { ...issue, path: issue.path ?? issue.field };
+  }
+  return issue;
+}
+
+export function normalizeIssues(result: Partial<ValidationResult> | null | undefined, graph?: Pick<FlowGraph, "wires">): ValidationResult | null {
+  if (!result) return null;
+  return { errors: (result.errors ?? []).map((i) => normalizeIssue(i, graph)), warnings: (result.warnings ?? []).map((i) => normalizeIssue(i, graph)) };
+}
+
+/** 문제 목록의 노드 ID들(nodeId 또는 nodeIds, 없으면 서버 field `nodes[<id>]…`) */
 export function issueNodeIds(issue: ValidationIssue): string[] {
-  return issue.nodeIds ?? (issue.nodeId ? [issue.nodeId] : []);
+  if (issue.nodeIds) return issue.nodeIds;
+  const id = issue.nodeId ?? nodeIdOfField(issue.field);
+  return id ? [id] : [];
 }

@@ -45,7 +45,8 @@
       "deleteBody": "请输入流程名称“{{name}}”以删除。此操作无法撤销。",
       "confirmName": "流程名称",
       "confirmMismatch": "名称不匹配",
-      "deleted": "流程已删除。"
+      "deleted": "流程已删除。",
+      "metricsNone": "暂无指标"
     },
     "editor": {
       "name": "流程名称",
@@ -237,7 +238,10 @@
       "TARGET_OFFLINE": "目标设备离线",
       "TARGET_EMPTY": "目标为空",
       "SINK_SCHEMA_MISSING": "缺少输出模式",
-      "DEPRECATED_NODE": "已弃用节点"
+      "DEPRECATED_NODE": "已弃用节点",
+      "UNKNOWN_NODE_TYPE": "未知节点类型",
+      "UNKNOWN_PORT": "不存在的输出端口",
+      "INVALID_DEFINITION": "定义格式错误"
     },
     "bottom": {
       "label": "底部面板",
@@ -276,7 +280,8 @@
       "confirm": "应用",
       "approvalSent": "已发送审批请求",
       "applied": "已应用 v{{v}}",
-      "noControlPermission": "您没有应用含控制节点流程的权限"
+      "noControlPermission": "您没有应用含控制节点流程的权限",
+      "ackRequired": "存在风险变更。请确认内容并勾选“我已了解”后再次应用"
     },
     "statePolicy": {
       "KEEP": "保留(KEEP)",
@@ -306,7 +311,7 @@
       "PENDING_APPROVAL": "待审批"
     },
     "errors": {
-      "unavailable": "无法加载指标",
+      "unavailable": "暂无指标 — 尚无法获取执行引擎指标",
       "summary": "最近1小时：执行 {{executions}} 次 · 错误 {{errors}} 次 · 错误率 {{rate}}%",
       "isolation": "节点错误只会结束该次执行并增加错误计数，不会阻塞其他流程以及同一设备的后续消息。",
       "none": "最近1小时没有错误",

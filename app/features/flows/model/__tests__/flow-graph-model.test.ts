@@ -27,7 +27,7 @@ import {
   wireUnder,
 } from "../flow-graph";
 import { checkDuration, isoToSeconds, joinDuration, secondsToIso, splitDuration } from "../duration";
-import { issueNodeIds, nodeProblems, validateConfig, validateGraph } from "../validation";
+import { issueNodeIds, nodeProblems, normalizeIssue, normalizeIssues, validateConfig, validateGraph } from "../validation";
 import { M3_NODE_TYPES, TYPED_TEST_NODES } from "./catalog-fixture";
 
 const catalog = catalogOf([...M3_NODE_TYPES, ...TYPED_TEST_NODES]);
@@ -110,7 +110,8 @@ describe("FLW-01.03 TC-FLW-005 BR-FLW-03 connect() 규칙", () => {
     const step4 = step2.ok ? connect(step2.graph, { from: "n-action01", port: "error", to: "n-number01" }, catalog) : step2;
     expect(step4.ok).toBe(true);
     expect(outputPorts({ type: "condition.threshold", config: {} }, catalog).map((p) => p.name)).toEqual(["true", "false", "error"]);
-    expect(outputPorts({ type: "trigger.telemetry", config: {} }, catalog).map((p) => p.name)).toEqual(["out"]);
+    // contracts flow-node-type.v1: 트리거를 포함한 모든 노드에 error 출력 포트
+    expect(outputPorts({ type: "trigger.telemetry", config: {} }, catalog).map((p) => p.name)).toEqual(["out", "error"]);
     expect(outputPorts({ type: "transform.js", config: { outputs: 3 } }, catalog).map((p) => p.name)).toEqual(["out1", "out2", "out3", "error"]);
     expect(outputPorts({ type: "unknown.x", config: {} }).map((p) => p.name)).toEqual(["out", "error"]);
     expect(inputPorts({ type: "unknown.x" })).toEqual([{ name: "in", type: "any" }]);
@@ -236,6 +237,34 @@ describe("FLW-01.02 BR-FLW-05 설정 스키마 검증·그래프 검증", () => 
     expect(issueNodeIds(result.errors[2])).toEqual(["n-a0000001", "n-b0000001"]);
     expect(issueNodeIds(result.errors[3])).toEqual(["n-c0000001"]);
     expect(issueNodeIds({ code: "X" })).toEqual([]);
+  });
+
+  it("ADR-044 서버 문제 {field, code, message}: nodes[<id>]…는 노드·설정 경로, wires[<i>]는 i번째 연결선의 양 끝 노드", () => {
+    const graph = createFlowGraph(catalog).node("trigger.telemetry", "n-trg00001").node("debug.log", "n-dbg00001").wire("n-trg00001", "out", "n-dbg00001").build();
+    expect(issueNodeIds({ field: "nodes[n-trg00001].config.metrics", code: "INVALID_CONFIG" })).toEqual(["n-trg00001"]);
+    expect(normalizeIssue({ field: "nodes[n-trg00001].config.metrics", code: "INVALID_CONFIG", message: "m" })).toMatchObject({ nodeId: "n-trg00001", path: "metrics" });
+    expect(normalizeIssue({ field: "nodes[n-trg00001]", code: "UNCONNECTED" })).toMatchObject({ nodeId: "n-trg00001", path: undefined });
+    expect(normalizeIssue({ field: "nodes[n-trg00001].id", code: "INVALID_CONFIG" }).path).toBeUndefined();
+    expect(normalizeIssue({ field: "wires[0].port", code: "UNKNOWN_PORT" }, graph)).toMatchObject({ nodeIds: ["n-trg00001", "n-dbg00001"], path: "port", wire: graph.wires[0] });
+    expect(normalizeIssue({ field: "wires[5]", code: "UNCONNECTED" }, graph)).toMatchObject({ path: "wires[5]" });
+    expect(normalizeIssue({ field: "nodes", code: "NO_TRIGGER" })).toEqual({ field: "nodes", code: "NO_TRIGGER" });
+    expect(normalizeIssues({ errors: [{ field: "nodes[n-x]", code: "CYCLE" }] }, graph)).toEqual({ errors: [{ field: "nodes[n-x]", code: "CYCLE", nodeId: "n-x", path: undefined }], warnings: [] });
+    expect(normalizeIssues(null)).toBeNull();
+  });
+
+  it("contracts flow-definition.v1: 정의의 노드 outputs·disabled와 트리거 error 연결을 그대로 읽고 저장한다", () => {
+    const definition = {
+      schema: "data2flow.flow-definition/v1",
+      nodes: [
+        { id: "n-trg00001", type: "trigger.telemetry", typeVersion: 1, name: "t", config: {}, position: { x: 0, y: 0 }, outputs: ["out", "error"], disabled: false },
+        { id: "n-dbg00001", type: "debug.log", typeVersion: 1, name: "d", config: {}, position: { x: 200, y: 0 }, disabled: true },
+      ],
+      wires: [{ from: "n-trg00001", port: "error", to: "n-dbg00001" }],
+    };
+    const graph = fromDefinition(definition);
+    expect(toDefinition(graph).nodes).toEqual(definition.nodes);
+    expect(validateGraph(graph, catalog).errors.filter((e) => e.code !== "INVALID_CONFIG")).toEqual([]);
+    expect(connect(graph, { from: "n-trg00001", port: "error", to: "n-dbg00001" }, catalog)).toEqual({ ok: false, reason: "DUPLICATE" });
     expect(validateGraph(emptyGraph(), catalog).errors).toEqual([]);
   });
 });

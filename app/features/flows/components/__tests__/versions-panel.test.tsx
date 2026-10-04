@@ -23,7 +23,7 @@ describe("FLW-01.06 UI-FLW-05 버전 기록·비교·롤백", () => {
     await userEvent.type(within(dialog).getByRole("textbox"), "되돌림");
     await userEvent.click(within(dialog).getByRole("button", { name: "롤백" }));
     expect(api.rollback).toHaveBeenCalledWith("f-7f3a", { toVersion: 13, memo: "되돌림" });
-    expect(onRolledBack).toHaveBeenCalledWith(15);
+    expect(onRolledBack).toHaveBeenCalledWith(13, undefined);
   });
 
   it("조회 권한만이면 롤백 없음, 오류·빈 목록·롤백 실패", async () => {

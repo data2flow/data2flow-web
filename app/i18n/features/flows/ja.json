@@ -45,7 +45,8 @@
       "deleteBody": "削除するにはフロー名「{{name}}」を入力してください。元に戻せません。",
       "confirmName": "フロー名",
       "confirmMismatch": "名前が一致しません",
-      "deleted": "フローを削除しました。"
+      "deleted": "フローを削除しました。",
+      "metricsNone": "指標なし"
     },
     "editor": {
       "name": "フロー名",
@@ -237,7 +238,10 @@
       "TARGET_OFFLINE": "対象機器オフライン",
       "TARGET_EMPTY": "対象が空です",
       "SINK_SCHEMA_MISSING": "保存先スキーマなし",
-      "DEPRECATED_NODE": "非推奨ノード"
+      "DEPRECATED_NODE": "非推奨ノード",
+      "UNKNOWN_NODE_TYPE": "不明なノード種類",
+      "UNKNOWN_PORT": "存在しない出力ポート",
+      "INVALID_DEFINITION": "定義の形式エラー"
     },
     "bottom": {
       "label": "下部パネル",
@@ -276,7 +280,8 @@
       "confirm": "適用",
       "approvalSent": "承認依頼を送信しました",
       "applied": "v{{v}} を適用しました",
-      "noControlPermission": "制御ノードを含むフローを適用する権限がありません"
+      "noControlPermission": "制御ノードを含むフローを適用する権限がありません",
+      "ackRequired": "リスクのある変更です。内容を確認し「理解しました」を選択してから再度適用してください"
     },
     "statePolicy": {
       "KEEP": "維持(KEEP)",
@@ -306,7 +311,7 @@
       "PENDING_APPROVAL": "承認待ち"
     },
     "errors": {
-      "unavailable": "指標を読み込めませんでした",
+      "unavailable": "指標なし — 実行エンジンの指標はまだ取得できません",
       "summary": "直近1時間: 実行 {{executions}}回 · エラー {{errors}}件 · エラー率 {{rate}}%",
       "isolation": "ノードのエラーはその実行だけを終了しエラー指標を増やします。他のフローや同じ機器の次のメッセージ処理は止まりません。",
       "none": "直近1時間のエラーはありません",

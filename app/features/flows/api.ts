@@ -11,10 +11,12 @@ export interface SaveResult {
   validation?: ValidationResult;
 }
 
+/** API-FLW-07·08: 바로 적용 200 {appliedVersion, applyStatus} · 승인 대기 202 FLOW_APPROVAL_REQUIRED {approvalId, version} */
 export interface ApplyResult {
   appliedVersion?: number;
   applyStatus?: { targetVersion: number; converged: boolean; instances?: unknown[] };
   approvalId?: string;
+  version?: number;
 }
 
 export interface CapabilitySummary {
@@ -47,6 +49,7 @@ export interface FlowApi {
   saveDraft(flowId: string, body: { name?: string; baseVersion: number; definition: FlowDefinition }): Promise<BffJsonResult<SaveResult>>;
   validate(flowId: string, version: number): Promise<BffJsonResult<ValidateResponse>>;
   apply(flowId: string, body: { version: number; baseVersion: number; memo?: string; acknowledgedRisks: boolean }): Promise<BffJsonResult<ApplyResult>>;
+  /** API-FLW-04 `{responses, totalCount}`(페이징 없음, 최대 100개) */
   versions(flowId: string): Promise<BffJsonResult<{ responses: VersionRow[]; totalCount?: number }>>;
   diff(flowId: string, from: number, to: number): Promise<BffJsonResult<VersionDiff>>;
   rollback(flowId: string, body: { toVersion: number; memo?: string }): Promise<BffJsonResult<ApplyResult>>;
