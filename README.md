@@ -161,3 +161,24 @@ SEED=7 KEEP=1 e2e/m3-demo.sh            # 재현 시드를 바꾸고, 끝나도 
 ```
 
 포트 41025·45432·45552·45672·46379·48025·48780~48798을 씁니다. 결과 예시는 다음과 같습니다(2026-10-04 기준): 27℃ 도달 8분 뒤(시뮬레이션) 명령이 나갔고, 이때 실행 시작 후 실제 시간은 약 20초였습니다. 명령 직후 최고 28.0℃였고, 시뮬레이션 10분 뒤 24.7℃, 60~90분 뒤 24.2℃였습니다. 재현 실행 두 번의 SHA-256은 `294dbe90…34b72`로 같았습니다.
+
+## M4 자동화 완성 시연 검증(e2e)
+
+`e2e/m4-demo.sh`는 plan/milestones.md §M4 시연(시나리오 2 전체, 시나리오 6, 시나리오 7의 2~3단계)을 실제 서비스로 끝까지 돌립니다. 효과 확인(15분)·지속 판정(5분)·무수신(5분)·게이트웨이 오프라인 기준(120초)은 실제 시간으로 재므로 운영 단계는 측정 시각 `WALL_CLOCK`(x10)으로 돌리고, 15분 효과 확인을 기다리는 동안 시나리오 7과 6을 함께 진행합니다(ADR-054).
+
+1. 관리자 로그인 → 텔레그램 채널 저장(가짜 Bot API, action이 `setWebhook`으로 BFF `/hooks/messenger/telegram`과 비밀 헤더 값을 등록) → 계정 연결(`/start {코드}` 콜백, 틀린 비밀 헤더는 401) → 알림 정책(WARNING 이상 → 관리자 텔레그램).
+2. **시나리오 2:** 가상 강의실 키트와 "고온이면 냉방"(27℃ 5분) 플로우 → "폭염 오후" 3시간을 x60으로 흘려 저장(플로우 미적용) → 그 구간 과거 재생(API-FLW-13, 드라이런이라 명령 이력 0건) → 적용 → 온도 센서 고착(29℃) → 5분 뒤 `Thermostat.set {cool, 24}` APPLIED → 15분 뒤 효과 확인 NO_EFFECT → EVT-ACT-04 → "제어 효과 없음" WARNING 알람 → 가짜 텔레그램 알림, 기기 이력(API-DEV-27) → 라이브 뷰(BFF WebSocket `/bff/stream/flows/{id}`)의 `node.stats`.
+3. **시나리오 7의 2~3단계:** CO2 고착(1,200ppm) → "CO2 높으면 환기"(30분 지속) 적용 → 지속 타이머 대기 → 평균과 기준 사이에 `transform.js` 노드를 끼워 운영 중 적용 → 같은 타이머 행·같은 만기 유지 → 즉시 롤백 → 그대로 유지.
+4. **시나리오 6:** 센서 무수신 규칙(5분, 엔진 컴파일) → 가상 게이트웨이 오프라인 기준 120초 → 게이트웨이 다운 → MAJOR 게이트웨이 알람 1건, 하위 무수신 알람은 SUPPRESSED(PARENT)로 묶임 → 텔레그램 알림 1건 → 메신저 [확인] 콜백(비밀 헤더)으로 ACKNOWLEDGED(같은 `update_id` 재전송은 한 번만) → 복구 → 게이트웨이·하위 알람 함께 해제, 실시간 `alarms` 토픽으로 발생·확인·해제 수신, 장애 구간 수신 공백.
+
+- 공용 인프라(s3·s4·`iot-data.java21.net`·`api.telegram.org`)는 쓰지 않습니다. PostgreSQL 18·Valkey 8·RabbitMQ 4(stream)·Mailpit·Mosquitto(action MQTT 드라이버용, 버림)를 임시 컨테이너로 띄우고, 텔레그램 Bot API는 스크립트가 띄우는 가짜 HTTP 서버(127.0.0.1)로 대신합니다. 웹은 WebSocket 중계가 있는 `node server.mjs`로 띄우고 `DATA2FLOW_MESSENGER_TELEGRAM_SECRET`·`DATA2FLOW_ACTION_URL`을 줍니다. 끝나면 컨테이너와 프로세스를 모두 지웁니다.
+- 남는 기록: 결과 `WORK_DIR/results.txt`, 가짜 텔레그램 요청 `WORK_DIR/telegram.jsonl`, 라이브 뷰 `WORK_DIR/live-view.jsonl`, SSE `WORK_DIR/sse-live.txt`, 재생 결과 `WORK_DIR/replay.json`, 서비스 로그 `WORK_DIR/logs`.
+
+```bash
+e2e/m4-demo.sh                          # 빌드 + 시연(빌드 뒤 약 25분)
+SKIP_BUILD=1 WORK_DIR=/tmp/m4 e2e/m4-demo.sh
+JARS_DIR=/path/to/jars SKIP_BUILD=1 e2e/m4-demo.sh   # 다른 곳에서 만든 jar를 먼저 쓴다
+KEEP=1 e2e/m4-demo.sh                   # 끝나도 컨테이너·프로세스를 남긴다(디버깅)
+```
+
+포트 41883·42025·46432·46552·46672·47379·49025·49780~49799를 씁니다. 결과 예시(2026-10-04, 56개 확인 모두 통과): 과거 재생은 저장된 828건으로 361회 실행하고 냉방 명령 1건(드라이런)을 셌습니다. 운영 적용 뒤 303초에 냉방 명령이 APPLIED였고, 15분 뒤 효과 확인은 29→29℃로 NO_EFFECT였습니다. 게이트웨이 다운 173초 뒤 게이트웨이 알람이 났고 하위 무수신 알람 3건이 묶였으며, 텔레그램 알림은 1건이었습니다. 복구 90초 뒤 게이트웨이·하위 알람이 함께 해제되었습니다. 라이브 뷰는 `node.stats`를 193번 받았습니다.
