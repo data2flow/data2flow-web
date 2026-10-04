@@ -2,7 +2,7 @@
 
 data2flow 화면과 BFF입니다. React Router v8 프레임워크 모드(SSR, Vite) + React 19 + TypeScript로 만들고, 브라우저는 토큰 없이 HttpOnly 세션 쿠키(`data2flow_session`)만 갖습니다. Access·Refresh 토큰은 BFF가 서버 쪽에 보관하고, 브라우저의 API 호출은 `/bff/api/{svc}/**`로 받아 내부 gateway에 Bearer로 중계합니다(ADR-024, design/auth.md §9). 화면 문구는 한국어·영어·일본어·중국어 4개 언어입니다(ADR-037).
 
-- 관련 스펙: IAM(로그인·세션·회원·권한·감사), OPS-07(조직·외부 서비스 설정), M2 수집 경로 화면(DSC·DEV·DSH·ING·SCR·TSD), M3 폐루프(가상) 화면(FLW·ACT·SIM·DEV-03.03), M4 자동화 완성 화면(RUL·FLW·ACT·OPS-05·06·DSH·DEV-02.07·02.09) (정본은 비공개 저장소 `data2flow-docs`)
+- 관련 스펙: IAM(로그인·세션·회원·권한·감사), OPS-07(조직·외부 서비스 설정), M2 수집 경로 화면(DSC·DEV·DSH·ING·SCR·TSD), M3 폐루프(가상) 화면(FLW·ACT·SIM·DEV-03.03), M4 자동화 완성 화면(RUL·FLW·ACT·OPS-05·06·DSH·DEV-02.07·02.09), M5 데이터 관리 화면(DSH-04·06·08.04·11·13.01 등) (정본은 비공개 저장소 `data2flow-docs`)
 - 포트: 8080. 프로브는 `/healthz`
 
 ## 구조
@@ -91,6 +91,26 @@ data2flow 화면과 BFF입니다. React Router v8 프레임워크 모드(SSR, Vi
 - 메신저 콜백 `POST /hooks/messenger/{channel}`(design/auth.md §9.3, API-RUL-31): 세션·CSRF 대상이 아니고, 허용 채널은 `telegram`뿐입니다. `X-Telegram-Bot-Api-Secret-Token`을 상수 시간 비교(틀리면 본문을 읽지 않고 401), 1MB 초과 413, `update_id` 중복은 Redis `data2flow:hook:msg:telegram:{id}`(10분, Redis가 없으면 메모리)로 200 무시, 원본 본문을 action `/internal/action/notifications/callbacks/telegram`에 넘기고 기다리지 않고 200을 돌려줍니다.
 - 메신저 콜백 비밀값: BFF 환경 변수 `DATA2FLOW_MESSENGER_TELEGRAM_SECRET`(없으면 404)와 core 텔레그램 채널의 `webhookSecret`이 같아야 합니다. action이 같은 헤더를 채널 정의의 `webhookSecret`과 다시 비교하고, 버튼 데이터 `ACK|{alarmId}|{deliveryId}`(또는 `MUTE_30M|…`)를 연결된 계정 권한으로 core `/internal/core/alarms/{id}/ack|mute`에 넘깁니다. action 주소는 `DATA2FLOW_ACTION_URL`(기본 `http://data2flow-action`).
 - 비상 정지 띠는 `/bff/stream/live?topics=notifications` 연결로 받는 `emergency-stop` 이벤트(토픽과 관계없이 조직의 모든 연결에 옴)로 그리고 지웁니다. 같은 연결의 `notification`은 오른쪽 아래 알림으로 띄웁니다(읽음 수 없음). 유지보수 띠는 실시간 토픽이 없어 5초마다 조회합니다(API-OPS-23).
+
+## M5 데이터 관리 화면
+
+### 대시보드·키오스크·공유 링크·브랜딩
+
+| 경로 | 화면 | 스펙 |
+|---|---|---|
+| `/dashboards?tab=mine\|shared\|favorite` | 대시보드 목록(카드·기본 표시·복제·기본으로·JSON 내보내기·가져오기·삭제, 키오스크에 넣기) | DSH-04.07 |
+| `/dashboards/{id}?var-space=31` | 대시보드 보기(변수·시간 범위·집계·새로고침, 위젯 메뉴: 데이터 표로 보기·PNG·CSV·전체 화면, 드래그 확대 동기화·[초기화], 대시보드 PNG, 기능 투어) | DSH-04.05, DSH-06.01, DSH-08.04, DSH-11.01·11.03·11.04, NFR-01.09 |
+| `/dashboards/{id}/edit` | 편집(위젯 라이브러리, 24열 격자 끌어 놓기·크기 조정·복제·삭제와 키보드 조작, 위젯 설정·옵션 스키마 폼, 대시보드 설정·변수, 저장 충돌 모달) | DSH-04.01, DSH-04.05 |
+| `/kiosk?boards=1,2&interval=60` | 키오스크(앱 틀 없음, 자동 순환·진행 막대·시계, 세션 유지) | DSH-06.02 |
+| `/share/{token}`, `/share/d/{token}` | 공유 링크 보기(로그인 없음, 읽기 전용) | DSH-06.03 |
+| `/admin/branding` | 브랜딩(로고 2종·파비콘·로그인 배경, 주 색상 대비 경고, 문구·메일 서명, 미리 보기). 웹 헤더 로고·주 색상에 적용 | DSH-13.01 |
+
+- 첫 화면(NFR-01.09): loader가 정의(API-DSH-06)와 읽는 순서로 앞쪽 위젯 12개의 데이터(API-DSH-09)를 병렬로 받아 서버에서 그린다(위젯 하나가 2초를 넘기면 그 위젯만 브라우저가 다시 받음). 이후 갱신은 위젯마다 따로(`/bff/api/core/dashboards/{id}/widgets/{wid}/data`), 변수가 바뀌면 그 변수를 쓰는 위젯만 다시 요청한다. 실시간(LIVE)은 `telemetry:{기기}.{항목}` `point`를 받으면 그 위젯만 1초 묶음으로 다시 조회한다.
+- 공유 링크: 화면은 세션을 쓰지 않고 gateway 공개 경로 `GET /api/v1/core/public/share/{token}`만 부른다. 위젯 데이터는 BFF 공개 경로 `GET /share/{token}/widgets/{wid}/data?q=`(쿠키·CSRF 없음, 범위·집계·변수만 골라 `POST …/public/share/{token}/widgets/{wid}/data`로 중계). 응답에 `Referrer-Policy: no-referrer`·`X-Robots-Tag: noindex`, hreflang·canonical 없음. 토큰 경로 레이트 리밋은 gateway 몫(TC-DSH-068). core가 주는 공유 주소는 `/share/{token}`(문서 00-navigation은 `/share/d/{token}`이라 둘 다 받는다).
+- 키오스크 세션: 화면이 4분마다 `GET /bff/api/core/accounts/me`를 보내 유휴 만료를 늦추고, Access 만료는 BFF가 Refresh로 서버 쪽에서 갱신해 화면을 다시 불러오지 않는다. 지금 보이는 대시보드 하나만 그리고 순환하면 이전 부품을 내려 차트를 dispose한다(24시간 메모리 소크 TC-DSH-064는 staging Playwright 몫).
+- 브랜딩 자산은 BFF 공개 경로 `/branding/assets/{id}`(→ `/api/v1/core/public/branding/assets/{id}`, 이미지 형식만, CSP sandbox)로 내려준다.
+- 차트 기본 팔레트(`app/lib/palette.ts`)는 색약 3종 시뮬레이션에서도 인접 색 ΔE00 ≥ 10, 배경 대비 ≥ 3:1(TC-DSH-098). 상태는 색 + 아이콘·글자.
+- 기본 대시보드로 지정하면 화면 설정 `home: DASHBOARD`도 함께 바꿔 `/`가 그 대시보드로 열린다(`/?summary`는 홈 요약).
 
 ## 개발
 

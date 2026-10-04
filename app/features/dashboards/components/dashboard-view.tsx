@@ -49,7 +49,7 @@ export function DashboardView(props: DashboardViewProps) {
   const [refresh, setRefresh] = useState(props.live === false && props.refresh === "LIVE" ? "30s" : props.refresh || "OFF");
   const [selected, setSelected] = useState<Record<string, string>>(props.initialValues ?? {});
   const [zoom, setZoom] = useState<ZoomWindow | null>(null);
-  const [custom, setCustom] = useState({ from: "", to: "" });
+  const [custom, setCustom] = useState<{ from: string; to: string } | null>(null);
   const values = useMemo(() => resolveValues(variables, selected), [variables, selected]);
   const { states, reload } = useDashboardData({ widgets, timeRange, resolution, values, fetcher: props.fetcher, initial: props.initialStates, refresh });
 
@@ -91,7 +91,7 @@ export function DashboardView(props: DashboardViewProps) {
     setSelected(next);
     props.onValuesChange?.(resolveValues(variables, next));
   };
-  const preset = isRelative(timeRange) ? timeRange.relative : "custom";
+  const preset = custom || !isRelative(timeRange) ? "custom" : timeRange.relative;
 
   return (
     <div>
@@ -115,8 +115,10 @@ export function DashboardView(props: DashboardViewProps) {
               value={preset}
               onChange={(e) => {
                 setZoom(null);
-                if (e.target.value !== "custom") setTimeRange({ relative: e.target.value });
-                else setCustom({ from: "", to: "" });
+                if (e.target.value !== "custom") {
+                  setCustom(null);
+                  setTimeRange({ relative: e.target.value });
+                } else setCustom({ from: "", to: "" });
               }}
             >
               {RANGE_PRESETS.map((r) => (
@@ -128,15 +130,15 @@ export function DashboardView(props: DashboardViewProps) {
               <option value="custom">{t("dashboards.ranges.custom")}</option>
             </SelectField>
           </div>
-          {preset === "custom" && (
+          {custom && (
             <div className="flex items-end gap-2 text-[13px]">
               <label className="flex flex-col">
                 {t("dashboards.view.from")}
-                <input type="datetime-local" className="rounded-md border border-line bg-panel px-2 py-1" value={custom.from} onChange={(e) => setCustom((c) => ({ ...c, from: e.target.value }))} />
+                <input type="datetime-local" className="rounded-md border border-line bg-panel px-2 py-1" value={custom.from} onChange={(e) => setCustom((c) => ({ to: c?.to ?? "", from: e.target.value }))} />
               </label>
               <label className="flex flex-col">
                 {t("dashboards.view.to")}
-                <input type="datetime-local" className="rounded-md border border-line bg-panel px-2 py-1" value={custom.to} onChange={(e) => setCustom((c) => ({ ...c, to: e.target.value }))} />
+                <input type="datetime-local" className="rounded-md border border-line bg-panel px-2 py-1" value={custom.to} onChange={(e) => setCustom((c) => ({ from: c?.from ?? "", to: e.target.value }))} />
               </label>
               <Button
                 onClick={() => {

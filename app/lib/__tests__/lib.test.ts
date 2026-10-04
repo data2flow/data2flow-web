@@ -88,7 +88,7 @@ describe("permissions IAM-04.05 메뉴 숨김", () => {
   it("권한별 메뉴, 비밀번호 변경 필요 시 메뉴 없음, 경로별 필요 권한", () => {
     expect(visibleMenu(["DEV_READ"]).map((m) => m.key)).toEqual(["home", "spaces", "devices"]);
     expect(visibleMenu(["IAM_MANAGE", "AUDIT_READ", "OPS_MANAGE"]).map((m) => m.key)).toEqual(["home", "members", "roles", "security", "audit", "settings"]);
-    expect(visibleMenu(["IAM_MANAGE", "AUDIT_READ", "OPS_MANAGE", "DEV_READ", "TS_READ", "INGEST_READ", "FLOW_READ", "DEVICE_CONTROL", "SIM_READ", "ALARM_READ", "DEV_PLACE", "NOTIFY_CHANNEL_MANAGE"])).toHaveLength(MENU.length);
+    expect(visibleMenu(["IAM_MANAGE", "AUDIT_READ", "OPS_MANAGE", "DEV_READ", "TS_READ", "INGEST_READ", "FLOW_READ", "DEVICE_CONTROL", "SIM_READ", "ALARM_READ", "DEV_PLACE", "NOTIFY_CHANNEL_MANAGE", "DASHBOARD_READ", "BRANDING_MANAGE"])).toHaveLength(MENU.length);
     // M4: 규칙·알람(ALARM_READ, 모든 역할), 유지보수 일정(DEV_PLACE), 알림 채널(NOTIFY_CHANNEL_MANAGE)
     expect(visibleMenu(["ALARM_READ"]).map((m) => m.key)).toEqual(["home", "alarms"]);
     expect(requiredPermissionsFor("/rules/r-1")).toEqual(["RULE_READ"]);
