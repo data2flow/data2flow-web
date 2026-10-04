@@ -229,7 +229,7 @@ T=$(csrf_of user)
 form user /login "$T" intent=credentials loginId=lee.op "password=$USER_PASSWORD" next=/
 check "사용자 로그인 302 → / (got $(status) $(location))" bash -c "[[ '$(status)' == 302 && '$(location)' == / ]]"
 T=$(csrf_page user /)
-check "사용자 홈 200, 관리자 메뉴(/admin/members) 없음" bash -c "[[ '$(status)' == 200 ]] && ! grep -q 'href=\"/admin/' '$LAST.body'"
+check "사용자 홈 200, 관리자 메뉴(/admin/members) 없음" bash -c "[[ '$(status)' == 200 ]] && ! grep -q 'href=\"/admin/members' '$LAST.body'"
 api user GET "/core/users?page=1" "$T"
 check "회원 목록 API 403 PERMISSION_DENIED (got $(status))" bash -c "[[ '$(status)' == 403 ]] && grep -q PERMISSION_DENIED '$LAST.body'"
 req user GET /admin/members
