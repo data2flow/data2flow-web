@@ -1,0 +1,426 @@
+{
+  "nav": {
+    "system": "系统状态",
+    "dataRetention": "数据保留"
+  },
+  "range": {
+    "1y": "1年"
+  },
+  "errors": {
+    "EXPORT_NOT_FOUND": "找不到导出任务。",
+    "EXPORT_EXPIRED": "文件已过期(7天),请重新导出。",
+    "EXPORT_LIMIT_EXCEEDED": "进行中的导出过多,请完成后重试。",
+    "EXPORT_TARGET_UNWRITABLE": "无法向投递目标写入文件。",
+    "EXPORT_STATE_CONFLICT": "当前状态下无法执行。",
+    "IMPORT_NOT_FOUND": "找不到导入任务。",
+    "IMPORT_FILE_INVALID": "文件或映射无效。",
+    "IMPORT_LIMIT_EXCEEDED": "超出单次导入上限(5000万行、2GB)。",
+    "IMPORT_SOURCE_UNREACHABLE": "无法连接 InfluxDB。",
+    "IMPORT_STATE_CONFLICT": "只能运行已完成试运行的任务。",
+    "RETENTION_CONFIRM_REQUIRED": "缩短保留期需要确认影响预览,请重新预览。",
+    "RETENTION_INVALID": "保留期超出允许范围",
+    "ARCHIVE_NOT_FOUND": "找不到长期存档文件。"
+  },
+  "data": {
+    "common": {
+      "loadFailed": "加载失败,请稍后重试。",
+      "status": "状态",
+      "actions": "操作",
+      "yes": "是",
+      "no": "否"
+    },
+    "tabs": {
+      "jobs": "任务",
+      "schedules": "定期导出",
+      "dictionary": "数据字典"
+    },
+    "compare": {
+      "suggest": "单位有3个以上,两个坐标轴无法全部显示。请用归一化视图比较形状。",
+      "normalized": "归一化视图:每个序列将期间内最小值~最大值显示为 0~100%。",
+      "normalize": "归一化视图",
+      "showRaw": "显示实际值"
+    },
+    "export": {
+      "open": "导出",
+      "title": "导出",
+      "summary": "{{n}} 个序列 · {{from}} ~ {{to}} · {{resolution}}",
+      "format": "格式",
+      "formats": {
+        "CSV": "CSV",
+        "XLSX": "Excel",
+        "PARQUET": "Parquet"
+      },
+      "columns": "布局",
+      "columnKinds": {
+        "LONG": "长格式",
+        "WIDE": "宽格式"
+      },
+      "preview": "示例预览",
+      "includeQuality": "包含质量代码",
+      "timezone": "时区",
+      "estimateSync": "预计 {{rows}} 行 · 直接下载",
+      "estimateAsync": "预计 {{rows}} 行 · 作为任务执行,完成后通知您",
+      "tooManyActive": "已有 {{n}} 个导出在进行,请完成后重试。",
+      "queued": "完成后会通知您。",
+      "openJobs": "查看任务列表",
+      "submit": "导出",
+      "saveSchedule": "保存为定期导出"
+    },
+    "jobs": {
+      "title": "导出任务",
+      "empty": "没有导出任务",
+      "emptyBody": "在数据探索中设置条件后点击[导出]。",
+      "createdAt": "时间",
+      "query": "条件",
+      "rows": "行数",
+      "size": "大小",
+      "expiresAt": "过期时间",
+      "querySummary": "{{n}} 个序列 · {{from}} ~ {{to}}",
+      "fromSchedule": "(定期)",
+      "statuses": {
+        "QUEUED": "排队",
+        "RUNNING": "进行中",
+        "SUCCEEDED": "完成",
+        "FAILED": "失败",
+        "EXPIRED": "已过期",
+        "CANCELLED": "已取消"
+      },
+      "download": "下载"
+    },
+    "schedule": {
+      "editorTitle": "定期导出设置",
+      "name": "名称",
+      "repeat": "重复",
+      "repeatKind": "周期",
+      "choose": "选择",
+      "repeatKinds": {
+        "DAILY": "每天",
+        "WEEKLY": "每周",
+        "MONTHLY": "每月"
+      },
+      "weekday": "星期",
+      "weekdays": {
+        "0": "星期日",
+        "1": "星期一",
+        "2": "星期二",
+        "3": "星期三",
+        "4": "星期四",
+        "5": "星期五",
+        "6": "星期六"
+      },
+      "day": "日期(1~28)",
+      "time": "时间",
+      "period": "期间",
+      "periods": {
+        "PREVIOUS_DAY": "前一天",
+        "PREVIOUS_WEEK": "上周",
+        "PREVIOUS_MONTH": "上月"
+      },
+      "delivery": "投递",
+      "deliveries": {
+        "EMAIL": "邮件",
+        "STORAGE": "存储(S3/SFTP)"
+      },
+      "recipients": "收件人",
+      "recipientsHint": "用逗号分隔邮箱地址(最多 20 个)。",
+      "targetType": "目标类型",
+      "target": {
+        "endpoint": "端点",
+        "bucket": "存储桶",
+        "region": "区域",
+        "prefix": "路径前缀",
+        "host": "主机",
+        "port": "端口",
+        "username": "用户名",
+        "directory": "目录",
+        "hostKeySha256": "主机密钥 SHA-256"
+      },
+      "credential": {
+        "accessKey": "访问密钥",
+        "secretKey": "秘密密钥",
+        "password": "密码"
+      },
+      "credentialKept": "已保存凭据,仅在更改时输入。",
+      "testTarget": "测试连接",
+      "testResult": "连接测试结果",
+      "steps": {
+        "CONNECT": "连接",
+        "WRITE": "写入测试文件",
+        "DELETE": "删除测试文件"
+      },
+      "enabled": "启用",
+      "saved": "已保存定期导出。",
+      "errors": {
+        "name": {
+          "required": "请输入名称(最多100字)。"
+        },
+        "repeat": {
+          "required": "请设置重复规则。"
+        },
+        "query": {
+          "required": "没有查询条件。请先在数据探索中设置条件。"
+        },
+        "recipients": {
+          "required": "请至少输入一个收件人。",
+          "email": "邮箱地址格式不正确。"
+        },
+        "target": {
+          "required": "请填写目标的必填项(*)。"
+        }
+      },
+      "addHint": "新的定期导出请在数据探索中设置条件后,通过[导出] → [保存为定期导出]创建。",
+      "empty": "没有定期导出",
+      "scope": "{{n}} 个序列 · {{period}}",
+      "next": "下次 {{at}}",
+      "last": "上次结果",
+      "disable": "关闭",
+      "enable": "开启",
+      "deleteOf": "删除 {{name}}",
+      "repeatDaily": "每天 {{time}}",
+      "repeatWeekly": "每周{{day}} {{time}}",
+      "repeatMonthly": "每月{{day}}日 {{time}}"
+    },
+    "dictionary": {
+      "empty": "没有数据字典",
+      "version": "数据字典 v{{v}}",
+      "html": "下载 HTML",
+      "json": "下载 JSON",
+      "generatedAt": "生成于 {{at}}",
+      "metrics": "测量项",
+      "key": "键",
+      "name": "名称",
+      "unit": "单位",
+      "agg": "聚合方式",
+      "validRange": "有效范围",
+      "quality": "质量代码",
+      "code": "代码",
+      "meaning": "含义",
+      "inAggregates": "计入聚合",
+      "spaces": "空间层级"
+    },
+    "imports": {
+      "title": "数据导入",
+      "new": "新建导入",
+      "empty": "没有导入任务",
+      "emptyBody": "从 CSV 文件或 InfluxDB 导入历史数据。重复数据不会覆盖。",
+      "originLabel": "来源标签",
+      "originLabelExample": "例如:学院 iot-bucket 2026-09",
+      "sourceKind": "来源",
+      "result": "结果",
+      "resultLine": "插入 {{inserted}} · 重复 {{skipped}} · 失败 {{failed}}",
+      "steps": "导入步骤",
+      "step": {
+        "source": "来源",
+        "mapping": "映射",
+        "dryRun": "试运行",
+        "run": "运行"
+      },
+      "kinds": {
+        "CSV": "CSV 文件",
+        "INFLUXDB": "InfluxDB"
+      },
+      "file": "CSV 文件(2GB 以内)",
+      "previewCaption": "前 {{n}} 行预览",
+      "badTime": "无法读取时间的行:{{lines}}",
+      "timeColumn": "时间列",
+      "timeFormat": "时间格式",
+      "timeFormats": {
+        "ISO": "ISO-8601",
+        "EPOCH_S": "epoch 秒",
+        "EPOCH_MS": "epoch 毫秒",
+        "CUSTOM": "自定义格式"
+      },
+      "customPattern": "格式模式",
+      "tz": "时区(无偏移的值)",
+      "deviceColumn": "设备列",
+      "deviceKey": "设备识别方式",
+      "deviceKeys": {
+        "EXTERNAL_ID": "外部 ID",
+        "ID": "设备 ID",
+        "NAME": "名称"
+      },
+      "shape": "列布局",
+      "shapes": {
+        "WIDE": "宽格式(每个测量项一列)",
+        "LONG": "长格式(metric、value 列)"
+      },
+      "metricColumn": "测量项列",
+      "valueColumn": "值列",
+      "metricColumns": "列 → 测量项键",
+      "metricKeyOf": "{{column}} 的测量项键",
+      "influx": {
+        "url": "URL",
+        "org": "org",
+        "bucket": "bucket",
+        "token": "令牌",
+        "measurement": "measurement",
+        "deviceTag": "设备标签",
+        "deviceTagHint": "标签值按设备外部 ID 匹配。",
+        "from": "开始",
+        "to": "结束",
+        "fields": "field → 测量项键",
+        "field": "field {{n}}",
+        "metricKey": "测量项键 {{n}}",
+        "addField": "+ 添加 field"
+      },
+      "dryRun": "试运行",
+      "errors": {
+        "file": {
+          "required": "请选择 CSV 文件。",
+          "tooLarge": "文件必须小于等于 2GB。"
+        },
+        "originLabel": {
+          "required": "请输入来源标签(例如:学院 iot-bucket 2026-09)。"
+        },
+        "timeColumn": {
+          "required": "请选择时间列。"
+        },
+        "deviceColumn": {
+          "required": "请选择设备列。"
+        },
+        "metricColumns": {
+          "required": "请至少映射一个测量项列。"
+        },
+        "customPattern": {
+          "required": "请输入时间格式模式。"
+        },
+        "delimiter": {
+          "required": "分隔符必须为一个字符。"
+        },
+        "url": {
+          "url": "InfluxDB URL 必须以 http:// 或 https:// 开头。"
+        },
+        "org": {
+          "required": "请输入 org。"
+        },
+        "bucket": {
+          "required": "请输入 bucket。"
+        },
+        "token": {
+          "required": "请输入令牌。"
+        },
+        "range": {
+          "order": "开始晚于结束"
+        }
+      },
+      "statuses": {
+        "QUEUED": "排队",
+        "VALIDATING": "校验中",
+        "DRY_RUN_DONE": "试运行完成",
+        "RUNNING": "导入中",
+        "SUCCEEDED": "完成",
+        "FAILED": "失败",
+        "CANCELLED": "已取消"
+      },
+      "originOf": "来源:{{label}}",
+      "progress": "进度",
+      "counts": {
+        "total": "总计",
+        "inserted": "插入",
+        "skippedDuplicate": "重复(不覆盖)",
+        "failed": "失败",
+        "dry": {
+          "total": "预计行数",
+          "inserted": "将插入行",
+          "skippedDuplicate": "预计重复",
+          "failed": "预计错误"
+        }
+      },
+      "run": "运行导入",
+      "sample": "错误示例",
+      "errorList": "{{n}} 个错误",
+      "downloadErrors": "下载错误列表",
+      "noErrors": "没有错误。",
+      "line": "行/点",
+      "code": "代码",
+      "message": "内容"
+    },
+    "retention": {
+      "crumb": "设置",
+      "title": "数据保留",
+      "orgDefault": "组织默认",
+      "dataClass": "数据类型",
+      "days": "保留天数",
+      "allowed": "允许范围",
+      "archive": "删除前长期存档",
+      "classes": {
+        "RAW_MESSAGE": "原始消息",
+        "TELEMETRY": "原始测量值",
+        "LINK": "通信质量",
+        "AGG_1M": "1分钟聚合",
+        "AGG_1H": "1小时聚合",
+        "AGG_1D": "1天聚合",
+        "FLOW_EXECUTION": "流程执行记录",
+        "ANALYSIS_RESULT": "分析结果",
+        "AUDIT_LOG": "审计日志",
+        "NOTIFICATION_DELIVERY": "通知发送记录",
+        "COMMAND": "控制命令记录",
+        "DEVICE_STATE_HISTORY": "设备状态记录",
+        "WEBHOOK_DELIVERY": "Webhook 投递记录"
+      },
+      "daysOf": "{{name}} 保留天数",
+      "forever": "0 = 永久",
+      "range": "{{min}}~{{max}} 天",
+      "archiveOf": "{{name}} 删除前长期存档",
+      "overrides": "覆盖(按测量项/型号)",
+      "addOverride": "+ 添加覆盖",
+      "noOverrides": "没有覆盖,全部遵循组织默认。",
+      "scope": "范围",
+      "target": "对象",
+      "storeMode": "存储方式",
+      "scopes": {
+        "METRIC": "测量项",
+        "MODEL": "型号",
+        "ORG": "组织默认"
+      },
+      "scopeOf": "覆盖 {{n}} 范围",
+      "targetOf": "覆盖 {{n}} 对象",
+      "classOf": "覆盖 {{n}} 数据类型",
+      "overrideDaysOf": "覆盖 {{n}} 保留天数",
+      "overrideArchiveOf": "覆盖 {{n}} 删除前长期存档",
+      "storeModeOf": "覆盖 {{n}} 存储方式",
+      "storeModes": {
+        "ALL": "全部值",
+        "ON_CHANGE": "仅变化"
+      },
+      "removeOf": "删除覆盖 {{n}}",
+      "errors": {
+        "range": "保留期超出允许范围",
+        "duplicate": "已存在相同范围、对象和类型的覆盖",
+        "required": "请选择对象"
+      },
+      "savedAt": "已保存,将从 {{at}} 的夜间任务开始生效。",
+      "previewAndSave": "预览影响后保存",
+      "storage": "存储状况",
+      "totalBytes": "总计 {{size}}",
+      "table": "表",
+      "partitions": "分区",
+      "partitionDetail": "按分区查看",
+      "partition": "分区",
+      "state": "状态",
+      "compression": "压缩率",
+      "archives": "长期存档文件",
+      "noArchives": "没有长期存档文件。",
+      "period": "期间",
+      "previewTitle": "缩短保留期的影响",
+      "confirmSave": "确认并保存",
+      "previewBody": "保存后,下一次夜间任务将删除约 {{rows}} 行({{size}})。",
+      "previewNote": "启用删除前长期存档的类型会先导出为 Parquet 文件。"
+    },
+    "storage": {
+      "title": "存储指标",
+      "unavailable": "无法加载存储指标",
+      "dbSize": "数据库总容量",
+      "perDay": "日均 {{size}}",
+      "diskFree": "磁盘剩余",
+      "diskUnknown": "未配置磁盘容量,不计算剩余空间。",
+      "diskWarn": "磁盘剩余低于 {{n}}%",
+      "capacity": "磁盘容量 {{size}}",
+      "trend": "数据库大小趋势",
+      "topTables": "按大小前 10 的表"
+    },
+    "system": {
+      "title": "系统状态"
+    }
+  }
+}

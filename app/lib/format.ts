@@ -119,9 +119,9 @@ export function formatDate(iso: string | null | undefined, timezone: string, lan
   return new Intl.DateTimeFormat(LOCALE_TAGS[lang] ?? "en-US", { timeZone: resolveTimezone(timezone), ...style }).format(date);
 }
 
-/** 기간 키(1h·24h·7d·30d)를 [from, to] UTC ISO로 */
+/** 기간 키(1h·24h·7d·30d·90d·1y)를 [from, to] UTC ISO로 */
 export function rangeOf(key: string, nowMs: number): { from: string; to: string } {
-  const hours: Record<string, number> = { "1h": 1, "6h": 6, "24h": 24, "7d": 168, "30d": 720, "90d": 2160 };
+  const hours: Record<string, number> = { "1h": 1, "6h": 6, "24h": 24, "7d": 168, "30d": 720, "90d": 2160, "1y": 8760 };
   const h = hours[key] ?? 24;
   const iso = (ms: number) => new Date(ms).toISOString().replace(/\.\d{3}Z$/, "Z");
   return { from: iso(nowMs - h * 3600_000), to: iso(nowMs) };

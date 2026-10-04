@@ -118,5 +118,12 @@ export default [
     route("calendar", "routes/calendar.tsx"),
     route("sources/context", "routes/sources-context.tsx"),
     route("sources/context/:siteId", "routes/sources-context-site.tsx"),
+    // M5 data: 내보내기 작업·정기 내보내기·데이터 사전(UI-TSD-02·08), 가져오기(UI-TSD-03), 보관 설정(UI-TSD-04), 저장 지표(UI-OPS-01, OPS-01.03)
+    route("exports", "routes/exports.tsx"),
+    route("imports", "routes/imports.tsx"),
+    route("imports/new", "routes/imports-new.tsx"),
+    route("imports/:importId", "routes/import-detail.tsx"),
+    route("settings/data-retention", "routes/settings-data-retention.tsx"),
+    route("admin/system", "routes/admin-system.tsx"),
   ]),
 ] satisfies RouteConfig;

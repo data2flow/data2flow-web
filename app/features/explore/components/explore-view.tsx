@@ -6,7 +6,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { TimeseriesChart, type ChartFactory } from "~/components/charts/timeseries-chart";
 import { LiveBanner, LiveDot, useLiveStream, type UseLiveStreamOptions } from "~/components/live";
-import { Alert, Button, Card, EmptyState, PageHeader } from "~/components/ui";
+import { Alert, Button, ButtonLink, Card, EmptyState, PageHeader } from "~/components/ui";
 import { appendPoint, type ChartSeries } from "~/lib/chart-model";
 import { errorText } from "~/lib/error-text";
 import { liveUrl, type StreamEvent } from "~/lib/event-stream";
@@ -19,6 +19,9 @@ import { AnnotationForm, AnnotationList, AnnotationToggles } from "./annotations
 import { SeriesPanel } from "./series-panel";
 import { Toolbar } from "./toolbar";
 import { RuleFromChart } from "~/features/rules/components/rule-from-chart";
+import type { DataApi } from "~/features/data/api";
+import { ExportDialog } from "~/features/data/components/export-dialog";
+import { exportQuery, normalizeSeries, suggestNormalize } from "../model/compare";
 
 export interface ExploreViewProps {
   data: ExploreData;
@@ -28,6 +31,8 @@ export interface ExploreViewProps {
   fetchJson?: FetchJson;
   chartFactory?: ChartFactory;
   live?: UseLiveStreamOptions;
+  /** 내보내기 API(테스트에서 가짜를 넣는다) */
+  dataApi?: DataApi;
 }
 
 interface PointEvent {
@@ -38,8 +43,9 @@ interface PointEvent {
   quality?: number | null;
 }
 
-export function ExploreView({ data, onNavigate, loading, actionResult, fetchJson, chartFactory, live }: ExploreViewProps) {
-  const { t } = useTranslation();
+export function ExploreView({ data, onNavigate, loading, actionResult, fetchJson, chartFactory, live, dataApi }: ExploreViewProps) {
+  const { t, i18n } = useTranslation();
+  const [exporting, setExporting] = useState(false);
   const { state } = data;
   const [series, setSeries] = useState<ChartSeries[]>(data.series);
   const [adding, setAdding] = useState(false);
@@ -61,6 +67,11 @@ export function ExploreView({ data, onNavigate, loading, actionResult, fetchJson
     const visible = new Set(state.series.filter((s) => !s.hidden).map(seriesKey));
     return series.filter((s) => visible.has(s.key));
   }, [series, state.series]);
+  // TSD-03.03: 단위가 3개 이상이면 정규화 보기를 권하고, 켜면 0~100%로 그린다
+  const canNormalize = suggestNormalize(visibleSeries);
+  const normalized = Boolean(state.normalize) && canNormalize;
+  const chartSeries = useMemo(() => (normalized ? normalizeSeries(visibleSeries) : visibleSeries), [normalized, visibleSeries]);
+  const visibleSpecs = state.series.filter((s) => !s.hidden);
 
   const copyLink = async () => {
     try {
@@ -83,6 +94,14 @@ export function ExploreView({ data, onNavigate, loading, actionResult, fetchJson
           <>
             {url && <LiveDot status={status} />}
             <Button onClick={() => void copyLink()}>{copied ? t("common.copied") : t("explore.copyLink")}</Button>
+            {data.canExport && (
+              <>
+                <Button disabled={visibleSpecs.length === 0 || Boolean(data.problem)} onClick={() => setExporting(true)}>
+                  {t("data.export.open")}
+                </Button>
+                <ButtonLink to="/exports">{t("data.jobs.title")}</ButtonLink>
+              </>
+            )}
           </>
         }
       />
@@ -119,11 +138,19 @@ export function ExploreView({ data, onNavigate, loading, actionResult, fetchJson
               {data.result.truncated && ` ${t("explore.truncated")}`}
             </Alert>
           )}
+          {canNormalize && (
+            <Alert tone="info">
+              {t(normalized ? "data.compare.normalized" : "data.compare.suggest")}
+              <Button className="ml-2" onClick={() => onNavigate({ ...state, normalize: !normalized })}>
+                {t(normalized ? "data.compare.showRaw" : "data.compare.normalize")}
+              </Button>
+            </Alert>
+          )}
           <Card>
             {state.series.length === 0 ? (
               <EmptyState title={t("explore.emptyTitle")} body={t("explore.emptyBody")} action={<Button variant="primary" onClick={() => setAdding(true)}>{t("explore.series.add")}</Button>} />
             ) : (
-              <TimeseriesChart series={visibleSeries} timezone={data.timezone} annotations={data.annotations} loading={loading} factory={chartFactory} title={t("explore.title")} />
+              <TimeseriesChart series={chartSeries} timezone={data.timezone} annotations={data.annotations} loading={loading} factory={chartFactory} title={t("explore.title")} />
             )}
             <RuleFromChart series={state.series} />
           </Card>
@@ -147,6 +174,18 @@ export function ExploreView({ data, onNavigate, loading, actionResult, fetchJson
           </Card>
         </div>
       </div>
+      {data.canExport && (
+        <ExportDialog
+          open={exporting}
+          onClose={() => setExporting(false)}
+          query={exportQuery(state, data.range, data.timezone)}
+          labels={visibleSpecs.map((s) => ({ id: s.id, label: s.label, metric: s.metric, unit: series.find((x) => x.key === seriesKey(s))?.unit ?? s.unit }))}
+          resolutionUsed={data.result?.resolutionUsed}
+          timezone={data.timezone}
+          lang={i18n.language}
+          api={dataApi}
+        />
+      )}
       <AddSeriesDialog
         open={adding}
         spaces={data.spaces}

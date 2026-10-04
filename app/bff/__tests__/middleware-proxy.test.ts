@@ -7,11 +7,12 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { callApi, callList, field, listOrThrow, loginUrl, newIdempotencyKey, orThrow, requirePermission } from "../api.server";
 import { login } from "../auth-flow.server";
 import { applySecurityHeaders, bff, bffContext, bffMiddleware, errorResponse, verifyCsrf } from "../middleware.server";
-import { proxyRequest } from "../proxy.server";
+import { isStreamingUpload, limitStream, proxyRequest } from "../proxy.server";
 import { clientIpFrom, requestMetaFrom } from "../request-meta.server";
 import { checkLangParam } from "../routing.server";
 import { getRuntime, setRuntime } from "../runtime.server";
 import { getMe, guardUser } from "../user.server";
+import { GATEWAY } from "../../../test/msw/fake-gateway";
 import { cookieValue, meta, setup } from "./helpers";
 
 const t = setup();
@@ -232,5 +233,76 @@ describe("runtime", () => {
     const created = await getRuntime();
     expect(created.config.gatewayUrl).toBeTruthy();
     setRuntime(t.state.runtime);
+  });
+});
+
+describe("TSD-04.01 TSD-04.02 큰 파일 중계(내려받기·가져오기 업로드)", () => {
+  it("TC-TSD-108 제한 시간은 응답 머리까지만 — 머리가 온 뒤 느린 본문(1년치 CSV)은 끝까지 흘려보낸다", async () => {
+    t.reset({ DATA2FLOW_GATEWAY_TIMEOUT_MS: "1000" });
+    t.server.use(
+      http.get(`${GATEWAY}/api/v1/core/exports/7/file`, () => {
+        const encoder = new TextEncoder();
+        const stream = new ReadableStream<Uint8Array>({
+          start(controller) {
+            controller.enqueue(encoder.encode("time,device_id\n"));
+            setTimeout(() => {
+              controller.enqueue(encoder.encode("2025-10-04T00:00:00+09:00,1042\n"));
+              controller.close();
+            }, 1300);
+          },
+        });
+        return new HttpResponse(stream, { headers: { "Content-Type": "text/csv; charset=utf-8", "Content-Disposition": 'attachment; filename="export-7.csv"' } });
+      }),
+    );
+    const ctx = { session: t.session(), runtime: t.state.runtime, meta, nonce: "" };
+    const response = await proxyRequest(new Request(`${ORIGIN}/bff/api/core/exports/7/file?expires=1&signature=ab`), ctx, "core", "exports/7/file");
+    expect(response.status).toBe(200);
+    expect(response.headers.get("content-disposition")).toContain("export-7.csv");
+    expect(await response.text()).toBe("time,device_id\n2025-10-04T00:00:00+09:00,1042\n");
+  });
+
+  it("응답 머리가 제한 시간 안에 오지 않으면 503", async () => {
+    t.reset({ DATA2FLOW_GATEWAY_TIMEOUT_MS: "1000" });
+    t.server.use(http.get(`${GATEWAY}/api/v1/core/exports`, () => new Promise<Response>((resolve) => setTimeout(() => resolve(HttpResponse.json({})), 1500))));
+    const ctx = { session: t.session(), runtime: t.state.runtime, meta, nonce: "" };
+    const response = await proxyRequest(new Request(`${ORIGIN}/bff/api/core/exports`), ctx, "core", "exports");
+    expect(response.status).toBe(503);
+  });
+
+  it("TC-TSD-113 가져오기 CSV multipart는 10MB를 넘어도 버퍼 없이 흘려보낸다(2GB 한도)", async () => {
+    let received = 0;
+    t.server.use(
+      http.post(`${GATEWAY}/api/v1/core/imports`, async ({ request }) => {
+        received = (await request.arrayBuffer()).byteLength;
+        return HttpResponse.json({ header: { isSuccessful: true, resultCode: "SUCCESS", resultMessage: "SUCCESS" }, response: { id: "9" } }, { status: 202 });
+      }),
+    );
+    const ctx = { session: t.session(), runtime: t.state.runtime, meta, nonce: "" };
+    const size = 10 * 1024 * 1024 + 10;
+    const request = new Request(`${ORIGIN}/bff/api/core/imports`, { method: "POST", headers: { "Content-Type": "multipart/form-data; boundary=b" }, body: new Uint8Array(size) });
+    const response = await proxyRequest(request, ctx, "core", "imports");
+    expect(response.status).toBe(202);
+    expect(received).toBe(size);
+    expect(isStreamingUpload("core", "imports", "POST", "multipart/form-data; boundary=b")).toBe(true);
+    expect(isStreamingUpload("core", "imports", "POST", "application/json")).toBe(false);
+    expect(isStreamingUpload("core", "exports", "POST", "multipart/form-data")).toBe(false);
+  });
+
+  it("limitStream은 한도를 넘으면 스트림을 오류로 끊는다", async () => {
+    const source = new ReadableStream<Uint8Array>({
+      start(controller) {
+        controller.enqueue(new Uint8Array(4));
+        controller.enqueue(new Uint8Array(4));
+        controller.close();
+      },
+    });
+    await expect(new Response(limitStream(source, 5)).arrayBuffer()).rejects.toThrow();
+    const ok = new ReadableStream<Uint8Array>({
+      start(controller) {
+        controller.enqueue(new Uint8Array(3));
+        controller.close();
+      },
+    });
+    expect((await new Response(limitStream(ok, 5)).arrayBuffer()).byteLength).toBe(3);
   });
 });

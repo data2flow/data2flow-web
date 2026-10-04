@@ -1,7 +1,7 @@
 /**
  * UI-TSD-01 데이터 탐색기 `/explore?q=…` (TSD-03.01·03.04·03.05, TSD-01.04·01.05, DSH-05.02·05.03). 조회 V+, [주석 추가] O+(DEV_PLACE).
  * API: 시계열 API-TSD-02(단일 기기)·API-TSD-04(그 외), 주석 API-TSD-06·07, 공간 API-DEV-01, 실시간 API-DSH-20 `telemetry:{기기}.{항목}`.
- * 내보내기(TSD-04)는 M5라 이 화면에 아직 버튼을 두지 않는다.
+ * M5: 여러 항목 비교·정규화 보기(TSD-03.03), [내보내기] 대화상자(TSD-04.01, TS_EXPORT, API-TSD-20).
  */
 import { data, useActionData, useLoaderData, useNavigation, useSearchParams } from "react-router";
 import { callApi, callList, field } from "~/bff/api.server";
@@ -32,7 +32,7 @@ export async function loader({ request, context }: Route.LoaderArgs): Promise<Ex
   const problem = state.series.length ? checkRange(state, now) : undefined;
 
   const spacesCall = callApi<SpaceNode[]>(ctx, request, "/api/v1/core/spaces");
-  const base: Omit<ExploreData, "series" | "annotations"> = { state, range, problem, spaces: [], canAnnotate: permissions.includes("DEV_PLACE"), timezone, meId: me.ok ? String(me.data.id) : undefined };
+  const base: Omit<ExploreData, "series" | "annotations"> = { state, range, problem, spaces: [], canAnnotate: permissions.includes("DEV_PLACE"), canExport: permissions.includes("TS_EXPORT"), timezone, meId: me.ok ? String(me.data.id) : undefined };
 
   const telemetry = buildTelemetryRequest(state, range, timezone);
   let result: TelemetryResult | undefined;

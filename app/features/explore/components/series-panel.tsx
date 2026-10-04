@@ -3,7 +3,7 @@
  */
 import { useTranslation } from "react-i18next";
 import { Button, cx } from "~/components/ui";
-import { AGGS, removeSeries, updateSeries, type ExploreState } from "../model/state";
+import { AGGS, MAX_SERIES, removeSeries, updateSeries, type ExploreState } from "../model/state";
 
 /** 차트 계열 색과 같은 순서(lib/chart-model 팔레트) */
 export const SERIES_COLORS = ["#206bc4", "#2f9e44", "#b7791f", "#ae3ec9", "#d63939", "#0ca678", "#f76707", "#4263eb"];
@@ -54,7 +54,11 @@ export function SeriesPanel({ state, onChange, onAdd }: { state: ExploreState; o
           );
         })}
       </ul>
-      <Button onClick={onAdd}>{t("explore.series.add")}</Button>
+      {/* TSD-03.03: 50개면 추가 버튼을 막는다 */}
+      <Button onClick={onAdd} disabled={state.series.length >= MAX_SERIES}>
+        {t("explore.series.add")}
+      </Button>
+      {state.series.length >= MAX_SERIES && <p className="text-[12px] text-muted">{t("explore.tooMany")}</p>}
     </section>
   );
 }

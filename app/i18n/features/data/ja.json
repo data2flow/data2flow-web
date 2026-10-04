@@ -1,0 +1,426 @@
+{
+  "nav": {
+    "system": "システム状態",
+    "dataRetention": "データ保持"
+  },
+  "range": {
+    "1y": "1年"
+  },
+  "errors": {
+    "EXPORT_NOT_FOUND": "エクスポートジョブが見つかりません。",
+    "EXPORT_EXPIRED": "ダウンロード期限(7日)が過ぎたファイルです。もう一度エクスポートしてください。",
+    "EXPORT_LIMIT_EXCEEDED": "実行中のエクスポートが多すぎます。終了後に再試行してください。",
+    "EXPORT_TARGET_UNWRITABLE": "配信先にファイルを書き込めません。",
+    "EXPORT_STATE_CONFLICT": "現在の状態では実行できません。",
+    "IMPORT_NOT_FOUND": "インポートジョブが見つかりません。",
+    "IMPORT_FILE_INVALID": "ファイルまたはマッピングが正しくありません。",
+    "IMPORT_LIMIT_EXCEEDED": "一度にインポートできる量(5,000万行・2GB)を超えています。",
+    "IMPORT_SOURCE_UNREACHABLE": "InfluxDBに接続できません。",
+    "IMPORT_STATE_CONFLICT": "プレビュー実行が終わったジョブのみ実行できます。",
+    "RETENTION_CONFIRM_REQUIRED": "保持期間を短くするには影響プレビューの確認が必要です。再度プレビューしてください。",
+    "RETENTION_INVALID": "保持期間が許容範囲外です",
+    "ARCHIVE_NOT_FOUND": "長期保管ファイルが見つかりません。"
+  },
+  "data": {
+    "common": {
+      "loadFailed": "読み込めませんでした。しばらくして再試行してください。",
+      "status": "状態",
+      "actions": "操作",
+      "yes": "はい",
+      "no": "いいえ"
+    },
+    "tabs": {
+      "jobs": "ジョブ",
+      "schedules": "定期エクスポート",
+      "dictionary": "データ辞書"
+    },
+    "compare": {
+      "suggest": "単位が3つ以上あり、2つの軸では描けません。正規化表示で形を比較してください。",
+      "normalized": "正規化表示: 系列ごとに期間内の最小〜最大を0〜100%で表示します。",
+      "normalize": "正規化表示",
+      "showRaw": "実際の値を表示"
+    },
+    "export": {
+      "open": "エクスポート",
+      "title": "エクスポート",
+      "summary": "系列 {{n}}件 · {{from}} 〜 {{to}} · {{resolution}}",
+      "format": "形式",
+      "formats": {
+        "CSV": "CSV",
+        "XLSX": "Excel",
+        "PARQUET": "Parquet"
+      },
+      "columns": "形態",
+      "columnKinds": {
+        "LONG": "ロング形式",
+        "WIDE": "ワイド形式"
+      },
+      "preview": "サンプルプレビュー",
+      "includeQuality": "品質コードを含める",
+      "timezone": "タイムゾーン",
+      "estimateSync": "約 {{rows}}行 · すぐにダウンロード",
+      "estimateAsync": "約 {{rows}}行 · ジョブとして作成し完了したらお知らせします",
+      "tooManyActive": "実行中のエクスポートが{{n}}件あります。終了後に再試行してください。",
+      "queued": "完了したらお知らせします。",
+      "openJobs": "ジョブ一覧を見る",
+      "submit": "エクスポート",
+      "saveSchedule": "定期エクスポートとして保存"
+    },
+    "jobs": {
+      "title": "エクスポートジョブ",
+      "empty": "エクスポートジョブはありません",
+      "emptyBody": "データ探索で条件を決めて[エクスポート]を押してください。",
+      "createdAt": "日時",
+      "query": "条件",
+      "rows": "行数",
+      "size": "サイズ",
+      "expiresAt": "有効期限",
+      "querySummary": "系列 {{n}}件 · {{from}} 〜 {{to}}",
+      "fromSchedule": "(定期)",
+      "statuses": {
+        "QUEUED": "待機",
+        "RUNNING": "実行中",
+        "SUCCEEDED": "完了",
+        "FAILED": "失敗",
+        "EXPIRED": "期限切れ",
+        "CANCELLED": "キャンセル済み"
+      },
+      "download": "ダウンロード"
+    },
+    "schedule": {
+      "editorTitle": "定期エクスポート設定",
+      "name": "名前",
+      "repeat": "繰り返し",
+      "repeatKind": "周期",
+      "choose": "選択",
+      "repeatKinds": {
+        "DAILY": "毎日",
+        "WEEKLY": "毎週",
+        "MONTHLY": "毎月"
+      },
+      "weekday": "曜日",
+      "weekdays": {
+        "0": "日曜日",
+        "1": "月曜日",
+        "2": "火曜日",
+        "3": "水曜日",
+        "4": "木曜日",
+        "5": "金曜日",
+        "6": "土曜日"
+      },
+      "day": "日(1〜28)",
+      "time": "時刻",
+      "period": "期間",
+      "periods": {
+        "PREVIOUS_DAY": "前日",
+        "PREVIOUS_WEEK": "先週",
+        "PREVIOUS_MONTH": "先月"
+      },
+      "delivery": "配信",
+      "deliveries": {
+        "EMAIL": "メール",
+        "STORAGE": "ストレージ(S3・SFTP)"
+      },
+      "recipients": "受信者",
+      "recipientsHint": "メールアドレスをカンマ区切りで入力してください(最大20件)。",
+      "targetType": "配信先の種類",
+      "target": {
+        "endpoint": "エンドポイント",
+        "bucket": "バケット",
+        "region": "リージョン",
+        "prefix": "パスプレフィックス",
+        "host": "ホスト",
+        "port": "ポート",
+        "username": "ユーザー名",
+        "directory": "ディレクトリ",
+        "hostKeySha256": "ホストキー SHA-256"
+      },
+      "credential": {
+        "accessKey": "アクセスキー",
+        "secretKey": "シークレットキー",
+        "password": "パスワード"
+      },
+      "credentialKept": "保存済みの資格情報があります。変更する場合のみ入力してください。",
+      "testTarget": "接続テスト",
+      "testResult": "接続テスト結果",
+      "steps": {
+        "CONNECT": "接続",
+        "WRITE": "テストファイル書き込み",
+        "DELETE": "テストファイル削除"
+      },
+      "enabled": "有効",
+      "saved": "定期エクスポートを保存しました。",
+      "errors": {
+        "name": {
+          "required": "名前を入力してください(100文字以内)。"
+        },
+        "repeat": {
+          "required": "繰り返しルールを設定してください。"
+        },
+        "query": {
+          "required": "照会条件がありません。データ探索で条件を決めてから保存してください。"
+        },
+        "recipients": {
+          "required": "受信者を1人以上入力してください。",
+          "email": "メールアドレスの形式が正しくありません。"
+        },
+        "target": {
+          "required": "配信先の必須項目(*)を入力してください。"
+        }
+      },
+      "addHint": "新しい定期エクスポートはデータ探索で条件を決め、[エクスポート] → [定期エクスポートとして保存]で作成します。",
+      "empty": "定期エクスポートはありません",
+      "scope": "系列 {{n}}件 · {{period}}",
+      "next": "次回 {{at}}",
+      "last": "前回結果",
+      "disable": "オフ",
+      "enable": "オン",
+      "deleteOf": "{{name}} を削除",
+      "repeatDaily": "毎日 {{time}}",
+      "repeatWeekly": "毎週{{day}} {{time}}",
+      "repeatMonthly": "毎月{{day}}日 {{time}}"
+    },
+    "dictionary": {
+      "empty": "データ辞書はありません",
+      "version": "データ辞書 v{{v}}",
+      "html": "HTMLをダウンロード",
+      "json": "JSONをダウンロード",
+      "generatedAt": "生成 {{at}}",
+      "metrics": "測定項目",
+      "key": "キー",
+      "name": "名前",
+      "unit": "単位",
+      "agg": "集計方式",
+      "validRange": "有効範囲",
+      "quality": "品質コード",
+      "code": "コード",
+      "meaning": "意味",
+      "inAggregates": "集計に含む",
+      "spaces": "空間階層"
+    },
+    "imports": {
+      "title": "データインポート",
+      "new": "新規インポート",
+      "empty": "インポートジョブはありません",
+      "emptyBody": "CSVファイルやInfluxDBから過去データをインポートします。重複は上書きしません。",
+      "originLabel": "出所ラベル",
+      "originLabelExample": "例: アカデミー iot-bucket 2026-09",
+      "sourceKind": "出所",
+      "result": "結果",
+      "resultLine": "挿入 {{inserted}} · 重複 {{skipped}} · 失敗 {{failed}}",
+      "steps": "インポート手順",
+      "step": {
+        "source": "出所",
+        "mapping": "マッピング",
+        "dryRun": "プレビュー実行",
+        "run": "実行"
+      },
+      "kinds": {
+        "CSV": "CSVファイル",
+        "INFLUXDB": "InfluxDB"
+      },
+      "file": "CSVファイル(2GB以下)",
+      "previewCaption": "先頭 {{n}}行のプレビュー",
+      "badTime": "時刻を読み取れない行: {{lines}}",
+      "timeColumn": "時刻列",
+      "timeFormat": "時刻形式",
+      "timeFormats": {
+        "ISO": "ISO-8601",
+        "EPOCH_S": "epoch 秒",
+        "EPOCH_MS": "epoch ミリ秒",
+        "CUSTOM": "カスタム形式"
+      },
+      "customPattern": "パターン",
+      "tz": "タイムゾーン(オフセットなしの値)",
+      "deviceColumn": "機器列",
+      "deviceKey": "機器の識別方式",
+      "deviceKeys": {
+        "EXTERNAL_ID": "外部ID",
+        "ID": "機器ID",
+        "NAME": "名前"
+      },
+      "shape": "列の形態",
+      "shapes": {
+        "WIDE": "ワイド形式(測定項目ごとに列)",
+        "LONG": "ロング形式(metric, value列)"
+      },
+      "metricColumn": "測定項目列",
+      "valueColumn": "値列",
+      "metricColumns": "列 → 測定項目キー",
+      "metricKeyOf": "{{column}} の測定項目キー",
+      "influx": {
+        "url": "URL",
+        "org": "org",
+        "bucket": "bucket",
+        "token": "トークン",
+        "measurement": "measurement",
+        "deviceTag": "機器タグ",
+        "deviceTagHint": "タグ値は機器の外部IDで照合します。",
+        "from": "開始",
+        "to": "終了",
+        "fields": "field → 測定項目キー",
+        "field": "field {{n}}",
+        "metricKey": "測定項目キー {{n}}",
+        "addField": "+ field を追加"
+      },
+      "dryRun": "プレビュー実行",
+      "errors": {
+        "file": {
+          "required": "CSVファイルを選んでください。",
+          "tooLarge": "ファイルは2GB以下にしてください。"
+        },
+        "originLabel": {
+          "required": "出所ラベルを入力してください(例: アカデミー iot-bucket 2026-09)。"
+        },
+        "timeColumn": {
+          "required": "時刻列を選んでください。"
+        },
+        "deviceColumn": {
+          "required": "機器列を選んでください。"
+        },
+        "metricColumns": {
+          "required": "測定項目列を1つ以上マッピングしてください。"
+        },
+        "customPattern": {
+          "required": "時刻パターンを入力してください。"
+        },
+        "delimiter": {
+          "required": "区切り文字は1文字にしてください。"
+        },
+        "url": {
+          "url": "InfluxDB URLは http:// または https:// で始めてください。"
+        },
+        "org": {
+          "required": "orgを入力してください。"
+        },
+        "bucket": {
+          "required": "bucketを入力してください。"
+        },
+        "token": {
+          "required": "トークンを入力してください。"
+        },
+        "range": {
+          "order": "開始が終了より遅いです"
+        }
+      },
+      "statuses": {
+        "QUEUED": "待機",
+        "VALIDATING": "検査中",
+        "DRY_RUN_DONE": "プレビュー実行完了",
+        "RUNNING": "インポート中",
+        "SUCCEEDED": "完了",
+        "FAILED": "失敗",
+        "CANCELLED": "キャンセル済み"
+      },
+      "originOf": "出所: {{label}}",
+      "progress": "進捗",
+      "counts": {
+        "total": "全体",
+        "inserted": "挿入",
+        "skippedDuplicate": "重複(上書きしない)",
+        "failed": "失敗",
+        "dry": {
+          "total": "予想行数",
+          "inserted": "挿入予定行",
+          "skippedDuplicate": "重複予想",
+          "failed": "エラー予想"
+        }
+      },
+      "run": "インポート実行",
+      "sample": "エラー例",
+      "errorList": "エラー {{n}}件",
+      "downloadErrors": "エラー一覧をダウンロード",
+      "noErrors": "エラーはありません。",
+      "line": "行・地点",
+      "code": "コード",
+      "message": "内容"
+    },
+    "retention": {
+      "crumb": "設定",
+      "title": "データ保持",
+      "orgDefault": "組織の既定",
+      "dataClass": "データ種別",
+      "days": "保持日数",
+      "allowed": "許容範囲",
+      "archive": "削除前に長期保管",
+      "classes": {
+        "RAW_MESSAGE": "生メッセージ",
+        "TELEMETRY": "測定値(生)",
+        "LINK": "通信品質",
+        "AGG_1M": "1分集計",
+        "AGG_1H": "1時間集計",
+        "AGG_1D": "1日集計",
+        "FLOW_EXECUTION": "フロー実行記録",
+        "ANALYSIS_RESULT": "分析結果",
+        "AUDIT_LOG": "監査ログ",
+        "NOTIFICATION_DELIVERY": "通知送信履歴",
+        "COMMAND": "制御コマンド履歴",
+        "DEVICE_STATE_HISTORY": "機器状態履歴",
+        "WEBHOOK_DELIVERY": "Webhook配信履歴"
+      },
+      "daysOf": "{{name}} の保持日数",
+      "forever": "0 = 無期限",
+      "range": "{{min}}〜{{max}}日",
+      "archiveOf": "{{name}} を削除前に長期保管",
+      "overrides": "上書き(測定項目・モデル別)",
+      "addOverride": "+ 上書きを追加",
+      "noOverrides": "上書きはありません。すべて組織の既定に従います。",
+      "scope": "範囲",
+      "target": "対象",
+      "storeMode": "保存方式",
+      "scopes": {
+        "METRIC": "測定項目",
+        "MODEL": "モデル",
+        "ORG": "組織の既定"
+      },
+      "scopeOf": "上書き {{n}} の範囲",
+      "targetOf": "上書き {{n}} の対象",
+      "classOf": "上書き {{n}} のデータ種別",
+      "overrideDaysOf": "上書き {{n}} の保持日数",
+      "overrideArchiveOf": "上書き {{n}} 削除前に長期保管",
+      "storeModeOf": "上書き {{n}} の保存方式",
+      "storeModes": {
+        "ALL": "すべての値",
+        "ON_CHANGE": "変化のみ"
+      },
+      "removeOf": "上書き {{n}} を削除",
+      "errors": {
+        "range": "保持期間が許容範囲外です",
+        "duplicate": "同じ範囲・対象・種別の上書きが既にあります",
+        "required": "対象を選んでください"
+      },
+      "savedAt": "保存しました。{{at}} の夜間処理から適用されます。",
+      "previewAndSave": "影響をプレビューして保存",
+      "storage": "保存状況",
+      "totalBytes": "合計 {{size}}",
+      "table": "テーブル",
+      "partitions": "パーティション",
+      "partitionDetail": "パーティション別に見る",
+      "partition": "パーティション",
+      "state": "状態",
+      "compression": "圧縮率",
+      "archives": "長期保管ファイル",
+      "noArchives": "長期保管ファイルはありません。",
+      "period": "期間",
+      "previewTitle": "保持期間短縮の影響",
+      "confirmSave": "確認して保存",
+      "previewBody": "保存すると次の夜間処理で約 {{rows}}行・{{size}} が削除されます。",
+      "previewNote": "削除前に長期保管を有効にした種別は先にParquetファイルへ書き出します。"
+    },
+    "storage": {
+      "title": "保存指標",
+      "unavailable": "保存指標を読み込めません",
+      "dbSize": "DB全体容量",
+      "perDay": "1日平均 {{size}}",
+      "diskFree": "ディスク空き",
+      "diskUnknown": "ディスク容量が設定されていないため空き容量を計算しません。",
+      "diskWarn": "ディスク空きが{{n}}%未満です",
+      "capacity": "ディスク容量 {{size}}",
+      "trend": "DB サイズの推移",
+      "topTables": "テーブル別サイズ上位10"
+    },
+    "system": {
+      "title": "システム状態"
+    }
+  }
+}

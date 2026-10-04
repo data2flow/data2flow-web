@@ -15,6 +15,8 @@ export interface ExploreData {
   failure?: { code: string; message?: string; retryAfter?: number };
   spaces: SpaceNode[];
   canAnnotate: boolean;
+  /** [내보내기](UI-TSD-02) — TS_EXPORT */
+  canExport?: boolean;
   timezone: string;
   meId?: string;
 }

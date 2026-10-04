@@ -180,12 +180,9 @@ describe("UI-TSD-01 데이터 탐색기", () => {
     const full = makeData({ state: { ...defaultState(), series: Array.from({ length: MAX_SERIES }, (_, i) => dev(`m${i}`)) } });
     navigate.mockClear();
     const { unmount } = await renderRoute(<ExploreView data={full} onNavigate={navigate} fetchJson={fetchJson} live={live} chartFactory={stubChart} />, { session: meOf("VIEWER") });
-    await userEvent.click(await screen.findByRole("button", { name: "+ 시계열 추가" }));
-    const again = screen.getByRole("dialog");
-    await userEvent.click(within(again).getByRole("button", { name: "검색" }));
-    await userEvent.click(await within(again).findByRole("button", { name: /AM107-067999/ }));
-    await userEvent.click(within(again).getByRole("button", { name: "추가" }));
-    expect(await within(again).findByText("한 번에 50개까지 비교할 수 있습니다")).toBeInTheDocument();
+    // TSD-03.03(M5): 50개면 [+ 시계열 추가]가 비활성화되고 안내가 보인다
+    expect(await screen.findByRole("button", { name: "+ 시계열 추가" })).toBeDisabled();
+    expect(screen.getByText("한 번에 50개까지 비교할 수 있습니다")).toBeInTheDocument();
     expect(navigate).not.toHaveBeenCalled();
     unmount();
   });
