@@ -104,7 +104,7 @@
       "removeGroup": "グループ削除",
       "add": "条件を追加",
       "addGroup": "グループを追加",
-      "itemLabel": "条件",
+      "itemLabel": "条件項目",
       "kind": "条件の種類",
       "metric": "測定項目",
       "chooseMetric": "測定項目を選択",

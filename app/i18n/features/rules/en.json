@@ -104,7 +104,7 @@
       "removeGroup": "Remove group",
       "add": "Add condition",
       "addGroup": "Add group",
-      "itemLabel": "Condition",
+      "itemLabel": "Condition item",
       "kind": "Condition type",
       "metric": "Metric",
       "chooseMetric": "Choose a metric",

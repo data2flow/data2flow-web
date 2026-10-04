@@ -104,7 +104,7 @@
       "removeGroup": "그룹 삭제",
       "add": "조건 추가",
       "addGroup": "그룹 추가",
-      "itemLabel": "조건",
+      "itemLabel": "조건 항목",
       "kind": "조건 종류",
       "metric": "측정 항목",
       "chooseMetric": "측정 항목 선택",

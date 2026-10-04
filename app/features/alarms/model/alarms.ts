@@ -72,7 +72,8 @@ export interface AlarmFilter {
 const pick = <T extends string>(values: string[], allowed: readonly T[]) => values.flatMap((v) => v.split(",")).filter((v): v is T => (allowed as readonly string[]).includes(v));
 
 export function filterFromParams(params: URLSearchParams): AlarmFilter {
-  const status = pick(params.getAll("status"), ALARM_STATUSES);
+  // `state`는 `status`의 다른 이름(홈 알람 카드 링크 `/alarms?state=ACTIVE`, TC-DSH-004)
+  const status = pick(params.getAll("status").length ? params.getAll("status") : params.getAll("state"), ALARM_STATUSES);
   const range = params.get("range");
   return {
     status: status.length ? status : [...OPEN_STATUSES],

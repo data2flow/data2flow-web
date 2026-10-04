@@ -62,6 +62,9 @@ describe("UI-RUL-04 알람 목록(RUL-02.06, RUL-04.01)", () => {
     const sent = app.gateway.received.filter((r) => r.path.startsWith("/api/v1/core/alarms?")).at(-1)!;
     for (const part of ["status=CLEARED", "severity=MINOR", "spaceId=31", "sourceType=RULE", "groupBySpaceEvent=true", "from=2026-09-27"]) expect(sent.path).toContain(part);
     expect(page.body).toContain("현재 열린 알람이 없습니다 ✓");
+    // 홈 알람 카드(TC-DSH-004) 링크 `/alarms?state=ACTIVE` → API-RUL-10 status=ACTIVE
+    await browser.get("/alarms?state=ACTIVE");
+    expect(app.gateway.received.filter((r) => r.path.startsWith("/api/v1/core/alarms?")).at(-1)!.path).toContain("status=ACTIVE&");
     await browser.get("/alarms?range=all");
     expect(app.gateway.received.filter((r) => r.path.startsWith("/api/v1/core/alarms?")).at(-1)!.path).not.toContain("from=");
   });

@@ -104,7 +104,7 @@
       "removeGroup": "删除分组",
       "add": "添加条件",
       "addGroup": "添加分组",
-      "itemLabel": "条件",
+      "itemLabel": "条件项",
       "kind": "条件类型",
       "metric": "测量项",
       "chooseMetric": "选择测量项",
