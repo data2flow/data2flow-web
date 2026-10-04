@@ -50,7 +50,8 @@
     "expectationState": {
       "PENDING": "待機",
       "PASSED": "合格",
-      "FAILED": "不合格"
+      "FAILED": "不合格",
+      "SKIPPED": "判定不可"
     },
     "validation": {
       "number": "数値を入力してください。",
@@ -433,6 +434,25 @@
       "failurePct": "失敗確率（%、0〜100）",
       "loadFailed": "仮想設定を読み込めませんでした。",
       "notVirtual": "仮想デバイスではありません。"
+    },
+    "reportX": {
+      "expectation": "期待結果",
+      "verdict": "判定",
+      "evidence": "根拠",
+      "verdicts": {
+        "PASSED": "合格",
+        "FAILED": "不合格",
+        "SKIPPED": "判定不可(停止)"
+      },
+      "actual": "実際 {{value}}",
+      "check": "根拠を見る",
+      "describe": {
+        "deviceStateBy": "{{deadline}}までに {{device}} {{state}}",
+        "deviceState": "{{device}} {{state}}",
+        "alarmCount": "アラーム {{op}} {{value}} 件",
+        "metricRange": "{{metric}} {{min}}〜{{max}} を {{pct}}% 維持",
+        "controlMax": "{{device}} 制御 {{max}} 回以下"
+      }
     }
   },
   "errors": {

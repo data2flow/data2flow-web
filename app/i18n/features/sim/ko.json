@@ -50,7 +50,8 @@
     "expectationState": {
       "PENDING": "대기",
       "PASSED": "통과",
-      "FAILED": "실패"
+      "FAILED": "실패",
+      "SKIPPED": "판정 불가"
     },
     "validation": {
       "number": "숫자를 입력하세요.",
@@ -433,6 +434,25 @@
       "failurePct": "실패 확률(%, 0~100)",
       "loadFailed": "가상 설정을 불러오지 못했습니다.",
       "notVirtual": "가상 기기가 아닙니다."
+    },
+    "reportX": {
+      "expectation": "기대 결과",
+      "verdict": "판정",
+      "evidence": "근거",
+      "verdicts": {
+        "PASSED": "통과",
+        "FAILED": "실패",
+        "SKIPPED": "판정 불가(정지)"
+      },
+      "actual": "실제 {{value}}",
+      "check": "근거 보기",
+      "describe": {
+        "deviceStateBy": "{{deadline}}까지 {{device}} {{state}}",
+        "deviceState": "{{device}} {{state}}",
+        "alarmCount": "알람 {{op}} {{value}}건",
+        "metricRange": "{{metric}} {{min}}~{{max}} {{pct}}% 유지",
+        "controlMax": "{{device}} 제어 {{max}}회 이하"
+      }
     }
   },
   "errors": {

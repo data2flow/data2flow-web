@@ -50,7 +50,8 @@
     "expectationState": {
       "PENDING": "等待",
       "PASSED": "通过",
-      "FAILED": "失败"
+      "FAILED": "失败",
+      "SKIPPED": "无法判定"
     },
     "validation": {
       "number": "请输入数字。",
@@ -433,6 +434,25 @@
       "failurePct": "失败概率（%，0~100）",
       "loadFailed": "无法加载虚拟设置。",
       "notVirtual": "不是虚拟设备。"
+    },
+    "reportX": {
+      "expectation": "预期结果",
+      "verdict": "判定",
+      "evidence": "依据",
+      "verdicts": {
+        "PASSED": "通过",
+        "FAILED": "未通过",
+        "SKIPPED": "无法判定(已停止)"
+      },
+      "actual": "实际 {{value}}",
+      "check": "查看依据",
+      "describe": {
+        "deviceStateBy": "{{deadline}}前 {{device}} {{state}}",
+        "deviceState": "{{device}} {{state}}",
+        "alarmCount": "告警 {{op}} {{value}} 条",
+        "metricRange": "{{metric}} {{min}}~{{max}} 保持 {{pct}}%",
+        "controlMax": "{{device}} 控制不超过 {{max}} 次"
+      }
     }
   },
   "errors": {

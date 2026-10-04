@@ -50,7 +50,8 @@
     "expectationState": {
       "PENDING": "Pending",
       "PASSED": "Passed",
-      "FAILED": "Failed"
+      "FAILED": "Failed",
+      "SKIPPED": "Not evaluated"
     },
     "validation": {
       "number": "Enter a number.",
@@ -433,6 +434,25 @@
       "failurePct": "Failure rate (%, 0–100)",
       "loadFailed": "Could not load the virtual settings.",
       "notVirtual": "This is not a virtual device."
+    },
+    "reportX": {
+      "expectation": "Expected result",
+      "verdict": "Verdict",
+      "evidence": "Evidence",
+      "verdicts": {
+        "PASSED": "Passed",
+        "FAILED": "Failed",
+        "SKIPPED": "Not evaluated (stopped)"
+      },
+      "actual": "Actual {{value}}",
+      "check": "View evidence",
+      "describe": {
+        "deviceStateBy": "{{device}} {{state}} by {{deadline}}",
+        "deviceState": "{{device}} {{state}}",
+        "alarmCount": "Alarms {{op}} {{value}}",
+        "metricRange": "{{metric}} within {{min}}–{{max}} {{pct}}% of the time",
+        "controlMax": "{{device}} at most {{max}} controls"
+      }
     }
   },
   "errors": {
