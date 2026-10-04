@@ -10,6 +10,7 @@ import { useTranslation } from "react-i18next";
 import { Form, Link, data, redirect, useRouteLoaderData } from "react-router";
 import { callApi, callList, field, listOrThrow, newIdempotencyKey, orThrow } from "~/bff/api.server";
 import { bff } from "~/bff/middleware.server";
+import { getMe } from "~/bff/user.server";
 import { Alert, Badge, Button, ButtonLink, Card, CsrfField, Dialog, PageHeader, SelectField, Table, Tabs, TextField } from "~/components/ui";
 import { AttributeSchemaEditor } from "~/features/catalog/components/attribute-schema-editor";
 import { ModelFields } from "~/features/catalog/components/model-fields";
@@ -18,6 +19,7 @@ import type { DeviceLite, MetricRow, ModelDetail, ModelSummary, ScriptLite } fro
 import { can, failed, invalid, outcome, type CatalogActionResult } from "~/features/catalog/server";
 import { DeviceAreaTabs } from "~/features/devices/area-tabs";
 import { errorText } from "~/lib/error-text";
+import { hasAny } from "~/lib/permissions";
 import type { RootData } from "~/root";
 import type { Route } from "./+types/model-detail";
 
@@ -47,8 +49,10 @@ export async function loader({ request, context, params }: Route.LoaderArgs) {
     tab === "package" ? callList<ScriptLite>(ctx, request, "/api/v1/core/scripts?kind=TRANSFORM&size=100") : null,
     tab === "devices" ? callList<DeviceLite>(ctx, request, `/api/v1/core/devices?modelId=${encodeURIComponent(model.id)}&size=50`) : null,
   ]);
-  // 드라이버 목록은 DRIVER_MANAGE만 볼 수 있다. 실패(403)면 현재 연결만 읽기 전용으로 보여 준다
-  const drivers = tab === "package" ? await callList<DriverRow>(ctx, request, "/api/v1/core/drivers?size=100") : null;
+  // 드라이버 목록·상세(API-ACT-30)는 DRIVER_MANAGE(ADMIN·INTEGRATOR)만: 권한이 없으면 부르지 않고 현재 연결만 읽기 전용으로 보여 준다
+  const me = tab === "package" ? await getMe(ctx, request) : null;
+  const canManageDrivers = Boolean(me?.ok && hasAny(me.data.permissions, ["DRIVER_MANAGE"]));
+  const drivers = canManageDrivers ? await callList<DriverRow>(ctx, request, "/api/v1/core/drivers?size=100") : null;
   return {
     tab,
     model,

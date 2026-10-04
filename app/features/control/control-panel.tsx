@@ -13,6 +13,7 @@ import { errorText } from "~/lib/error-text";
 import { liveUrl, type StreamEvent } from "~/lib/event-stream";
 import { formatDateTime } from "~/lib/format";
 import { controlApi, type ControlApi } from "./api";
+import { SourceLabel } from "./command-history";
 import {
   PROGRESS_STEPS,
   attributeRange,
@@ -27,6 +28,7 @@ import {
   writableAttributes,
   type AttributeDef,
   type CapabilityControl,
+  type CommandSource,
   type ControlInfo,
   type Shadow,
 } from "./model/control";
@@ -36,6 +38,28 @@ export interface TrackedCommand {
   capability: string;
   status: string;
   reason?: string;
+  /** 명령 출처(플로우면 flowName, 사용자면 userName — core가 붙인다, ADR-043) */
+  source?: CommandSource | null;
+}
+
+/** 실시간 `command-status`(commands:{deviceId}, API-DSH-20): 실패 사유는 reason(상태 사유 코드), message(차단 사유 문구) */
+export interface CommandStatusEvent {
+  commandId?: string;
+  deviceId?: string;
+  capability?: string;
+  command?: string;
+  status?: string;
+  reason?: string | null;
+  message?: string | null;
+  source?: CommandSource | null;
+  at?: string;
+}
+
+/** 실시간 `device-update`(space:{id}, API-DSH-20). 액추에이터 보고면 state가 {reported, delta, reportedVersion, origin, at} */
+export interface DeviceUpdateEvent {
+  deviceId?: string;
+  connection?: string | null;
+  state?: { reported?: Record<string, Record<string, unknown>> | null; delta?: Record<string, Record<string, unknown>> | null; reportedVersion?: number; origin?: string; at?: string } | string | null;
 }
 
 export interface DeviceControlPanelProps {
@@ -73,34 +97,40 @@ export function DeviceControlPanel({ deviceId, spaceId, initial, canControl, tim
     if (result.ok) setShadow(result.data);
   }, [api, deviceId]);
 
-  const track = useCallback((id: string, capability: string, status: string, reason?: string) => {
+  const track = useCallback((id: string, capability: string, status: string, reason?: string, source?: CommandSource | null) => {
     setCommands((list) => {
       const existing = list.find((c) => c.id === id);
-      if (existing) return list.map((c) => (c.id === id ? { ...c, status: nextStatus(c.status, status), reason: reason ?? c.reason } : c));
-      return [{ id, capability, status, reason }, ...list].slice(0, 20);
+      if (existing) return list.map((c) => (c.id === id ? { ...c, status: nextStatus(c.status, status), reason: reason ?? c.reason, source: source ?? c.source } : c));
+      return [{ id, capability, status, reason, source }, ...list].slice(0, 20);
     });
   }, []);
 
   const onEvent = useCallback(
     (event: StreamEvent) => {
       if (event.type === "command-status") {
-        const data = event.data as { commandId?: string; status?: string; error?: unknown };
+        const data = event.data as CommandStatusEvent;
         if (!data?.commandId || !data.status) return;
-        const errorReason = typeof data.error === "string" ? data.error : data.error && typeof data.error === "object" ? ((data.error as { message?: string; code?: string }).message ?? (data.error as { code?: string }).code) : undefined;
+        if (data.deviceId && data.deviceId !== deviceId) return;
+        const reason = data.message ?? data.reason ?? undefined;
         const known = commandsRef.current.find((c) => c.id === data.commandId);
-        const progress = progressOf(data.status);
-        if (known) track(known.id, known.capability, data.status, errorReason);
-        // 다른 출처(플로우·장면)의 명령이거나 사유가 없는 실패면 명령 상세(API-ACT-02)를 읽는다
-        if (!known || (progress.failed && !errorReason)) {
+        const capability = known?.capability ?? data.capability;
+        if (capability) track(data.commandId, capability, data.status, reason, data.source);
+        // 기능 이름이 없거나 사유 없는 실패면 명령 상세(API-ACT-02)를 읽는다
+        if (!capability || (progressOf(data.status).failed && !reason)) {
           void api.commandDetail(data.commandId).then((detail) => {
-            if (detail.ok) track(detail.data.id, detail.data.capability, data.status!, detail.data.message ?? detail.data.statusReason ?? errorReason);
+            if (detail.ok) track(detail.data.id, detail.data.capability, data.status!, detail.data.message ?? detail.data.statusReason ?? reason, detail.data.source);
           });
         }
         if (data.status === "APPLIED") void refreshShadow();
       } else if (event.type === "device-update") {
-        const data = event.data as { deviceId?: string; state?: unknown; at?: string };
-        if (data?.deviceId !== deviceId || !data.state) return;
-        setShadow((s) => mergeReported(s, data.state, data.at));
+        const data = event.data as DeviceUpdateEvent;
+        // 측정값 갱신(metrics)이나 기기 상태 문자열은 섀도와 무관하다. 액추에이터 보고 상태만 합친다
+        if (data?.deviceId !== deviceId || !data.state || typeof data.state !== "object") return;
+        const state = data.state;
+        setShadow((s) => {
+          const merged = mergeReported(s, state.reported ?? {}, state.at);
+          return { ...merged, ...(state.delta ? { delta: state.delta } : {}), ...(data.connection ? { connectivity: data.connection } : {}) };
+        });
       }
     },
     [api, deviceId, refreshShadow, track],
@@ -251,7 +281,18 @@ function CapabilityCard({
         })}
         {writable.length > 0 && (
           <div className="flex flex-wrap items-center justify-between gap-2">
-            {command ? <CommandProgress command={command} /> : <span />}
+            {command ? (
+              <span className="inline-flex flex-wrap items-center gap-2">
+                <CommandProgress command={command} />
+                {command.source && command.source.type !== "USER" && (
+                  <span className="text-[12px] text-muted">
+                    <SourceLabel source={command.source} />
+                  </span>
+                )}
+              </span>
+            ) : (
+              <span />
+            )}
             {canControl && (
               <Button variant="primary" disabled={!changed || problems.length > 0} onClick={onApply}>
                 {t("control.panel.apply")}
