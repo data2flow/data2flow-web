@@ -1,0 +1,426 @@
+{
+  "nav": {
+    "system": "시스템 상태",
+    "dataRetention": "데이터 보관"
+  },
+  "range": {
+    "1y": "1년"
+  },
+  "errors": {
+    "EXPORT_NOT_FOUND": "내보내기 작업을 찾을 수 없습니다.",
+    "EXPORT_EXPIRED": "내려받기 기간(7일)이 지난 파일입니다. 다시 내보내 주세요.",
+    "EXPORT_LIMIT_EXCEEDED": "진행 중인 내보내기가 너무 많습니다. 끝난 뒤 다시 시도해 주세요.",
+    "EXPORT_TARGET_UNWRITABLE": "전달 대상에 파일을 쓸 수 없습니다.",
+    "EXPORT_STATE_CONFLICT": "지금 상태에서는 할 수 없는 작업입니다.",
+    "IMPORT_NOT_FOUND": "가져오기 작업을 찾을 수 없습니다.",
+    "IMPORT_FILE_INVALID": "파일이나 매핑이 올바르지 않습니다.",
+    "IMPORT_LIMIT_EXCEEDED": "한 번에 가져올 수 있는 양(5,000만 행·2GB)을 넘었습니다.",
+    "IMPORT_SOURCE_UNREACHABLE": "InfluxDB에 연결할 수 없습니다.",
+    "IMPORT_STATE_CONFLICT": "미리 실행이 끝난 작업만 실행할 수 있습니다.",
+    "RETENTION_CONFIRM_REQUIRED": "보관 기간을 줄이려면 영향 미리 보기를 확인해야 합니다. 다시 미리 보기 해 주세요.",
+    "RETENTION_INVALID": "보관 기간이 허용 범위를 벗어났습니다",
+    "ARCHIVE_NOT_FOUND": "장기 보관 파일을 찾을 수 없습니다."
+  },
+  "data": {
+    "common": {
+      "loadFailed": "불러오지 못했습니다. 잠시 뒤 다시 시도해 주세요.",
+      "status": "상태",
+      "actions": "동작",
+      "yes": "예",
+      "no": "아니요"
+    },
+    "tabs": {
+      "jobs": "작업",
+      "schedules": "정기 내보내기",
+      "dictionary": "데이터 사전"
+    },
+    "compare": {
+      "suggest": "단위가 3개 이상이라 축 2개로 모두 그릴 수 없습니다. 정규화 보기로 모양을 비교해 보세요.",
+      "normalized": "정규화 보기: 계열마다 기간 안 최솟값~최댓값을 0~100%로 표시합니다.",
+      "normalize": "정규화 보기",
+      "showRaw": "원래 값 보기"
+    },
+    "export": {
+      "open": "내보내기",
+      "title": "내보내기",
+      "summary": "시계열 {{n}}개 · {{from}} ~ {{to}} · {{resolution}}",
+      "format": "형식",
+      "formats": {
+        "CSV": "CSV",
+        "XLSX": "Excel",
+        "PARQUET": "Parquet"
+      },
+      "columns": "형태",
+      "columnKinds": {
+        "LONG": "긴 형식",
+        "WIDE": "넓은 형식"
+      },
+      "preview": "예시 미리 보기",
+      "includeQuality": "품질 코드 포함",
+      "timezone": "시간대",
+      "estimateSync": "예상 {{rows}}행 · 바로 내려받기",
+      "estimateAsync": "예상 {{rows}}행 · 작업으로 만들고 완료되면 알려 드립니다",
+      "tooManyActive": "진행 중인 내보내기가 {{n}}개입니다. 끝난 뒤 다시 시도해 주세요.",
+      "queued": "완료되면 알려 드립니다.",
+      "openJobs": "작업 목록 보기",
+      "submit": "내보내기",
+      "saveSchedule": "정기 내보내기로 저장"
+    },
+    "jobs": {
+      "title": "내보내기 작업",
+      "empty": "내보내기 작업이 없습니다",
+      "emptyBody": "데이터 탐색에서 조건을 정하고 [내보내기]를 누르세요.",
+      "createdAt": "시각",
+      "query": "조건",
+      "rows": "행 수",
+      "size": "크기",
+      "expiresAt": "만료일",
+      "querySummary": "시계열 {{n}}개 · {{from}} ~ {{to}}",
+      "fromSchedule": "(정기)",
+      "statuses": {
+        "QUEUED": "대기",
+        "RUNNING": "진행 중",
+        "SUCCEEDED": "완료",
+        "FAILED": "실패",
+        "EXPIRED": "만료",
+        "CANCELLED": "취소됨"
+      },
+      "download": "다운로드"
+    },
+    "schedule": {
+      "editorTitle": "정기 내보내기 설정",
+      "name": "이름",
+      "repeat": "반복",
+      "repeatKind": "주기",
+      "choose": "선택",
+      "repeatKinds": {
+        "DAILY": "매일",
+        "WEEKLY": "매주",
+        "MONTHLY": "매월"
+      },
+      "weekday": "요일",
+      "weekdays": {
+        "0": "일요일",
+        "1": "월요일",
+        "2": "화요일",
+        "3": "수요일",
+        "4": "목요일",
+        "5": "금요일",
+        "6": "토요일"
+      },
+      "day": "날짜(1~28)",
+      "time": "시각",
+      "period": "기간",
+      "periods": {
+        "PREVIOUS_DAY": "전날",
+        "PREVIOUS_WEEK": "지난주",
+        "PREVIOUS_MONTH": "지난달"
+      },
+      "delivery": "전달",
+      "deliveries": {
+        "EMAIL": "메일",
+        "STORAGE": "저장소(S3·SFTP)"
+      },
+      "recipients": "수신자",
+      "recipientsHint": "메일 주소를 쉼표로 구분해 넣으세요(최대 20명).",
+      "targetType": "대상 종류",
+      "target": {
+        "endpoint": "엔드포인트",
+        "bucket": "버킷",
+        "region": "리전",
+        "prefix": "경로 접두사",
+        "host": "호스트",
+        "port": "포트",
+        "username": "사용자 이름",
+        "directory": "디렉터리",
+        "hostKeySha256": "호스트 키 SHA-256"
+      },
+      "credential": {
+        "accessKey": "액세스 키",
+        "secretKey": "시크릿 키",
+        "password": "비밀번호"
+      },
+      "credentialKept": "저장된 자격 증명이 있습니다. 바꿀 때만 입력하세요.",
+      "testTarget": "연결 테스트",
+      "testResult": "연결 테스트 결과",
+      "steps": {
+        "CONNECT": "연결",
+        "WRITE": "테스트 파일 쓰기",
+        "DELETE": "테스트 파일 지우기"
+      },
+      "enabled": "사용",
+      "saved": "정기 내보내기를 저장했습니다.",
+      "errors": {
+        "name": {
+          "required": "이름을 넣어 주세요(100자 이하)."
+        },
+        "repeat": {
+          "required": "반복 규칙을 정해 주세요."
+        },
+        "query": {
+          "required": "조회 조건이 없습니다. 데이터 탐색에서 조건을 정한 뒤 저장하세요."
+        },
+        "recipients": {
+          "required": "수신자를 한 명 이상 넣어 주세요.",
+          "email": "메일 주소 형식이 올바르지 않습니다."
+        },
+        "target": {
+          "required": "대상의 필수 항목(*)을 넣어 주세요."
+        }
+      },
+      "addHint": "새 정기 내보내기는 데이터 탐색에서 조건을 정한 뒤 [내보내기] → [정기 내보내기로 저장]으로 만듭니다.",
+      "empty": "정기 내보내기가 없습니다",
+      "scope": "시계열 {{n}}개 · {{period}}",
+      "next": "다음 {{at}}",
+      "last": "마지막 결과",
+      "disable": "끄기",
+      "enable": "켜기",
+      "deleteOf": "{{name}} 삭제",
+      "repeatDaily": "매일 {{time}}",
+      "repeatWeekly": "매주 {{day}} {{time}}",
+      "repeatMonthly": "매월 {{day}}일 {{time}}"
+    },
+    "dictionary": {
+      "empty": "데이터 사전이 없습니다",
+      "version": "데이터 사전 v{{v}}",
+      "html": "HTML 내려받기",
+      "json": "JSON 내려받기",
+      "generatedAt": "생성 {{at}}",
+      "metrics": "측정 항목",
+      "key": "키",
+      "name": "이름",
+      "unit": "단위",
+      "agg": "집계 방식",
+      "validRange": "유효 범위",
+      "quality": "품질 코드",
+      "code": "코드",
+      "meaning": "뜻",
+      "inAggregates": "집계 포함",
+      "spaces": "공간 계층"
+    },
+    "imports": {
+      "title": "데이터 가져오기",
+      "new": "새 가져오기",
+      "empty": "가져오기 작업이 없습니다",
+      "emptyBody": "CSV 파일이나 InfluxDB에서 과거 데이터를 가져옵니다. 중복은 덮어쓰지 않습니다.",
+      "originLabel": "출처 라벨",
+      "originLabelExample": "예: 아카데미 iot-bucket 2026-09",
+      "sourceKind": "출처",
+      "result": "결과",
+      "resultLine": "삽입 {{inserted}} · 중복 {{skipped}} · 실패 {{failed}}",
+      "steps": "가져오기 단계",
+      "step": {
+        "source": "출처",
+        "mapping": "매핑",
+        "dryRun": "미리 실행",
+        "run": "실행"
+      },
+      "kinds": {
+        "CSV": "CSV 파일",
+        "INFLUXDB": "InfluxDB"
+      },
+      "file": "CSV 파일(2GB 이하)",
+      "previewCaption": "앞 {{n}}행 미리 보기",
+      "badTime": "시각을 읽을 수 없는 줄: {{lines}}",
+      "timeColumn": "시각 열",
+      "timeFormat": "시각 형식",
+      "timeFormats": {
+        "ISO": "ISO-8601",
+        "EPOCH_S": "epoch 초",
+        "EPOCH_MS": "epoch 밀리초",
+        "CUSTOM": "사용자 형식"
+      },
+      "customPattern": "형식 패턴",
+      "tz": "시간대(오프셋 없는 값)",
+      "deviceColumn": "기기 열",
+      "deviceKey": "기기 식별 방식",
+      "deviceKeys": {
+        "EXTERNAL_ID": "외부 ID",
+        "ID": "기기 ID",
+        "NAME": "이름"
+      },
+      "shape": "열 형태",
+      "shapes": {
+        "WIDE": "넓은 형식(측정 항목마다 열)",
+        "LONG": "긴 형식(metric, value 열)"
+      },
+      "metricColumn": "측정 항목 열",
+      "valueColumn": "값 열",
+      "metricColumns": "열 → 측정 항목 키",
+      "metricKeyOf": "{{column}} 측정 항목 키",
+      "influx": {
+        "url": "URL",
+        "org": "org",
+        "bucket": "bucket",
+        "token": "토큰",
+        "measurement": "measurement",
+        "deviceTag": "기기 태그",
+        "deviceTagHint": "태그 값은 기기 외부 ID로 찾습니다.",
+        "from": "시작",
+        "to": "끝",
+        "fields": "field → 측정 항목 키",
+        "field": "field {{n}}",
+        "metricKey": "측정 항목 키 {{n}}",
+        "addField": "+ field 추가"
+      },
+      "dryRun": "미리 실행",
+      "errors": {
+        "file": {
+          "required": "CSV 파일을 고르세요.",
+          "tooLarge": "파일은 2GB 이하여야 합니다."
+        },
+        "originLabel": {
+          "required": "출처 라벨을 넣어 주세요(예: 아카데미 iot-bucket 2026-09)."
+        },
+        "timeColumn": {
+          "required": "시각 열을 고르세요."
+        },
+        "deviceColumn": {
+          "required": "기기 열을 고르세요."
+        },
+        "metricColumns": {
+          "required": "측정 항목 열을 하나 이상 매핑하세요."
+        },
+        "customPattern": {
+          "required": "시각 형식 패턴을 넣어 주세요."
+        },
+        "delimiter": {
+          "required": "구분자는 한 글자여야 합니다."
+        },
+        "url": {
+          "url": "InfluxDB URL은 http:// 또는 https://로 시작해야 합니다."
+        },
+        "org": {
+          "required": "org를 넣어 주세요."
+        },
+        "bucket": {
+          "required": "bucket을 넣어 주세요."
+        },
+        "token": {
+          "required": "토큰을 넣어 주세요."
+        },
+        "range": {
+          "order": "시작이 끝보다 늦습니다"
+        }
+      },
+      "statuses": {
+        "QUEUED": "대기",
+        "VALIDATING": "검사 중",
+        "DRY_RUN_DONE": "미리 실행 완료",
+        "RUNNING": "가져오는 중",
+        "SUCCEEDED": "완료",
+        "FAILED": "실패",
+        "CANCELLED": "취소됨"
+      },
+      "originOf": "출처: {{label}}",
+      "progress": "진행률",
+      "counts": {
+        "total": "전체",
+        "inserted": "삽입",
+        "skippedDuplicate": "중복(덮어쓰지 않음)",
+        "failed": "실패",
+        "dry": {
+          "total": "예상 행 수",
+          "inserted": "넣을 행",
+          "skippedDuplicate": "중복 예상",
+          "failed": "오류 예상"
+        }
+      },
+      "run": "가져오기 실행",
+      "sample": "오류 예시",
+      "errorList": "오류 {{n}}건",
+      "downloadErrors": "오류 목록 내려받기",
+      "noErrors": "오류가 없습니다.",
+      "line": "줄·지점",
+      "code": "코드",
+      "message": "내용"
+    },
+    "retention": {
+      "crumb": "설정",
+      "title": "데이터 보관",
+      "orgDefault": "조직 기본",
+      "dataClass": "데이터 종류",
+      "days": "보관 일수",
+      "allowed": "허용 범위",
+      "archive": "삭제 전 장기 보관",
+      "classes": {
+        "RAW_MESSAGE": "원본 메시지",
+        "TELEMETRY": "측정값 원본",
+        "LINK": "통신 품질",
+        "AGG_1M": "1분 집계",
+        "AGG_1H": "1시간 집계",
+        "AGG_1D": "1일 집계",
+        "FLOW_EXECUTION": "플로우 실행 기록",
+        "ANALYSIS_RESULT": "분석 결과",
+        "AUDIT_LOG": "감사 로그",
+        "NOTIFICATION_DELIVERY": "알림 발송 이력",
+        "COMMAND": "제어 명령 이력",
+        "DEVICE_STATE_HISTORY": "기기 상태 이력",
+        "WEBHOOK_DELIVERY": "Webhook 전달 이력"
+      },
+      "daysOf": "{{name}} 보관 일수",
+      "forever": "0 = 무기한",
+      "range": "{{min}}~{{max}}일",
+      "archiveOf": "{{name}} 삭제 전 장기 보관",
+      "overrides": "재정의(측정 항목·모델별)",
+      "addOverride": "+ 재정의 추가",
+      "noOverrides": "재정의가 없습니다. 모두 조직 기본을 따릅니다.",
+      "scope": "범위",
+      "target": "대상",
+      "storeMode": "저장 방식",
+      "scopes": {
+        "METRIC": "측정 항목",
+        "MODEL": "모델",
+        "ORG": "조직 기본"
+      },
+      "scopeOf": "재정의 {{n}} 범위",
+      "targetOf": "재정의 {{n}} 대상",
+      "classOf": "재정의 {{n}} 데이터 종류",
+      "overrideDaysOf": "재정의 {{n}} 보관 일수",
+      "overrideArchiveOf": "재정의 {{n}} 삭제 전 장기 보관",
+      "storeModeOf": "재정의 {{n}} 저장 방식",
+      "storeModes": {
+        "ALL": "값 전체",
+        "ON_CHANGE": "값 변화만"
+      },
+      "removeOf": "재정의 {{n}} 삭제",
+      "errors": {
+        "range": "보관 기간이 허용 범위를 벗어났습니다",
+        "duplicate": "같은 범위·대상·종류의 재정의가 이미 있습니다",
+        "required": "대상을 고르세요"
+      },
+      "savedAt": "저장했습니다. {{at}} 야간 작업부터 적용됩니다.",
+      "previewAndSave": "영향 미리 보기 후 저장",
+      "storage": "저장 현황",
+      "totalBytes": "전체 {{size}}",
+      "table": "테이블",
+      "partitions": "파티션",
+      "partitionDetail": "파티션별 보기",
+      "partition": "파티션",
+      "state": "상태",
+      "compression": "압축률",
+      "archives": "장기 보관 파일",
+      "noArchives": "장기 보관 파일이 없습니다.",
+      "period": "기간",
+      "previewTitle": "보관 기간 단축 영향",
+      "confirmSave": "확인하고 저장",
+      "previewBody": "저장하면 다음 야간 작업에서 약 {{rows}}행, {{size}}이 삭제됩니다.",
+      "previewNote": "삭제 전 장기 보관을 켠 종류는 Parquet 파일로 먼저 내보냅니다."
+    },
+    "storage": {
+      "title": "저장 지표",
+      "unavailable": "저장 지표를 불러올 수 없습니다",
+      "dbSize": "DB 전체 용량",
+      "perDay": "하루 평균 {{size}}",
+      "diskFree": "디스크 여유",
+      "diskUnknown": "디스크 용량 설정이 없어 여유 공간을 계산하지 않습니다.",
+      "diskWarn": "디스크 여유가 {{n}}% 미만입니다",
+      "capacity": "디스크 용량 {{size}}",
+      "trend": "DB 크기 추이",
+      "topTables": "테이블별 크기 상위 10"
+    },
+    "system": {
+      "title": "시스템 상태"
+    }
+  }
+}

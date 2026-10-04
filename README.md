@@ -92,6 +92,22 @@ data2flow 화면과 BFF입니다. React Router v8 프레임워크 모드(SSR, Vi
 - 메신저 콜백 비밀값: BFF 환경 변수 `DATA2FLOW_MESSENGER_TELEGRAM_SECRET`(없으면 404)와 core 텔레그램 채널의 `webhookSecret`이 같아야 합니다. action이 같은 헤더를 채널 정의의 `webhookSecret`과 다시 비교하고, 버튼 데이터 `ACK|{alarmId}|{deliveryId}`(또는 `MUTE_30M|…`)를 연결된 계정 권한으로 core `/internal/core/alarms/{id}/ack|mute`에 넘깁니다. action 주소는 `DATA2FLOW_ACTION_URL`(기본 `http://data2flow-action`).
 - 비상 정지 띠는 `/bff/stream/live?topics=notifications` 연결로 받는 `emergency-stop` 이벤트(토픽과 관계없이 조직의 모든 연결에 옴)로 그리고 지웁니다. 같은 연결의 `notification`은 오른쪽 아래 알림으로 띄웁니다(읽음 수 없음). 유지보수 띠는 실시간 토픽이 없어 5초마다 조회합니다(API-OPS-23).
 
+## M5 데이터 관리 화면
+
+### 데이터 비교·내보내기·가져오기·보관·저장 지표
+
+| 경로 | 화면 | 스펙 |
+|---|---|---|
+| `/explore` | 여러 측정 항목·기기 비교(단위별 축 2개, 단위 3개 이상이면 정규화 보기 제안, 50개면 추가 버튼 비활성), 기간 1년, [내보내기] 대화상자(형식·긴/넓은 형식 예시 3행·품질·시간대·예상 행 수, 진행 중 3개면 막음, [정기 내보내기로 저장]) | TSD-03.03, TSD-04.01 |
+| `/exports?tab=jobs\|schedules\|dictionary` | 내보내기 작업(진행 중이면 5초마다 다시 읽음, 다운로드·취소), 정기 내보내기(반복·기간·메일/S3·SFTP·[연결 테스트]·켜기/끄기), 데이터 사전(판 번호·측정 항목·품질 코드·공간 계층, HTML·JSON) | TSD-04.01·04.03·07.02·07.04 |
+| `/imports`, `/imports/new`, `/imports/{id}` | 가져오기: CSV(앞 20행 미리 보기·시각 파싱 실패 줄·열 매핑) 또는 InfluxDB(URL·org·bucket·토큰·기간·field 매핑) → 미리 실행 → [가져오기 실행], 진행률·오류 목록 내려받기 | TSD-04.02 |
+| `/settings/data-retention` | 데이터 보관(조직 기본 13종·재정의·저장 현황·장기 보관 파일 목록), 기간이 줄면 영향 미리 보기 후 확인 토큰으로 저장. 저장은 ADMIN, INTEGRATOR는 보기 | TSD-05.01, TSD-02.01·05.03 |
+| `/admin/system` | 시스템 상태 중 저장 지표(DB 용량·상위 테이블·DB 크기 추이·디스크 여유, 20% 미만 경고) | OPS-01.03 |
+
+- 큰 파일 중계: `/bff/api/**` 제한 시간(`DATA2FLOW_GATEWAY_TIMEOUT_MS`)은 응답 머리까지만 셉니다. 1년치 CSV처럼 본문이 오래 걸리는 내려받기는 브라우저가 끊을 때까지 흘려보내고, 브라우저가 끊으면 gateway 요청도 끊습니다. 데이터 가져오기 CSV(`POST /bff/api/core/imports`, multipart)는 버퍼에 담지 않고 2GB까지 흘려보냅니다(응답 머리 제한 30분). 그 밖의 요청 본문은 10MB 그대로입니다.
+- 내보내기 다운로드는 core가 준 서명 주소(`/api/v1/core/exports/{id}/file?expires=&signature=`, 1시간)를 `/bff/api/core/…`로 바꿔 엽니다. 완료 알림 SSE(EVT-TSD-01)는 core 실시간 토픽에 아직 없어 목록을 5초마다 다시 읽습니다.
+- 권한: 내보내기 TS_EXPORT, 가져오기 TS_IMPORT, 보관 TS_POLICY(+ 저장은 ADMIN), 데이터 사전 TS_READ, 저장 지표 OPS_MANAGE.
+
 ## 개발
 
 ```bash

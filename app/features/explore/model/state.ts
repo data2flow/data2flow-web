@@ -2,7 +2,7 @@
  * 데이터 탐색기 조회 조건(UI-TSD-01 `/explore?q=…`). 주소에 그대로 담아 [링크 복사]로 공유한다.
  * 시각은 UTC ISO로 보관하고(TSD-01.05) 화면에서만 사용자 시간대로 바꾼다.
  */
-export const RANGE_KEYS = ["1h", "24h", "7d", "30d", "90d"] as const;
+export const RANGE_KEYS = ["1h", "24h", "7d", "30d", "90d", "1y"] as const;
 export const RESOLUTIONS = ["auto", "raw", "1m", "1h", "1d"] as const;
 export const FILLS = ["none", "previous", "linear"] as const;
 export const QUALITIES = ["normal", "all"] as const;
@@ -34,6 +34,8 @@ export interface ExploreState {
   includeVirtual: boolean;
   /** 표시할 주석 종류(TSD-01.04) */
   annotations: string[];
+  /** 정규화 보기(단위가 3개 이상일 때 0~100%로, UI-TSD-07·TSD-03.03) */
+  normalize?: boolean;
 }
 
 export function defaultState(): ExploreState {
@@ -77,6 +79,7 @@ export function decodeState(raw: string | null | undefined): ExploreState {
     quality: pick(parsed.quality, QUALITIES, "normal"),
     includeVirtual: parsed.includeVirtual === true,
     annotations: Array.isArray(parsed.annotations) ? (parsed.annotations as string[]).filter((t) => (ANNOTATION_TYPES as readonly string[]).includes(t)) : [...ANNOTATION_TYPES],
+    ...(parsed.normalize === true ? { normalize: true } : {}),
   };
 }
 

@@ -1,0 +1,426 @@
+{
+  "nav": {
+    "system": "System status",
+    "dataRetention": "Data retention"
+  },
+  "range": {
+    "1y": "1 year"
+  },
+  "errors": {
+    "EXPORT_NOT_FOUND": "Export job not found.",
+    "EXPORT_EXPIRED": "This file has expired (7 days). Export again.",
+    "EXPORT_LIMIT_EXCEEDED": "Too many exports in progress. Try again after they finish.",
+    "EXPORT_TARGET_UNWRITABLE": "Cannot write a file to the delivery target.",
+    "EXPORT_STATE_CONFLICT": "Not possible in the current state.",
+    "IMPORT_NOT_FOUND": "Import job not found.",
+    "IMPORT_FILE_INVALID": "The file or mapping is invalid.",
+    "IMPORT_LIMIT_EXCEEDED": "Exceeds the import limit (50 million rows, 2 GB).",
+    "IMPORT_SOURCE_UNREACHABLE": "Cannot reach InfluxDB.",
+    "IMPORT_STATE_CONFLICT": "Only jobs with a finished dry run can be run.",
+    "RETENTION_CONFIRM_REQUIRED": "Shortening retention needs a confirmed impact preview. Preview again.",
+    "RETENTION_INVALID": "Retention period is out of the allowed range",
+    "ARCHIVE_NOT_FOUND": "Archive file not found."
+  },
+  "data": {
+    "common": {
+      "loadFailed": "Could not load. Try again shortly.",
+      "status": "Status",
+      "actions": "Actions",
+      "yes": "Yes",
+      "no": "No"
+    },
+    "tabs": {
+      "jobs": "Jobs",
+      "schedules": "Scheduled exports",
+      "dictionary": "Data dictionary"
+    },
+    "compare": {
+      "suggest": "There are 3 or more units, more than 2 axes can show. Try the normalized view to compare shapes.",
+      "normalized": "Normalized view: each series shows its min–max in the period as 0–100%.",
+      "normalize": "Normalized view",
+      "showRaw": "Show actual values"
+    },
+    "export": {
+      "open": "Export",
+      "title": "Export",
+      "summary": "{{n}} series · {{from}} – {{to}} · {{resolution}}",
+      "format": "Format",
+      "formats": {
+        "CSV": "CSV",
+        "XLSX": "Excel",
+        "PARQUET": "Parquet"
+      },
+      "columns": "Layout",
+      "columnKinds": {
+        "LONG": "Long",
+        "WIDE": "Wide"
+      },
+      "preview": "Sample preview",
+      "includeQuality": "Include quality codes",
+      "timezone": "Time zone",
+      "estimateSync": "About {{rows}} rows · direct download",
+      "estimateAsync": "About {{rows}} rows · runs as a job and notifies you when done",
+      "tooManyActive": "{{n}} exports are in progress. Try again after they finish.",
+      "queued": "We will notify you when it is done.",
+      "openJobs": "Open jobs",
+      "submit": "Export",
+      "saveSchedule": "Save as scheduled export"
+    },
+    "jobs": {
+      "title": "Export jobs",
+      "empty": "No export jobs",
+      "emptyBody": "Set conditions in Data explorer and press [Export].",
+      "createdAt": "Time",
+      "query": "Query",
+      "rows": "Rows",
+      "size": "Size",
+      "expiresAt": "Expires",
+      "querySummary": "{{n}} series · {{from}} – {{to}}",
+      "fromSchedule": "(scheduled)",
+      "statuses": {
+        "QUEUED": "Queued",
+        "RUNNING": "Running",
+        "SUCCEEDED": "Succeeded",
+        "FAILED": "Failed",
+        "EXPIRED": "Expired",
+        "CANCELLED": "Cancelled"
+      },
+      "download": "Download"
+    },
+    "schedule": {
+      "editorTitle": "Scheduled export settings",
+      "name": "Name",
+      "repeat": "Repeat",
+      "repeatKind": "Frequency",
+      "choose": "Select",
+      "repeatKinds": {
+        "DAILY": "Daily",
+        "WEEKLY": "Weekly",
+        "MONTHLY": "Monthly"
+      },
+      "weekday": "Weekday",
+      "weekdays": {
+        "0": "Sunday",
+        "1": "Monday",
+        "2": "Tuesday",
+        "3": "Wednesday",
+        "4": "Thursday",
+        "5": "Friday",
+        "6": "Saturday"
+      },
+      "day": "Day (1–28)",
+      "time": "Time",
+      "period": "Period",
+      "periods": {
+        "PREVIOUS_DAY": "Previous day",
+        "PREVIOUS_WEEK": "Previous week",
+        "PREVIOUS_MONTH": "Previous month"
+      },
+      "delivery": "Delivery",
+      "deliveries": {
+        "EMAIL": "Email",
+        "STORAGE": "Storage (S3/SFTP)"
+      },
+      "recipients": "Recipients",
+      "recipientsHint": "Separate email addresses with commas (up to 20).",
+      "targetType": "Target type",
+      "target": {
+        "endpoint": "Endpoint",
+        "bucket": "Bucket",
+        "region": "Region",
+        "prefix": "Path prefix",
+        "host": "Host",
+        "port": "Port",
+        "username": "Username",
+        "directory": "Directory",
+        "hostKeySha256": "Host key SHA-256"
+      },
+      "credential": {
+        "accessKey": "Access key",
+        "secretKey": "Secret key",
+        "password": "Password"
+      },
+      "credentialKept": "Credentials are saved. Enter only to change them.",
+      "testTarget": "Test connection",
+      "testResult": "Connection test result",
+      "steps": {
+        "CONNECT": "Connect",
+        "WRITE": "Write test file",
+        "DELETE": "Delete test file"
+      },
+      "enabled": "Enabled",
+      "saved": "Scheduled export saved.",
+      "errors": {
+        "name": {
+          "required": "Enter a name (up to 100 characters)."
+        },
+        "repeat": {
+          "required": "Set a repeat rule."
+        },
+        "query": {
+          "required": "No query. Set conditions in Data explorer first."
+        },
+        "recipients": {
+          "required": "Enter at least one recipient.",
+          "email": "Invalid email address."
+        },
+        "target": {
+          "required": "Fill in the required target fields (*)."
+        }
+      },
+      "addHint": "Create a scheduled export from Data explorer: set conditions, then [Export] → [Save as scheduled export].",
+      "empty": "No scheduled exports",
+      "scope": "{{n}} series · {{period}}",
+      "next": "Next {{at}}",
+      "last": "Last result",
+      "disable": "Turn off",
+      "enable": "Turn on",
+      "deleteOf": "Delete {{name}}",
+      "repeatDaily": "Daily {{time}}",
+      "repeatWeekly": "Every {{day}} {{time}}",
+      "repeatMonthly": "Monthly on day {{day}} {{time}}"
+    },
+    "dictionary": {
+      "empty": "No data dictionary",
+      "version": "Data dictionary v{{v}}",
+      "html": "Download HTML",
+      "json": "Download JSON",
+      "generatedAt": "Generated {{at}}",
+      "metrics": "Metrics",
+      "key": "Key",
+      "name": "Name",
+      "unit": "Unit",
+      "agg": "Aggregation",
+      "validRange": "Valid range",
+      "quality": "Quality codes",
+      "code": "Code",
+      "meaning": "Meaning",
+      "inAggregates": "In aggregates",
+      "spaces": "Space hierarchy"
+    },
+    "imports": {
+      "title": "Data import",
+      "new": "New import",
+      "empty": "No import jobs",
+      "emptyBody": "Import past data from a CSV file or InfluxDB. Duplicates are never overwritten.",
+      "originLabel": "Origin label",
+      "originLabelExample": "e.g. Academy iot-bucket 2026-09",
+      "sourceKind": "Source",
+      "result": "Result",
+      "resultLine": "Inserted {{inserted}} · duplicates {{skipped}} · failed {{failed}}",
+      "steps": "Import steps",
+      "step": {
+        "source": "Source",
+        "mapping": "Mapping",
+        "dryRun": "Dry run",
+        "run": "Run"
+      },
+      "kinds": {
+        "CSV": "CSV file",
+        "INFLUXDB": "InfluxDB"
+      },
+      "file": "CSV file (up to 2 GB)",
+      "previewCaption": "Preview of the first {{n}} rows",
+      "badTime": "Lines with unreadable time: {{lines}}",
+      "timeColumn": "Time column",
+      "timeFormat": "Time format",
+      "timeFormats": {
+        "ISO": "ISO-8601",
+        "EPOCH_S": "Epoch seconds",
+        "EPOCH_MS": "Epoch milliseconds",
+        "CUSTOM": "Custom pattern"
+      },
+      "customPattern": "Pattern",
+      "tz": "Time zone (values without offset)",
+      "deviceColumn": "Device column",
+      "deviceKey": "Device identified by",
+      "deviceKeys": {
+        "EXTERNAL_ID": "External ID",
+        "ID": "Device ID",
+        "NAME": "Name"
+      },
+      "shape": "Layout",
+      "shapes": {
+        "WIDE": "Wide (a column per metric)",
+        "LONG": "Long (metric, value columns)"
+      },
+      "metricColumn": "Metric column",
+      "valueColumn": "Value column",
+      "metricColumns": "Column → metric key",
+      "metricKeyOf": "Metric key for {{column}}",
+      "influx": {
+        "url": "URL",
+        "org": "org",
+        "bucket": "bucket",
+        "token": "Token",
+        "measurement": "measurement",
+        "deviceTag": "Device tag",
+        "deviceTagHint": "Tag values are matched to device external IDs.",
+        "from": "From",
+        "to": "To",
+        "fields": "Field → metric key",
+        "field": "Field {{n}}",
+        "metricKey": "Metric key {{n}}",
+        "addField": "+ Add field"
+      },
+      "dryRun": "Dry run",
+      "errors": {
+        "file": {
+          "required": "Choose a CSV file.",
+          "tooLarge": "The file must be 2 GB or smaller."
+        },
+        "originLabel": {
+          "required": "Enter an origin label (e.g. Academy iot-bucket 2026-09)."
+        },
+        "timeColumn": {
+          "required": "Choose the time column."
+        },
+        "deviceColumn": {
+          "required": "Choose the device column."
+        },
+        "metricColumns": {
+          "required": "Map at least one metric column."
+        },
+        "customPattern": {
+          "required": "Enter a time pattern."
+        },
+        "delimiter": {
+          "required": "The delimiter must be one character."
+        },
+        "url": {
+          "url": "InfluxDB URL must start with http:// or https://."
+        },
+        "org": {
+          "required": "Enter the org."
+        },
+        "bucket": {
+          "required": "Enter the bucket."
+        },
+        "token": {
+          "required": "Enter the token."
+        },
+        "range": {
+          "order": "Start is later than end"
+        }
+      },
+      "statuses": {
+        "QUEUED": "Queued",
+        "VALIDATING": "Validating",
+        "DRY_RUN_DONE": "Dry run done",
+        "RUNNING": "Importing",
+        "SUCCEEDED": "Succeeded",
+        "FAILED": "Failed",
+        "CANCELLED": "Cancelled"
+      },
+      "originOf": "Origin: {{label}}",
+      "progress": "Progress",
+      "counts": {
+        "total": "Total",
+        "inserted": "Inserted",
+        "skippedDuplicate": "Duplicates (kept)",
+        "failed": "Failed",
+        "dry": {
+          "total": "Expected rows",
+          "inserted": "Rows to insert",
+          "skippedDuplicate": "Expected duplicates",
+          "failed": "Expected errors"
+        }
+      },
+      "run": "Run import",
+      "sample": "Error samples",
+      "errorList": "{{n}} errors",
+      "downloadErrors": "Download errors",
+      "noErrors": "No errors.",
+      "line": "Line/point",
+      "code": "Code",
+      "message": "Message"
+    },
+    "retention": {
+      "crumb": "Settings",
+      "title": "Data retention",
+      "orgDefault": "Organization default",
+      "dataClass": "Data type",
+      "days": "Days kept",
+      "allowed": "Allowed",
+      "archive": "Archive before delete",
+      "classes": {
+        "RAW_MESSAGE": "Raw messages",
+        "TELEMETRY": "Raw measurements",
+        "LINK": "Link quality",
+        "AGG_1M": "1-minute aggregates",
+        "AGG_1H": "1-hour aggregates",
+        "AGG_1D": "1-day aggregates",
+        "FLOW_EXECUTION": "Flow execution logs",
+        "ANALYSIS_RESULT": "Analysis results",
+        "AUDIT_LOG": "Audit logs",
+        "NOTIFICATION_DELIVERY": "Notification deliveries",
+        "COMMAND": "Command history",
+        "DEVICE_STATE_HISTORY": "Device state history",
+        "WEBHOOK_DELIVERY": "Webhook deliveries"
+      },
+      "daysOf": "Days kept for {{name}}",
+      "forever": "0 = forever",
+      "range": "{{min}}–{{max}} days",
+      "archiveOf": "Archive {{name}} before delete",
+      "overrides": "Overrides (per metric/model)",
+      "addOverride": "+ Add override",
+      "noOverrides": "No overrides. Everything follows the organization default.",
+      "scope": "Scope",
+      "target": "Target",
+      "storeMode": "Store mode",
+      "scopes": {
+        "METRIC": "Metric",
+        "MODEL": "Model",
+        "ORG": "Organization default"
+      },
+      "scopeOf": "Override {{n}} scope",
+      "targetOf": "Override {{n}} target",
+      "classOf": "Override {{n}} data type",
+      "overrideDaysOf": "Override {{n}} days",
+      "overrideArchiveOf": "Override {{n}} archive before delete",
+      "storeModeOf": "Override {{n}} store mode",
+      "storeModes": {
+        "ALL": "All values",
+        "ON_CHANGE": "Changes only"
+      },
+      "removeOf": "Delete override {{n}}",
+      "errors": {
+        "range": "Retention period is out of the allowed range",
+        "duplicate": "An override with the same scope, target and type already exists",
+        "required": "Choose a target"
+      },
+      "savedAt": "Saved. Applies from the nightly job at {{at}}.",
+      "previewAndSave": "Preview impact and save",
+      "storage": "Storage status",
+      "totalBytes": "Total {{size}}",
+      "table": "Table",
+      "partitions": "Partitions",
+      "partitionDetail": "Show partitions",
+      "partition": "Partition",
+      "state": "State",
+      "compression": "Compression",
+      "archives": "Archive files",
+      "noArchives": "No archive files.",
+      "period": "Period",
+      "previewTitle": "Impact of shorter retention",
+      "confirmSave": "Confirm and save",
+      "previewBody": "After saving, about {{rows}} rows ({{size}}) will be deleted in the next nightly job.",
+      "previewNote": "Types with archive-before-delete are exported to Parquet first."
+    },
+    "storage": {
+      "title": "Storage metrics",
+      "unavailable": "Storage metrics are unavailable",
+      "dbSize": "Database size",
+      "perDay": "{{size}} per day on average",
+      "diskFree": "Free disk",
+      "diskUnknown": "Disk capacity is not configured, so free space is not calculated.",
+      "diskWarn": "Free disk is below {{n}}%",
+      "capacity": "Disk capacity {{size}}",
+      "trend": "Database size trend",
+      "topTables": "Top 10 tables by size"
+    },
+    "system": {
+      "title": "System status"
+    }
+  }
+}

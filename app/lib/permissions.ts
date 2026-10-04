@@ -2,7 +2,26 @@
  * 화면 메뉴와 권한(IAM-04.01, IAM-04.05). 메뉴를 숨기는 것은 보조 수단이고 실제 거부는 서버가 한다.
  * 권한 이름은 spec/IAM-identity.md의 Permission 목록을, 경로는 spec/detail/00-navigation.md §2를 따른다.
  */
-export type MenuKey = "home" | "spaces" | "devices" | "explore" | "ingest" | "alarms" | "automation" | "control" | "sim" | "members" | "roles" | "security" | "audit" | "settings" | "maintenance" | "channels";
+export type MenuKey =
+  | "home"
+  | "spaces"
+  | "devices"
+  | "explore"
+  | "ingest"
+  | "alarms"
+  | "automation"
+  | "control"
+  | "sim"
+  | "members"
+  | "roles"
+  | "security"
+  | "audit"
+  | "settings"
+  | "maintenance"
+  | "channels"
+  // M5 data
+  | "system"
+  | "dataRetention";
 
 export interface MenuItem {
   key: MenuKey;
@@ -20,7 +39,7 @@ export const MENU: MenuItem[] = [
   { key: "home", path: "/", anyOf: [], group: "main" },
   { key: "spaces", path: "/spaces", anyOf: ["DEV_READ"], group: "main", sections: ["/sites"] },
   { key: "devices", path: "/devices", anyOf: ["DEV_READ"], group: "main", sections: ["/models", "/metrics", "/device-groups"] },
-  { key: "explore", path: "/explore", anyOf: ["TS_READ"], group: "main" },
+  { key: "explore", path: "/explore", anyOf: ["TS_READ"], group: "main", sections: ["/exports", "/imports"] },
   { key: "ingest", path: "/ingest/monitor", anyOf: ["INGEST_READ"], group: "main", sections: ["/ingest", "/sources", "/scripts"] },
   // M4 자동화 완성: 규칙·알람(RUL) — 알람 목록은 VIEWER부터, 규칙·알림 설정은 하위 경로 가드로 좁힌다
   { key: "alarms", path: "/alarms", anyOf: ["ALARM_READ"], group: "main", sections: ["/rules", "/notifications"] },
@@ -36,6 +55,9 @@ export const MENU: MenuItem[] = [
   // M4: 유지보수 일정(UI-OPS-05, OPERATOR 이상 — API-OPS-20은 권한 이름 없이 "ADMIN, OPERATOR(공간 범위)"라 DEV_PLACE로 가린다), 알림 채널(UI-OPS-06)
   { key: "maintenance", path: "/admin/maintenance", anyOf: ["DEV_PLACE"], group: "admin" },
   { key: "channels", path: "/admin/channels", anyOf: ["NOTIFY_CHANNEL_MANAGE"], group: "admin" },
+  // M5 data: 시스템 상태(저장 지표, UI-OPS-01)·데이터 보관(UI-TSD-04)
+  { key: "system", path: "/admin/system", anyOf: ["OPS_MANAGE"], group: "admin" },
+  { key: "dataRetention", path: "/settings/data-retention", anyOf: ["TS_POLICY"], group: "admin" },
 ];
 
 /** 메뉴 밖 경로의 권한(라우트 가드). 가장 긴 접두사가 이긴다 */
@@ -74,6 +96,9 @@ export const ROUTE_GUARDS: { prefix: string; anyOf: string[] }[] = [
   { prefix: "/control/capabilities", anyOf: ["DEVICE_CONTROL", "CAPABILITY_MANAGE"] },
   { prefix: "/device-jobs", anyOf: ["DEV_READ"] },
   { prefix: "/me/notifications", anyOf: [] },
+  // M5 data(spec/detail/00-navigation.md §2): 내보내기 작업은 탭별로 좁힌다(사전은 VIEWER, 작업·정기는 TS_EXPORT)
+  { prefix: "/exports", anyOf: ["TS_READ"] },
+  { prefix: "/imports", anyOf: ["TS_IMPORT"] },
 ];
 
 export function hasAny(permissions: readonly string[] | undefined, required: readonly string[]): boolean {
