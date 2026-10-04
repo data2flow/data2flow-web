@@ -6,6 +6,7 @@
 import type { CoreHandler } from "../core-fixtures";
 import { baseHandler } from "./base";
 import { controlHandler } from "./control";
+import { dashboardsHandler, dashboardsPublicHandler } from "./dashboards";
 import { flowopsHandler } from "./flowops";
 import { flowsHandler } from "./flows";
 import { notifyHandler } from "./notify";
@@ -21,4 +22,7 @@ import { sourcesHandler } from "./sources";
 import { spacesHandler } from "./spaces";
 import { telemetryHandler } from "./telemetry";
 
-export const CORE_HANDLERS: CoreHandler[] = [rulesHandler, notifyHandler, flowopsHandler, flowsHandler, simHandler, controlHandler, spacesHandler, devicesHandler, modelsHandler, groupsHandler, sourcesHandler, telemetryHandler, ingestHandler, scriptsHandler, homeHandler, baseHandler];
+export const CORE_HANDLERS: CoreHandler[] = [dashboardsHandler, rulesHandler, notifyHandler, flowopsHandler, flowsHandler, simHandler, controlHandler, spacesHandler, devicesHandler, modelsHandler, groupsHandler, sourcesHandler, telemetryHandler, ingestHandler, scriptsHandler, homeHandler, baseHandler];
+
+/** 공개 경로(로그인 없음, `/public/**`) 핸들러. M5: 공유 링크 보기·브랜딩(API-DSH-15·25) */
+export const PUBLIC_HANDLERS = [dashboardsPublicHandler];

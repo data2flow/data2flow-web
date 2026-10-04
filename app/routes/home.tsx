@@ -3,7 +3,7 @@
  * 실시간 갱신은 API-DSH-20 `home` 토픽. 홈 요약 카드의 알람 수 완성은 M4(DSH-01.01)다.
  */
 import { useTranslation } from "react-i18next";
-import { Link, useLoaderData, useRouteLoaderData } from "react-router";
+import { Link, redirect, useLoaderData, useRouteLoaderData } from "react-router";
 import { callApi } from "~/bff/api.server";
 import { bff } from "~/bff/middleware.server";
 import { Alert, EmptyState, PageHeader } from "~/components/ui";
@@ -20,6 +20,11 @@ export function meta() {
 
 export async function loader({ request, context }: Route.LoaderArgs) {
   const ctx = bff(context);
+  // 첫 화면을 기본 대시보드로 정했으면(DSH-04.07, API-DSH-12 `home: DASHBOARD`) 그 대시보드로. `/?summary`는 홈 요약을 그대로 연다
+  if (!new URL(request.url).searchParams.has("summary")) {
+    const prefs = await callApi<{ home?: string; defaultDashboardId?: string | null }>(ctx, request, "/api/v1/core/accounts/me/preferences", { noGuards: true });
+    if (prefs.ok && prefs.data?.home === "DASHBOARD" && prefs.data.defaultDashboardId) throw redirect(`/dashboards/${encodeURIComponent(prefs.data.defaultDashboardId)}`);
+  }
   const [summary, spaces] = await Promise.all([callApi<HomeSummary>(ctx, request, "/api/v1/core/home/summary"), callApi<SpaceNode[]>(ctx, request, "/api/v1/core/spaces")]);
   return {
     summary: summary.ok ? (summary.data ?? {}) : null,

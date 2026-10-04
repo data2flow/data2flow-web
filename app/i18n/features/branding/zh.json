@@ -1,0 +1,52 @@
+{
+  "branding": {
+    "title": "品牌",
+    "settings": "设置",
+    "loadFailed": "无法加载品牌设置,显示默认值。",
+    "assets": {
+      "LOGO_LIGHT": "标志(浅色背景)",
+      "LOGO_DARK": "标志(深色背景)",
+      "FAVICON": "网站图标",
+      "LOGIN_BACKGROUND": "登录背景图"
+    },
+    "assetErrors": {
+      "TYPE": "标志必须是 1MB 以内的 PNG 或安全的 SVG",
+      "SIZE": "标志必须是 1MB 以内的 PNG 或安全的 SVG",
+      "UNSAFE_SVG": "SVG 包含脚本或外部引用",
+      "BRANDING_ASSET_INVALID": "标志必须是 1MB 以内的 PNG 或安全的 SVG"
+    },
+    "colorPicker": "选择颜色",
+    "primaryColor": "主色(HEX)",
+    "lowContrast": "对比度过低({{ratio}},标准 {{min}})",
+    "contrastOk": "与白色背景对比度 {{ratio}}",
+    "appName": "应用名称",
+    "loginMessage": "登录页文字(≤{{max}} 字)",
+    "mailSenderName": "邮件发件人名称(≤{{max}} 字)",
+    "mailSignature": "邮件签名(≤{{max}} 字)",
+    "publicTheme": "公开页面主题",
+    "themes": {
+      "LIGHT": "浅色",
+      "DARK": "深色",
+      "AUTO": "品牌(自动)"
+    },
+    "errors": {
+      "COLOR": "请输入 6 位 HEX 颜色(例如 #0055AA)",
+      "LOGIN_MESSAGE": "请不超过 {{max}} 个字符",
+      "SENDER_NAME": "请不超过 {{max}} 个字符",
+      "SIGNATURE": "请不超过 {{max}} 个字符"
+    },
+    "saveAnyway": "仍然保存",
+    "save": "保存",
+    "saved": "已保存",
+    "conflict": "其他管理员已先修改,请刷新后重新保存。",
+    "preview": "预览",
+    "previews": {
+      "web": "网页",
+      "login": "登录",
+      "mail": "邮件"
+    },
+    "noLoginMessage": "(无登录文字)",
+    "loginButton": "登录",
+    "from": "发件人"
+  }
+}

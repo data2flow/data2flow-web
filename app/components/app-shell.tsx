@@ -3,7 +3,7 @@
  * 메뉴는 권한으로 거르고(보조 수단, IAM-04.05), 임시 비밀번호 상태에서는 메뉴를 보이지 않는다(AT-IAM-01.1).
  * `headerActions`(⏻ 자동화 비상 정지 등, UI-ACT-07)는 사용자 메뉴 앞에, `bands`(비상 정지·유지보수 띠)는 헤더 바로 아래 전체 폭으로 둔다(00-navigation.md §1.3).
  */
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { Form, Link, NavLink, useLocation } from "react-router";
 import type { Me } from "~/lib/api-types";
@@ -12,16 +12,37 @@ import { nextTheme, type Theme } from "~/lib/theme";
 import { Logo } from "./logo";
 import { CsrfField, cx } from "./ui";
 
-export function AppShell({ me, children, theme = "SYSTEM", headerActions, bands }: { me: Me | null; children: ReactNode; theme?: Theme; headerActions?: ReactNode; bands?: ReactNode }) {
+/** 조직 브랜딩(DSH-13.01): 헤더 로고(밝은·어두운 배경용)와 주 색상 */
+export interface HeaderBrand {
+  logoLightUrl?: string | null;
+  logoDarkUrl?: string | null;
+  primaryColor?: string | null;
+  appName?: string | null;
+}
+
+/** API-DSH-25 응답에서 헤더에 쓰는 값만. 자산 주소는 BFF 공개 경로(`/branding/assets/{id}`)로 */
+export function headerBrand(b: HeaderBrand): HeaderBrand {
+  const local = (url?: string | null) => (url && url.startsWith("/api/v1/core/public/branding/assets/") ? `/branding/assets/${url.split("/").pop()}` : null);
+  const color = b.primaryColor && /^#[0-9a-fA-F]{6}$/.test(b.primaryColor) ? b.primaryColor : null;
+  return { logoLightUrl: local(b.logoLightUrl), logoDarkUrl: local(b.logoDarkUrl), primaryColor: color, appName: b.appName ?? null };
+}
+
+export function AppShell({ me, children, theme = "SYSTEM", headerActions, bands, brand }: { me: Me | null; children: ReactNode; theme?: Theme; headerActions?: ReactNode; bands?: ReactNode; brand?: HeaderBrand | null }) {
   const { t } = useTranslation();
   const locked = !me || Boolean(me.mustChangePassword);
   const menu = visibleMenu(me?.permissions, locked);
   const { pathname, search } = useLocation();
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen" style={brand?.primaryColor ? ({ "--d2f-accent": brand.primaryColor } as CSSProperties) : undefined}>
       <header className="border-b border-line bg-panel">
         <div className="mx-auto flex max-w-7xl items-center gap-6 px-4">
-          <Logo />
+          {brand?.logoLightUrl || brand?.logoDarkUrl ? (
+            <Link to="/" aria-label={brand.appName || "data2flow"} className="flex items-center">
+              <img src={(theme === "DARK" ? brand.logoDarkUrl : brand.logoLightUrl) ?? brand.logoLightUrl ?? brand.logoDarkUrl ?? ""} alt="" className="h-6 max-w-40 object-contain" />
+            </Link>
+          ) : (
+            <Logo />
+          )}
           <nav aria-label={t("nav.label")} className="flex flex-1 gap-1 overflow-x-auto">
             {menu.map((item) => (
               <Link

@@ -1,0 +1,52 @@
+{
+  "branding": {
+    "title": "브랜딩",
+    "settings": "설정",
+    "loadFailed": "브랜딩 설정을 불러오지 못했습니다. 기본값으로 보여 줍니다.",
+    "assets": {
+      "LOGO_LIGHT": "로고(밝은 배경용)",
+      "LOGO_DARK": "로고(어두운 배경용)",
+      "FAVICON": "파비콘",
+      "LOGIN_BACKGROUND": "로그인 배경 이미지"
+    },
+    "assetErrors": {
+      "TYPE": "로고는 1MB 이하 PNG 또는 안전한 SVG여야 합니다",
+      "SIZE": "로고는 1MB 이하 PNG 또는 안전한 SVG여야 합니다",
+      "UNSAFE_SVG": "SVG에 스크립트나 외부 참조가 있어 쓸 수 없습니다",
+      "BRANDING_ASSET_INVALID": "로고는 1MB 이하 PNG 또는 안전한 SVG여야 합니다"
+    },
+    "colorPicker": "색 선택",
+    "primaryColor": "주 색상(HEX)",
+    "lowContrast": "대비가 낮습니다({{ratio}}, 기준 {{min}})",
+    "contrastOk": "흰 배경 대비 {{ratio}}",
+    "appName": "앱 이름",
+    "loginMessage": "로그인 화면 문구(≤{{max}}자)",
+    "mailSenderName": "메일 발신 이름(≤{{max}}자)",
+    "mailSignature": "메일 서명(≤{{max}}자)",
+    "publicTheme": "공개 화면 테마",
+    "themes": {
+      "LIGHT": "밝음",
+      "DARK": "어두움",
+      "AUTO": "브랜드(자동)"
+    },
+    "errors": {
+      "COLOR": "HEX 6자리로 입력하세요(예: #0055AA)",
+      "LOGIN_MESSAGE": "{{max}}자 이하로 입력하세요",
+      "SENDER_NAME": "{{max}}자 이하로 입력하세요",
+      "SIGNATURE": "{{max}}자 이하로 입력하세요"
+    },
+    "saveAnyway": "그래도 저장",
+    "save": "저장",
+    "saved": "저장했습니다",
+    "conflict": "다른 관리자가 먼저 바꿨습니다. 새로고침 뒤 다시 저장하세요.",
+    "preview": "미리 보기",
+    "previews": {
+      "web": "웹",
+      "login": "로그인",
+      "mail": "메일"
+    },
+    "noLoginMessage": "(로그인 문구 없음)",
+    "loginButton": "로그인",
+    "from": "보낸 사람"
+  }
+}

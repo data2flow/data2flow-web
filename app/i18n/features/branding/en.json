@@ -1,0 +1,52 @@
+{
+  "branding": {
+    "title": "Branding",
+    "settings": "Settings",
+    "loadFailed": "Could not load branding. Showing defaults.",
+    "assets": {
+      "LOGO_LIGHT": "Logo (light background)",
+      "LOGO_DARK": "Logo (dark background)",
+      "FAVICON": "Favicon",
+      "LOGIN_BACKGROUND": "Login background image"
+    },
+    "assetErrors": {
+      "TYPE": "Logos must be PNG or safe SVG up to 1 MB",
+      "SIZE": "Logos must be PNG or safe SVG up to 1 MB",
+      "UNSAFE_SVG": "The SVG contains scripts or external references",
+      "BRANDING_ASSET_INVALID": "Logos must be PNG or safe SVG up to 1 MB"
+    },
+    "colorPicker": "Pick color",
+    "primaryColor": "Primary color (HEX)",
+    "lowContrast": "Low contrast ({{ratio}}, minimum {{min}})",
+    "contrastOk": "Contrast on white {{ratio}}",
+    "appName": "App name",
+    "loginMessage": "Login message (≤{{max}} chars)",
+    "mailSenderName": "Mail sender name (≤{{max}} chars)",
+    "mailSignature": "Mail signature (≤{{max}} chars)",
+    "publicTheme": "Public screen theme",
+    "themes": {
+      "LIGHT": "Light",
+      "DARK": "Dark",
+      "AUTO": "Brand (auto)"
+    },
+    "errors": {
+      "COLOR": "Enter a 6-digit HEX color (e.g. #0055AA)",
+      "LOGIN_MESSAGE": "Use at most {{max}} characters",
+      "SENDER_NAME": "Use at most {{max}} characters",
+      "SIGNATURE": "Use at most {{max}} characters"
+    },
+    "saveAnyway": "Save anyway",
+    "save": "Save",
+    "saved": "Saved",
+    "conflict": "Another admin changed it first. Reload and save again.",
+    "preview": "Preview",
+    "previews": {
+      "web": "Web",
+      "login": "Login",
+      "mail": "Mail"
+    },
+    "noLoginMessage": "(no login message)",
+    "loginButton": "Sign in",
+    "from": "From"
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "branding": {
+    "title": "ブランディング",
+    "settings": "設定",
+    "loadFailed": "ブランディング設定を読み込めませんでした。既定値を表示します。",
+    "assets": {
+      "LOGO_LIGHT": "ロゴ(明るい背景用)",
+      "LOGO_DARK": "ロゴ(暗い背景用)",
+      "FAVICON": "ファビコン",
+      "LOGIN_BACKGROUND": "ログイン背景画像"
+    },
+    "assetErrors": {
+      "TYPE": "ロゴは1MB以下のPNGまたは安全なSVGにしてください",
+      "SIZE": "ロゴは1MB以下のPNGまたは安全なSVGにしてください",
+      "UNSAFE_SVG": "SVGにスクリプトまたは外部参照が含まれています",
+      "BRANDING_ASSET_INVALID": "ロゴは1MB以下のPNGまたは安全なSVGにしてください"
+    },
+    "colorPicker": "色を選択",
+    "primaryColor": "メインカラー(HEX)",
+    "lowContrast": "コントラストが低いです({{ratio}}、基準 {{min}})",
+    "contrastOk": "白背景とのコントラスト {{ratio}}",
+    "appName": "アプリ名",
+    "loginMessage": "ログイン画面の文言(≤{{max}}文字)",
+    "mailSenderName": "メール送信者名(≤{{max}}文字)",
+    "mailSignature": "メール署名(≤{{max}}文字)",
+    "publicTheme": "公開画面のテーマ",
+    "themes": {
+      "LIGHT": "ライト",
+      "DARK": "ダーク",
+      "AUTO": "ブランド(自動)"
+    },
+    "errors": {
+      "COLOR": "6桁のHEXで入力してください(例: #0055AA)",
+      "LOGIN_MESSAGE": "{{max}}文字以内で入力してください",
+      "SENDER_NAME": "{{max}}文字以内で入力してください",
+      "SIGNATURE": "{{max}}文字以内で入力してください"
+    },
+    "saveAnyway": "それでも保存",
+    "save": "保存",
+    "saved": "保存しました",
+    "conflict": "他の管理者が先に変更しました。再読み込みして保存し直してください。",
+    "preview": "プレビュー",
+    "previews": {
+      "web": "Web",
+      "login": "ログイン",
+      "mail": "メール"
+    },
+    "noLoginMessage": "(ログイン文言なし)",
+    "loginButton": "ログイン",
+    "from": "差出人"
+  }
+}

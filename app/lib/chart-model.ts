@@ -8,6 +8,7 @@
  * - 시각: 축과 툴팁은 표시 시간대(TSD-01.05). 저장·API는 UTC
  */
 import { resolveTimezone } from "./format";
+import { seriesColor } from "./palette";
 
 /** [시각(ISO), 값, 품질(원본) 또는 표본 수(집계)] */
 export type SeriesPoint = [string, number | null, number | null];
@@ -80,8 +81,6 @@ export interface ChartOptions {
 
 export const QUALITY = { NORMAL: 0, OUT_OF_RANGE: 1, UNVERIFIED: 2, SUSPECT: 3, TIME_CORRECTED: 4, FORECAST: 5 } as const;
 
-const PALETTE = ["#206bc4", "#2f9e44", "#b7791f", "#ae3ec9", "#d63939", "#0ca678", "#f76707", "#4263eb"];
-
 type Pair = [number, number | null];
 
 /** 공백에 null을 끼워 넣는다(값 보간 없음, TC-DSH-057) */
@@ -153,7 +152,7 @@ export function buildChartOption(series: ChartSeries[], options: ChartOptions): 
   const out: Record<string, unknown>[] = [];
   const legend: string[] = [];
   series.forEach((s, index) => {
-    const color = PALETTE[index % PALETTE.length];
+    const color = seriesColor(index, options.dark);
     const name = s.unit ? `${s.label} (${s.unit})` : s.label;
     legend.push(name);
     const yAxisIndex = axes.get(s.unit ?? "") ?? 0;

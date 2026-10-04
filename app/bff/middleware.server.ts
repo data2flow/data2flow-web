@@ -83,7 +83,8 @@ export function applySecurityHeaders(response: Response, config: BffConfig, nonc
   const headers = out.headers;
   headers.set("X-Content-Type-Options", "nosniff");
   headers.set("X-Frame-Options", "DENY");
-  headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+  // 공유 링크 화면(DSH-06.03)처럼 라우트가 더 엄격한 값(no-referrer)을 정했으면 그대로 둔다
+  if (!headers.has("Referrer-Policy")) headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
   headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
   if (config.cookieSecure) headers.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
   const contentType = headers.get("Content-Type") ?? "";

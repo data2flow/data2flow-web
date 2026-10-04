@@ -1,0 +1,359 @@
+{
+  "nav": {
+    "dashboards": "仪表板",
+    "branding": "品牌"
+  },
+  "dashboards": {
+    "title": "仪表板",
+    "new": "新建仪表板",
+    "create": "创建",
+    "delete": "删除",
+    "deleteConfirm": "要删除仪表板\"{{name}}\"吗?",
+    "duplicate": "复制",
+    "exportJson": "导出 JSON",
+    "setDefault": "设为默认",
+    "unsetDefault": "取消默认",
+    "isDefault": "默认",
+    "favorite": "收藏",
+    "widgetCount": "{{n}} 个组件",
+    "empty": "没有仪表板",
+    "emptyBody": "使用[新建仪表板]汇集所需组件。",
+    "loadFailed": "无法加载仪表板列表。",
+    "tabs": {
+      "mine": "我的仪表板",
+      "shared": "共享",
+      "favorite": "收藏"
+    },
+    "visibility": {
+      "PRIVATE": "个人",
+      "ORG": "共享(组织)"
+    },
+    "types": {
+      "stat": "当前值",
+      "line": "折线图",
+      "area": "面积图",
+      "bar": "柱状图",
+      "gauge": "仪表",
+      "heatmap": "热力图",
+      "table": "表格",
+      "status-list": "设备状态列表",
+      "alarm-list": "告警列表",
+      "floorplan": "平面图",
+      "markdown": "备注",
+      "control": "控制",
+      "analysis": "分析结果",
+      "kpi": "KPI"
+    },
+    "kinds": {
+      "DEVICE_METRIC": "设备测量项",
+      "SPACE_AGGREGATE": "空间汇总",
+      "DEVICE": "设备",
+      "SPACE": "空间"
+    },
+    "variableTypes": {
+      "SPACE": "空间",
+      "DEVICE": "设备",
+      "METRIC": "测量项"
+    },
+    "ranges": {
+      "1h": "最近1小时",
+      "6h": "最近6小时",
+      "24h": "最近24小时",
+      "7d": "最近7天",
+      "30d": "最近30天",
+      "custom": "自定义"
+    },
+    "resolutions": {
+      "AUTO": "自动",
+      "RAW": "原始",
+      "1h": "1小时",
+      "1d": "1天"
+    },
+    "refreshes": {
+      "LIVE": "实时",
+      "30s": "30秒",
+      "1m": "1分钟",
+      "5m": "5分钟",
+      "OFF": "关闭"
+    },
+    "view": {
+      "toolbar": "仪表板条件",
+      "choose": "请选择",
+      "range": "时间范围",
+      "from": "开始",
+      "to": "结束",
+      "apply": "应用",
+      "resolution": "聚合",
+      "refresh": "刷新",
+      "resetZoom": "重置",
+      "empty": "没有组件。请在[编辑]中添加。"
+    },
+    "widget": {
+      "loading": "加载中",
+      "forbidden": "无访问权限",
+      "error": "无法加载({{code}})",
+      "retry": "重试",
+      "menu": "{{title}} 菜单",
+      "showTable": "以表格查看数据",
+      "hideTable": "关闭表格",
+      "fullscreen": "全屏",
+      "exitFullscreen": "退出全屏",
+      "noData": "无数据",
+      "noAlarms": "无未处理告警",
+      "unsupported": "不支持的组件({{type}})"
+    },
+    "table": {
+      "copy": "复制数值",
+      "copied": "已复制",
+      "caption": "{{title}} 数据表",
+      "summary": "{{title}}:{{rows}} 行数据",
+      "columns": {
+        "time": "时间",
+        "value": "值",
+        "unit": "单位",
+        "name": "名称",
+        "connection": "连接",
+        "battery": "电池",
+        "rssi": "信号(RSSI)",
+        "alarms": "告警",
+        "severity": "严重程度",
+        "title": "标题",
+        "state": "状态",
+        "device": "设备",
+        "min": "最小",
+        "max": "最大",
+        "content": "内容"
+      }
+    },
+    "tone": {
+      "good": "正常",
+      "warn": "注意",
+      "bad": "警告",
+      "muted": "未知"
+    },
+    "trend": {
+      "up": "较上次上升",
+      "down": "较上次下降",
+      "flat": "与上次相同"
+    },
+    "connection": {
+      "ONLINE": "在线",
+      "OFFLINE": "离线",
+      "UNKNOWN": "未知"
+    },
+    "severity": {
+      "CRITICAL": "严重",
+      "MAJOR": "主要",
+      "MINOR": "次要",
+      "WARNING": "警告",
+      "INFO": "信息"
+    },
+    "edit": {
+      "title": "编辑",
+      "heading": "{{name}}(编辑)",
+      "settings": "仪表板设置",
+      "cancel": "取消",
+      "save": "保存",
+      "apply": "应用",
+      "library": "组件库",
+      "add": "添加{{type}}组件",
+      "count": "组件 {{n}}/{{max}}",
+      "keyboardHint": "选中组件后,用方向键移动,Shift+方向键调整大小,Delete 删除。",
+      "widgetSettings": "组件设置",
+      "selectWidget": "请选择要设置的组件。",
+      "duplicate": "复制{{title}}",
+      "remove": "删除{{title}}",
+      "removed": "已删除组件{{title}}",
+      "position": "位置 {{x}},{{y}} 大小 {{w}}×{{h}}",
+      "blocked": "与其他组件重叠或超出网格,无法移动"
+    },
+    "fields": {
+      "name": "名称",
+      "title": "标题",
+      "description": "说明",
+      "visibility": "可见范围",
+      "targets": "数据({{min}}~{{max}} 个)",
+      "kind": "对象类型",
+      "deviceId": "设备 ID",
+      "spaceId": "空间 ID",
+      "metricKey": "测量项",
+      "refHint": "ID 或变量 ${space}",
+      "addTarget": "添加数据",
+      "removeTarget": "移除此数据",
+      "options": "选项",
+      "variables": "变量",
+      "variableName": "变量名",
+      "variableType": "类型",
+      "variableDefault": "默认值",
+      "addVariable": "添加变量",
+      "removeVariable": "删除变量{{name}}"
+    },
+    "options": {
+      "unit": "单位",
+      "decimals": "小数位数",
+      "thresholds": "阈值颜色",
+      "trend": "趋势箭头",
+      "sparkline": "迷你图",
+      "yMin": "Y轴最小",
+      "yMax": "Y轴最大",
+      "legend": "图例位置",
+      "showQuality": "显示质量",
+      "annotations": "告警/控制注释",
+      "stacked": "堆叠",
+      "orientation": "方向",
+      "agg": "聚合函数",
+      "groupBy": "分组依据",
+      "sort": "排序",
+      "min": "最小",
+      "max": "最大",
+      "ranges": "颜色区间",
+      "days": "天数",
+      "columns": "列",
+      "fields": "显示项",
+      "severities": "严重程度",
+      "states": "状态",
+      "maxRows": "最大行数",
+      "showAck": "显示确认按钮",
+      "metricKey": "显示的测量项",
+      "heat": "热力颜色",
+      "content": "内容"
+    },
+    "optionValues": {
+      "bottom": "下方",
+      "right": "右侧",
+      "hidden": "隐藏",
+      "vertical": "纵向",
+      "horizontal": "横向",
+      "avg": "平均",
+      "min": "最小",
+      "max": "最大",
+      "sum": "求和",
+      "last": "最新",
+      "space": "空间",
+      "device": "设备",
+      "asc": "升序",
+      "desc": "降序",
+      "none": "无"
+    },
+    "errors": {
+      "nameRequired": "请输入名称",
+      "tooMany": "最多可添加 40 个组件",
+      "targetCount": "请选择 {{min}}~{{max}} 个数据",
+      "variableName": "变量名格式不正确",
+      "field": "请检查该值",
+      "json": "JSON 格式不正确",
+      "layout": {
+        "OUT_OF_GRID": "第 {{n}} 个组件超出网格",
+        "OVERLAP": "第 {{n}} 个组件与其他组件重叠",
+        "DUPLICATE_ID": "第 {{n}} 个组件 ID 重复",
+        "INVALID_ID": "第 {{n}} 个组件 ID 无效",
+        "TOO_MANY_WIDGETS": "最多可添加 40 个组件"
+      },
+      "widget": {
+        "TYPE_UNSUPPORTED": "不支持的组件类型",
+        "TARGET_COUNT": "数据数量不符",
+        "TARGET_KIND": "请检查对象类型({{field}})",
+        "TARGET_REF": "请检查 ID 或变量({{field}})",
+        "METRIC_REQUIRED": "请选择测量项({{field}})",
+        "AGG_INVALID": "请检查聚合函数({{field}})",
+        "OPTION_INVALID": "请检查选项({{field}})",
+        "OPTION_ORDER": "最大值必须大于最小值"
+      },
+      "NAME": "请输入名称",
+      "DASHBOARD_NOT_FOUND": "找不到仪表板",
+      "DASHBOARD_LAYOUT_INVALID": "组件布局无效",
+      "WIDGET_TYPE_UNSUPPORTED": "不支持的组件类型",
+      "WIDGET_QUERY_INVALID": "组件数据条件无效",
+      "DASHBOARD_VERSION_CONFLICT": "其他用户已先保存",
+      "PERMISSION_DENIED": "没有权限",
+      "INVALID_REQUEST": "请求无效"
+    },
+    "conflict": {
+      "title": "保存冲突",
+      "body": "其他用户已先保存(修改者:{{name}})。可以重新加载最新版本或保留我的修改。",
+      "reload": "重新加载",
+      "keepMine": "保留我的修改"
+    },
+    "import": {
+      "button": "导入 JSON",
+      "TOO_LARGE": "文件过大(最大 1MB)",
+      "NOT_JSON": "不是 JSON 文件",
+      "NOT_DASHBOARD": "不是仪表板导出文件",
+      "unmapped": "已导入,但有 {{n}} 个对象无法映射。请在编辑中重新指定。"
+    },
+    "share": {
+      "title": "共享链接",
+      "help": "获得链接的人无需登录即可只读查看,无法控制。",
+      "days": "有效期(天,{{min}}~{{max}})",
+      "daysInvalid": "有效期为 {{min}}~{{max}} 天",
+      "create": "创建链接",
+      "once": "此地址仅显示一次,请立即复制。",
+      "copy": "复制地址",
+      "status": "状态",
+      "expiresAt": "到期",
+      "lastUsedAt": "最近使用",
+      "revoke": "撤销",
+      "empty": "尚无链接",
+      "loadFailed": "无法加载链接列表",
+      "createFailed": "无法创建链接",
+      "revokeFailed": "无法撤销链接",
+      "statuses": {
+        "ACTIVE": "有效",
+        "EXPIRED": "已过期",
+        "REVOKED": "已撤销"
+      }
+    },
+    "shareView": {
+      "banner": "只读共享页面 · 到期 {{date}}",
+      "invalid": "链接无效"
+    },
+    "kiosk": {
+      "open": "信息亭",
+      "pick": "加入信息亭",
+      "start": "启动信息亭({{n}} 个)",
+      "clock": "当前时间",
+      "updated": "{{s}} 秒前更新",
+      "controls": "信息亭控制",
+      "pause": "暂停",
+      "resume": "继续",
+      "next": "下一个仪表板",
+      "exit": "退出",
+      "nextUp": "下一个:{{name}}({{s}} 秒)",
+      "loadFailed": "无法加载仪表板",
+      "sessionEnded": "会话已结束,请重新登录。",
+      "login": "登录",
+      "boardsInvalid": "请选择 1~{{max}} 个仪表板",
+      "intervalInvalid": "轮播间隔为 {{min}}~{{max}} 秒"
+    },
+    "tour": {
+      "s1": {
+        "title": "仪表板导览",
+        "body": "在顶部栏更改变量(空间、设备、测量项)和时间范围,所有组件都会随之更新。"
+      },
+      "s2": {
+        "title": "图表缩放",
+        "body": "在图表上拖动选择区间,同一仪表板的所有图表都会同步。按[重置]返回。"
+      },
+      "s3": {
+        "title": "组件菜单",
+        "body": "通过 ⋯ 菜单可以表格查看、下载 PNG/CSV 或全屏。"
+      },
+      "s4": {
+        "title": "共享与信息亭",
+        "body": "可通过共享链接免登录只读展示,或用信息亭模式在电视上轮播。"
+      }
+    }
+  },
+  "tour": {
+    "step": "第 {{n}}/{{total}} 步",
+    "next": "下一步",
+    "prev": "上一步",
+    "done": "完成",
+    "never": "不再显示"
+  },
+  "errors": {
+    "DASHBOARD_NOT_FOUND": "找不到仪表板。",
+    "SHARE_LINK_INVALID": "链接无效。",
+    "DASHBOARD_VERSION_CONFLICT": "其他用户已先保存。"
+  }
+}

@@ -2,7 +2,7 @@
  * 화면 메뉴와 권한(IAM-04.01, IAM-04.05). 메뉴를 숨기는 것은 보조 수단이고 실제 거부는 서버가 한다.
  * 권한 이름은 spec/IAM-identity.md의 Permission 목록을, 경로는 spec/detail/00-navigation.md §2를 따른다.
  */
-export type MenuKey = "home" | "spaces" | "devices" | "explore" | "ingest" | "alarms" | "automation" | "control" | "sim" | "members" | "roles" | "security" | "audit" | "settings" | "maintenance" | "channels";
+export type MenuKey = "home" | "spaces" | "devices" | "explore" | "ingest" | "alarms" | "automation" | "control" | "sim" | "members" | "roles" | "security" | "audit" | "settings" | "maintenance" | "channels" | "dashboards" | "branding";
 
 export interface MenuItem {
   key: MenuKey;
@@ -28,6 +28,8 @@ export const MENU: MenuItem[] = [
   { key: "automation", path: "/automation/flows", anyOf: ["FLOW_READ"], group: "main", sections: ["/automation"] },
   { key: "control", path: "/control/commands", anyOf: ["DEVICE_CONTROL"], group: "main", sections: ["/control"], guard: ["DEV_READ"] },
   { key: "sim", path: "/sim", anyOf: ["SIM_READ"], group: "main" },
+  // M5 사용자 정의 대시보드(UI-DSH-04)
+  { key: "dashboards", path: "/dashboards", anyOf: ["DASHBOARD_READ"], group: "main" },
   { key: "members", path: "/admin/members", anyOf: ["IAM_MANAGE"], group: "admin" },
   { key: "roles", path: "/admin/roles", anyOf: ["IAM_MANAGE"], group: "admin" },
   { key: "security", path: "/admin/security", anyOf: ["IAM_MANAGE"], group: "admin" },
@@ -36,6 +38,8 @@ export const MENU: MenuItem[] = [
   // M4: 유지보수 일정(UI-OPS-05, OPERATOR 이상 — API-OPS-20은 권한 이름 없이 "ADMIN, OPERATOR(공간 범위)"라 DEV_PLACE로 가린다), 알림 채널(UI-OPS-06)
   { key: "maintenance", path: "/admin/maintenance", anyOf: ["DEV_PLACE"], group: "admin" },
   { key: "channels", path: "/admin/channels", anyOf: ["NOTIFY_CHANNEL_MANAGE"], group: "admin" },
+  // M5 브랜딩(UI-DSH-13, ADMIN)
+  { key: "branding", path: "/admin/branding", anyOf: ["BRANDING_MANAGE"], group: "admin" },
 ];
 
 /** 메뉴 밖 경로의 권한(라우트 가드). 가장 긴 접두사가 이긴다 */
@@ -74,6 +78,9 @@ export const ROUTE_GUARDS: { prefix: string; anyOf: string[] }[] = [
   { prefix: "/control/capabilities", anyOf: ["DEVICE_CONTROL", "CAPABILITY_MANAGE"] },
   { prefix: "/device-jobs", anyOf: ["DEV_READ"] },
   { prefix: "/me/notifications", anyOf: [] },
+  // M5: 키오스크(UI-DSH-06, 틀 없는 화면), 대시보드 편집은 편집 권한
+  { prefix: "/kiosk", anyOf: ["DASHBOARD_READ"] },
+  { prefix: "/dashboards", anyOf: ["DASHBOARD_READ"] },
 ];
 
 export function hasAny(permissions: readonly string[] | undefined, required: readonly string[]): boolean {

@@ -11,7 +11,7 @@ import type { Me } from "./lib/api-types";
 import { resolveTimezone } from "./lib/format";
 import { themeAttribute, themeFromCookie, type Theme } from "./lib/theme";
 import { useNonce } from "./lib/nonce";
-import { isPublicPath } from "./lib/public-paths";
+import { isLocalizedPublicPath, isPublicPath } from "./lib/public-paths";
 
 /** 세션·CSRF·보안 헤더(IAM-07.04) */
 export const middleware: Route.MiddlewareFunction[] = [bffMiddleware];
@@ -64,7 +64,7 @@ export const links: Route.LinksFunction = () => [{ rel: "icon", href: "/favicon.
 /** 공개 페이지는 언어별 주소의 hreflang·canonical을 넣는다(ADR-037) */
 function AlternateLinks({ origin, lang }: { origin: string; lang: Language }) {
   const location = useLocation();
-  if (!isPublicPath(location.pathname)) return null;
+  if (!isLocalizedPublicPath(location.pathname)) return null;
   const base = stripLanguagePrefix(location.pathname);
   return (
     <>
