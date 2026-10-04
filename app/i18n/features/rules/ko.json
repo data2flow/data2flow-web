@@ -1,0 +1,471 @@
+{
+  "rules": {
+    "crumb": "규칙·알람",
+    "title": "규칙",
+    "newRule": "새 규칙",
+    "newTitle": "새 규칙",
+    "tuningCount": "튜닝 제안 {{n}}건",
+    "limitNear": "규칙이 {{total}}개입니다. 조직당 {{limit}}개까지 만들 수 있습니다.",
+    "openFlow": "플로우로 열기",
+    "convertedNotice": "플로우로 변환된 규칙은 폼으로 편집할 수 없습니다.",
+    "errorReason": "규칙 오류: {{reason}}",
+    "errorReasons": {
+      "NO_TARGET": "대상 기기 없음",
+      "METRIC_DELETED": "측정 항목 삭제됨",
+      "FLOW_ERROR": "플로우 적용 실패"
+    },
+    "status": {
+      "ACTIVE": "활성",
+      "INACTIVE": "비활성",
+      "ERROR": "오류",
+      "CONVERTED": "플로우로 변환됨",
+      "DELETED": "삭제됨"
+    },
+    "scope": {
+      "SPACE": "공간",
+      "DEVICE": "기기",
+      "MODEL": "기기 모델",
+      "TAG": "태그"
+    },
+    "dow": {
+      "1": "월",
+      "2": "화",
+      "3": "수",
+      "4": "목",
+      "5": "금",
+      "6": "토",
+      "7": "일"
+    },
+    "unit": {
+      "s": "초",
+      "m": "분",
+      "h": "시간"
+    },
+    "list": {
+      "search": "검색",
+      "status": "상태",
+      "severity": "심각도",
+      "space": "공간",
+      "template": "템플릿",
+      "empty": "규칙이 없습니다. 템플릿으로 시작하세요",
+      "noMatch": "조건에 맞는 규칙이 없습니다",
+      "raised7d": "최근 7일 발생 수",
+      "openAlarms": "열린 알람 수",
+      "copy": "복제",
+      "activate": "활성화",
+      "deactivate": "비활성화",
+      "withChildren": "하위 포함",
+      "clearOpenAlarms": "이 규칙의 열린 알람을 해제합니다",
+      "convertBody": "같은 동작을 하는 일반 플로우로 바꿉니다. 바꾼 뒤에는 규칙 폼으로 편집할 수 없습니다.",
+      "raised7dValue": "7일 {{n}}",
+      "openAlarmsValue": "열림 {{n}}",
+      "scopeValue": "{{scope}} · {{n}}대",
+      "deleteTitle": "\"{{name}}\" 삭제",
+      "deleteBody": "규칙을 삭제합니다. 열린 알람이 {{n}}건 있습니다.",
+      "convertTitle": "\"{{name}}\"을(를) 플로우로 열기"
+    },
+    "form": {
+      "template": "템플릿",
+      "custom": "직접 만들기",
+      "name": "이름",
+      "scope": "범위",
+      "scopeType": "범위 종류",
+      "targets": "대상",
+      "noTargets": "고를 대상이 없습니다",
+      "includeChildren": "하위 공간 포함",
+      "targetCountLabel": "현재 대상 수",
+      "noTargetWarn": "대상 기기가 없으면 규칙이 오류(NO_TARGET)가 됩니다",
+      "condition": "조건",
+      "time": "시간 조건",
+      "timeEnabled": "시간 조건 사용",
+      "days": "요일",
+      "timeFrom": "시작 시각",
+      "timeTo": "끝 시각",
+      "schedule": "공간 운영 시간표",
+      "scheduleNone": "사용 안 함",
+      "scheduleInside": "운영 시간 안",
+      "scheduleOutside": "운영 시간 밖",
+      "severity": "심각도",
+      "titleTemplate": "알람 제목",
+      "titleHint": "변수: {{device.name}} {{space.path}} {{value}}",
+      "autoClear": "조건이 풀리면 자동 해제",
+      "policy": "알림 정책",
+      "noPolicy": "정책 없음(일치하는 정책을 따름)",
+      "simulate": "시뮬레이션",
+      "fixErrors": "입력을 확인하세요",
+      "conflict": "그 사이 다른 사람이 이 규칙을 바꿨습니다. 새로 고침한 뒤 다시 저장하세요.",
+      "targetCount": "현재 대상 {{n}}대",
+      "savedCount": "저장 시 {{n}}대"
+    },
+    "cond": {
+      "groupOp": "묶음",
+      "and": "AND(모두)",
+      "or": "OR(하나라도)",
+      "removeGroup": "그룹 삭제",
+      "add": "조건 추가",
+      "addGroup": "그룹 추가",
+      "itemLabel": "조건 항목",
+      "kind": "조건 종류",
+      "metric": "측정 항목",
+      "chooseMetric": "측정 항목 선택",
+      "anyMetric": "모든 측정 항목",
+      "op": "연산자",
+      "value": "값",
+      "chooseValue": "값 선택",
+      "rangeLow": "범위 아래",
+      "rangeHigh": "범위 위",
+      "for": "지속 시간",
+      "clear": "해제 기준",
+      "repeat": "반복 횟수",
+      "aggregate": "대상 기준",
+      "direction": "방향",
+      "delta": "변화량",
+      "window": "기간",
+      "remove": "조건 삭제",
+      "groupLabel": "조건 그룹 {{depth}}단계",
+      "groupOpLabel": "그룹 {{depth}}단계 묶음 방식",
+      "limitReached": "조건은 {{n}}개까지 넣을 수 있습니다",
+      "depthHint": "그룹은 {{n}}단계까지 중첩할 수 있습니다",
+      "anomalySummary": "이상 점수 {{score}} 이상(분석 연동)",
+      "kinds": {
+        "threshold": "임계값",
+        "rateOfChange": "변화율",
+        "noData": "무수신",
+        "anomaly": "이상 점수"
+      },
+      "ops": {
+        "gt": "> 초과",
+        "gte": ">= 이상",
+        "lt": "< 미만",
+        "lte": "<= 이하",
+        "eq": "= 같음",
+        "ne": "≠ 다름",
+        "outside": "범위 밖",
+        "inside": "범위 안"
+      },
+      "aggregates": {
+        "perDevice": "기기별",
+        "spaceAvg": "공간 평균",
+        "spaceMax": "공간 최대",
+        "spaceMin": "공간 최소",
+        "any": "하나라도",
+        "all": "모두"
+      },
+      "directions": {
+        "UP": "상승",
+        "DOWN": "하강",
+        "ANY": "양방향"
+      }
+    },
+    "v": {
+      "metricRequired": "측정 항목을 고르세요",
+      "valueRequired": "값을 입력하세요",
+      "rangeOrder": "범위의 아래 값이 위 값보다 작아야 합니다",
+      "forRange": "지속 시간은 0초~24시간입니다",
+      "repeatRange": "반복 횟수는 1~100입니다",
+      "windowRange": "기간은 1초~24시간입니다",
+      "deltaPositive": "변화량은 0보다 커야 합니다",
+      "nameRequired": "이름을 입력하세요",
+      "nameLength": "이름은 100자까지입니다",
+      "scopeRequired": "대상을 하나 이상 고르세요",
+      "titleRequired": "알람 제목을 입력하세요",
+      "titleLength": "알람 제목은 200자까지입니다",
+      "daysRequired": "요일을 하나 이상 고르세요",
+      "timeFormat": "시작·끝 시각을 함께 HH:mm으로 입력하세요",
+      "valueRange": "{{metric}}의 유효 범위는 {{min}}~{{max}}입니다",
+      "clearBelow": "해제 기준은 {{value}}보다 작아야 합니다",
+      "clearAbove": "해제 기준은 {{value}}보다 커야 합니다",
+      "countLimit": "조건은 {{n}}개까지입니다",
+      "depthLimit": "그룹은 {{n}}단계까지 중첩할 수 있습니다",
+      "targetLimit": "대상 기기는 {{n}}대까지입니다"
+    },
+    "warnings": {
+      "TARGET_EMPTY": "대상 기기가 없습니다",
+      "TARGET_OFFLINE": "일부 대상 기기가 오프라인입니다"
+    },
+    "sim": {
+      "panel": "시뮬레이션 결과",
+      "period": "기간",
+      "run": "실행",
+      "rerun": "다시 실행",
+      "running": "계산 중…",
+      "fixForm": "규칙 입력 오류를 먼저 고치세요",
+      "lowCoverage": "기간 중 데이터가 10% 미만입니다",
+      "metric": "항목",
+      "byDevice": "기기별",
+      "noAlarms": "예상 알람이 없습니다",
+      "device": "기기",
+      "count": "발생 수",
+      "longest": "최장 지속",
+      "heatmap": "시간대별 발생(요일 × 시)",
+      "title": "시뮬레이션 (최근 {{days}}일)",
+      "days": "{{n}}일",
+      "progress": "계산 중 {{processed}}/{{total}}",
+      "current": "이번 ({{label}})",
+      "previous": "이전 ({{label}})",
+      "basis": "기준 {{value}}",
+      "hours": "{{n}}시간",
+      "minutes": "{{n}}분",
+      "seconds": "{{n}}초",
+      "rows": {
+        "alarms": "예상 알람",
+        "notifications": "예상 알림",
+        "avgDurationSec": "평균 지속"
+      }
+    },
+    "fromChart": {
+      "title": "이 기준선으로 규칙 만들기",
+      "series": "계열",
+      "baseline": "기준선 값",
+      "create": "규칙 만들기",
+      "hint": "기준선 값을 입력하세요"
+    }
+  },
+  "alarms": {
+    "crumb": "규칙·알람",
+    "title": "알람",
+    "summary": "알람 요약",
+    "ack": "확인",
+    "clear": "해제",
+    "silence": "무음",
+    "silenceMenu": "무음 ▼",
+    "empty": "현재 열린 알람이 없습니다 ✓",
+    "flapping": "플래핑",
+    "selectAll": "이 페이지 모두 선택",
+    "backToList": "알람 목록",
+    "children": "하위 {{n}}",
+    "times": "{{n}}회",
+    "select": "{{title}} 선택",
+    "selectedCount": "선택 {{n}}건",
+    "silenceFor": "{{duration}} 무음",
+    "newAlarm": "새 알람: {{title}}",
+    "spaceEvent": "공간 이벤트 · {{space}} · 알람 {{n}}건",
+    "col": {
+      "values": "발생 값 / 최고값"
+    },
+    "bulk": {
+      "ackResult": "{{ok}}건 확인, {{failed}}건 실패",
+      "silenceResult": "{{ok}}건 무음, {{failed}}건 실패",
+      "ok": "처리됨",
+      "already": "이미 확인됨"
+    },
+    "filter": {
+      "status": "상태",
+      "open": "열린 알람",
+      "severity": "심각도",
+      "space": "공간",
+      "range": "기간",
+      "source": "출처",
+      "groupBySpaceEvent": "공간 이벤트로 묶기"
+    },
+    "range": {
+      "24h": "24시간",
+      "7d": "7일",
+      "30d": "30일",
+      "all": "전체 기간"
+    },
+    "severity": {
+      "CRITICAL": "CRITICAL 긴급",
+      "MAJOR": "MAJOR 중요",
+      "MINOR": "MINOR 경미",
+      "WARNING": "WARNING 경고",
+      "INFO": "INFO 정보"
+    },
+    "severityShort": {
+      "CRITICAL": "CRIT",
+      "MAJOR": "MAJ",
+      "MINOR": "MIN",
+      "WARNING": "WARN",
+      "INFO": "INFO"
+    },
+    "status": {
+      "ACTIVE": "발생",
+      "ACKNOWLEDGED": "확인됨",
+      "SUPPRESSED": "억제됨",
+      "CLEARED": "해제됨"
+    },
+    "source": {
+      "RULE": "규칙",
+      "FLOW": "플로우",
+      "SYSTEM": "시스템"
+    },
+    "suppressed": {
+      "MAINTENANCE": "유지보수",
+      "PARENT": "상위 원인",
+      "DEVICE_OFFLINE": "기기 오프라인"
+    },
+    "clearReason": {
+      "AUTO": "조건 해소",
+      "MANUAL": "수동 해제",
+      "PARENT_CLEARED": "상위 알람 해제",
+      "RULE_DELETED": "규칙 삭제",
+      "RULE_SCOPE_CHANGED": "규칙 범위 변경"
+    },
+    "actionType": {
+      "ONSITE": "현장 확인",
+      "CONFIG_CHANGE": "설정 변경",
+      "DEVICE_REPLACED": "기기 교체",
+      "OTHER": "기타"
+    },
+    "event": {
+      "RAISED": "발생",
+      "RERAISED": "재발생",
+      "ACKED": "확인",
+      "CLEARED": "해제",
+      "ASSIGNED": "담당자 지정",
+      "NOTE": "메모",
+      "ACTION": "조치",
+      "ESCALATED": "에스컬레이션",
+      "NOTIFIED": "알림 발송",
+      "SILENCED": "무음",
+      "FLAPPING_ON": "플래핑 시작",
+      "FLAPPING_OFF": "플래핑 끝",
+      "SUPPRESSED": "억제"
+    },
+    "eventText": {
+      "value": "값 {{value}}",
+      "assigned": "→ {{name}}",
+      "notified": "{{channel}} · {{recipient}} · {{status}}",
+      "escalated": "{{step}}단계"
+    },
+    "dur": {
+      "days": "{{n}}일",
+      "hours": "{{n}}시간",
+      "minutes": "{{n}}분",
+      "seconds": "{{n}}초"
+    },
+    "detail": {
+      "source": "출처",
+      "openRule": "규칙 열기",
+      "openFlow": "플로우 열기",
+      "target": "대상",
+      "hiddenTarget": "권한 밖 대상",
+      "values": "값",
+      "raisedAt": "발생",
+      "ackedAt": "확인",
+      "clearedAt": "해제",
+      "assignee": "담당자",
+      "assign": "담당자 지정",
+      "parent": "상위 알람",
+      "openParent": "상위 알람 보기",
+      "timeline": "타임라인",
+      "noEvents": "기록이 없습니다",
+      "deliveries": "알림 발송 이력",
+      "noDeliveries": "발송한 알림이 없습니다",
+      "channel": "채널",
+      "recipient": "수신자",
+      "deliveryStatus": "상태",
+      "attempts": "시도",
+      "sentAt": "보낸 시각",
+      "noteTitle": "메모·조치 기록",
+      "note": "메모",
+      "actionType": "조치 종류",
+      "noteOnly": "메모만",
+      "clearNote": "해제 메모(선택)",
+      "me": "{{name}} (나)",
+      "valueLine": "발생 {{trigger}} · 최고 {{peak}} · 현재 {{last}}",
+      "duration": "지속 {{d}}",
+      "chart": "{{metric}} 발생 전후",
+      "thresholds": "발생 기준 {{raise}} · 해제 기준 {{clear}}",
+      "childrenTitle": "하위 알람 {{n}}건",
+      "done": {
+        "ack": "알람을 확인했습니다",
+        "clear": "알람을 해제했습니다",
+        "note": "기록했습니다",
+        "assign": "담당자를 지정했습니다",
+        "silence": "무음을 걸었습니다"
+      }
+    },
+    "v": {
+      "noteLength": "메모는 1~{{n}}자입니다"
+    }
+  },
+  "silences": {
+    "title": "무음 일정",
+    "list": "무음 목록",
+    "new": "새 무음",
+    "empty": "무음이 없습니다",
+    "active": "적용 중",
+    "release": "해제",
+    "targetType": "대상 종류",
+    "targetId": "대상",
+    "chooseTarget": "대상 선택",
+    "startsAt": "시작",
+    "endsAt": "끝",
+    "repeat": "반복",
+    "weekly": "요일·시간대",
+    "dates": "날짜 범위",
+    "dateFrom": "시작 날짜",
+    "dateTo": "끝 날짜",
+    "reason": "사유",
+    "create": "무음 만들기",
+    "col": {
+      "kind": "종류",
+      "target": "대상",
+      "when": "기간",
+      "reason": "사유",
+      "by": "만든 사람"
+    },
+    "kind": {
+      "ONE_TIME": "일시 무음",
+      "RECURRING": "반복 무음"
+    },
+    "target": {
+      "RULE": "규칙",
+      "DEVICE": "기기",
+      "SPACE": "공간",
+      "ALARM": "알람"
+    },
+    "v": {
+      "target": "대상을 고르세요",
+      "days": "요일을 하나 이상 고르세요",
+      "reason": "사유는 200자까지입니다"
+    }
+  },
+  "alarmStats": {
+    "title": "알람 통계",
+    "period": "기간",
+    "topRules": "상위 규칙",
+    "topSpaces": "상위 공간",
+    "topDevices": "상위 기기",
+    "daily": "일별 발생",
+    "date": "날짜",
+    "raised": "발생 수",
+    "cards": {
+      "raised": "발생 수",
+      "mtta": "평균 확인 시간(MTTA)",
+      "mttr": "평균 해결 시간(MTTR)",
+      "unacked": "미확인 비율"
+    }
+  },
+  "tuning": {
+    "title": "규칙 튜닝 제안",
+    "empty": "열린 튜닝 제안이 없습니다",
+    "current": "현재",
+    "proposed": "제안",
+    "simulation": "시뮬레이션",
+    "apply": "적용",
+    "dismiss": "무시",
+    "dismissed": "제안을 무시했습니다",
+    "applied": "제안을 적용했습니다(규칙 버전 {{version}})",
+    "simulationValue": "예상 알람 {{before}}건 → {{after}}건",
+    "problem": {
+      "TOO_FREQUENT": "과다 발생",
+      "FLAPPING": "플래핑",
+      "UNACKNOWLEDGED": "미확인 많음"
+    }
+  },
+  "errors": {
+    "RULE_NOT_FOUND": "규칙을 찾을 수 없습니다",
+    "RULE_NAME_DUPLICATED": "같은 이름의 규칙이 있습니다",
+    "RULE_CONDITION_INVALID": "조건이 올바르지 않습니다",
+    "RULE_LIMIT_EXCEEDED": "규칙은 1,000개까지 만들 수 있습니다",
+    "RULE_TARGET_LIMIT_EXCEEDED": "대상 기기는 5,000대까지입니다",
+    "RULE_STATE_CONFLICT": "지금 상태에서는 할 수 없습니다",
+    "RULE_SIMULATION_RANGE_INVALID": "시뮬레이션 기간은 30일까지입니다",
+    "ALARM_NOT_FOUND": "알람을 찾을 수 없습니다",
+    "ALARM_STATE_CONFLICT": "이미 처리된 알람입니다",
+    "ALARM_BULK_LIMIT_EXCEEDED": "한 번에 200건까지 처리할 수 있습니다",
+    "SILENCE_RANGE_INVALID": "무음 기간이 올바르지 않습니다"
+  }
+}

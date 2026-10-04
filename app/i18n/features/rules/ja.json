@@ -1,0 +1,471 @@
+{
+  "rules": {
+    "crumb": "ルール・アラーム",
+    "title": "ルール",
+    "newRule": "新規ルール",
+    "newTitle": "新規ルール",
+    "tuningCount": "チューニング提案 {{n}}件",
+    "limitNear": "ルールが {{total}} 件あります。組織あたり {{limit}} 件まで作成できます。",
+    "openFlow": "フローとして開く",
+    "convertedNotice": "フローに変換したルールはフォームで編集できません。",
+    "errorReason": "ルールエラー: {{reason}}",
+    "errorReasons": {
+      "NO_TARGET": "対象デバイスなし",
+      "METRIC_DELETED": "測定項目が削除されました",
+      "FLOW_ERROR": "フロー適用失敗"
+    },
+    "status": {
+      "ACTIVE": "有効",
+      "INACTIVE": "無効",
+      "ERROR": "エラー",
+      "CONVERTED": "フローに変換済み",
+      "DELETED": "削除済み"
+    },
+    "scope": {
+      "SPACE": "空間",
+      "DEVICE": "デバイス",
+      "MODEL": "デバイスモデル",
+      "TAG": "タグ"
+    },
+    "dow": {
+      "1": "月",
+      "2": "火",
+      "3": "水",
+      "4": "木",
+      "5": "金",
+      "6": "土",
+      "7": "日"
+    },
+    "unit": {
+      "s": "秒",
+      "m": "分",
+      "h": "時間"
+    },
+    "list": {
+      "search": "検索",
+      "status": "状態",
+      "severity": "重大度",
+      "space": "空間",
+      "template": "テンプレート",
+      "empty": "ルールがありません。テンプレートから始めましょう",
+      "noMatch": "条件に合うルールがありません",
+      "raised7d": "直近7日の発生数",
+      "openAlarms": "未解決アラーム数",
+      "copy": "複製",
+      "activate": "有効化",
+      "deactivate": "無効化",
+      "withChildren": "下位を含む",
+      "clearOpenAlarms": "このルールの未解決アラームを解除する",
+      "convertBody": "同じ動作の通常フローに変換します。変換後はルールフォームで編集できません。",
+      "raised7dValue": "7日 {{n}}",
+      "openAlarmsValue": "未解決 {{n}}",
+      "scopeValue": "{{scope}} · {{n}}台",
+      "deleteTitle": "「{{name}}」を削除",
+      "deleteBody": "ルールを削除します。未解決アラームが {{n}} 件あります。",
+      "convertTitle": "「{{name}}」をフローとして開く"
+    },
+    "form": {
+      "template": "テンプレート",
+      "custom": "カスタム",
+      "name": "名前",
+      "scope": "範囲",
+      "scopeType": "範囲の種類",
+      "targets": "対象",
+      "noTargets": "選択できる対象がありません",
+      "includeChildren": "下位空間を含む",
+      "targetCountLabel": "現在の対象数",
+      "noTargetWarn": "対象デバイスがないとルールはエラー(NO_TARGET)になります",
+      "condition": "条件",
+      "time": "時間条件",
+      "timeEnabled": "時間条件を使う",
+      "days": "曜日",
+      "timeFrom": "開始時刻",
+      "timeTo": "終了時刻",
+      "schedule": "空間の運用時間",
+      "scheduleNone": "使わない",
+      "scheduleInside": "運用時間内",
+      "scheduleOutside": "運用時間外",
+      "severity": "重大度",
+      "titleTemplate": "アラームタイトル",
+      "titleHint": "変数: {{device.name}} {{space.path}} {{value}}",
+      "autoClear": "条件が解消したら自動解除",
+      "policy": "通知ポリシー",
+      "noPolicy": "なし(一致するポリシーに従う)",
+      "simulate": "シミュレーション",
+      "fixErrors": "入力内容を確認してください",
+      "conflict": "その間に他の人がこのルールを変更しました。再読み込みしてから保存してください。",
+      "targetCount": "現在の対象 {{n}}台",
+      "savedCount": "保存時 {{n}}台"
+    },
+    "cond": {
+      "groupOp": "結合",
+      "and": "AND(すべて)",
+      "or": "OR(いずれか)",
+      "removeGroup": "グループ削除",
+      "add": "条件を追加",
+      "addGroup": "グループを追加",
+      "itemLabel": "条件項目",
+      "kind": "条件の種類",
+      "metric": "測定項目",
+      "chooseMetric": "測定項目を選択",
+      "anyMetric": "すべての測定項目",
+      "op": "演算子",
+      "value": "値",
+      "chooseValue": "値を選択",
+      "rangeLow": "範囲の下限",
+      "rangeHigh": "範囲の上限",
+      "for": "継続時間",
+      "clear": "解除基準",
+      "repeat": "繰り返し回数",
+      "aggregate": "評価単位",
+      "direction": "方向",
+      "delta": "変化量",
+      "window": "期間",
+      "remove": "条件を削除",
+      "groupLabel": "条件グループ {{depth}}段目",
+      "groupOpLabel": "グループ {{depth}}段目の結合方法",
+      "limitReached": "条件は {{n}} 個まで追加できます",
+      "depthHint": "グループは {{n}} 段まで入れ子にできます",
+      "anomalySummary": "異常スコア {{score}} 以上(分析連携)",
+      "kinds": {
+        "threshold": "しきい値",
+        "rateOfChange": "変化率",
+        "noData": "無受信",
+        "anomaly": "異常スコア"
+      },
+      "ops": {
+        "gt": "> 超過",
+        "gte": ">= 以上",
+        "lt": "< 未満",
+        "lte": "<= 以下",
+        "eq": "= 等しい",
+        "ne": "≠ 等しくない",
+        "outside": "範囲外",
+        "inside": "範囲内"
+      },
+      "aggregates": {
+        "perDevice": "デバイスごと",
+        "spaceAvg": "空間平均",
+        "spaceMax": "空間最大",
+        "spaceMin": "空間最小",
+        "any": "いずれか",
+        "all": "すべて"
+      },
+      "directions": {
+        "UP": "上昇",
+        "DOWN": "下降",
+        "ANY": "双方向"
+      }
+    },
+    "v": {
+      "metricRequired": "測定項目を選択してください",
+      "valueRequired": "値を入力してください",
+      "rangeOrder": "下限は上限より小さくしてください",
+      "forRange": "継続時間は0秒〜24時間です",
+      "repeatRange": "繰り返し回数は1〜100です",
+      "windowRange": "期間は1秒〜24時間です",
+      "deltaPositive": "変化量は0より大きくしてください",
+      "nameRequired": "名前を入力してください",
+      "nameLength": "名前は100文字までです",
+      "scopeRequired": "対象を1つ以上選択してください",
+      "titleRequired": "アラームタイトルを入力してください",
+      "titleLength": "アラームタイトルは200文字までです",
+      "daysRequired": "曜日を1つ以上選択してください",
+      "timeFormat": "開始・終了時刻をHH:mmで両方入力してください",
+      "valueRange": "{{metric}} の有効範囲は {{min}}〜{{max}} です",
+      "clearBelow": "解除基準は {{value}} より小さくしてください",
+      "clearAbove": "解除基準は {{value}} より大きくしてください",
+      "countLimit": "条件は {{n}} 個までです",
+      "depthLimit": "グループは {{n}} 段まで入れ子にできます",
+      "targetLimit": "対象デバイスは {{n}}台までです"
+    },
+    "warnings": {
+      "TARGET_EMPTY": "対象デバイスがありません",
+      "TARGET_OFFLINE": "一部の対象デバイスがオフラインです"
+    },
+    "sim": {
+      "panel": "シミュレーション結果",
+      "period": "期間",
+      "run": "実行",
+      "rerun": "再実行",
+      "running": "計算中…",
+      "fixForm": "先にルールの入力エラーを直してください",
+      "lowCoverage": "期間中のデータが10%未満です",
+      "metric": "項目",
+      "byDevice": "デバイス別",
+      "noAlarms": "想定アラームはありません",
+      "device": "デバイス",
+      "count": "発生数",
+      "longest": "最長継続",
+      "heatmap": "時間帯別の発生(曜日×時)",
+      "title": "シミュレーション(直近{{days}}日)",
+      "days": "{{n}}日",
+      "progress": "計算中 {{processed}}/{{total}}",
+      "current": "今回({{label}})",
+      "previous": "前回({{label}})",
+      "basis": "基準 {{value}}",
+      "hours": "{{n}}時間",
+      "minutes": "{{n}}分",
+      "seconds": "{{n}}秒",
+      "rows": {
+        "alarms": "想定アラーム",
+        "notifications": "想定通知",
+        "avgDurationSec": "平均継続"
+      }
+    },
+    "fromChart": {
+      "title": "この基準線でルールを作成",
+      "series": "系列",
+      "baseline": "基準線の値",
+      "create": "ルールを作成",
+      "hint": "基準線の値を入力してください"
+    }
+  },
+  "alarms": {
+    "crumb": "ルール・アラーム",
+    "title": "アラーム",
+    "summary": "アラーム概要",
+    "ack": "確認",
+    "clear": "解除",
+    "silence": "ミュート",
+    "silenceMenu": "ミュート ▼",
+    "empty": "現在、未解決のアラームはありません ✓",
+    "flapping": "フラッピング",
+    "selectAll": "このページをすべて選択",
+    "backToList": "アラーム一覧",
+    "children": "下位 {{n}}",
+    "times": "{{n}}回",
+    "select": "{{title}} を選択",
+    "selectedCount": "選択 {{n}}件",
+    "silenceFor": "{{duration}} ミュート",
+    "newAlarm": "新しいアラーム: {{title}}",
+    "spaceEvent": "空間イベント · {{space}} · アラーム {{n}}件",
+    "col": {
+      "values": "発生値 / 最大値"
+    },
+    "bulk": {
+      "ackResult": "{{ok}}件確認、{{failed}}件失敗",
+      "silenceResult": "{{ok}}件ミュート、{{failed}}件失敗",
+      "ok": "処理済み",
+      "already": "確認済み"
+    },
+    "filter": {
+      "status": "状態",
+      "open": "未解決アラーム",
+      "severity": "重大度",
+      "space": "空間",
+      "range": "期間",
+      "source": "発生元",
+      "groupBySpaceEvent": "空間イベントでまとめる"
+    },
+    "range": {
+      "24h": "24時間",
+      "7d": "7日",
+      "30d": "30日",
+      "all": "全期間"
+    },
+    "severity": {
+      "CRITICAL": "CRITICAL 緊急",
+      "MAJOR": "MAJOR 重要",
+      "MINOR": "MINOR 軽微",
+      "WARNING": "WARNING 警告",
+      "INFO": "INFO 情報"
+    },
+    "severityShort": {
+      "CRITICAL": "CRIT",
+      "MAJOR": "MAJ",
+      "MINOR": "MIN",
+      "WARNING": "WARN",
+      "INFO": "INFO"
+    },
+    "status": {
+      "ACTIVE": "発生中",
+      "ACKNOWLEDGED": "確認済み",
+      "SUPPRESSED": "抑制中",
+      "CLEARED": "解除済み"
+    },
+    "source": {
+      "RULE": "ルール",
+      "FLOW": "フロー",
+      "SYSTEM": "システム"
+    },
+    "suppressed": {
+      "MAINTENANCE": "メンテナンス",
+      "PARENT": "上位原因",
+      "DEVICE_OFFLINE": "デバイスオフライン"
+    },
+    "clearReason": {
+      "AUTO": "条件解消",
+      "MANUAL": "手動解除",
+      "PARENT_CLEARED": "上位アラーム解除",
+      "RULE_DELETED": "ルール削除",
+      "RULE_SCOPE_CHANGED": "ルール範囲変更"
+    },
+    "actionType": {
+      "ONSITE": "現地確認",
+      "CONFIG_CHANGE": "設定変更",
+      "DEVICE_REPLACED": "デバイス交換",
+      "OTHER": "その他"
+    },
+    "event": {
+      "RAISED": "発生",
+      "RERAISED": "再発生",
+      "ACKED": "確認",
+      "CLEARED": "解除",
+      "ASSIGNED": "担当者指定",
+      "NOTE": "メモ",
+      "ACTION": "対応",
+      "ESCALATED": "エスカレーション",
+      "NOTIFIED": "通知送信",
+      "SILENCED": "ミュート",
+      "FLAPPING_ON": "フラッピング開始",
+      "FLAPPING_OFF": "フラッピング終了",
+      "SUPPRESSED": "抑制"
+    },
+    "eventText": {
+      "value": "値 {{value}}",
+      "assigned": "→ {{name}}",
+      "notified": "{{channel}} · {{recipient}} · {{status}}",
+      "escalated": "{{step}}段階"
+    },
+    "dur": {
+      "days": "{{n}}日",
+      "hours": "{{n}}時間",
+      "minutes": "{{n}}分",
+      "seconds": "{{n}}秒"
+    },
+    "detail": {
+      "source": "発生元",
+      "openRule": "ルールを開く",
+      "openFlow": "フローを開く",
+      "target": "対象",
+      "hiddenTarget": "権限外の対象",
+      "values": "値",
+      "raisedAt": "発生",
+      "ackedAt": "確認",
+      "clearedAt": "解除",
+      "assignee": "担当者",
+      "assign": "担当者を指定",
+      "parent": "上位アラーム",
+      "openParent": "上位アラームを見る",
+      "timeline": "タイムライン",
+      "noEvents": "記録がありません",
+      "deliveries": "通知送信履歴",
+      "noDeliveries": "送信した通知はありません",
+      "channel": "チャネル",
+      "recipient": "受信者",
+      "deliveryStatus": "状態",
+      "attempts": "試行",
+      "sentAt": "送信時刻",
+      "noteTitle": "メモ・対応記録",
+      "note": "メモ",
+      "actionType": "対応の種類",
+      "noteOnly": "メモのみ",
+      "clearNote": "解除メモ(任意)",
+      "me": "{{name}}(自分)",
+      "valueLine": "発生 {{trigger}} · 最大 {{peak}} · 現在 {{last}}",
+      "duration": "継続 {{d}}",
+      "chart": "{{metric}} 発生前後",
+      "thresholds": "発生基準 {{raise}} · 解除基準 {{clear}}",
+      "childrenTitle": "下位アラーム {{n}}件",
+      "done": {
+        "ack": "アラームを確認しました",
+        "clear": "アラームを解除しました",
+        "note": "記録しました",
+        "assign": "担当者を指定しました",
+        "silence": "ミュートしました"
+      }
+    },
+    "v": {
+      "noteLength": "メモは1〜{{n}}文字です"
+    }
+  },
+  "silences": {
+    "title": "ミュート予定",
+    "list": "ミュート一覧",
+    "new": "新規ミュート",
+    "empty": "ミュートはありません",
+    "active": "適用中",
+    "release": "解除",
+    "targetType": "対象の種類",
+    "targetId": "対象",
+    "chooseTarget": "対象を選択",
+    "startsAt": "開始",
+    "endsAt": "終了",
+    "repeat": "繰り返し",
+    "weekly": "曜日・時間帯",
+    "dates": "日付範囲",
+    "dateFrom": "開始日",
+    "dateTo": "終了日",
+    "reason": "理由",
+    "create": "ミュートを作成",
+    "col": {
+      "kind": "種類",
+      "target": "対象",
+      "when": "期間",
+      "reason": "理由",
+      "by": "作成者"
+    },
+    "kind": {
+      "ONE_TIME": "一時ミュート",
+      "RECURRING": "繰り返しミュート"
+    },
+    "target": {
+      "RULE": "ルール",
+      "DEVICE": "デバイス",
+      "SPACE": "空間",
+      "ALARM": "アラーム"
+    },
+    "v": {
+      "target": "対象を選択してください",
+      "days": "曜日を1つ以上選択してください",
+      "reason": "理由は200文字までです"
+    }
+  },
+  "alarmStats": {
+    "title": "アラーム統計",
+    "period": "期間",
+    "topRules": "上位ルール",
+    "topSpaces": "上位空間",
+    "topDevices": "上位デバイス",
+    "daily": "日別発生",
+    "date": "日付",
+    "raised": "発生数",
+    "cards": {
+      "raised": "発生数",
+      "mtta": "平均確認時間(MTTA)",
+      "mttr": "平均解決時間(MTTR)",
+      "unacked": "未確認率"
+    }
+  },
+  "tuning": {
+    "title": "ルールのチューニング提案",
+    "empty": "未対応のチューニング提案はありません",
+    "current": "現在",
+    "proposed": "提案",
+    "simulation": "シミュレーション",
+    "apply": "適用",
+    "dismiss": "無視",
+    "dismissed": "提案を無視しました",
+    "applied": "提案を適用しました(ルールバージョン {{version}})",
+    "simulationValue": "想定アラーム {{before}}件 → {{after}}件",
+    "problem": {
+      "TOO_FREQUENT": "発生過多",
+      "FLAPPING": "フラッピング",
+      "UNACKNOWLEDGED": "未確認が多い"
+    }
+  },
+  "errors": {
+    "RULE_NOT_FOUND": "ルールが見つかりません",
+    "RULE_NAME_DUPLICATED": "同じ名前のルールがあります",
+    "RULE_CONDITION_INVALID": "条件が正しくありません",
+    "RULE_LIMIT_EXCEEDED": "ルールは1,000件まで作成できます",
+    "RULE_TARGET_LIMIT_EXCEEDED": "対象デバイスは5,000台までです",
+    "RULE_STATE_CONFLICT": "現在の状態ではできません",
+    "RULE_SIMULATION_RANGE_INVALID": "シミュレーション期間は30日までです",
+    "ALARM_NOT_FOUND": "アラームが見つかりません",
+    "ALARM_STATE_CONFLICT": "既に処理されたアラームです",
+    "ALARM_BULK_LIMIT_EXCEEDED": "一度に200件まで処理できます",
+    "SILENCE_RANGE_INVALID": "ミュート期間が正しくありません"
+  }
+}
