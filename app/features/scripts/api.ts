@@ -28,9 +28,15 @@ export interface ScriptDetail {
   draft: { versionId: string; versionNo: number; code: string; staticCheck: StaticCheck } | null;
   versions?: ScriptVersionRow[];
   bindings?: { targetType: string; targetId: string; name?: string; failurePolicy?: string }[];
-  usage?: { bindings?: { processed24h?: number }[] };
+  usage?: ScriptUsage;
   config?: Record<string, unknown>;
   version?: number;
+}
+
+/** API-SCR-04 `include=usage`(SCR-04.04, UI-SCR-08) */
+export interface ScriptUsage {
+  bindings?: { targetType?: string; targetId?: string; name?: string | null; deviceCount?: number | null; processed24h?: number | null; failurePolicy?: string | null }[];
+  flowNodes?: { flowId: string; flowName?: string | null; nodeId: string; flowVersion?: number | null }[];
 }
 
 export interface DeployRequest {
