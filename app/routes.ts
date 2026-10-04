@@ -113,5 +113,11 @@ export default [
     route("control/capabilities", "routes/control-capabilities.tsx"),
     route("device-jobs", "routes/device-jobs.tsx"),
     route("device-jobs/:jobId", "routes/device-job-detail.tsx"),
+
+    // M5 sources: 출력 연결(UI-DSC-05, DSC-04.01)·엣지 게이트웨이(UI-DSC-10, DSC-08.03). 커넥터 스키마 폼은 /sources/new/:connectorKey
+    route("outputs/new", "routes/output-new.tsx"),
+    route("outputs/:outputId", "routes/output-detail.tsx"),
+    route("sources/edges", "routes/source-edges.tsx"),
+    route("sources/edges/:edgeId", "routes/source-edge-detail.tsx"),
   ]),
 ] satisfies RouteConfig;

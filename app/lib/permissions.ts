@@ -74,6 +74,9 @@ export const ROUTE_GUARDS: { prefix: string; anyOf: string[] }[] = [
   { prefix: "/control/capabilities", anyOf: ["DEVICE_CONTROL", "CAPABILITY_MANAGE"] },
   { prefix: "/device-jobs", anyOf: ["DEV_READ"] },
   { prefix: "/me/notifications", anyOf: [] },
+  // M5 sources: 출력 연결(UI-DSC-05 조회 OPERATOR 이상, 관리 INTEGRATOR 이상). 엣지(/sources/edges)는 /sources 가드
+  { prefix: "/outputs", anyOf: ["SRC_READ"] },
+  { prefix: "/outputs/new", anyOf: ["SRC_ADMIN"] },
 ];
 
 export function hasAny(permissions: readonly string[] | undefined, required: readonly string[]): boolean {

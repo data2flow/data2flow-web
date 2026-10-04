@@ -1,3 +1,5 @@
+import { EMPTY_TLS, tlsBody, tlsFrom, validateTls, type TlsSettings } from "./schema-form";
+
 /**
  * 데이터 소스 화면 모델(DSC-01·02·07·09). 입력 검증(UI-DSC-02 표), 실제 client-id 미리 보기(BR-DSC-01),
  * 대표 연결 상태(가장 나쁜 인스턴스), 상태별 버튼(DSC-07.01), 저장 요청 본문(API-DSC-02·04).
@@ -175,6 +177,10 @@ export interface SourceFormValues {
   defaultSpaceId: string;
   autoregLimitPerHour: string;
   noDataAlarmAfterSec: string;
+  /** TLS 설정(DSC-09.06): SNI·최소 버전·인증서 고정. 없으면 기본 */
+  tls?: TlsSettings;
+  /** TLS 비밀값(CA_CERT, mTLS의 CLIENT_CERT·CLIENT_KEY). 쓰기 전용 */
+  tlsSecrets?: Record<string, string>;
 }
 
 /** generic-json 기본 매핑(ING-02.03 예: `devices/esp-01/telemetry` + `{"temp":22.4}`) */
@@ -251,6 +257,8 @@ export function formFromSource(source: SourceDetail): SourceFormValues {
     defaultSpaceId: str(source.defaultSpaceId),
     autoregLimitPerHour: str(source.autoregLimitPerHour, "100"),
     noDataAlarmAfterSec: str(source.noDataAlarmAfterSec, "600"),
+    tls: tlsFrom(c.tls),
+    tlsSecrets: {},
   };
 }
 
@@ -277,6 +285,9 @@ export function validateForm(values: SourceFormValues, options: { editing?: bool
     if (values.auth === "USERPASS" && !values.username.trim()) errors.username = "username";
     if (values.auth === "HEADER" && !values.headerName.trim()) errors.headerName = "headerName";
     if (values.tlsInsecure && !values.isDev) errors.tlsInsecure = "tlsDevOnly";
+    const ts = values.tlsSecrets ?? {};
+    if (values.auth === "MTLS" && !(options.editing && options.secretConfigured) && (!ts.CLIENT_CERT?.trim() || !ts.CLIENT_KEY?.trim())) errors.secretValue = "secret";
+    if (Object.keys(validateTls(values.tls ?? EMPTY_TLS)).length > 0) errors.tls = "tls";
   }
   if (values.decoderKey === "script" && !values.decodeScriptId) errors.decodeScriptId = "script";
   if (values.decoderKey === "generic-json" && options.mappingError) errors.decoderConfig = "mapping";
@@ -305,6 +316,8 @@ function connectionOf(values: SourceFormValues): Record<string, unknown> {
   if (values.auth === "HEADER") connection.headerName = values.headerName.trim();
   if (values.auth === "HEADER" && values.headerScheme.trim()) connection.headerScheme = values.headerScheme.trim();
   if (values.auth === "USERPASS") connection.username = values.username.trim();
+  const tls = tlsBody(values.tls ?? EMPTY_TLS);
+  if (tls) connection.tls = tls;
   return connection;
 }
 
@@ -346,7 +359,21 @@ export function updateBody(values: SourceFormValues): Record<string, unknown> {
   };
   // 비밀값 종류: core는 인증 방식 이름(USERPASS→PASSWORD, HEADER→HEADER_VALUE)을 받는다. MTLS 인증서·키 올리기는 M5(DSC-09.06)
   if (values.secretValue && (values.auth === "USERPASS" || values.auth === "HEADER")) body.secret = { kind: values.auth, value: values.secretValue };
+  // mTLS(DSC-09.06): 클라이언트 인증서·키(+ CA)를 한 건으로(`{cert, key, ca}`)
+  const ts = values.tlsSecrets ?? {};
+  if (values.type === "MQTT_SUBSCRIBE" && values.auth === "MTLS" && ts.CLIENT_CERT?.trim() && ts.CLIENT_KEY?.trim()) body.secret = { cert: ts.CLIENT_CERT, key: ts.CLIENT_KEY, ...(ts.CA_CERT?.trim() ? { ca: ts.CA_CERT } : {}) };
   return body;
+}
+
+/**
+ * 저장 본문 `secret` 한 건에 못 들어간 비밀값(사설 CA 묶음 등). 저장 뒤 API-DSC-58 `PUT …/secrets/{kind}`로 보낸다(DSC-09.06).
+ */
+export function extraSecrets(values: SourceFormValues): { kind: string; value: string }[] {
+  if (values.type !== "MQTT_SUBSCRIBE") return [];
+  const ts = values.tlsSecrets ?? {};
+  const sentWithMtls = values.auth === "MTLS" && ts.CLIENT_CERT?.trim() && ts.CLIENT_KEY?.trim();
+  if (ts.CA_CERT?.trim() && !sentWithMtls) return [{ kind: "CA_CERT", value: ts.CA_CERT }];
+  return [];
 }
 
 /** 연결 테스트 본문(API-DSC-57): 소스 설정 전체(저장 안 함). 테스트는 저장 본문에 영향이 없다(TC-DSC-093) */
@@ -510,3 +537,34 @@ export function testOutcome(result: TestResult): "failed" | "partial" | "success
   if (result.preview.length === 0) return "partial";
   return "success";
 }
+
+/** 커넥터 템플릿 preset(API-DSC-56) */
+export interface MqttPreset {
+  connection?: Record<string, unknown>;
+  topics?: { topic: string; qos: number }[];
+  decoderKey?: string | null;
+  decoderConfig?: unknown;
+}
+
+const str = (v: unknown, fallback: string) => (typeof v === "string" ? v : typeof v === "number" ? String(v) : fallback);
+
+/** MQTT 템플릿 preset → 기본 폼 값(TC-DSC-309: 주소·헤더 Basic·토픽·QoS가 채워지고 비밀번호만 빈칸) */
+export function mqttFromPreset(initial: SourceFormValues, preset: MqttPreset): SourceFormValues {
+  const c = preset.connection ?? {};
+  return {
+    ...initial,
+    url: str(c.url, initial.url),
+    protocolVersion: c.protocolVersion === "3.1.1" ? "3.1.1" : initial.protocolVersion,
+    qos: typeof c.qos === "number" ? c.qos : initial.qos,
+    keepaliveSec: str(c.keepaliveSec, initial.keepaliveSec),
+    cleanStart: typeof c.cleanStart === "boolean" ? c.cleanStart : initial.cleanStart,
+    auth: str(c.auth, initial.auth),
+    headerName: str(c.headerName, initial.headerName),
+    headerScheme: str(c.headerScheme, initial.headerScheme),
+    username: str(c.username, initial.username),
+    topics: preset.topics?.length ? preset.topics : initial.topics,
+    decoderKey: preset.decoderKey ?? initial.decoderKey,
+    decoderConfig: preset.decoderConfig ? JSON.stringify(preset.decoderConfig, null, 2) : initial.decoderConfig,
+  };
+}
+
