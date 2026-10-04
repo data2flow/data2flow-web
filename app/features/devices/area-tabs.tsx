@@ -1,10 +1,10 @@
 /**
- * 기기 메뉴 하위 탭(00-navigation.md §2 기기): 전체 기기, 승인 대기(대기 수 배지), 기기 모델, 측정 항목, 그룹, 일괄 작업(UI-DEV-12, M4).
+ * 기기 메뉴 하위 탭(00-navigation.md §2 기기): 전체 기기, 승인 대기(대기 수 배지), 기기 모델, 측정 항목, 그룹, 일괄 작업(UI-DEV-12, M4), 작업 지시(UI-DEV-13)·설치 현황(UI-DEV-22, M5).
  */
 import { useTranslation } from "react-i18next";
 import { Tabs } from "~/components/ui";
 
-export type DeviceArea = "all" | "pending" | "models" | "metrics" | "groups" | "jobs";
+export type DeviceArea = "all" | "pending" | "models" | "metrics" | "groups" | "jobs" | "workOrders" | "installation";
 
 export function DeviceAreaTabs({ current, pendingCount }: { current: DeviceArea; pendingCount?: number | null }) {
   const { t } = useTranslation();
@@ -19,6 +19,8 @@ export function DeviceAreaTabs({ current, pendingCount }: { current: DeviceArea;
         { key: "metrics", label: t("devices.area.metrics"), to: "/metrics" },
         { key: "groups", label: t("devices.area.groups"), to: "/device-groups" },
         { key: "jobs", label: t("devices.area.jobs"), to: "/device-jobs" },
+        { key: "workOrders", label: t("field.area.workOrders"), to: "/work-orders" },
+        { key: "installation", label: t("field.area.installation"), to: "/devices/installation" },
       ]}
     />
   );

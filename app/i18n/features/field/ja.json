@@ -1,0 +1,386 @@
+{
+  "field": {
+    "title": "作業指示",
+    "loadFailed": "情報を読み込めませんでした。",
+    "area": {
+      "workOrders": "作業指示",
+      "installation": "設置状況"
+    },
+    "views": {
+      "mine": "自分の作業",
+      "all": "すべて",
+      "dueSoon": "期限間近",
+      "overdue": "遅延"
+    },
+    "status": {
+      "OPEN": "未着手",
+      "ASSIGNED": "割当済み",
+      "IN_PROGRESS": "作業中",
+      "DONE": "完了",
+      "CANCELLED": "取消"
+    },
+    "priority": {
+      "LOW": "低",
+      "NORMAL": "通常",
+      "HIGH": "高",
+      "URGENT": "緊急"
+    },
+    "types": {
+      "BATTERY": "電池交換",
+      "CALIBRATION": "校正",
+      "INSPECTION": "点検",
+      "REPAIR": "修理",
+      "REPLACE": "交換",
+      "RELOCATE": "移設",
+      "OTHER": "その他"
+    },
+    "origins": {
+      "MANUAL": "手動",
+      "ALARM": "アラーム",
+      "ANALYSIS": "分析",
+      "FLOW": "フロー",
+      "SCHEDULE": "定期点検"
+    },
+    "severity": {
+      "CRITICAL": "重大",
+      "MAJOR": "主要",
+      "MINOR": "軽微",
+      "WARNING": "警告",
+      "INFO": "情報"
+    },
+    "list": {
+      "views": "作業指示の表示",
+      "stats": "未完了 {{open}} · 遅延 {{overdue}} · 平均処理 {{hours}}時間",
+      "title": "タイトル",
+      "type": "種類",
+      "priority": "優先度",
+      "target": "対象",
+      "assignee": "担当者",
+      "due": "期限",
+      "status": "状態",
+      "origin": "発生元",
+      "user": "ユーザー #{{id}}",
+      "deviceCount": "機器 {{count}}台",
+      "spaceCount": "空間 {{count}}か所",
+      "empty": "作業指示はありません",
+      "emptyView": {
+        "mine": "自分に割り当てられた未完了の作業はありません",
+        "all": "作業指示はありません",
+        "dueSoon": "48時間以内に期限の作業はありません",
+        "overdue": "遅延している作業はありません"
+      },
+      "dueAt": "期限 {{at}}",
+      "overdueAt": "期限超過 {{at}}",
+      "spaceFilter": "空間(下位を含む)",
+      "allSpaces": "すべての空間",
+      "forDevice": "{{name}} の作業指示"
+    },
+    "create": {
+      "open": "+ 新しい作業指示",
+      "title": "新しい作業指示",
+      "titleLabel": "タイトル",
+      "targets": "対象(機器または空間、1つ以上)",
+      "deviceFilter": "機器名で検索",
+      "noDevices": "該当する機器はありません",
+      "space": "空間",
+      "noSpace": "空間なし",
+      "assignee": "担当者",
+      "unassigned": "未割当",
+      "me": "自分",
+      "checklist": "チェックリスト(1行に1つ、{{count}}件)",
+      "submit": "作成",
+      "linked": "既存の作業指示に追加されました"
+    },
+    "validation": {
+      "title": {
+        "required": "タイトルを入力してください",
+        "tooLong": "タイトルは150文字以内です"
+      },
+      "type": {
+        "required": "種類を選んでください"
+      },
+      "targets": {
+        "required": "対象を1つ以上選んでください"
+      },
+      "dueAt": {
+        "invalid": "期限の形式が正しくありません",
+        "past": "期限は現在より後にしてください"
+      },
+      "checklist": {
+        "tooMany": "チェックリストは50件までです"
+      },
+      "name": {
+        "required": "名前を入力してください",
+        "tooLong": "名前は100文字以内です"
+      },
+      "targetGroupId": {
+        "required": "対象グループを選んでください"
+      },
+      "intervalDays": {
+        "range": "周期は{{min}}~{{max}}日です"
+      },
+      "leadDays": {
+        "range": "事前作成日数は0以上で周期より短くしてください"
+      },
+      "nextDueOn": {
+        "required": "次回期限日を入力してください"
+      },
+      "checklistTemplate": {
+        "tooMany": "チェックリストは50件までです"
+      },
+      "serialNo": {
+        "tooLong": "100文字以内で入力してください"
+      },
+      "supplier": {
+        "tooLong": "100文字以内で入力してください"
+      },
+      "installer": {
+        "tooLong": "100文字以内で入力してください"
+      },
+      "installedOn": {
+        "order": "設置日は購入日以降にしてください"
+      },
+      "warrantyUntil": {
+        "order": "保証終了日は購入日以降にしてください"
+      }
+    },
+    "detail": {
+      "title": "作業指示の詳細",
+      "targets": "対象",
+      "device": "機器 #{{id}}",
+      "space": "空間 #{{id}}",
+      "origin": "発生元: {{origin}}",
+      "linkedOrigins": "同じ原因で{{count}}回追加要求",
+      "checklist": "チェックリスト {{done}}/{{total}}",
+      "noChecklist": "チェックリストはありません"
+    },
+    "attachments": {
+      "title": "添付 {{count}}",
+      "add": "写真・ファイルを追加",
+      "empty": "添付はありません",
+      "remove": "{{name}} を削除",
+      "uploaded": "写真をアップロードしました",
+      "invalid": {
+        "type": "画像またはPDFのみアップロードできます",
+        "size": "ファイルは20MB以下です"
+      }
+    },
+    "comments": {
+      "title": "コメント",
+      "empty": "コメントはありません",
+      "new": "コメント",
+      "add": "投稿"
+    },
+    "actions": {
+      "ASSIGN": "割当",
+      "assignMe": "自分に割り当て",
+      "START": "作業開始",
+      "COMPLETE": "完了",
+      "CANCEL": "作業指示を取消",
+      "done": {
+        "ASSIGN": "割り当てました",
+        "START": "作業を開始しました",
+        "COMPLETE": "作業を完了しました",
+        "CANCEL": "作業指示を取り消しました"
+      }
+    },
+    "errors": {
+      "stateConflict": "他の人が先に状態を変更しました。新しい状態を確認してください",
+      "versionConflict": "他の人が先に変更しました。再読み込みしてから保存してください"
+    },
+    "complete": {
+      "title": "作業完了",
+      "replacedOn": "電池交換日",
+      "attributeKey": "校正属性キー",
+      "attributeValue": "新しい値",
+      "newDeviceId": "新しい機器 ID",
+      "newDeviceHint": "交換した機器を旧機器の論理機器に紐付けます",
+      "note": "メモ"
+    },
+    "plans": {
+      "title": "定期点検計画",
+      "new": "新しい計画",
+      "edit": "計画を編集",
+      "empty": "定期点検計画はありません",
+      "name": "名前",
+      "group": "対象グループ",
+      "chooseGroup": "グループを選択",
+      "interval": "周期",
+      "everyDays": "{{days}}日ごと(期限の{{lead}}日前に作成)",
+      "intervalDays": "周期(日)",
+      "leadDays": "事前作成(日)",
+      "nextDue": "次回期限",
+      "checklist": "チェックリストテンプレート(1行に1つ)",
+      "enabled": "有効",
+      "deleted": "計画を削除しました",
+      "deleteNamed": "{{name}} を削除"
+    },
+    "asset": {
+      "tab": "資産",
+      "title": "資産情報",
+      "serialNo": "シリアル番号",
+      "purchasedOn": "購入日",
+      "installedOn": "設置日",
+      "warrantyUntil": "保証終了日",
+      "supplier": "仕入先",
+      "installer": "設置業者",
+      "photos": "写真 {{count}}枚",
+      "photoAlt": "資産写真 {{n}}",
+      "addPhoto": "写真を追加",
+      "removePhoto": "写真 {{n}} を削除",
+      "warrantySoon": "保証はあと{{days}}日で終了します",
+      "warrantyExpired": "保証期間が終了しました",
+      "workOrders": "この機器の作業指示を見る"
+    },
+    "qr": {
+      "title": "QRラベル",
+      "alt": "{{name}} のQRコード",
+      "print": "ラベル印刷(PDF)",
+      "printList": "{{count}}台のラベルを印刷",
+      "reissue": "QRを再発行",
+      "reissueWarning": "再発行すると貼付済みの旧ラベルは開けなくなります(404)。新しいラベルを印刷して貼り替えてください。",
+      "reissued": "QRを再発行しました。新しいラベルを印刷してください",
+      "notFound": "このQRラベルは使用できません。再発行されたか、閲覧できない機器です。",
+      "labels": {
+        "empty": "印刷する機器がありません",
+        "tooMany": "一度に200台まで印刷できます"
+      }
+    },
+    "board": {
+      "title": "設置状況",
+      "titleSite": "設置状況 · {{site}}",
+      "site": "サイト",
+      "floor": "階",
+      "planned": "予定",
+      "installed": "完了",
+      "verified": "確認",
+      "problem": "問題",
+      "progress": "進捗",
+      "progressOf": "{{floor}} の進捗",
+      "total": "合計",
+      "empty": "設置する機器はありません",
+      "cellLabel": "{{floor}} {{status}} {{count}}台を表示",
+      "drawer": "{{floor}} · {{status}}",
+      "noDevices": "機器はありません",
+      "commission": "現場設置を開く"
+    },
+    "commission": {
+      "steps": "設置ステップ",
+      "step": {
+        "scan": "QRスキャン",
+        "confirm": "機器確認",
+        "position": "位置指定",
+        "photos": "写真",
+        "wait": "初回受信待ち"
+      },
+      "space": "設置空間",
+      "chooseSpace": "空間を選んでください",
+      "rescan": "再スキャン",
+      "next": "次へ: 位置",
+      "back": "戻る",
+      "nextPhotos": "次へ: 写真",
+      "noFloorplan": "この空間には平面図がありません。位置なしで設置を記録します",
+      "floorplanAlt": "設置する階の平面図",
+      "here": "ここ",
+      "photos": "設置写真 {{count}}/{{max}}",
+      "addPhoto": "写真を撮る",
+      "removePhoto": "{{name}} を外す",
+      "save": "設置を保存",
+      "queueTitle": "送信する設置記録",
+      "queued": "{{name}}: 接続後に送信",
+      "sent": "{{name}}: 保存済み",
+      "failed": "{{name}}: 保存失敗({{code}})",
+      "conflict": "{{name}}: 別の担当者が先に設置を記録しました",
+      "server": "サーバーの記録",
+      "mine": "自分の入力",
+      "installedAt": "設置時刻",
+      "installedBy": "設置者",
+      "waitTitle": "初回受信待ち {{time}}",
+      "waiting": "データを待っています。10分を過ぎると点検案内を表示します",
+      "firstData": "初回受信を確認 · {{at}}",
+      "problem": "10分間データが届きません。以下を点検してください",
+      "nextDevice": "次の機器をスキャン",
+      "status": {
+        "PLANNED": "設置予定",
+        "INSTALLED": "設置完了",
+        "VERIFIED": "初回受信確認",
+        "PROBLEM": "問題あり"
+      },
+      "check": {
+        "firstData": "初回受信",
+        "position": "位置",
+        "photo": "写真",
+        "signal": "電波強度",
+        "battery": "電池",
+        "gateway": "ゲートウェイ",
+        "source": "ソース接続"
+      },
+      "hint": {
+        "signal": "電波が弱いです。ゲートウェイとの距離や障害物を確認してください",
+        "battery": "電池残量が少ないです。電池を確認してください",
+        "gateway": "近くのゲートウェイがオフラインです",
+        "source": "データソースの接続を確認してください",
+        "firstData": "機器の電源とJoin状態を確認してください"
+      }
+    },
+    "deviceStatus": {
+      "PENDING": "承認待ち",
+      "ACTIVE": "使用中",
+      "INACTIVE": "停止中"
+    },
+    "device": {
+      "connectivity": "接続状態",
+      "conn": {
+        "ONLINE": "オンライン",
+        "OFFLINE": "オフライン",
+        "UNKNOWN": "不明"
+      },
+      "lastSeen": "最終受信",
+      "battery": "電池",
+      "latest": "現在値",
+      "noLatest": "受信した値はありません",
+      "alarms": "最近のアラーム",
+      "noAlarms": "最近のアラームはありません",
+      "openOrders": "未完了の作業指示 {{count}}",
+      "noOrders": "未完了の作業指示はありません"
+    },
+    "mobile": {
+      "tabs": "モバイルメニュー",
+      "tab": {
+        "alarms": "アラーム",
+        "spaces": "空間",
+        "work": "作業",
+        "notifications": "通知",
+        "scan": "QR"
+      },
+      "desktop": "PC画面",
+      "workActions": "作業ボタン",
+      "scan": "QRスキャン",
+      "photo": "写真",
+      "noSpaces": "表示できる空間はありません",
+      "spaceCounts": "機器 {{devices}} · アラーム {{alarms}}"
+    },
+    "notifications": {
+      "hint": "この画面を開いてから受け取った通知です。",
+      "settings": "受信設定",
+      "empty": "新しい通知はありません"
+    },
+    "offline": {
+      "band": "オフライン — 閲覧のみです。待機中のアップロード {{count}}件は接続後に送信します",
+      "sending": "待機中の{{count}}件を送信しています",
+      "queued": "接続後に送信します",
+      "whenOnline": "接続後に送信",
+      "pendingAction": "{{action}}: 接続後に送信"
+    },
+    "scan": {
+      "start": "カメラでスキャン",
+      "camera": "QRカメラ",
+      "denied": "カメラを使用できません。設定でカメラを許可してください",
+      "unsupported": "このブラウザはQR読み取りに対応していません。ラベル下のアドレスを入力してください",
+      "manual": "QRアドレスまたはコード",
+      "open": "開く",
+      "invalid": "QRアドレスの形式ではありません",
+      "notFound": "見つからない機器です"
+    }
+  }
+}

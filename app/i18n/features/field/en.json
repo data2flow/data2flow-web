@@ -1,0 +1,386 @@
+{
+  "field": {
+    "title": "Work orders",
+    "loadFailed": "Could not load the data.",
+    "area": {
+      "workOrders": "Work orders",
+      "installation": "Installation"
+    },
+    "views": {
+      "mine": "My work",
+      "all": "All",
+      "dueSoon": "Due soon",
+      "overdue": "Overdue"
+    },
+    "status": {
+      "OPEN": "Open",
+      "ASSIGNED": "Assigned",
+      "IN_PROGRESS": "In progress",
+      "DONE": "Done",
+      "CANCELLED": "Cancelled"
+    },
+    "priority": {
+      "LOW": "Low",
+      "NORMAL": "Normal",
+      "HIGH": "High",
+      "URGENT": "Urgent"
+    },
+    "types": {
+      "BATTERY": "Battery",
+      "CALIBRATION": "Calibration",
+      "INSPECTION": "Inspection",
+      "REPAIR": "Repair",
+      "REPLACE": "Replace",
+      "RELOCATE": "Relocate",
+      "OTHER": "Other"
+    },
+    "origins": {
+      "MANUAL": "Manual",
+      "ALARM": "Alarm",
+      "ANALYSIS": "Analysis",
+      "FLOW": "Flow",
+      "SCHEDULE": "Schedule"
+    },
+    "severity": {
+      "CRITICAL": "Critical",
+      "MAJOR": "Major",
+      "MINOR": "Minor",
+      "WARNING": "Warning",
+      "INFO": "Info"
+    },
+    "list": {
+      "views": "Work order views",
+      "stats": "Open {{open}} · Overdue {{overdue}} · Avg. lead time {{hours}} h",
+      "title": "Title",
+      "type": "Type",
+      "priority": "Priority",
+      "target": "Target",
+      "assignee": "Assignee",
+      "due": "Due",
+      "status": "Status",
+      "origin": "Origin",
+      "user": "User #{{id}}",
+      "deviceCount": "{{count}} devices",
+      "spaceCount": "{{count}} spaces",
+      "empty": "No work orders",
+      "emptyView": {
+        "mine": "No open work assigned to you",
+        "all": "No work orders",
+        "dueSoon": "Nothing due in the next 48 hours",
+        "overdue": "No overdue work"
+      },
+      "dueAt": "Due {{at}}",
+      "overdueAt": "Overdue since {{at}}",
+      "spaceFilter": "Space (incl. children)",
+      "allSpaces": "All spaces",
+      "forDevice": "Work orders for {{name}}"
+    },
+    "create": {
+      "open": "+ New work order",
+      "title": "New work order",
+      "titleLabel": "Title",
+      "targets": "Targets (devices or a space, at least one)",
+      "deviceFilter": "Find device by name",
+      "noDevices": "No matching devices",
+      "space": "Space",
+      "noSpace": "No space",
+      "assignee": "Assignee",
+      "unassigned": "Unassigned",
+      "me": "Me",
+      "checklist": "Checklist (one per line, {{count}})",
+      "submit": "Create",
+      "linked": "Added to the existing work order"
+    },
+    "validation": {
+      "title": {
+        "required": "Enter a title",
+        "tooLong": "Title must be 150 characters or fewer"
+      },
+      "type": {
+        "required": "Choose a type"
+      },
+      "targets": {
+        "required": "Choose at least one target"
+      },
+      "dueAt": {
+        "invalid": "Invalid due date",
+        "past": "Due date must be in the future"
+      },
+      "checklist": {
+        "tooMany": "Up to 50 checklist items"
+      },
+      "name": {
+        "required": "Enter a name",
+        "tooLong": "Name must be 100 characters or fewer"
+      },
+      "targetGroupId": {
+        "required": "Choose a target group"
+      },
+      "intervalDays": {
+        "range": "Interval must be {{min}}–{{max}} days"
+      },
+      "leadDays": {
+        "range": "Lead days must be 0 or more and shorter than the interval"
+      },
+      "nextDueOn": {
+        "required": "Enter the next due date"
+      },
+      "checklistTemplate": {
+        "tooMany": "Up to 50 checklist items"
+      },
+      "serialNo": {
+        "tooLong": "Use 100 characters or fewer"
+      },
+      "supplier": {
+        "tooLong": "Use 100 characters or fewer"
+      },
+      "installer": {
+        "tooLong": "Use 100 characters or fewer"
+      },
+      "installedOn": {
+        "order": "Install date must be on or after the purchase date"
+      },
+      "warrantyUntil": {
+        "order": "Warranty end must be on or after the purchase date"
+      }
+    },
+    "detail": {
+      "title": "Work order",
+      "targets": "Targets",
+      "device": "Device #{{id}}",
+      "space": "Space #{{id}}",
+      "origin": "Origin: {{origin}}",
+      "linkedOrigins": "Requested {{count}} more times for the same cause",
+      "checklist": "Checklist {{done}}/{{total}}",
+      "noChecklist": "No checklist"
+    },
+    "attachments": {
+      "title": "Attachments {{count}}",
+      "add": "Add photo or file",
+      "empty": "No attachments",
+      "remove": "Delete {{name}}",
+      "uploaded": "Photo uploaded",
+      "invalid": {
+        "type": "Only images or PDF files",
+        "size": "Files must be 20 MB or smaller"
+      }
+    },
+    "comments": {
+      "title": "Comments",
+      "empty": "No comments",
+      "new": "Comment",
+      "add": "Post"
+    },
+    "actions": {
+      "ASSIGN": "Assign",
+      "assignMe": "Assign to me",
+      "START": "Start work",
+      "COMPLETE": "Complete",
+      "CANCEL": "Cancel work order",
+      "done": {
+        "ASSIGN": "Assigned",
+        "START": "Work started",
+        "COMPLETE": "Work completed",
+        "CANCEL": "Work order cancelled"
+      }
+    },
+    "errors": {
+      "stateConflict": "Someone changed the status first. Check the new status.",
+      "versionConflict": "Someone saved changes first. Reload and save again."
+    },
+    "complete": {
+      "title": "Complete work",
+      "replacedOn": "Battery replaced on",
+      "attributeKey": "Calibrated attribute key",
+      "attributeValue": "New value",
+      "newDeviceId": "New device ID",
+      "newDeviceHint": "The new device is linked to the old device's logical device",
+      "note": "Note"
+    },
+    "plans": {
+      "title": "Maintenance plans",
+      "new": "New plan",
+      "edit": "Edit plan",
+      "empty": "No maintenance plans",
+      "name": "Name",
+      "group": "Target group",
+      "chooseGroup": "Choose a group",
+      "interval": "Interval",
+      "everyDays": "Every {{days}} days (created {{lead}} days before due)",
+      "intervalDays": "Interval (days)",
+      "leadDays": "Lead time (days)",
+      "nextDue": "Next due",
+      "checklist": "Checklist template (one per line)",
+      "enabled": "Enabled",
+      "deleted": "Plan deleted",
+      "deleteNamed": "Delete {{name}}"
+    },
+    "asset": {
+      "tab": "Asset",
+      "title": "Asset information",
+      "serialNo": "Serial number",
+      "purchasedOn": "Purchased on",
+      "installedOn": "Installed on",
+      "warrantyUntil": "Warranty until",
+      "supplier": "Supplier",
+      "installer": "Installer",
+      "photos": "Photos ({{count}})",
+      "photoAlt": "Asset photo {{n}}",
+      "addPhoto": "Add photo",
+      "removePhoto": "Delete photo {{n}}",
+      "warrantySoon": "Warranty ends in {{days}} days",
+      "warrantyExpired": "Warranty has expired",
+      "workOrders": "View work orders for this device"
+    },
+    "qr": {
+      "title": "QR label",
+      "alt": "QR code for {{name}}",
+      "print": "Print label (PDF)",
+      "printList": "Print labels for {{count}} devices",
+      "reissue": "Reissue QR",
+      "reissueWarning": "After reissuing, the old label stops working (404). Print and attach a new label.",
+      "reissued": "QR reissued. Print a new label.",
+      "notFound": "This QR label is no longer valid. It was reissued or the device is not available to you.",
+      "labels": {
+        "empty": "No devices to print",
+        "tooMany": "Up to 200 devices per print"
+      }
+    },
+    "board": {
+      "title": "Installation status",
+      "titleSite": "Installation status · {{site}}",
+      "site": "Site",
+      "floor": "Floor",
+      "planned": "Planned",
+      "installed": "Installed",
+      "verified": "Verified",
+      "problem": "Problem",
+      "progress": "Progress",
+      "progressOf": "{{floor}} progress",
+      "total": "Total",
+      "empty": "No devices to install",
+      "cellLabel": "Show {{count}} {{status}} devices on {{floor}}",
+      "drawer": "{{floor}} · {{status}}",
+      "noDevices": "No devices",
+      "commission": "Open field installation"
+    },
+    "commission": {
+      "steps": "Installation steps",
+      "step": {
+        "scan": "Scan QR",
+        "confirm": "Confirm device",
+        "position": "Set position",
+        "photos": "Photos",
+        "wait": "Wait for first data"
+      },
+      "space": "Installed space",
+      "chooseSpace": "Choose a space",
+      "rescan": "Scan again",
+      "next": "Next: position",
+      "back": "Back",
+      "nextPhotos": "Next: photos",
+      "noFloorplan": "This space has no floor plan. Installation will be recorded without a position.",
+      "floorplanAlt": "Floor plan for installation",
+      "here": "Here",
+      "photos": "Installation photos {{count}}/{{max}}",
+      "addPhoto": "Take photo",
+      "removePhoto": "Remove {{name}}",
+      "save": "Save installation",
+      "queueTitle": "Installation records to send",
+      "queued": "{{name}}: will send when online",
+      "sent": "{{name}}: saved",
+      "failed": "{{name}}: failed ({{code}})",
+      "conflict": "{{name}}: another installer recorded this first",
+      "server": "Server record",
+      "mine": "My entry",
+      "installedAt": "Installed at",
+      "installedBy": "Installed by",
+      "waitTitle": "Waiting for first data {{time}}",
+      "waiting": "Waiting for data. A checklist appears after 10 minutes.",
+      "firstData": "First data received · {{at}}",
+      "problem": "No data for 10 minutes. Check the following.",
+      "nextDevice": "Scan next device",
+      "status": {
+        "PLANNED": "Planned",
+        "INSTALLED": "Installed",
+        "VERIFIED": "First data verified",
+        "PROBLEM": "Problem"
+      },
+      "check": {
+        "firstData": "First data",
+        "position": "Position",
+        "photo": "Photo",
+        "signal": "Signal",
+        "battery": "Battery",
+        "gateway": "Gateway",
+        "source": "Source connection"
+      },
+      "hint": {
+        "signal": "Weak signal. Check distance and obstacles to the gateway.",
+        "battery": "Low battery. Check the battery.",
+        "gateway": "The nearby gateway is offline",
+        "source": "Check the data source connection",
+        "firstData": "Check device power and join status"
+      }
+    },
+    "deviceStatus": {
+      "PENDING": "Pending",
+      "ACTIVE": "Active",
+      "INACTIVE": "Inactive"
+    },
+    "device": {
+      "connectivity": "Connectivity",
+      "conn": {
+        "ONLINE": "Online",
+        "OFFLINE": "Offline",
+        "UNKNOWN": "Unknown"
+      },
+      "lastSeen": "Last seen",
+      "battery": "Battery",
+      "latest": "Current values",
+      "noLatest": "No values yet",
+      "alarms": "Recent alarms",
+      "noAlarms": "No recent alarms",
+      "openOrders": "Open work orders ({{count}})",
+      "noOrders": "No open work orders"
+    },
+    "mobile": {
+      "tabs": "Mobile menu",
+      "tab": {
+        "alarms": "Alarms",
+        "spaces": "Spaces",
+        "work": "Work",
+        "notifications": "Notifications",
+        "scan": "QR"
+      },
+      "desktop": "Desktop view",
+      "workActions": "Work actions",
+      "scan": "Scan QR",
+      "photo": "Photo",
+      "noSpaces": "No spaces available",
+      "spaceCounts": "Devices {{devices}} · Alarms {{alarms}}"
+    },
+    "notifications": {
+      "hint": "Notifications received since this page opened.",
+      "settings": "Notification settings",
+      "empty": "No new notifications"
+    },
+    "offline": {
+      "band": "Offline — read only. {{count}} pending uploads will be sent when online.",
+      "sending": "Sending {{count}} pending items",
+      "queued": "Will send when online",
+      "whenOnline": "Sends when online",
+      "pendingAction": "{{action}}: will send when online"
+    },
+    "scan": {
+      "start": "Scan with camera",
+      "camera": "QR camera",
+      "denied": "Camera unavailable. Allow camera access in settings.",
+      "unsupported": "This browser cannot read QR codes. Enter the address printed under the label.",
+      "manual": "QR address or code",
+      "open": "Open",
+      "invalid": "Not a valid QR address",
+      "notFound": "Device not found"
+    }
+  }
+}

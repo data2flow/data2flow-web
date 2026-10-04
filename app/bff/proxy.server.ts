@@ -13,6 +13,11 @@ export const PROXY_SERVICES = new Set(["core", "ai"]);
 const FORWARD_REQUEST_HEADERS = ["content-type", "idempotency-key", "accept"];
 const FORWARD_RESPONSE_HEADERS = ["content-type", "content-disposition", "retry-after", "x-request-id", "cache-control", "content-language"];
 const MAX_BODY_BYTES = 10 * 1024 * 1024;
+/**
+ * 파일 올리기(multipart)는 더 크게 받는다: 작업 지시 첨부·자산 사진은 파일당 20MB(API-DEV-93·96),
+ * 현장 설치는 사진 5장까지 한 번에(API-DEV-137). 실제 파일 크기 검사는 core가 다시 한다
+ */
+export const MAX_MULTIPART_BYTES = 60 * 1024 * 1024;
 
 export async function proxyRequest(request: Request, ctx: BffRequestContext, service: string, rest: string): Promise<Response> {
   const { session, runtime, meta } = ctx;
@@ -34,7 +39,8 @@ export async function proxyRequest(request: Request, ctx: BffRequestContext, ser
   let body: ArrayBuffer | undefined;
   if (method !== "GET" && method !== "HEAD") {
     body = await request.arrayBuffer();
-    if (body.byteLength > MAX_BODY_BYTES) return errorResponse(413, "INVALID_REQUEST", meta.lang, meta.requestId);
+    const multipart = (request.headers.get("content-type") ?? "").toLowerCase().startsWith("multipart/form-data");
+    if (body.byteLength > (multipart ? MAX_MULTIPART_BYTES : MAX_BODY_BYTES)) return errorResponse(413, "INVALID_REQUEST", meta.lang, meta.requestId);
   }
 
   let upstream: Response;

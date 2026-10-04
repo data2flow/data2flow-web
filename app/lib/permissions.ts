@@ -19,7 +19,7 @@ export interface MenuItem {
 export const MENU: MenuItem[] = [
   { key: "home", path: "/", anyOf: [], group: "main" },
   { key: "spaces", path: "/spaces", anyOf: ["DEV_READ"], group: "main", sections: ["/sites"] },
-  { key: "devices", path: "/devices", anyOf: ["DEV_READ"], group: "main", sections: ["/models", "/metrics", "/device-groups"] },
+  { key: "devices", path: "/devices", anyOf: ["DEV_READ"], group: "main", sections: ["/models", "/metrics", "/device-groups", "/work-orders"] },
   { key: "explore", path: "/explore", anyOf: ["TS_READ"], group: "main" },
   { key: "ingest", path: "/ingest/monitor", anyOf: ["INGEST_READ"], group: "main", sections: ["/ingest", "/sources", "/scripts"] },
   // M4 자동화 완성: 규칙·알람(RUL) — 알람 목록은 VIEWER부터, 규칙·알림 설정은 하위 경로 가드로 좁힌다
@@ -74,6 +74,15 @@ export const ROUTE_GUARDS: { prefix: string; anyOf: string[] }[] = [
   { prefix: "/control/capabilities", anyOf: ["DEVICE_CONTROL", "CAPABILITY_MANAGE"] },
   { prefix: "/device-jobs", anyOf: ["DEV_READ"] },
   { prefix: "/me/notifications", anyOf: [] },
+  // M5 field: 작업 지시(UI-DEV-13 조회 V+, 계획 I+), 모바일 셸(UI-DSH-14)·현장 설치(UI-DEV-21 DEV_PLACE)
+  { prefix: "/work-orders", anyOf: ["DEV_READ"] },
+  { prefix: "/work-orders/plans", anyOf: ["DEV_ADMIN"] },
+  { prefix: "/m/alarms", anyOf: ["ALARM_READ"] },
+  { prefix: "/m/spaces", anyOf: ["DEV_READ"] },
+  { prefix: "/m/work-orders", anyOf: ["DEV_READ"] },
+  { prefix: "/m/devices", anyOf: ["DEV_READ"] },
+  { prefix: "/m/scan", anyOf: ["DEV_READ"] },
+  { prefix: "/m/commission", anyOf: ["DEV_PLACE"] },
 ];
 
 export function hasAny(permissions: readonly string[] | undefined, required: readonly string[]): boolean {

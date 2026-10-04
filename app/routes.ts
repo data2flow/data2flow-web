@@ -113,5 +113,25 @@ export default [
     route("control/capabilities", "routes/control-capabilities.tsx"),
     route("device-jobs", "routes/device-jobs.tsx"),
     route("device-jobs/:jobId", "routes/device-job-detail.tsx"),
+
+    // M5 field: 작업 지시·정기 점검(UI-DEV-13), 설치 현황판(UI-DEV-22) — spec/detail/00-navigation.md §2
+    route("work-orders", "routes/work-orders.tsx"),
+    route("work-orders/plans", "routes/work-order-plans.tsx"),
+    route("work-orders/:workOrderId", "routes/work-order-detail.tsx"),
+    route("devices/installation", "routes/devices-installation.tsx"),
+  ]),
+
+  // M5 field: 모바일 셸(UI-DSH-14, UI-DEV-17·21)과 QR 딥링크(`/d/{qrToken}`, 로그인 필요) — 00-navigation.md §2·§3
+  route("d/:token", "routes/qr-link.tsx"),
+  route("m", "routes/m-layout.tsx", [
+    index("routes/m-index.ts"),
+    route("alarms", "routes/m-alarms.tsx"),
+    route("spaces", "routes/m-spaces.tsx"),
+    route("work-orders", "routes/m-work-orders.tsx"),
+    route("work-orders/:workOrderId", "routes/m-work-order-detail.tsx"),
+    route("notifications", "routes/m-notifications.tsx"),
+    route("scan", "routes/m-scan.tsx"),
+    route("devices/:deviceId", "routes/m-device.tsx"),
+    route("commission", "routes/m-commission.tsx"),
   ]),
 ] satisfies RouteConfig;
