@@ -84,7 +84,11 @@
       "duplicateKey": "같은 키가 이미 있습니다.",
       "minMax": "최대는 최소보다 크거나 같아야 합니다.",
       "enumRequired": "선택지를 하나 이상 입력하세요.",
-      "effectProperty": "영향에 연결할 숫자 특성을 고르세요."
+      "effectProperty": "영향에 연결할 숫자 특성을 고르세요.",
+      "sourceRequired": "소스를 고르세요.",
+      "rangeOrder": "끝은 시작보다 뒤여야 합니다.",
+      "rangeTooLong": "기간은 최대 {{max}}일입니다.",
+      "retention": "원본은 최근 {{days}}일만 보관합니다."
     },
     "home": {
       "title": "가상 환경",
@@ -409,7 +413,20 @@
       "defaultSuffix": " [재생]",
       "count": "대상 측정값 {{n}}건",
       "dryRun": "대상 건수 확인",
-      "start": "재생 시작"
+      "start": "재생 시작",
+      "modeLabel": "재생 데이터",
+      "mode": {
+        "RAW": "원본 선택",
+        "FILE": "파일 가져오기"
+      },
+      "rawTitle": "보관된 실제 원본 재생",
+      "from": "시작",
+      "to": "끝",
+      "source": "소스",
+      "devices": "기기(선택 {{n}}대)",
+      "noDevices": "이 소스로 들어오는 실제 기기가 없습니다.",
+      "allDevicesHint": "기기를 고르지 않으면 이 소스의 모든 기기를 재생합니다.",
+      "rawCount": "대상 원본 {{n}}건"
     },
     "report": {
       "title": "결과 R-{{id}} {{name}}",

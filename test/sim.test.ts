@@ -285,7 +285,7 @@ describe("UI-SIM-09·10·12 실행 패널·장애 주입·결과(SIM-04.02, SIM-
 describe("UI-SIM-11 실제 데이터 재생 — 파일 가져오기(SIM-06.03)", () => {
   it("M3: core가 재생 경로(API-SIM-22·23)를 열지 않으면(404) '아직 쓸 수 없음' 문구, 10MB 넘는 파일은 BFF에서 거부", async () => {
     const kim = await operator();
-    expect((await kim.get("/sim/replay")).body).toContain("최대 10MB");
+    expect((await kim.get("/sim/replay?mode=file")).body).toContain("최대 10MB");
     const csv = "timestamp,deviceId,temperature\n2026-10-02T00:00:00Z,AM107,22";
     const form = new FormData();
     form.set("_csrf", kim.csrf);
@@ -389,5 +389,21 @@ describe("[SIM-09.06] UI-SIM-14 사용자 정의 가상 기기 유형", () => {
     const kim = await operator();
     const opPage = await kim.get("/sim/catalog?tab=sensor");
     expect(opPage.body).not.toContain("사용자 정의 유형 만들기");
+  });
+});
+
+describe("[SIM-06.01] UI-SIM-11 원본 선택 재생(API-SIM-22 RAW, core M4)", () => {
+  it("TC-SIM-069 기본은 원본 선택: 소스·실제 기기 후보, 대상 건수(dryRun)와 재생 시작 → 실행 ID", async () => {
+    simState(app.gateway.m2).replayEnabled = true;
+    const kim = await operator();
+    const page = await kim.get("/sim/replay");
+    expect(page.response.status).toBe(200);
+    expect(page.body).toContain("보관된 실제 원본 재생");
+    expect(page.body).toContain("ChirpStack s3");
+    const body = { source: { type: "RAW", sourceId: "7", deviceIds: ["1042"], from: "2026-10-02T15:00:00.000Z", to: "2026-10-03T15:00:00.000Z" }, timeShift: { basis: "NOW" }, acceleration: 60, cloneSpaceId: "41" };
+    const dry = await json(kim, "/bff/api/core/sim/replays?dryRun=true", "POST", body);
+    expect(JSON.parse(dry.body).response.total).toBe(1440);
+    const started = await json(kim, "/bff/api/core/sim/replays", "POST", body);
+    expect(JSON.parse(started.body).response.runId).toBeTruthy();
   });
 });

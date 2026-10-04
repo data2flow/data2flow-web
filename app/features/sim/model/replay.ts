@@ -80,3 +80,50 @@ export function replayBody(options: ReplayOptions): { body?: Record<string, unkn
   if (options.cloneSuffix) body.cloneSuffix = options.cloneSuffix;
   return { body, problems };
 }
+
+/** 원본 보관 기간(ING-01, 30일)과 한 번에 고를 수 있는 기간(UI-SIM-11, 31일) */
+export const RAW_RETENTION_DAYS = 30;
+export const RAW_MAX_DAYS = 31;
+const DAY_MS = 86_400_000;
+
+export interface RawReplayOptions {
+  sourceId: string;
+  deviceIds: string[];
+  from: string;
+  to: string;
+  basis: "NOW" | "AT";
+  at?: string;
+  acceleration: number;
+  cloneSpaceId: string;
+  cloneSuffix?: string;
+}
+
+/**
+ * 보관된 실제 원본 재생(SIM-06.01, API-SIM-22 `source.type=RAW`): 소스 필수, 기간은 원본 보관 30일 안·최대 31일, 시작 < 끝.
+ * 기기를 고르지 않으면 `deviceIds`를 비워 보낸다(그 소스의 모든 기기). 시각은 UTC ISO로 보낸다
+ */
+export function rawReplayBody(options: RawReplayOptions, nowMs: number): { body?: Record<string, unknown>; problems: Record<string, Problem> } {
+  const problems: Record<string, Problem> = {};
+  if (!options.sourceId) problems.sourceId = { key: "sourceRequired" };
+  const from = Date.parse(options.from);
+  const to = Date.parse(options.to);
+  if (Number.isNaN(from)) problems.from = { key: "dateTime" };
+  if (Number.isNaN(to)) problems.to = { key: "dateTime" };
+  if (!problems.from && !problems.to) {
+    if (to <= from) problems.to = { key: "rangeOrder" };
+    else if (to - from > RAW_MAX_DAYS * DAY_MS) problems.to = { key: "rangeTooLong", values: { max: RAW_MAX_DAYS } };
+    if (from < nowMs - RAW_RETENTION_DAYS * DAY_MS) problems.from = { key: "retention", values: { days: RAW_RETENTION_DAYS } };
+  }
+  if (!options.cloneSpaceId) problems.cloneSpaceId = { key: "spaceRequired" };
+  if (!Number.isInteger(options.acceleration) || options.acceleration < 1 || options.acceleration > 60) problems.acceleration = { key: "range", values: { min: 1, max: 60 } };
+  if (options.basis === "AT" && (!options.at || Number.isNaN(Date.parse(options.at)))) problems.at = { key: "dateTime" };
+  if (Object.keys(problems).length) return { problems };
+  const body: Record<string, unknown> = {
+    source: { type: "RAW", sourceId: options.sourceId, deviceIds: [...options.deviceIds], from: new Date(from).toISOString(), to: new Date(to).toISOString() },
+    timeShift: options.basis === "AT" ? { basis: "AT", at: new Date(options.at as string).toISOString() } : { basis: "NOW" },
+    acceleration: options.acceleration,
+    cloneSpaceId: options.cloneSpaceId,
+  };
+  if (options.cloneSuffix) body.cloneSuffix = options.cloneSuffix;
+  return { body, problems };
+}

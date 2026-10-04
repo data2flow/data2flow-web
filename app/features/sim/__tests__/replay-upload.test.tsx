@@ -19,7 +19,7 @@ const FILE: ReplayFile = {
 
 describe("TC-SIM-075 AT-SIM-12.3 실제 데이터 재생 — 파일 가져오기", () => {
   it("업로드 전: 10MB 넘는 파일·지원하지 않는 확장자는 바로 막는다", async () => {
-    await renderRoute(<ReplayView spaces={SPACES} canRun api={fakeSimApi()} navigate={vi.fn()} />, { session: meOf("OPERATOR") });
+    await renderRoute(<ReplayView initialMode="FILE" spaces={SPACES} canRun api={fakeSimApi()} navigate={vi.fn()} />, { session: meOf("OPERATOR") });
     const input = (await screen.findByLabelText("CSV 또는 JSON Lines 파일")) as HTMLInputElement;
     const big = new File(["x"], "classroom.csv", { type: "text/csv" });
     Object.defineProperty(big, "size", { value: 11 * 1024 * 1024 });
@@ -34,7 +34,7 @@ describe("TC-SIM-075 AT-SIM-12.3 실제 데이터 재생 — 파일 가져오기
   });
 
   it("업로드 오류(SIM_IMPORT_INVALID)는 문제 행 번호와 이유", async () => {
-    await renderRoute(<ReplayView spaces={SPACES} canRun uploadError={{ code: "SIM_IMPORT_INVALID", row: 12, reason: "열 누락" }} api={fakeSimApi()} navigate={vi.fn()} />, { session: meOf("OPERATOR") });
+    await renderRoute(<ReplayView initialMode="FILE" spaces={SPACES} canRun uploadError={{ code: "SIM_IMPORT_INVALID", row: 12, reason: "열 누락" }} api={fakeSimApi()} navigate={vi.fn()} />, { session: meOf("OPERATOR") });
     expect(await screen.findByRole("alert")).toHaveTextContent("파일 형식이 올바르지 않습니다 12행: 열 누락");
   });
 

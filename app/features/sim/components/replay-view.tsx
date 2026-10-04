@@ -13,6 +13,7 @@ import { checkMapping, checkReplayFile, guessMapping, replayBody, TIME_FORMATS, 
 import type { Problem } from "../model/sim";
 import type { ReplayFile } from "../model/types";
 import { useProblemText } from "./common";
+import { RawReplayPanel } from "./raw-replay";
 
 /** core가 재생 경로를 아직 열지 않았을 때(M3, M4에서 열림) 오는 상태 */
 export const REPLAY_UNAVAILABLE = [404, 405, 501];
@@ -34,6 +35,10 @@ export function ReplayView({
   canRun,
   api,
   navigate,
+  sources = [],
+  devices = [],
+  now = Date.now(),
+  initialMode,
 }: {
   uploaded?: ReplayFile | null;
   uploadError?: UploadError | null;
@@ -41,8 +46,16 @@ export function ReplayView({
   canRun: boolean;
   api: Pick<SimApi, "replay">;
   navigate: (to: string) => void;
+  /** 원본 선택(SIM-06.01)의 소스·기기 후보 */
+  sources?: { id: string; name: string }[];
+  devices?: { id: string; name: string; sourceId: string | null }[];
+  now?: number;
+  /** 처음 열 쪽(`/sim/replay?mode=file`). 없으면 원본 선택, 파일을 올렸거나 실패했으면 파일 */
+  initialMode?: "RAW" | "FILE";
 }) {
   const { t } = useTranslation();
+  // [원본 선택] [파일 가져오기] — 파일을 올렸거나 올리다 실패했으면 파일 쪽을 연다
+  const [mode, setMode] = useState<"RAW" | "FILE">(uploaded || uploadError ? "FILE" : (initialMode ?? "RAW"));
   const problemText = useProblemText();
   const [fileProblem, setFileProblem] = useState<Problem | undefined>();
   const [mapping, setMapping] = useState<ColumnMapping>(() => guessMapping(uploaded?.columns ?? []));
@@ -83,8 +96,27 @@ export function ReplayView({
     else if (result.data.runId) navigate(`/sim/runs/${encodeURIComponent(result.data.runId)}`);
   };
 
+  const toggle = (
+    <div role="tablist" aria-label={t("sim.replay.modeLabel")} className="inline-flex overflow-hidden rounded-md border border-line text-[13px]">
+      {(["RAW", "FILE"] as const).map((key) => (
+        <button key={key} type="button" role="tab" aria-selected={mode === key} onClick={() => setMode(key)} className={mode === key ? "min-h-[44px] bg-accent px-3 text-white" : "min-h-[44px] bg-panel px-3"}>
+          {t(`sim.replay.mode.${key}`)}
+        </button>
+      ))}
+    </div>
+  );
+  if (mode === "RAW") {
+    return (
+      <div className="flex flex-col gap-4">
+        {toggle}
+        <RawReplayPanel sources={sources} devices={devices} spaces={spaces} canRun={canRun} api={api} navigate={navigate} now={now} />
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-4">
+      {toggle}
       <Card title={t("sim.replay.uploadTitle")}>
         <Form method="post" encType="multipart/form-data" className="flex flex-wrap items-end gap-3">
           <CsrfField />

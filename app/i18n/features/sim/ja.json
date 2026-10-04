@@ -84,7 +84,11 @@
       "duplicateKey": "同じキーが既にあります。",
       "minMax": "最大は最小以上にしてください。",
       "enumRequired": "選択肢を1つ以上入力してください。",
-      "effectProperty": "影響に連携する数値特性を選んでください。"
+      "effectProperty": "影響に連携する数値特性を選んでください。",
+      "sourceRequired": "ソースを選んでください。",
+      "rangeOrder": "終了は開始より後にしてください。",
+      "rangeTooLong": "期間は最大 {{max}} 日です。",
+      "retention": "元データは直近 {{days}} 日分のみ保存しています。"
     },
     "home": {
       "title": "仮想環境",
@@ -409,7 +413,20 @@
       "defaultSuffix": " [再生]",
       "count": "対象の測定値 {{n}}件",
       "dryRun": "対象件数を確認",
-      "start": "再生開始"
+      "start": "再生開始",
+      "modeLabel": "再生データ",
+      "mode": {
+        "RAW": "元データを選択",
+        "FILE": "ファイルを取り込む"
+      },
+      "rawTitle": "保存済みの実データを再生",
+      "from": "開始",
+      "to": "終了",
+      "source": "ソース",
+      "devices": "デバイス(選択 {{n}} 台)",
+      "noDevices": "このソースから届く実デバイスはありません。",
+      "allDevicesHint": "デバイスを選ばない場合、このソースの全デバイスを再生します。",
+      "rawCount": "対象の元データ {{n}} 件"
     },
     "report": {
       "title": "結果 R-{{id}} {{name}}",

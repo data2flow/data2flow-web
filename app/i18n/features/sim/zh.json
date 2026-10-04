@@ -84,7 +84,11 @@
       "duplicateKey": "该键已存在。",
       "minMax": "最大值须大于等于最小值。",
       "enumRequired": "请至少输入一个选项。",
-      "effectProperty": "请为影响选择数值属性。"
+      "effectProperty": "请为影响选择数值属性。",
+      "sourceRequired": "请选择来源。",
+      "rangeOrder": "结束时间须晚于开始时间。",
+      "rangeTooLong": "时间段最多 {{max}} 天。",
+      "retention": "原始数据仅保留最近 {{days}} 天。"
     },
     "home": {
       "title": "虚拟环境",
@@ -409,7 +413,20 @@
       "defaultSuffix": " [回放]",
       "count": "待回放测量值 {{n}} 条",
       "dryRun": "检查条数",
-      "start": "开始回放"
+      "start": "开始回放",
+      "modeLabel": "回放数据",
+      "mode": {
+        "RAW": "选择原始数据",
+        "FILE": "导入文件"
+      },
+      "rawTitle": "回放已保存的原始数据",
+      "from": "开始",
+      "to": "结束",
+      "source": "来源",
+      "devices": "设备(已选 {{n}} 台)",
+      "noDevices": "没有使用此来源的真实设备。",
+      "allDevicesHint": "不选择设备时回放该来源的所有设备。",
+      "rawCount": "目标原始数据 {{n}} 条"
     },
     "report": {
       "title": "结果 R-{{id}} {{name}}",

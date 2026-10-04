@@ -84,7 +84,11 @@
       "duplicateKey": "This key is already used.",
       "minMax": "Max must be greater than or equal to min.",
       "enumRequired": "Enter at least one value.",
-      "effectProperty": "Choose a numeric property for the effect."
+      "effectProperty": "Choose a numeric property for the effect.",
+      "sourceRequired": "Choose a source.",
+      "rangeOrder": "The end must be after the start.",
+      "rangeTooLong": "The period can be up to {{max}} days.",
+      "retention": "Raw messages are kept for the last {{days}} days only."
     },
     "home": {
       "title": "Virtual environment",
@@ -409,7 +413,20 @@
       "defaultSuffix": " [Replay]",
       "count": "{{n}} values to replay",
       "dryRun": "Check count",
-      "start": "Start replay"
+      "start": "Start replay",
+      "modeLabel": "Replay data",
+      "mode": {
+        "RAW": "Stored raw data",
+        "FILE": "Import file"
+      },
+      "rawTitle": "Replay stored raw messages",
+      "from": "From",
+      "to": "To",
+      "source": "Source",
+      "devices": "Devices ({{n}} selected)",
+      "noDevices": "No real devices use this source.",
+      "allDevicesHint": "If no device is chosen, all devices of this source are replayed.",
+      "rawCount": "{{n}} raw messages"
     },
     "report": {
       "title": "Result R-{{id}} {{name}}",

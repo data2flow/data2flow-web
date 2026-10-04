@@ -623,6 +623,16 @@ export const simHandler: CoreHandler = async (core, req) => {
   }
   if (path === "/sim/replays" && method === "POST") {
     if (need("SIM_RUN")) return denied();
+    const raw = body.source as { type?: string; deviceIds?: string[] };
+    if (raw?.type === "RAW") {
+      // 보관된 원본 재생(SIM-06.01): 기기당 1,440건(하루 1분 주기)으로 흉내 낸다
+      const devices = raw.deviceIds?.length ? raw.deviceIds : core.devices.filter((d) => !d.virtual).map((d) => d.id);
+      const total = devices.length * 1440;
+      if (url.searchParams.get("dryRun") === "true") return ok({ total, byDevice: Object.fromEntries(devices.map((id) => [id, 1440])) });
+      const runId = core.nextId();
+      state.runs.push({ runId, kind: "REPLAY", status: "RUNNING", scenarioId: null, accelerationRequested: Number(body.acceleration), accelerationEffective: Number(body.acceleration), throttled: false, simClock: "2026-10-04T00:00:00Z", startedAt: "2026-10-04T00:00:00Z", elapsedSec: 0, progressPct: 0, seed: 1, expectations: [], lastEvents: [] });
+      return ok({ runId, total, clones: devices.map((id) => ({ originalDeviceId: id, cloneDeviceId: `c-${id}`, name: `${id} [재생]` })) }, 201);
+    }
     const source = body.source as { fileId: string; columnMapping: { metrics: Record<string, string> } };
     const file = state.files.get(source?.fileId);
     if (!file) return fail(400, "SIM_IMPORT_INVALID");
