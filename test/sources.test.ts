@@ -311,10 +311,12 @@ describe("UI-DSC-03 소스 상세", () => {
     expect(app.gateway.m2.sources.find((s) => s.code === "chirpstack-copy")?.lifecycle).toBe("DRAFT");
   });
 
-  it("사용처 탭(API-DSC-11), 무시 목록 [해제](API-DSC-13)", async () => {
+  it("[DSC-07.06] TC-DSC-198 사용처 탭(API-DSC-11: 기기 수·플로우 링크·7일 수신량), 무시 목록 [해제](API-DSC-13)", async () => {
     const browser = await integrator();
     const usage = await browser.get("/sources/7?tab=usage");
     expect(usage.body).toContain("실습실 환기");
+    // DSC-07.06 TC-DSC-198: 플로우 이름을 누르면 플로우 편집기로
+    expect(usage.body).toContain('href="/automation/flows/201"');
     expect(usage.body).toContain('href="/devices?sourceId=7"');
     const ignore = await browser.get("/sources/7?tab=ignore");
     expect(ignore.body).toContain("24e1240000000001");
