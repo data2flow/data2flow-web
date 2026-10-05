@@ -69,7 +69,7 @@ export async function action({ request, context }: Route.ActionArgs) {
     excludeFromAnalytics: form.get("excludeFromAnalytics") === "on",
     reason: field(form, "reason"),
   };
-  const errors = checkMaintenance(input, Date.now());
+  const errors = checkMaintenance(input, ctx.runtime.now());
   if (Object.keys(errors).length) return invalid("create", errors);
   const result = await callApi(ctx, request, "/api/v1/core/maintenance-windows", { method: "POST", body: maintenanceBody(input), idempotencyKey: field(form, "idempotencyKey") || newIdempotencyKey() });
   return result.ok ? done("create", "ops.maintenance.created") : failed("create", result);
