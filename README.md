@@ -211,6 +211,27 @@ pnpm test:coverage     # server(node: BFF·도우미) + ssr(node: 실제 라우�
 pnpm build && pnpm start
 ```
 
+## 로컬 화면 미리보기(Mac)
+
+`e2e/local-preview.sh`는 플랫폼 전체(서비스 11개)를 내 컴퓨터에 띄워 브라우저로 화면을 둘러보게 합니다(OPS-08.01). 공용 s3·s4 인프라 대신 로컬 Docker에 PostgreSQL 18·Valkey 8·RabbitMQ 4·Mailpit·Mosquitto를 띄우는데, 이것은 **미리보기에만 허용한 예외**입니다(ADR-057). 시연 스크립트(m1~m4)와 달리 끝나도 계속 떠 있고, `stop`으로 내립니다.
+
+```bash
+e2e/local-preview.sh                  # 빌드 + 시작(처음 10~20분), 끝나면 URL·아이디·비밀번호를 출력
+SKIP_BUILD=1 e2e/local-preview.sh     # 지난번 빌드 재사용(약 5분, 견본 데이터 3분 포함)
+KEEP_DATA=1 e2e/local-preview.sh      # DB·RabbitMQ를 Docker 볼륨에 남겨 다시 시작해도 데이터 유지
+e2e/local-preview.sh status           # 컨테이너·서비스 상태, 접속 정보
+e2e/local-preview.sh logs core-api    # 서비스 로그 따라 보기
+e2e/local-preview.sh stop             # 프로세스 + 컨테이너 정지(볼륨·키·빌드는 남김)
+e2e/local-preview.sh reset            # stop + 볼륨·키 삭제
+```
+
+- **주소:** 웹 <http://localhost:3000>(아이디 `admin01`, 비밀번호는 출력과 `status`에 나옴), Mailpit <http://localhost:48025>, RabbitMQ 관리 화면 <http://localhost:45767>.
+- **견본 데이터:** 가상 강의실 301(표준 키트: 온습도 2·CO2·재실·에어컨·공기청정기·환기), 지난 3시간 측정값(x60으로 채움), "301호 고온이면 냉방" 플로우 적용, 실시간 시뮬레이터 실행(x1, 7일, 바깥 30~36℃, 매일 09~18시 수업 25명, 시작 시각이 수업 밖이면 처음 2시간 특강 30명). 실내가 27℃를 5분 넘기면 플로우가 가상 에어컨을 켭니다. 견본 기기는 가상 기기라 기기 목록에서 **"가상 포함"**을 켜야 보입니다(`/devices?virtual=true`). `SAMPLE=0`이면 견본을 만들지 않고, `SAMPLE_BACKFILL=0`이면 지난 3시간 채우기를 건너뜁니다.
+- **빌드 대상:** 각 저장소의 `origin/main`(먼저 fetch, `PREVIEW_REF=main`이면 로컬 main)을 `~/.data2flow-preview/src`로 내보내 빌드합니다. 작업 중인 체크아웃·브랜치는 건드리지 않고, Maven 산출물은 `~/.data2flow-preview/m2`에 설치합니다(`~/.m2`는 읽기만). ingress·ai·analytics는 빌드·시작에 실패하면 건너뜁니다.
+- **안전:** 모든 포트는 127.0.0.1에만 열립니다. 루트 `.env`를 읽지 않고(프로필 `e2e`), ingress는 버리는 Mosquitto에만 붙으며 공용 호스트(`iot-data`·`s3`·`s4.java21.net`)를 막습니다. action은 virtual 드라이버만 쓰고 MQTT·LoRaWAN·LG ThinQ·SmartThings 드라이버, 텔레그램, 출력 연결 발송은 꺼져 있습니다.
+- **키·로그:** 키와 비밀번호는 `~/.data2flow-preview/keys.env`(권한 600, 저장소 밖), 로그는 `~/.data2flow-preview/logs/<서비스>.log`.
+- **필요:** Docker Desktop, Java 21+, Node 22+ + pnpm, python3 3.12+, git, curl, openssl, lsof. 메모리 8GB 이상 여유. 포트 3000·45718~45799·48025를 씁니다.
+
 ## M1 전 구간 시연 검증(e2e)
 
 `e2e/m1-demo.sh`는 plan/milestones.md §M1 시연을 실제 서비스로 끝까지 돌립니다: 최초 관리자 Job → 관리자 로그인·비밀번호 변경 → 메일 설정·OPERATOR 초대 → 초대 메일(Mailpit) → 초대 수락 → 사용자 로그인 → 회원 관리 API 403·관리자 메뉴 없음 → 쿠키 검사(불투명 세션 쿠키 하나, JWT 없음) → 관리자 강제 로그아웃 → 사용자 다음 요청이 로그인으로 → 감사 로그.
