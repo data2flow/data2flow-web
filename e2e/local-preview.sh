@@ -25,8 +25,11 @@
 #   e2e/local-preview.sh stop            # 서비스 프로세스 + 컨테이너 정지(볼륨·키·빌드는 남김)
 #   e2e/local-preview.sh reset           # stop + 볼륨·키·견본 기록 삭제(빌드는 남김)
 #   e2e/local-preview.sh logs core-api   # 서비스 로그 따라 보기
+#   e2e/local-preview.sh seed            # 떠 있는 상태에서 관리자 로그인 확인 + 견본 데이터만 다시(이미 있으면 건너뜀)
+#   e2e/local-preview.sh restart web     # web만 다시 빌드($REF)하고 web 프로세스만 다시 시작(SKIP_BUILD=1이면 빌드 생략)
 # 환경 변수: PREVIEW_REF(기본 origin/main, 로컬 main을 쓰려면 main), NO_FETCH=1, SAMPLE=0(견본 데이터 생략),
-#   SAMPLE_BACKFILL=0(지난 3시간 데이터 생략), D2F_PREVIEW_HOME(기본 ~/.data2flow-preview), PREVIEW_JAVA_OPTS(기본 -Xmx512m)
+#   SAMPLE_BACKFILL=0(지난 3시간 데이터 생략), D2F_PREVIEW_HOME(기본 ~/.data2flow-preview), PREVIEW_JAVA_OPTS(기본 -Xmx512m),
+#   PREVIEW_AUTOFILL=0(로그인 폼에 관리자 아이디·비밀번호를 미리 채우지 않음. 기본은 채움 — localhost 미리보기에서만 켜진다)
 set -euo pipefail
 
 if [ -z "${BASH_VERSION:-}" ]; then echo "bash로 실행하세요" >&2; exit 1; fi
@@ -146,11 +149,20 @@ case "$CMD" in
   logs)
     [ -n "${2:-}" ] || die "사용: $0 logs <서비스>  (예: core-api, web)"
     exec tail -n 100 -f "$LOGS/$2.log";;
-  start) ;;
-  *) die "알 수 없는 명령: $CMD (start | stop | status | reset | logs <서비스>)";;
+  start|seed) ;;
+  restart) [ "${2:-}" = web ] || die "사용: $0 restart web  (지금은 web만 다시 시작할 수 있습니다)";;
+  *) die "알 수 없는 명령: $CMD (start | stop | status | reset | logs <서비스> | seed | restart web)";;
 esac
 
+if [ "$CMD" != start ]; then
+  # seed / restart web: 떠 있는 미리보기에 붙는다. 다른 서비스·컨테이너는 건드리지 않는다
+  [ -f "$KEYS" ] || die "키가 없습니다($KEYS). 먼저 $0 로 시작하세요"
+  for svc in core-api auth api-gateway; do pid_alive "$svc" || die "$svc 가 떠 있지 않습니다. 먼저 $0 로 시작하세요(상태: $0 status)"; done
+  docker inspect -f '{{.State.Running}}' "$P-pg" 2>/dev/null | grep -q true || die "$P-pg 컨테이너가 떠 있지 않습니다"
+fi
+
 # ---------------------------------------------------------------- 사전 점검
+if [ "$CMD" = start ]; then
 say "사전 점검"
 for t in docker java node pnpm python3 git curl openssl lsof; do command -v "$t" >/dev/null 2>&1 || die "$t 가 필요합니다"; done
 docker info >/dev/null 2>&1 || die "Docker Desktop이 실행 중이 아닙니다"
@@ -171,6 +183,7 @@ done
 mkdir -p "$LOGS" "$PIDS" "$SRC" "$JARS" "$RUN_DIR" "$STATE/m2"
 chmod 700 "$STATE"
 note "저장소 위치 $D2F_ROOT, 작업 폴더 $STATE"
+fi
 
 # ---------------------------------------------------------------- 키(처음 한 번 만들고 재사용, git 밖)
 if [ ! -f "$KEYS" ]; then
@@ -204,13 +217,29 @@ export_src() { # 저장소 이름(data2flow-<name>) → $SRC/<name>, 커밋을 V
   git -C "$repo" archive --format=tar "$REF" | tar -x -C "$SRC/$name"
   printf '%s %s %s\n' "$name" "$REF" "$sha" >> "$JARS/VERSIONS.new"
 }
+build_web() { # data2flow-web $REF → $SRC/web, 의존성 설치 + SSR 빌드
+  export_src web || die "data2flow-web에 $REF 가 없습니다"
+  (cd "$SRC/web" && CI=true pnpm install --frozen-lockfile && pnpm build) > "$LOGS/build-web.log" 2>&1 \
+    || die "web 빌드 실패: $LOGS/build-web.log"
+  note "빌드됨: web"
+}
 MVN_REPO_ARGS="-Dmaven.repo.local=$STATE/m2 -Dmaven.repo.local.tail=$HOME/.m2/repository"
 mvn_build() { # 이름 goal
   # shellcheck disable=SC2086
   (cd "$SRC/$1" && ./mvnw -q -B -DskipTests $MVN_REPO_ARGS "$2") > "$LOGS/build-$1.log" 2>&1
 }
 
-if [ "${SKIP_BUILD:-}" != 1 ]; then
+if [ "$CMD" = restart ]; then
+  if [ "${SKIP_BUILD:-}" != 1 ]; then
+    say "빌드: web만($REF → $SRC/web)"
+    : > "$JARS/VERSIONS.new"; build_web
+    if [ -f "$JARS/VERSIONS" ]; then grep -v '^web ' "$JARS/VERSIONS" >> "$JARS/VERSIONS.new" || true; fi
+    mv "$JARS/VERSIONS.new" "$JARS/VERSIONS"
+  fi
+  [ -f "$SRC/web/build/server/index.js" ] || die "web 빌드가 없습니다"
+elif [ "$CMD" = seed ]; then
+  :
+elif [ "${SKIP_BUILD:-}" != 1 ]; then
   say "빌드: 각 저장소 $REF 를 $SRC 로 내보내 빌드(테스트 생략, 로그 $LOGS/build-*.log)"
   : > "$JARS/VERSIONS.new"; rm -f "$JARS/SKIPPED"
   export_src contracts || die "data2flow-contracts에 $REF 가 없습니다"
@@ -238,10 +267,7 @@ if [ "${SKIP_BUILD:-}" != 1 ]; then
     echo analytics >> "$JARS/SKIPPED"; note "건너뜀: analytics(python 3.12+ venv 설치 실패, $LOGS/build-analytics.log)"
   fi
   # web: 의존성 설치 + SSR 빌드
-  export_src web || die "data2flow-web에 $REF 가 없습니다"
-  (cd "$SRC/web" && CI=true pnpm install --frozen-lockfile && pnpm build) > "$LOGS/build-web.log" 2>&1 \
-    || die "web 빌드 실패: $LOGS/build-web.log"
-  note "빌드됨: web"
+  build_web
   mv "$JARS/VERSIONS.new" "$JARS/VERSIONS"
 else
   say "빌드 생략(SKIP_BUILD=1): $JARS 재사용"
@@ -253,6 +279,7 @@ fi
 skipped() { [ -f "$JARS/SKIPPED" ] && grep -qx "$1" "$JARS/SKIPPED"; }
 
 # ---------------------------------------------------------------- 인프라(로컬 Docker, 127.0.0.1에만)
+if [ "$CMD" = start ]; then
 if [ "${KEEP_DATA:-}" = 1 ]; then say "인프라 컨테이너 시작(KEEP_DATA=1: 데이터 볼륨 유지)"; else say "인프라 컨테이너 시작(임시 데이터, stop 하면 사라짐)"; fi
 # shellcheck disable=SC2086
 docker rm -f $CONTAINERS >/dev/null 2>&1 || true
@@ -279,6 +306,7 @@ wait_for valkey 30 docker exec "$P-valkey" valkey-cli -a "$REDIS_PASSWORD" ping 
 wait_for rabbitmq 180 bash -c "docker logs $P-rabbit 2>&1 | grep -q 'Server startup complete'" || die "rabbitmq 시작 실패(docker logs $P-rabbit)"
 wait_for mailpit 30 curl -sf "$MAILPIT/api/v1/info" || die "mailpit 시작 실패"
 wait_for mosquitto 30 bash -c "docker logs $P-mqtt 2>&1 | grep -q running" || die "mosquitto 시작 실패"
+fi
 sql() { docker exec "$P-pg" psql -U data2flow -d data2flow -tAc "$1" 2>/dev/null; }
 
 # ---------------------------------------------------------------- 서비스 환경
@@ -324,9 +352,40 @@ start_java() { # 이름 [env…] -- [추가 인자…]
     java $(java_opts "$svc") -jar "$JARS/data2flow-$svc.jar" $(spring_args "$svc") ${args[@]+"${args[@]}"}
 }
 
+# web: SSR + BFF + 라이브 뷰 WebSocket 중계(server.mjs). 로그인 폼 미리 채우기(OPS-08.01)는 BFF가
+# localhost 주소 + Secure 쿠키 꺼짐일 때만 받아들인다(app/bff/config.server.ts previewLoginFrom). 비밀번호는 keys.env에서 실행 때만 넘긴다
+start_web() {
+  local autofill=()
+  if [ "${PREVIEW_AUTOFILL:-1}" != 0 ]; then
+    autofill=(DATA2FLOW_PREVIEW_LOGIN_ID="$ADMIN_LOGIN" DATA2FLOW_PREVIEW_LOGIN_PASSWORD="$ADMIN_PASSWORD")
+  fi
+  start_proc web "$SRC/web" env NODE_ENV=production HOST=127.0.0.1 PORT=$WEB_PORT DATA2FLOW_GATEWAY_URL=http://127.0.0.1:$GW_PORT \
+    DATA2FLOW_PUBLIC_ORIGIN="$ORIGIN" DATA2FLOW_COOKIE_SECURE=false DATA2FLOW_SESSION_KEYS="$SESSION_KEY" \
+    DATA2FLOW_TRUSTED_PROXY_HOPS=0 DATA2FLOW_GATEWAY_TIMEOUT_MS=40000 DATA2FLOW_ACTION_URL=http://127.0.0.1:$ACTION_PORT \
+    ${autofill[@]+"${autofill[@]}"} node server.mjs ./build/server/index.js
+}
+
+if [ "$CMD" = restart ]; then
+  say "web 다시 시작(다른 서비스·컨테이너는 그대로)"
+  if pid_alive web; then
+    kill -TERM "$(cat "$PIDS/web.pid")" 2>/dev/null || true
+    for i in $(seq 1 20); do pid_alive web || break; sleep 1; done
+    pid_alive web && kill -9 "$(cat "$PIDS/web.pid")" 2>/dev/null || true
+  fi
+  rm -f "$PIDS/web.pid"
+  for i in $(seq 1 10); do listening $WEB_PORT || break; sleep 1; done
+  listening $WEB_PORT && die "포트 $WEB_PORT 를 다른 프로그램이 쓰고 있습니다"
+  start_web
+  wait_for web 60 curl -sf "$(ready_url web)" || die "web 시작 실패: $LOGS/web.log"
+  note "web 다시 시작됨: $WEB (pid $(cat "$PIDS/web.pid"))"
+  exit 0
+fi
+
 # ---------------------------------------------------------------- 최초 관리자(빈 DB일 때만)
 FRESH=0
-if [ -z "$(sql "SELECT 1 FROM data2flow_core.organizations LIMIT 1" || true)" ]; then
+if [ "$CMD" = seed ]; then
+  :
+elif [ -z "$(sql "SELECT 1 FROM data2flow_core.organizations LIMIT 1" || true)" ]; then
   FRESH=1
   rm -f "$SAMPLE_ENV"
   say "최초 관리자 Job(core Flyway migrate + ADMIN 생성)"
@@ -345,6 +404,7 @@ fi
 ORG=$(sql "SELECT min(id) FROM data2flow_core.organizations")
 
 # ---------------------------------------------------------------- 서비스 시작
+if [ "$CMD" = start ]; then
 say "서비스 시작(로그 $LOGS/<서비스>.log)"
 start_java pipeline "${COMMON_ENV[@]}" -- --data2flow.pipeline.flyway-mode=migrate
 wait_for "pipeline(스키마)" 180 docker exec "$P-pg" psql -U data2flow -d data2flow -tAc "SELECT 1 FROM data2flow_pipeline.telemetry LIMIT 1" \
@@ -387,11 +447,7 @@ start_java auth DATA2FLOW_AUTH_JWT_KEYS="$JWT_KEY" DATA2FLOW_AUTH_JWT_ACTIVE_KEY
 start_java api-gateway DATA2FLOW_AUTH_URI=http://127.0.0.1:$AUTH_PORT DATA2FLOW_CORE_URI=http://127.0.0.1:$CORE_PORT \
   DATA2FLOW_AI_URI=$AI_URL DATA2FLOW_MCP_URI=$AI_URL DATA2FLOW_MCP_HOST=mcp.localhost \
   DATA2FLOW_GATEWAY_TRUSTED_PROXIES='127\.0\.0\.1' --
-# web: SSR + BFF + 라이브 뷰 WebSocket 중계(server.mjs)
-start_proc web "$SRC/web" env NODE_ENV=production HOST=127.0.0.1 PORT=$WEB_PORT DATA2FLOW_GATEWAY_URL=http://127.0.0.1:$GW_PORT \
-  DATA2FLOW_PUBLIC_ORIGIN="$ORIGIN" DATA2FLOW_COOKIE_SECURE=false DATA2FLOW_SESSION_KEYS="$SESSION_KEY" \
-  DATA2FLOW_TRUSTED_PROXY_HOPS=0 DATA2FLOW_GATEWAY_TIMEOUT_MS=40000 DATA2FLOW_ACTION_URL=http://127.0.0.1:$ACTION_PORT \
-  node server.mjs ./build/server/index.js
+start_web
 
 STARTED=""; FAILED=""
 for svc in core-api flow-engine action simulator auth api-gateway web ingress ai analytics; do
@@ -409,6 +465,11 @@ done
 STARTED="pipeline$STARTED"
 if grep -hE 'Connect(ing|ed) to .*(iot-data|s3|s4)\.java21\.net' "$LOGS"/*.log >/dev/null 2>&1; then
   die "공용 인프라 접속 흔적이 로그에 있습니다. 즉시 정지합니다: $0 stop"
+fi
+else
+  STARTED=""; FAILED=""
+  for svc in $ALL_SERVICES; do pid_alive "$svc" && STARTED="$STARTED $svc"; done
+  pid_alive web || die "web 이 떠 있지 않습니다: $0 restart web"
 fi
 
 # ---------------------------------------------------------------- BFF 도우미(m4-demo.sh와 같은 방식)
@@ -447,6 +508,8 @@ iso() { python3 -c "import datetime as d; print((d.datetime.now(d.timezone.utc)+
 
 # ---------------------------------------------------------------- 로그인(초기 비밀번호면 바꾼다)
 say "관리자 로그인(BFF)"
+# 지난 실행의 쿠키 파일을 버린다. keys.env의 세션 키가 같아 예전 세션 쿠키가 그대로 열리면 /login 이 302(이미 로그인)로 답한다
+rm -f "$JAR"
 T=$(csrf_page /login)
 [ "$(status)" = 200 ] || die "로그인 화면 응답 $(status)"
 note "로그인 화면 $WEB/login → 200"
@@ -462,9 +525,18 @@ login_as() { # 비밀번호 → 302면 성공. 막 뜬 서비스의 첫 호출�
 }
 if [ $FRESH = 1 ] || ! login_as "$ADMIN_PASSWORD"; then
   login_as "$ADMIN_INITIAL_PASSWORD" || die "관리자 로그인 실패(응답 $(status)). 키와 DB가 어긋났으면: $0 reset"
-  T=$(csrf_page "/me/security?required=password")
-  form /me/security "$T" intent=password "currentPassword=$ADMIN_INITIAL_PASSWORD" "newPassword=$ADMIN_PASSWORD" "confirmPassword=$ADMIN_PASSWORD"
-  [ "$(status)" = 302 ] || die "초기 비밀번호 변경 실패(응답 $(status))"
+  # 막 뜬 core의 첫 비밀번호 해시가 느려 503/504가 나면 잠시 뒤 다시. 시간 초과였지만 실제로 바뀌었으면 새 비밀번호로 로그인된다
+  changed=0
+  for i in 1 2 3; do
+    T=$(csrf_page "/me/security?required=password")
+    form /me/security "$T" intent=password "currentPassword=$ADMIN_INITIAL_PASSWORD" "newPassword=$ADMIN_PASSWORD" "confirmPassword=$ADMIN_PASSWORD"
+    [ "$(status)" = 302 ] && { changed=1; break; }
+    case "$(status)" in 503|504) ;; *) break;; esac
+    sleep 10
+    if login_as "$ADMIN_PASSWORD"; then changed=1; break; fi
+    login_as "$ADMIN_INITIAL_PASSWORD" || break
+  done
+  [ $changed = 1 ] || die "초기 비밀번호 변경 실패(응답 $(status)). 서비스는 그대로 두고 다시: $0 seed"
   note "초기 비밀번호를 미리보기 비밀번호로 바꿈"
 fi
 T=$(csrf_page /devices)
@@ -513,8 +585,24 @@ if [ -f "$SAMPLE_ENV" ]; then
   . "$SAMPLE_ENV"
 fi
 if [ "${SAMPLE:-1}" != 0 ] && [ -z "$SPACE" ]; then
+  # 견본 기록(sample.env)이 없어도 DB에 이미 있으면 다시 만들지 않는다(KEEP_DATA 재시작·seed 반복)
+  SPACE=$(sql "SELECT min(id) FROM data2flow_core.spaces WHERE name = '가상 강의실 301'" || true)
+  if [ -n "$SPACE" ]; then
+    FLOW=$(sql "SELECT id FROM data2flow_core.flows WHERE name = '301호 고온이면 냉방' LIMIT 1" || true)
+    note "견본 데이터가 이미 있음(공간 $SPACE, 플로우 ${FLOW:-없음}): 생성 생략"
+    printf 'SPACE=%s\nFLOW=%s\nLIVE_RUN=\n' "$SPACE" "$FLOW" > "$SAMPLE_ENV"
+  fi
+fi
+if [ "${SAMPLE:-1}" != 0 ] && [ -z "$SPACE" ]; then
   say "견본 데이터: 가상 강의실 301(표준 키트) → \"고온이면 냉방\" 플로우"
-  api POST /core/sim/kits/classroom-standard/place '{"newSpace":{"name":"가상 강의실 301","preset":"CLASSROOM"}}'
+  # 막 뜬 simulator의 첫 호출이 느려 503/504면 잠시 뒤 다시(실패한 배치는 core가 되돌린다. 그래도 공간이 생겼으면 seed로 이어 간다)
+  for i in 1 2 3; do
+    api POST /core/sim/kits/classroom-standard/place '{"newSpace":{"name":"가상 강의실 301","preset":"CLASSROOM"}}'
+    case "$(status)" in 503|504) ;; *) break;; esac
+    sleep 10
+    [ -z "$(sql "SELECT 1 FROM data2flow_core.spaces WHERE name = '가상 강의실 301' LIMIT 1" || true)" ] \
+      || die "키트 배치 응답이 늦었지만 공간은 생겼습니다. 서비스는 그대로 두고 다시: $0 seed"
+  done
   [ "$(status)" = 201 ] || die "키트 배치 실패(응답 $(status)): $(head -c 300 "$LAST.body")"
   cp "$LAST.body" "$RUN_DIR/kit.json"
   SPACE=$(jq_ "r['spaceId']")
@@ -577,10 +665,10 @@ cat <<EOF
  data2flow 로컬 미리보기가 떠 있습니다
    웹       $WEB
             견본 기기는 가상 기기입니다. 기기 목록에서 "가상 포함"을 켜세요: $WEB/devices?virtual=true
-   로그인   아이디 $ADMIN_LOGIN / 비밀번호 $ADMIN_PASSWORD
+   로그인   아이디 $ADMIN_LOGIN / 비밀번호 $ADMIN_PASSWORD$( [ "${PREVIEW_AUTOFILL:-1}" != 0 ] && printf '  (로그인 폼에 미리 채워져 있음 — [로그인]만 누르면 됨)' )
    Mailpit  $MAILPIT   (초대·비밀번호 재설정 메일)
    RabbitMQ http://localhost:$RABBIT_UI   (d2f / keys.env의 RABBIT_PASSWORD)
-   실행 중 :$STARTED
+   실행 중 :${STARTED# }
    건너뜀  :${FAILED:- 없음}
    로그     $LOGS
    키       $KEYS (이 컴퓨터에만, 커밋 금지)
