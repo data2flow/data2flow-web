@@ -31,11 +31,15 @@ export async function loader({ request, context, params }: Route.LoaderArgs) {
   const url = new URL(request.url);
   const next = safeNextPath(url.searchParams.get("next"));
   if (session.authenticated) throw redirect(session.mustChangePassword ? "/me/security?required=password" : next);
+  // 로컬 미리보기(OPS-08.01, ADR-057): localhost + Secure 쿠키 꺼짐일 때만 설정에 값이 있다(config.server.ts previewLoginFrom)
+  const preview = ctx.runtime.config.previewLogin;
   return {
     step: session.pendingMfaTicket ? ("mfa" as const) : ("credentials" as const),
     next,
     reason: url.searchParams.get("reason"),
-    loginId: url.searchParams.get("loginId") ?? "",
+    loginId: url.searchParams.get("loginId") || preview?.loginId || "",
+    previewPassword: preview?.password ?? "",
+    previewAutofill: Boolean(preview),
     signupEnabled: await signupRequestEnabled(ctx, request),
   };
 }
@@ -135,6 +139,11 @@ export default function Login({ loaderData, actionData }: Route.ComponentProps) 
           <Alert tone="danger">{error}</Alert>
         </div>
       )}
+      {loaderData.previewAutofill && step !== "mfa" && (
+        <div className="mb-3" data-testid="preview-autofill">
+          <Alert tone="info">{t("login.previewAutofill")}</Alert>
+        </div>
+      )}
       {step === "mfa" ? (
         <Form method="post" className="flex flex-col gap-3" noValidate>
           <CsrfField />
@@ -177,6 +186,7 @@ export default function Login({ loaderData, actionData }: Route.ComponentProps) 
               name="password"
               type={showPassword ? "text" : "password"}
               autoComplete="current-password"
+              defaultValue={loaderData.previewPassword}
               error={result?.fieldErrors?.password ? t("validation.passwordRequired") : undefined}
             />
             <Button onClick={() => setShowPassword((v) => !v)} aria-pressed={showPassword}>

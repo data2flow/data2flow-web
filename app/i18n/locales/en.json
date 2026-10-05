@@ -45,6 +45,7 @@
     "hidePassword": "Hide",
     "submit": "Sign in",
     "lockNotice": "After several failures, please wait a while before trying again.",
+    "previewAutofill": "Local preview: the administrator account is pre-filled. Press [Sign in] to enter as the administrator.",
     "forgot": "Forgot your password?",
     "signupRequest": "Request an account",
     "code": "Verification code",

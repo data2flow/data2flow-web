@@ -45,6 +45,7 @@
     "hidePassword": "隐藏",
     "submit": "登录",
     "lockNotice": "多次失败后，请稍后再试。",
+    "previewAutofill": "本地预览：已预先填入管理员账号。点击[登录]即可以管理员身份进入。",
     "forgot": "忘记密码？",
     "signupRequest": "申请账号",
     "code": "验证码",

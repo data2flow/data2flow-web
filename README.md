@@ -34,6 +34,7 @@ data2flow 화면과 BFF입니다. React Router v8 프레임워크 모드(SSR, Vi
 | `DATA2FLOW_MESSENGER_TELEGRAM_SECRET` | (없음) | `/hooks/messenger/telegram` 비밀 토큰(k8s Secret `data2flow-web`). 없으면 그 채널은 404 |
 | `DATA2FLOW_ACTION_URL` | `http://data2flow-action` | 메신저 콜백 내부 중계 대상(gateway를 거치지 않는 유일한 예외, `X-CALLER-SERVICE: data2flow-web`) |
 | `DATA2FLOW_SIGNUP_REQUEST_ENABLED` | `false` | 대체값만. 로그인 화면 [가입 신청] 링크와 `/signup`은 core 공개 API `GET /api/v1/core/public/signup-settings`(API-IAM-74)의 조직 설정을 따르고, 그 호출이 실패할 때만 이 값을 쓴다 (IAM-01.08) |
+| `DATA2FLOW_PREVIEW_LOGIN_ID`·`DATA2FLOW_PREVIEW_LOGIN_PASSWORD` | (없음, 꺼짐) | **로컬 미리보기 전용**(OPS-08.01, ADR-057). 둘 다 있으면 로그인 폼에 이 아이디·비밀번호를 미리 채우고 "로컬 미리보기: 관리자 계정이 미리 채워져 있습니다" 안내를 보인다. `DATA2FLOW_PUBLIC_ORIGIN`의 호스트가 `localhost`·`127.0.0.1`이고 `DATA2FLOW_COOKIE_SECURE=false`일 때만 켜지고, 그 밖에는 경고 로그만 남기고 꺼진다(운영 주소·Secure 쿠키에서는 넣어도 켜지지 않음). 값은 `e2e/local-preview.sh`가 실행 때 `~/.data2flow-preview/keys.env`에서 넘기며 저장소·매니페스트에 넣지 않는다 |
 
 ## M2 수집 경로 화면
 
@@ -223,9 +224,13 @@ e2e/local-preview.sh status           # 컨테이너·서비스 상태, 접속 �
 e2e/local-preview.sh logs core-api    # 서비스 로그 따라 보기
 e2e/local-preview.sh stop             # 프로세스 + 컨테이너 정지(볼륨·키·빌드는 남김)
 e2e/local-preview.sh reset            # stop + 볼륨·키 삭제
+e2e/local-preview.sh seed             # 떠 있는 상태에서 관리자 로그인 확인 + 견본 데이터만 다시(이미 있으면 건너뜀)
+e2e/local-preview.sh restart web      # web만 다시 빌드(origin/main)해서 web 프로세스만 다시 시작(SKIP_BUILD=1이면 빌드 생략)
 ```
 
 - **주소:** 웹 <http://localhost:3000>(아이디 `admin01`, 비밀번호는 출력과 `status`에 나옴), Mailpit <http://localhost:48025>, RabbitMQ 관리 화면 <http://localhost:45767>.
+- **로그인 미리 채우기:** 로그인 화면에 관리자 `admin01`의 아이디·비밀번호가 미리 채워져 있어 누구든 [로그인]만 누르면 관리자 홈으로 들어갑니다. 스크립트가 최초 로그인 때 초기 비밀번호를 `keys.env`의 `ADMIN_PASSWORD`로 바꿔 두므로 비밀번호 변경 화면을 거치지 않습니다. BFF는 웹 주소가 `localhost`·`127.0.0.1`이고 Secure 쿠키가 꺼져 있을 때만 이 기능을 켭니다. 끄려면 `PREVIEW_AUTOFILL=0`으로 시작하거나 `PREVIEW_AUTOFILL=0 SKIP_BUILD=1 e2e/local-preview.sh restart web`.
+- **다시 시작할 때:** `KEEP_DATA=1`로 다시 띄우면 기존 관리자·견본 데이터를 그대로 씁니다. 견본 기록(`sample.env`)이 없어도 DB에 "가상 강의실 301"이 있으면 다시 만들지 않습니다. 시작은 됐는데 로그인·견본 단계에서 멈췄다면 서비스를 내리지 말고 `e2e/local-preview.sh seed`만 다시 실행합니다.
 - **견본 데이터:** 가상 강의실 301(표준 키트: 온습도 2·CO2·재실·에어컨·공기청정기·환기), 지난 3시간 측정값(x60으로 채움), "301호 고온이면 냉방" 플로우 적용, 실시간 시뮬레이터 실행(x1, 7일, 바깥 30~36℃, 매일 09~18시 수업 25명, 시작 시각이 수업 밖이면 처음 2시간 특강 30명). 실내가 27℃를 5분 넘기면 플로우가 가상 에어컨을 켭니다. 견본 기기는 가상 기기라 기기 목록에서 **"가상 포함"**을 켜야 보입니다(`/devices?virtual=true`). `SAMPLE=0`이면 견본을 만들지 않고, `SAMPLE_BACKFILL=0`이면 지난 3시간 채우기를 건너뜁니다.
 - **빌드 대상:** 각 저장소의 `origin/main`(먼저 fetch, `PREVIEW_REF=main`이면 로컬 main)을 `~/.data2flow-preview/src`로 내보내 빌드합니다. 작업 중인 체크아웃·브랜치는 건드리지 않고, Maven 산출물은 `~/.data2flow-preview/m2`에 설치합니다(`~/.m2`는 읽기만). ingress·ai·analytics는 빌드·시작에 실패하면 건너뜁니다.
 - **안전:** 모든 포트는 127.0.0.1에만 열립니다. 루트 `.env`를 읽지 않고(프로필 `e2e`), ingress는 버리는 Mosquitto에만 붙으며 공용 호스트(`iot-data`·`s3`·`s4.java21.net`)를 막습니다. action은 virtual 드라이버만 쓰고 MQTT·LoRaWAN·LG ThinQ·SmartThings 드라이버, 텔레그램, 출력 연결 발송은 꺼져 있습니다.

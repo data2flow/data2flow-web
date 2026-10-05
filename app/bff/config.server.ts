@@ -48,6 +48,16 @@ export interface BffConfig {
   messengerSecrets: Record<string, string>;
   /** 메신저 콜백을 넘길 내부 action 주소(gateway를 거치지 않는 유일한 예외, ADR-021). 예: http://data2flow-action */
   actionUrl: string;
+  /**
+   * 로컬 미리보기 전용(OPS-08.01, ADR-057): 로그인 폼에 미리 채울 관리자 아이디·비밀번호. 기본 꺼짐(undefined).
+   * `previewLoginFrom`의 안전장치(웹 주소가 localhost/127.0.0.1 + Secure 쿠키 꺼짐)를 통과할 때만 값이 있다
+   */
+  previewLogin?: PreviewLogin;
+}
+
+export interface PreviewLogin {
+  loginId: string;
+  password: string;
 }
 
 const DEFAULT_GATEWAY = "http://data2flow-api-gateway";
@@ -87,6 +97,34 @@ function stripSlash(url: string) {
   return url.replace(/\/+$/, "");
 }
 
+const PREVIEW_HOSTS = new Set(["localhost", "127.0.0.1"]);
+
+/**
+ * 로컬 미리보기 로그인 미리 채우기(OPS-08.01, ADR-057). `DATA2FLOW_PREVIEW_LOGIN_ID`·`DATA2FLOW_PREVIEW_LOGIN_PASSWORD`가
+ * 둘 다 있을 때만 켠다. 웹 주소(DATA2FLOW_PUBLIC_ORIGIN)가 localhost/127.0.0.1이 아니거나 Secure 쿠키가 켜져 있으면(=실제 호스트)
+ * 경고만 남기고 끈다. 운영 배포(https://data2flow.java21.net, Secure 쿠키)에서는 값을 넣어도 켜지지 않는다.
+ */
+export function previewLoginFrom(
+  env: NodeJS.ProcessEnv,
+  publicOrigin: string,
+  cookieSecure: boolean,
+  warn: (message: string) => void = (m) => console.warn(m),
+): PreviewLogin | undefined {
+  const loginId = env.DATA2FLOW_PREVIEW_LOGIN_ID?.trim() ?? "";
+  const password = env.DATA2FLOW_PREVIEW_LOGIN_PASSWORD ?? "";
+  if (!loginId && !password) return undefined;
+  if (!loginId || !password) {
+    warn("[bff] preview login autofill disabled: DATA2FLOW_PREVIEW_LOGIN_ID and DATA2FLOW_PREVIEW_LOGIN_PASSWORD must both be set");
+    return undefined;
+  }
+  const host = URL.canParse(publicOrigin) ? new URL(publicOrigin).hostname : "";
+  if (!PREVIEW_HOSTS.has(host) || cookieSecure) {
+    warn(`[bff] preview login autofill refused: requires DATA2FLOW_PUBLIC_ORIGIN on localhost/127.0.0.1 and DATA2FLOW_COOKIE_SECURE=false (origin ${publicOrigin}, secure ${cookieSecure})`);
+    return undefined;
+  }
+  return { loginId, password };
+}
+
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): BffConfig {
   const production = env.NODE_ENV === "production";
   let sessionKeys: SessionKey[];
@@ -103,12 +141,13 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): BffConfig {
     .split(",")
     .map((o) => stripSlash(o.trim()))
     .filter(Boolean);
+  const cookieSecure = env.DATA2FLOW_COOKIE_SECURE !== "false";
   return {
     gatewayUrl: stripSlash(env.DATA2FLOW_GATEWAY_URL || DEFAULT_GATEWAY),
     publicOrigin,
     allowedOrigins: [publicOrigin, ...allowedOrigins],
     sessionKeys,
-    cookieSecure: env.DATA2FLOW_COOKIE_SECURE !== "false",
+    cookieSecure,
     sessionIdleMinutes: intEnv(env, "DATA2FLOW_SESSION_IDLE_MINUTES", 30, 5, 240),
     sessionAbsoluteHours: intEnv(env, "DATA2FLOW_SESSION_ABSOLUTE_HOURS", 12, 1, 24),
     refreshTtlHours: intEnv(env, "DATA2FLOW_REFRESH_TTL_HOURS", 6, 1, 24),
@@ -119,6 +158,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): BffConfig {
     contentSecurityPolicy: production,
     messengerSecrets: env.DATA2FLOW_MESSENGER_TELEGRAM_SECRET ? { telegram: env.DATA2FLOW_MESSENGER_TELEGRAM_SECRET } : {},
     actionUrl: stripSlash(env.DATA2FLOW_ACTION_URL || DEFAULT_ACTION),
+    previewLogin: previewLoginFrom(env, publicOrigin, cookieSecure),
   };
 }
 

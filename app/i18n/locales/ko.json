@@ -45,6 +45,7 @@
     "hidePassword": "숨기기",
     "submit": "로그인",
     "lockNotice": "여러 번 실패하면 잠시 후 다시 시도해 주세요.",
+    "previewAutofill": "로컬 미리보기: 관리자 계정이 미리 채워져 있습니다. [로그인]을 누르면 관리자로 들어갑니다.",
     "forgot": "비밀번호를 잊으셨나요?",
     "signupRequest": "가입 신청",
     "code": "인증 코드",
