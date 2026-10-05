@@ -226,6 +226,9 @@ e2e/local-preview.sh stop             # 프로세스 + 컨테이너 정지(볼�
 e2e/local-preview.sh reset            # stop + 볼륨·키 삭제
 e2e/local-preview.sh seed             # 떠 있는 상태에서 관리자 로그인 확인 + 견본 데이터만 다시(이미 있으면 건너뜀)
 e2e/local-preview.sh restart web      # web만 다시 빌드(origin/main)해서 web 프로세스만 다시 시작(SKIP_BUILD=1이면 빌드 생략)
+e2e/local-preview.sh restart ingress  # 서비스 하나만 다시 빌드·시작(web·core-api·pipeline·ingress·ai·analytics). 나머지는 그대로
+e2e/local-preview.sh seed-real        # 떠 있는 미리보기에 실제 아카데미 센서 연결(구독만) + 실제 데이터 견본
+KEEP_DATA=1 REAL_SOURCE=1 SKIP_BUILD=1 e2e/local-preview.sh   # 시작 + 가상 견본 + 실제 센서 견본을 한 번에
 ```
 
 - **주소:** 웹 <http://localhost:3000>(아이디 `admin01`, 비밀번호는 출력과 `status`에 나옴), Mailpit <http://localhost:48025>, RabbitMQ 관리 화면 <http://localhost:45767>.
@@ -234,6 +237,28 @@ e2e/local-preview.sh restart web      # web만 다시 빌드(origin/main)해서 
 - **견본 데이터:** 가상 강의실 301(표준 키트: 온습도 2·CO2·재실·에어컨·공기청정기·환기), 지난 3시간 측정값(x60으로 채움), "301호 고온이면 냉방" 플로우 적용, 실시간 시뮬레이터 실행(x1, 7일, 바깥 30~36℃, 매일 09~18시 수업 25명, 시작 시각이 수업 밖이면 처음 2시간 특강 30명). 실내가 27℃를 5분 넘기면 플로우가 가상 에어컨을 켭니다. 견본 기기는 가상 기기라 기기 목록에서 **"가상 포함"**을 켜야 보입니다(`/devices?virtual=true`). `SAMPLE=0`이면 견본을 만들지 않고, `SAMPLE_BACKFILL=0`이면 지난 3시간 채우기를 건너뜁니다.
 - **빌드 대상:** 각 저장소의 `origin/main`(먼저 fetch, `PREVIEW_REF=main`이면 로컬 main)을 `~/.data2flow-preview/src`로 내보내 빌드합니다. 작업 중인 체크아웃·브랜치는 건드리지 않고, Maven 산출물은 `~/.data2flow-preview/m2`에 설치합니다(`~/.m2`는 읽기만). ingress·ai·analytics는 빌드·시작에 실패하면 건너뜁니다.
 - **안전:** 모든 포트는 127.0.0.1에만 열립니다. 루트 `.env`를 읽지 않고(프로필 `e2e`), ingress는 버리는 Mosquitto에만 붙으며 공용 호스트(`iot-data`·`s3`·`s4.java21.net`)를 막습니다. action은 virtual 드라이버만 쓰고 MQTT·LoRaWAN·LG ThinQ·SmartThings 드라이버, 텔레그램, 출력 연결 발송은 꺼져 있습니다.
+
+### 실제 아카데미 센서 연결(seed-real, ADR-057 보완)
+
+가상 견본만으로는 실제 센서가 어떻게 보이는지 알 수 없어서, 미리보기에 한해 아카데미 센서 브로커 `wss://iot-data.java21.net/mqtt`를 **구독만** 하는 예외를 둡니다. DB·RabbitMQ·Redis는 그대로 로컬 Docker이고, 공용 s3·s4에는 여전히 접속하지 않습니다.
+
+`seed-real`은 아래를 차례로 하고, 이미 있는 것은 이름으로 찾아 다시 만들지 않습니다(만든 ID는 `~/.data2flow-preview/real.env`, 비밀값 없음).
+
+1. ingress가 실제 센서 모드가 아니면 ingress 하나만 다시 띄웁니다(`iot-data`만 열고 `s3`·`s4`는 계속 막음). client-id는 `data2flow-ingress-dev-<이름>-<n>`(기본 로그인 사용자 이름·1, `REAL_SOURCE_DEV`·`REAL_SOURCE_ORDINAL`로 바꿈)이고 다음 시작에도 같은 값을 씁니다. 같은 client-id로 두 곳에서 접속하면 서로 끊기므로 n을 고정합니다.
+2. 데이터 소스 `academy-chirpstack`(MQTT 구독, 토픽 `application/+/device/+/event/up`, 디코더 ChirpStack v4)를 등록합니다. 자격증명은 루트 `.env`에서 **`MQTT_BASIC_AUTH` 한 줄만** 읽어 BFF로 보내고(core가 암호화 저장), 화면·로그·파일에 남기지 않습니다(`D2F_ENV_FILE`로 파일을 바꿀 수 있음).
+3. 첫 수신을 기다립니다(`REAL_SOURCE_WAIT`, 기본 240초). 센서는 보통 1~5분마다 보냅니다.
+4. 공간 "아카데미"(SITE) 아래 센서 태그 `location`별 방(기본 "실습실", 회의실 센서는 "회의실")을 만들고, 승인 대기 기기를 이름 앞부분으로 모델(AM103·AM107·EM300-TH·EM320-TH·EM500-CO2·WS302)에 맞춰 승인합니다. 이름 뒤에 태그의 위치(`spot`)를 붙입니다. 새 센서가 들어오면 `seed-real`을 다시 실행하면 됩니다.
+5. 실습실 평면도(개략도 SVG)와 센서 위치 표시, 대시보드 **"아카데미 실습실 실시간"**(평균 온도·습도·CO2, TVOC·조도·소음 현재값, 센서별 온도·CO2 추이, 평면도, 재실 활동·소음 추이, 기기별 최신값 표 2개, 연결 상태, 알람 목록)을 만듭니다.
+6. 규칙 3개: 고CO2(1000ppm 이상 5분 → 주의), 고온(28℃ 이상 10분 → 주의), 소음(LAeq 70dB 이상 → 정보). 알림 정책·채널을 붙이지 않아 **화면 알람만** 생깁니다.
+7. 분석 4개: CO2 1000ppm 도달 예측(2시간마다), 쾌적도(매일 07:00), 온도 센서 건강·재실·활용률 추정(매주 월 07:00). 데이터 충분성 검사를 통과하면 바로 실행하고, 모자라면(처음 연결 직후는 모두 "데이터 부족") 일정 실행으로 걸어 둡니다. 도달 예측은 2시간, 쾌적도는 1일, 나머지는 7일 데이터가 쌓이면 결과가 나옵니다.
+8. 플로우 "실습실 CO2 높으면 가상 환기": 실습실 실제 CO2 센서 평균이 1000ppm을 5분 넘기면 **가상 강의실 301의 가상 환기 장치**를 켭니다. 실제 기기에는 제어 대상을 붙이지 않습니다(가상 견본이 없으면 건너뜀).
+9. 데이터 내보내기 1건(최근 1시간 실습실 온도·CO2 CSV, 내보내기 화면에서 내려받기).
+
+둘러볼 곳: 대시보드 `/dashboards/<id>`(시작 끝에 주소 출력), 공간 `/spaces/<실습실 id>?tab=floorplan`, 기기 `/devices`, 데이터 소스 `/sources`, 규칙 `/rules`, 알람 `/alarms`, 플로우 `/automation/flows`, 내보내기 `/exports`.
+
+- **다음 시작:** `real.env`가 있으면 다음 시작부터 ingress가 실제 센서 모드로 뜨고 견본 단계에서 `seed-real`도 이어서 합니다. 끄려면 `REAL_SOURCE=0 SKIP_BUILD=1 e2e/local-preview.sh restart ingress`(이번만) 또는 `real.env`를 지웁니다. `KEEP_DATA` 없이 시작하면 DB가 비므로 소스·승인·견본을 새로 만듭니다(client-id 정보만 남김).
+- **안전:** 공용 브로커에는 발행하지 않습니다(ingress는 구독만 함). 실제 센서에는 제어 대상(드라이버)을 붙이지 않고, 플로우는 가상 환기 장치만 켭니다. 알림 채널은 꺼진 그대로입니다.
+- **analytics 메모:** 미리보기는 analytics를 uvicorn `http=h11`로 띄웁니다. core의 JDK HttpClient가 평문 POST에 `Upgrade: h2c`를 붙이는데 uvicorn 기본(httptools)은 이때 본문을 버려 분석 만들기·충분성 검사가 400(`ANALYSIS_BINDING_INVALID`)이 되기 때문입니다.
 - **키·로그:** 키와 비밀번호는 `~/.data2flow-preview/keys.env`(권한 600, 저장소 밖), 로그는 `~/.data2flow-preview/logs/<서비스>.log`.
 - **필요:** Docker Desktop, Java 21+, Node 22+ + pnpm, python3 3.12+, git, curl, openssl, lsof. 메모리 8GB 이상 여유. 포트 3000·45718~45799·48025를 씁니다.
 
