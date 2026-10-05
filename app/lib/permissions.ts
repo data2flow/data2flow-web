@@ -108,6 +108,7 @@ export const ROUTE_GUARDS: { prefix: string; anyOf: string[] }[] = [
   // M5 data(spec/detail/00-navigation.md §2): 내보내기 작업은 탭별로 좁힌다(사전은 VIEWER, 작업·정기는 TS_EXPORT)
   { prefix: "/exports", anyOf: ["TS_READ"] },
   { prefix: "/imports", anyOf: ["TS_IMPORT"] },
+  { prefix: "/data/exports", anyOf: ["TS_EXPORT"] },
   // M5 field: 작업 지시(UI-DEV-13 조회 V+, 계획 I+), 모바일 셸(UI-DSH-14)·현장 설치(UI-DEV-21 DEV_PLACE)
   { prefix: "/work-orders", anyOf: ["DEV_READ"] },
   { prefix: "/work-orders/plans", anyOf: ["DEV_ADMIN"] },

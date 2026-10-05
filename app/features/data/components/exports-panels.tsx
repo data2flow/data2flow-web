@@ -24,7 +24,8 @@ interface Common {
   api?: DataApi;
 }
 
-export function ExportJobsPanel({ initial, failed, timezone, lang, api = defaultDataApi, download = browserDownload }: Common & { initial: ExportJob[]; failed?: boolean; download?: Downloader }) {
+/** `only`가 있으면 그 작업 하나만 다시 읽는다(메일 링크 `/data/exports/{jobId}`, API-TSD-21 단건) */
+export function ExportJobsPanel({ initial, failed, timezone, lang, api = defaultDataApi, download = browserDownload, only }: Common & { initial: ExportJob[]; failed?: boolean; download?: Downloader; only?: string }) {
   const { t } = useTranslation();
   const [jobs, setJobs] = useState(initial);
   const [failure, setFailure] = useState<{ code: string; message?: string }>();
@@ -32,9 +33,14 @@ export function ExportJobsPanel({ initial, failed, timezone, lang, api = default
   useEffect(() => setJobs(initial), [initial]);
 
   const refresh = useCallback(async () => {
+    if (only) {
+      const one = await api.getExport(only);
+      if (one.ok) setJobs([one.data]);
+      return;
+    }
     const result = await api.listExports(1);
     if (result.ok) setJobs(result.data.responses);
-  }, [api]);
+  }, [api, only]);
 
   const polling = jobs.some(isActiveJob);
   useEffect(() => {

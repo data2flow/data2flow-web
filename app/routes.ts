@@ -127,6 +127,8 @@ export default [
     route("sources/context/:siteId", "routes/sources-context-site.tsx"),
     // M5 data: 내보내기 작업·정기 내보내기·데이터 사전(UI-TSD-02·08), 가져오기(UI-TSD-03), 보관 설정(UI-TSD-04), 저장 지표(UI-OPS-01, OPS-01.03)
     route("exports", "routes/exports.tsx"),
+    // 정기 내보내기 메일 링크(core ExportScheduleRunner → `/data/exports/{jobId}`)
+    route("data/exports/:exportId", "routes/data-export-job.tsx"),
     route("imports", "routes/imports.tsx"),
     route("imports/new", "routes/imports-new.tsx"),
     route("imports/:importId", "routes/import-detail.tsx"),

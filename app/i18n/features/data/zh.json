@@ -85,7 +85,8 @@
         "EXPIRED": "已过期",
         "CANCELLED": "已取消"
       },
-      "download": "下载"
+      "download": "下载",
+      "allJobs": "全部导出任务"
     },
     "schedule": {
       "editorTitle": "定期导出设置",

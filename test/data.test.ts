@@ -84,6 +84,19 @@ describe("TSD-04.01 UI-TSD-02 내보내기 작업", () => {
   });
 });
 
+describe("TSD-04.03 정기 내보내기 메일 링크 /data/exports/{jobId}", () => {
+  it("TC-TSD-164 ANALYST: 링크로 들어오면 그 작업 하나와 [다운로드]·[전체 작업 목록], 없는 작업은 404, VIEWER는 403", async () => {
+    const ana = await analyst();
+    const page = await ana.get("/data/exports/71");
+    expect(page.response.status).toBe(200);
+    expect(page.body).toContain("다운로드");
+    expect(page.body).toContain("전체 작업 목록");
+    expect((await ana.get("/data/exports/999")).response.status).toBe(404);
+    const viewer = await as("view.er", "Viewer-Pass-123");
+    expect((await viewer.get("/data/exports/71")).response.status).toBe(403);
+  });
+});
+
 describe("TSD-04.03 TSD-07.02 TSD-07.04 UI-TSD-08", () => {
   it("TC-TSD-164 정기 내보내기 탭: 마지막 실행 실패 빨간 배지와 사유, BI 계정·피드 탭은 없다, PATCH는 baseVersion", async () => {
     const browser = await operator();

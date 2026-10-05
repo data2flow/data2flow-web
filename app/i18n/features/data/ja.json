@@ -85,7 +85,8 @@
         "EXPIRED": "期限切れ",
         "CANCELLED": "キャンセル済み"
       },
-      "download": "ダウンロード"
+      "download": "ダウンロード",
+      "allJobs": "すべてのエクスポート作業"
     },
     "schedule": {
       "editorTitle": "定期エクスポート設定",

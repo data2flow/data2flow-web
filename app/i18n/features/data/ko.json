@@ -85,7 +85,8 @@
         "EXPIRED": "만료",
         "CANCELLED": "취소됨"
       },
-      "download": "다운로드"
+      "download": "다운로드",
+      "allJobs": "전체 작업 목록"
     },
     "schedule": {
       "editorTitle": "정기 내보내기 설정",

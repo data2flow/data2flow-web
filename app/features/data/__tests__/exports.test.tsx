@@ -200,6 +200,19 @@ describe("TSD-04.01 UI-TSD-02 작업 목록", () => {
     expect(api.listExports).toHaveBeenCalledTimes(1);
   });
 
+  it("TC-TSD-107 TSD-04.03 메일 링크 화면(only): 그 작업 하나만 다시 읽고 목록은 읽지 않는다", async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    const done = { ...JOB, status: "SUCCEEDED" as const, downloadUrl: "/api/v1/core/exports/71/file?expires=9&signature=cd" };
+    const api = fakeDataApi({ getExport: vi.fn(async () => ({ ok: true as const, status: 200, data: done })) });
+    await show(<ExportJobsPanel initial={[JOB]} only={JOB.id} timezone="Asia/Seoul" lang="ko" api={api} />);
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(POLL_MS);
+    });
+    expect(api.getExport).toHaveBeenCalledWith(JOB.id);
+    expect(api.listExports).not.toHaveBeenCalled();
+    expect(await screen.findByRole("button", { name: "다운로드" })).toBeInTheDocument();
+  });
+
   it("[취소] → 취소됨, 실패는 문구, 빈 목록·불러오기 실패 안내, 정기 표시", async () => {
     const api = fakeDataApi();
     await show(<ExportJobsPanel initial={[{ ...JOB, scheduleId: "5" }, { ...JOB, id: "70", status: "FAILED", error: "디스크 부족" }]} timezone="Asia/Seoul" lang="ko" api={api} />);

@@ -85,7 +85,8 @@
         "EXPIRED": "Expired",
         "CANCELLED": "Cancelled"
       },
-      "download": "Download"
+      "download": "Download",
+      "allJobs": "All export jobs"
     },
     "schedule": {
       "editorTitle": "Scheduled export settings",
