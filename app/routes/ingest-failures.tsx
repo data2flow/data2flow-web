@@ -175,7 +175,7 @@ export default function IngestFailures() {
                 }
               >
                 {group.sampleMessage && <p className="text-[12.5px] text-muted">{group.sampleMessage}</p>}
-                {tooMany && canReprocess && <p className="text-[12.5px] text-bad">{t("ingest.failures.tooMany", { max: MAX_REPROCESS.toLocaleString("en-US") })}</p>}
+                {tooMany && canReprocess && <p className="text-[12.5px] text-bad-ink">{t("ingest.failures.tooMany", { max: MAX_REPROCESS.toLocaleString("en-US") })}</p>}
                 {expanded && loaded.items && (
                   <div className="mt-3">
                     <FailureItems items={loaded.items.responses} canReprocess={canReprocess} timezone={timezone} idempotencyKey={loaded.idempotencyKey} />

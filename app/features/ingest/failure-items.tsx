@@ -104,7 +104,7 @@ export function FailureItems({
                 <td>{item.attempts ?? 0}</td>
                 <td>
                   {t(`ingest.failures.itemStatus.${item.status}`, { defaultValue: item.status })}
-                  {item.lockedBy && <span className="ml-1 text-[11.5px] text-warn">{t("ingest.failures.locked")}</span>}
+                  {item.lockedBy && <span className="ml-1 text-[11.5px] text-fair-ink">{t("ingest.failures.locked")}</span>}
                 </td>
               </tr>
             ))}

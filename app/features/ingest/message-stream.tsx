@@ -105,7 +105,7 @@ export function MessageStream({
         </SelectField>
         <div className="ml-auto flex items-center gap-3">
           <LiveDot status={status} />
-          {b.paused && <span role="status" className="text-[12.5px] text-warn">{t("ingest.stream.waiting", { n: b.waiting })}</span>}
+          {b.paused && <span role="status" className="text-[12.5px] text-fair-ink">{t("ingest.stream.waiting", { n: b.waiting })}</span>}
           <Button
             onClick={() => {
               if (b.paused) b.resume();
@@ -151,7 +151,7 @@ function MessageRow({ message, sourceName, timezone, lang, open, onToggle }: { m
         <td>{sourceName}</td>
         <td className="max-w-[260px] truncate font-mono text-[12px]">{message.topic}</td>
         <td className="font-mono">{message.deviceId ?? message.externalId ?? "–"}</td>
-        <td className={message.result === "OK" ? "" : "text-bad"}>
+        <td className={message.result === "OK" ? "" : "text-bad-ink"}>
           {message.result}
           {message.errorCode && <span className="ml-1 font-mono text-[11.5px]">{message.errorCode}</span>}
         </td>

@@ -216,7 +216,7 @@ export function GlobalBands({
         </div>
       ))}
       {maintenance.map((m) => (
-        <div key={m.id} role="status" className="border-b border-warn bg-warn-soft px-4 py-2 text-[13px] text-text">
+        <div key={m.id} role="status" className="border-b border-fair bg-fair-soft px-4 py-2 text-[13px] text-text">
           <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-2">
             <span>
               {t("control.maintenance.band", {
@@ -226,7 +226,7 @@ export function GlobalBands({
               })}
             </span>
             {canEndMaintenance && (
-              <button type="button" className="rounded border border-warn px-2 py-0.5 font-medium" onClick={() => void endMaintenance(m.id)}>
+              <button type="button" className="rounded border border-fair px-2 py-0.5 font-medium" onClick={() => void endMaintenance(m.id)}>
                 {t("control.maintenance.end")}
               </button>
             )}
@@ -349,7 +349,7 @@ export function EmergencyStopButton({
       <button
         type="button"
         onClick={() => void openDialog()}
-        className={cx("rounded-md border border-bad px-2 py-1 text-[12.5px] font-medium text-bad hover:bg-bad-soft", compact && "px-1.5")}
+        className={cx("rounded-md border border-bad px-2 py-1 text-[12.5px] font-medium text-bad-ink hover:bg-bad-soft", compact && "px-1.5")}
         aria-label={t("control.emergency.button")}
       >
         ⏻ {compact ? "" : t("control.emergency.button")}

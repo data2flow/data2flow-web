@@ -78,7 +78,7 @@ function Field({ name, schema, value, onChange, problem, ctx, disabled, nodeType
         <CodeEditor label={label} value={code} onChange={onChange} readOnly={disabled} height={240} factory={ctx.editorFactory} />
         <p className="text-[11.5px] text-muted">{t("flows.js.size", { n: new TextEncoder().encode(code).length, max: JS_CODE_LIMIT_BYTES })}</p>
         {problem && (
-          <p role="alert" className="text-[12px] text-bad">
+          <p role="alert" className="text-[12px] text-bad-ink">
             {problem}
           </p>
         )}
@@ -207,7 +207,7 @@ export function PropertyPanel({
         </p>
         {nodeType?.description && <p className="text-[12px] text-muted">{nodeType.description}</p>}
         {lockedBy ? (
-          <p role="status" className="rounded bg-warn-soft px-2 py-1 text-[12px] text-warn">
+          <p role="status" className="rounded bg-fair-soft px-2 py-1 text-[12px] text-fair-ink">
             {t("flows.presence.locked", { name: lockedBy })}
           </p>
         ) : (
@@ -238,7 +238,7 @@ export function PropertyPanel({
       ))}
       {isControl && <ControlFields value={node.config as ControlValue} api={ctx.api} disabled={readOnly} onChange={(patch) => setConfig(patch as Record<string, unknown>)} />}
       {isControl && (problemOf("capability") || problemOf("command") || problemOf("args")) && (
-        <p role="alert" className="text-[12px] text-bad">
+        <p role="alert" className="text-[12px] text-bad-ink">
           {problemOf("capability") ?? problemOf("command") ?? problemOf("args")}
         </p>
       )}

@@ -8,7 +8,7 @@ import { Form, Link, useSearchParams } from "react-router";
 import { callApi, orThrow } from "~/bff/api.server";
 import { bff } from "~/bff/middleware.server";
 import { SpaceSelect } from "~/components/space-picker";
-import { Button, ButtonLink, Card, PageHeader, SelectField, Table } from "~/components/ui";
+import { Button, ButtonLink, Card, Kpi, PageHeader, SelectField, Table } from "~/components/ui";
 import { formatDuration } from "~/features/alarms/components/alarm-list-view";
 import { EChart } from "~/features/rules/components/echart";
 import { dailyBarOption } from "~/features/rules/model/simulation";
@@ -103,10 +103,7 @@ export default function AlarmStatsPage({ loaderData }: Route.ComponentProps) {
       </Card>
       <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-4">
         {cards.map((c) => (
-          <Card key={c.key}>
-            <p className="text-[12px] text-muted">{t(`alarmStats.cards.${c.key}`)}</p>
-            <p className="font-mono text-[22px] font-semibold">{c.value}</p>
-          </Card>
+          <Kpi key={c.key} label={t(`alarmStats.cards.${c.key}`)} value={c.value} />
         ))}
       </div>
       <div className="mt-4 grid gap-3 md:grid-cols-3">

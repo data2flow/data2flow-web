@@ -51,7 +51,7 @@ export function RecipientEditor({ value, onChange, users, usersAvailable, inputN
             {labelOf(r)}
             {inputName && <input type="hidden" name={inputName} value={encodeRecipient(r)} />}
             {!disabled && (
-              <button type="button" className="text-muted hover:text-bad" aria-label={t("notify.policy.remove", { name: labelOf(r) })} onClick={() => onChange(value.filter((x) => encodeRecipient(x) !== encodeRecipient(r)))}>
+              <button type="button" className="text-muted hover:text-bad-ink" aria-label={t("notify.policy.remove", { name: labelOf(r) })} onClick={() => onChange(value.filter((x) => encodeRecipient(x) !== encodeRecipient(r)))}>
                 ×
               </button>
             )}
@@ -95,7 +95,7 @@ export function RecipientEditor({ value, onChange, users, usersAvailable, inputN
           </Button>
         </div>
       )}
-      {error && <p className="text-[12.5px] text-bad">{error}</p>}
+      {error && <p className="text-[12.5px] text-bad-ink">{error}</p>}
     </fieldset>
   );
 }
@@ -130,7 +130,7 @@ export function StepsEditor({ initial, users, usersAvailable, error, disabled }:
           <Button onClick={() => setSteps([...steps, { stepNo: steps.length + 1, waitMinutes: 10, recipients: [] }])}>{t("notify.policy.addStep")}</Button>
         </div>
       )}
-      {error && <p className="text-[12.5px] text-bad">{error}</p>}
+      {error && <p className="text-[12.5px] text-bad-ink">{error}</p>}
     </fieldset>
   );
 }
@@ -204,7 +204,7 @@ export function PolicyForm({ policy, spaces, rules, templates, channelTypes, use
             <TextField label={t("notify.policy.to")} name="to" type="time" defaultValue={policy.timeWindow?.to ?? "18:00"} />
           </div>
         )}
-        {err("timeWindow") && <p className="text-[12.5px] text-bad">{err("timeWindow")}</p>}
+        {err("timeWindow") && <p className="text-[12.5px] text-bad-ink">{err("timeWindow")}</p>}
       </fieldset>
       <RecipientEditor label={t("notify.policy.recipients")} value={recipients} onChange={setRecipients} users={users} usersAvailable={usersAvailable} inputName="recipient" error={err("recipients")} disabled={readOnly} />
       <fieldset className="flex flex-col gap-2" aria-invalid={Boolean(errors.channels)}>
@@ -218,7 +218,7 @@ export function PolicyForm({ policy, spaces, rules, templates, channelTypes, use
           ))}
         </div>
         {err("channels") && (
-          <p className={cx("text-[12.5px] text-bad")} role="alert">
+          <p className={cx("text-[12.5px] text-bad-ink")} role="alert">
             {err("channels")}
           </p>
         )}

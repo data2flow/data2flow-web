@@ -99,7 +99,7 @@ export function CreateScriptDialog({
               </label>
             ))}
             {fieldErrors?.bindings && (
-              <p role="alert" className="text-[12px] text-bad">
+              <p role="alert" className="text-[12px] text-bad-ink">
                 {t(`scripts.validation.${fieldErrors.bindings}`)}
               </p>
             )}

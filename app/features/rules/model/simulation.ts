@@ -3,6 +3,7 @@
  * 시간대 히트맵(요일 × 시) ECharts 옵션.
  */
 import type { SimulationResult } from "./types";
+import { tokens } from "~/lib/tokens";
 
 export const MAX_SIM_DAYS = 30;
 export const SIM_PERIODS = [1, 7, 14, 30] as const;
@@ -50,7 +51,7 @@ export function heatmapOption(result: SimulationResult, dowLabels: string[], dar
     grid: { left: 48, right: 16, top: 8, bottom: 48 },
     xAxis: { type: "category", data: Array.from({ length: 24 }, (_, h) => String(h)), splitArea: { show: true } },
     yAxis: { type: "category", data: dowLabels, splitArea: { show: true } },
-    visualMap: { min: 0, max, calculable: false, orient: "horizontal", left: "center", bottom: 0, itemHeight: 80, textStyle: { color: dark ? "#ccc" : "#555" } },
+    visualMap: { min: 0, max, calculable: false, orient: "horizontal", left: "center", bottom: 0, itemHeight: 80, textStyle: { color: tokens(dark).text2 } },
     series: [{ type: "heatmap", data, label: { show: false } }],
   };
 }

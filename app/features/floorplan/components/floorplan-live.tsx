@@ -29,9 +29,9 @@ const ZOOM_STEP = 0.5;
 const HEAT_COLS = 40;
 
 const TONE_CLASS: Record<string, string> = {
-  bad: "border-bad bg-bad-soft text-bad",
-  warn: "border-warn bg-warn-soft text-warn",
-  good: "border-good bg-good-soft text-good",
+  bad: "border-bad bg-bad-soft text-bad-ink",
+  warn: "border-fair bg-fair-soft text-fair-ink",
+  good: "border-good bg-good-soft text-good-ink",
   muted: "border-line bg-panel text-muted",
 };
 

@@ -9,6 +9,7 @@
  */
 import { resolveTimezone } from "./format";
 import { seriesColor } from "./palette";
+import { alpha, tokens } from "./tokens";
 
 /** [시각(ISO), 값, 품질(원본) 또는 표본 수(집계)] */
 export type SeriesPoint = [string, number | null, number | null];
@@ -147,8 +148,9 @@ export function hasData(series: ChartSeries[]): boolean {
 export function buildChartOption(series: ChartSeries[], options: ChartOptions): Record<string, unknown> {
   const axes = axisIndexByUnit(series);
   const units = [...axes.keys()].slice(0, 2);
-  const text = options.dark ? "#94a3b5" : "#66768a";
-  const line = options.dark ? "#2c3a4b" : "#e1e6ee";
+  const tk = tokens(options.dark);
+  const text = tk.text2;
+  const line = tk.line;
   const out: Record<string, unknown>[] = [];
   const legend: string[] = [];
   series.forEach((s, index) => {
@@ -170,17 +172,17 @@ export function buildChartOption(series: ChartSeries[], options: ChartOptions): 
     });
     const outOfRange = qualityPoints(s, QUALITY.OUT_OF_RANGE);
     if (outOfRange.length) {
-      out.push({ id: `${s.key}:q1`, name: options.labels.outOfRange, type: "scatter", yAxisIndex, symbol: "triangle", symbolSize: 9, color: "#f76707", data: outOfRange });
+      out.push({ id: `${s.key}:q1`, name: options.labels.outOfRange, type: "scatter", yAxisIndex, symbol: "triangle", symbolSize: 9, color: tk.poor, data: outOfRange });
       if (!legend.includes(options.labels.outOfRange)) legend.push(options.labels.outOfRange);
     }
     const suspect = qualityPoints(s, QUALITY.SUSPECT);
     if (suspect.length) {
-      out.push({ id: `${s.key}:q3`, name: options.labels.suspect, type: "scatter", yAxisIndex, symbol: "diamond", symbolSize: 9, color: "#ae3ec9", data: suspect });
+      out.push({ id: `${s.key}:q3`, name: options.labels.suspect, type: "scatter", yAxisIndex, symbol: "diamond", symbolSize: 9, color: tk.virt, data: suspect });
       if (!legend.includes(options.labels.suspect)) legend.push(options.labels.suspect);
     }
   });
   if (series.some((s) => s.virtual)) {
-    out.push({ id: "virtual-legend", name: options.labels.virtual, type: "line", data: [], lineStyle: { type: "dashed" }, color: "#ae3ec9" });
+    out.push({ id: "virtual-legend", name: options.labels.virtual, type: "line", data: [], lineStyle: { type: "dashed" }, color: tk.virt });
     legend.push(options.labels.virtual);
   }
   return {
@@ -196,33 +198,34 @@ export function buildChartOption(series: ChartSeries[], options: ChartOptions): 
 }
 
 function markings(series: ChartSeries[], options: ChartOptions): Record<string, unknown> {
+  const tk = tokens(options.dark);
   const areas: unknown[] = [];
   const lines: unknown[] = [];
   for (const s of series) {
     for (const gap of s.gaps ?? []) {
-      areas.push([{ name: options.labels.gap, xAxis: Date.parse(gap.from), itemStyle: { color: "rgba(102,118,138,0.12)" } }, { xAxis: Date.parse(gap.to) }]);
+      areas.push([{ name: options.labels.gap, xAxis: Date.parse(gap.from), itemStyle: { color: alpha(tk.text3, 0.12) } }, { xAxis: Date.parse(gap.to) }]);
     }
   }
   for (const a of options.annotations ?? []) {
     const at = Date.parse(a.timeFrom);
     if (Number.isNaN(at)) continue;
     if (a.timeTo) {
-      areas.push([{ name: a.title, xAxis: at, itemStyle: { color: "rgba(32,107,196,0.10)" } }, { xAxis: Date.parse(a.timeTo) }]);
+      areas.push([{ name: a.title, xAxis: at, itemStyle: { color: alpha(tk.accent, 0.1) } }, { xAxis: Date.parse(a.timeTo) }]);
       continue;
     }
     const kind = annotationKind(a.type);
     const icon = ANNOTATION_ICON[a.type];
     const text = icon ? `${icon} ${a.title}` : a.title;
     const tooltip = { show: true, formatter: `${text} · ${axisLabel(at, options.timezone)}` };
-    if (kind === "alarm") lines.push({ name: a.title, xAxis: at, label: { formatter: text }, lineStyle: { type: "solid", color: "#d63939", width: 1.5 }, tooltip });
-    else if (kind === "control") lines.push({ name: a.title, xAxis: at, symbol: ["none", "pin"], symbolSize: 14, label: { formatter: text, position: "end" }, lineStyle: { type: "dashed", color: "#206bc4" }, itemStyle: { color: "#206bc4" }, tooltip });
+    if (kind === "alarm") lines.push({ name: a.title, xAxis: at, label: { formatter: text }, lineStyle: { type: "solid", color: tk.bad, width: 1.5 }, tooltip });
+    else if (kind === "control") lines.push({ name: a.title, xAxis: at, symbol: ["none", "pin"], symbolSize: 14, label: { formatter: text, position: "end" }, lineStyle: { type: "dashed", color: tk.accent }, itemStyle: { color: tk.accent }, tooltip });
     else lines.push({ name: a.title, xAxis: at, label: { formatter: a.title }, tooltip });
   }
   const result: Record<string, unknown> = {};
   if (areas.length) result.markArea = { silent: true, data: areas };
-  if (lines.length) result.markLine = { symbol: "none", data: lines, lineStyle: { type: "dotted", color: "#d63939" } };
+  if (lines.length) result.markLine = { symbol: "none", data: lines, lineStyle: { type: "dotted", color: tk.bad } };
   if (options.target && (options.target.min != null || options.target.max != null)) {
-    const band = [{ yAxis: options.target.min ?? "min", itemStyle: { color: "rgba(47,158,68,0.08)" } }, { yAxis: options.target.max ?? "max" }];
+    const band = [{ yAxis: options.target.min ?? "min", itemStyle: { color: alpha(tk.good, 0.08) } }, { yAxis: options.target.max ?? "max" }];
     result.markArea = { silent: true, data: [...((result.markArea as { data: unknown[] } | undefined)?.data ?? []), band] };
   }
   return result;

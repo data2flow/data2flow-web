@@ -217,7 +217,7 @@ export default function Dashboards({ loaderData }: Route.ComponentProps) {
                     <Form method="post" onSubmit={(e) => !window.confirm(t("dashboards.deleteConfirm", { name: item.name })) && e.preventDefault()}>
                       <CsrfField />
                       <input type="hidden" name="id" value={item.id} />
-                      <button type="submit" name="intent" value="delete" className="rounded px-2 py-1 text-[12px] text-bad hover:bg-bad-soft">
+                      <button type="submit" name="intent" value="delete" className="rounded px-2 py-1 text-[12px] text-bad-ink hover:bg-bad-soft">
                         {t("dashboards.delete")}
                       </button>
                     </Form>

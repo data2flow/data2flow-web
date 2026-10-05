@@ -19,5 +19,5 @@ const AREAS: { key: ControlArea; to: string; anyOf: string[] }[] = [
 
 export function ControlAreaTabs({ current, permissions }: { current: ControlArea; permissions: readonly string[] | undefined }) {
   const { t } = useTranslation();
-  return <Tabs current={current} items={AREAS.filter((a) => hasAny(permissions, a.anyOf)).map((a) => ({ key: a.key, label: t(`control.area.${a.key}`), to: a.to }))} />;
+  return <Tabs section current={current} items={AREAS.filter((a) => hasAny(permissions, a.anyOf)).map((a) => ({ key: a.key, label: t(`control.area.${a.key}`), to: a.to }))} />;
 }

@@ -279,7 +279,7 @@ describe("ACT-02.06 UI-ACT-03 일괄 제어(BFF 중계)", () => {
 describe("DEV-02.07 UI-DEV-06 기기 상세 M4 탭", () => {
   it("TC-DEV-069 AT-DEV-05.4: 액추에이터 [제어] 버튼은 제어 권한자만, VIEWER에게는 편집·삭제·제어 버튼이 없다", async () => {
     const op = await (await operator()).get(`/devices/${AIRCON_ID}`);
-    const controlButton = `border-accent hover:opacity-90" href="/devices/${AIRCON_ID}?tab=control"`;
+    const controlButton = `border-accent shadow-card hover:brightness-95" href="/devices/${AIRCON_ID}?tab=control"`;
     expect(op.body).toContain(controlButton);
     expect(op.body).toContain(">가동<");
     const view = await (await viewer()).get(`/devices/${AIRCON_ID}`);

@@ -11,6 +11,7 @@ export function DeviceAreaTabs({ current, pendingCount }: { current: DeviceArea;
   const pending = pendingCount ? `${t("devices.area.pending")} (${pendingCount})` : t("devices.area.pending");
   return (
     <Tabs
+      section
       current={current}
       items={[
         { key: "all", label: t("devices.area.all"), to: "/devices" },

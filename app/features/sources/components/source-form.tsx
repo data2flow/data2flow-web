@@ -176,7 +176,7 @@ export function SourceForm({ initial, mode, readOnly = false, secretConfigured, 
               {values.auth === "HEADER" && <TextField label={t("sources.form.headerName")} value={values.headerName} error={show("headerName")} onChange={(e) => set("headerName", e.target.value)} />}
               {values.auth === "USERPASS" && <TextField label={t("sources.form.username")} value={values.username} error={show("username")} onChange={(e) => set("username", e.target.value)} autoComplete="off" />}
               {values.auth === "MTLS" && <p className="text-[12.5px] text-muted">{t("sources.tls.mtlsHint")}</p>}
-              {show("secretValue") && values.auth === "MTLS" && <p className="text-[12px] text-bad">{t("sources.validation.secret")}</p>}
+              {show("secretValue") && values.auth === "MTLS" && <p className="text-[12px] text-bad-ink">{t("sources.validation.secret")}</p>}
               {(values.auth === "USERPASS" || values.auth === "HEADER") && (
                 <TextField
                   label={t(`sources.form.secret.${values.auth}`)}
@@ -236,7 +236,7 @@ export function SourceForm({ initial, mode, readOnly = false, secretConfigured, 
                   </div>
                 </div>
               ))}
-              {show("topics") && <p className="text-[12px] text-bad">{show("topics")}</p>}
+              {show("topics") && <p className="text-[12px] text-bad-ink">{show("topics")}</p>}
               <div>
                 <Button onClick={() => set("topics", [...values.topics, { topic: "", qos: 1 }])} disabled={values.topics.length >= maxTopics}>
                   {t("sources.form.addTopic")}

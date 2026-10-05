@@ -2,11 +2,12 @@
  * 수집 요약 카드(UI-ING-01, OPS-01.02): 분당 수신, 처리 지연 p95, 스트림 lag, 하트비트, 오늘 실패. 기준을 넘으면 주황·빨강.
  */
 import { useTranslation } from "react-i18next";
-import { Alert, cx } from "~/components/ui";
+import { Alert, Kpi, type Level } from "~/components/ui";
 import { formatNumber } from "~/lib/format";
 import { alertTone, cardTone, type IngestSummary, type Tone } from "./model/ingest";
 
-const TONE: Record<Tone, string> = { good: "border-line", warn: "border-warn bg-warn-soft", bad: "border-bad bg-bad-soft", muted: "border-line" };
+/** 기준을 넘은 카드: 주의(fair)·위험(bad) 점과 숫자색(목업 H.kpi) */
+const LEVEL: Record<Tone, Level | undefined> = { good: undefined, warn: "fair", bad: "bad", muted: undefined };
 
 export function SummaryCards({ summary }: { summary: IngestSummary | null }) {
   const { t, i18n } = useTranslation();
@@ -25,9 +26,8 @@ export function SummaryCards({ summary }: { summary: IngestSummary | null }) {
         {cards.map((card) => {
           const tone = cardTone(card.key, alerts);
           return (
-            <section key={card.key} data-card={card.key} data-tone={tone} className={cx("rounded-lg border bg-panel px-3 py-2", TONE[tone])}>
-              <h3 className="text-[10.5px] font-semibold uppercase tracking-wide text-muted">{t(`ingest.card.${card.key}`)}</h3>
-              <p className="text-[22px] font-semibold">{card.value}</p>
+            <section key={card.key} data-card={card.key} data-tone={tone}>
+              <Kpi label={<h3>{t(`ingest.card.${card.key}`)}</h3>} value={card.value} level={LEVEL[tone]} />
             </section>
           );
         })}

@@ -180,7 +180,7 @@ export function ReprocessView({ sources, devices, jobs: initialJobs, prefill, ca
               {(preview.scripts ?? []).map((s, i) => (
                 <p key={`${s.scriptId}-${i}`}>{t("ingest.reprocess.script", { scope: s.scope ?? "", name: s.name ?? s.scriptId ?? "", version: s.version ?? "–" })}</p>
               ))}
-              {preview.total === 0 && <p className="text-warn">{t("ingest.reprocess.noTarget")}</p>}
+              {preview.total === 0 && <p className="text-fair-ink">{t("ingest.reprocess.noTarget")}</p>}
               <div className="mt-2 flex justify-end">
                 <Button variant="primary" disabled={busy || preview.total === 0} onClick={() => setConfirm(true)}>
                   {t("ingest.reprocess.start")}
@@ -223,7 +223,7 @@ export function ReprocessView({ sources, devices, jobs: initialJobs, prefill, ca
                     </td>
                     <td>
                       <Badge tone={jobTone(job.status)}>{t(`ingest.reprocess.statuses.${job.status}`, { defaultValue: job.status })}</Badge>
-                      {job.error && <div className="text-[11.5px] text-bad">{job.error}</div>}
+                      {job.error && <div className="text-[11.5px] text-bad-ink">{job.error}</div>}
                     </td>
                     <td>
                       <progress max={100} value={pct} aria-label={t("ingest.reprocess.progress")} /> <span className="font-mono text-[12px]">{`${pct}%`}</span>

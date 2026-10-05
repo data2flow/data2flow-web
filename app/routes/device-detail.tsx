@@ -275,7 +275,7 @@ export default function DeviceDetailRoute({ loaderData, actionData }: Route.Comp
             <Form method="post" className="inline">
               <CsrfField />
               <input type="hidden" name="intent" value="favorite" />
-              <button type="submit" aria-pressed={favorite} aria-label={favorite ? t("devices.unfavorite") : t("devices.favorite")} className="text-[18px] text-warn">
+              <button type="submit" aria-pressed={favorite} aria-label={favorite ? t("devices.unfavorite") : t("devices.favorite")} className="text-[18px] text-fair-ink">
                 {favorite ? "★" : "☆"}
               </button>
             </Form>
@@ -428,7 +428,7 @@ export default function DeviceDetailRoute({ loaderData, actionData }: Route.Comp
         }
       >
         <p className="text-[13px]">{t("devices.deleteBody", { name: device.name })}</p>
-        {result?.intent === "delete" && result.error?.code === "DEVICE_IN_USE" && <p className="text-[13px] text-bad">{t("devices.inUse")}</p>}
+        {result?.intent === "delete" && result.error?.code === "DEVICE_IN_USE" && <p className="text-[13px] text-bad-ink">{t("devices.inUse")}</p>}
         <Form method="post" id="delete-form">
           <CsrfField />
           <input type="hidden" name="intent" value="delete" />

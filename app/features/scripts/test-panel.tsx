@@ -141,7 +141,7 @@ export function TestPanel({
         <textarea value={context} onChange={(e) => setContext(e.target.value)} rows={4} spellCheck={false} className="rounded-md border border-line bg-panel p-2 font-mono text-[12.5px] text-text" />
       </label>
       {inputError && (
-        <p role="alert" className="text-[12px] text-bad">
+        <p role="alert" className="text-[12px] text-bad-ink">
           {inputError}
         </p>
       )}
@@ -193,7 +193,7 @@ export function TestPanel({
           </div>
           <div className="p-2 text-[12.5px]" role="tabpanel">
             {result.error && (
-              <p role="alert" className="mb-2 text-bad">
+              <p role="alert" className="mb-2 text-bad-ink">
                 {`${result.error.message}${result.error.line ? ` (${result.error.line}:${result.error.col ?? 1})` : ""}`}
               </p>
             )}
@@ -204,7 +204,7 @@ export function TestPanel({
               ) : (
                 <ul>
                   {rows.map((row) => (
-                    <li key={`${row.kind}:${row.key}`} data-diff={row.kind} className={cx("font-mono", row.kind === "added" ? "text-good" : row.kind === "removed" ? "text-bad" : "text-warn")}>
+                    <li key={`${row.kind}:${row.key}`} data-diff={row.kind} className={cx("font-mono", row.kind === "added" ? "text-good-ink" : row.kind === "removed" ? "text-bad-ink" : "text-fair-ink")}>
                       {`${t(`scripts.test.${row.kind}`)} ${row.key}: ${row.kind === "changed" ? `${display(row.from)} → ${display(row.to)}` : display(row.kind === "added" ? row.to : row.from)}`}
                     </li>
                   ))}

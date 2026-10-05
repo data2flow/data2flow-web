@@ -112,9 +112,9 @@ export function ScriptOps({ scriptId, canWrite, logCaptureUntil, timezone, api, 
                   <td className="font-mono">{`v${v.versionNo}`}</td>
                   <td className="font-mono">{v.processed.toLocaleString(i18n.language)}</td>
                   <td className="font-mono">{v.errors.toLocaleString(i18n.language)}</td>
-                  <td className={v.errorRate >= 0.1 ? "font-mono text-bad" : "font-mono"}>{`${(v.errorRate * 100).toFixed(1)}%`}</td>
+                  <td className={v.errorRate >= 0.1 ? "font-mono text-bad-ink" : "font-mono"}>{`${(v.errorRate * 100).toFixed(1)}%`}</td>
                   <td className="font-mono">{v.avgMs ?? "–"}</td>
-                  <td className={v.p95Ms != null && v.p95Ms > 20 ? "font-mono text-warn" : "font-mono"}>{v.p95Ms ?? "–"}</td>
+                  <td className={v.p95Ms != null && v.p95Ms > 20 ? "font-mono text-fair-ink" : "font-mono"}>{v.p95Ms ?? "–"}</td>
                 </tr>
               ))}
             </tbody>

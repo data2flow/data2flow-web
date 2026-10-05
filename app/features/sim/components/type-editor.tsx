@@ -92,7 +92,7 @@ export function TypeEditor({
         </Card>
         {draft.category === "SENSOR" ? (
           <Card title={t("sim.types.metrics")}>
-            {err("metrics") && <p role="alert" className="mb-2 text-[12px] text-bad">{err("metrics")}</p>}
+            {err("metrics") && <p role="alert" className="mb-2 text-[12px] text-bad-ink">{err("metrics")}</p>}
             <ul className="grid gap-2 sm:grid-cols-2 md:grid-cols-3">
               {metricOptions.map((key) => {
                 const chosen = draft.metrics.find((m) => m.key === key);
@@ -115,7 +115,7 @@ export function TypeEditor({
           </Card>
         ) : (
           <Card title={t("sim.types.capabilities")}>
-            {err("capabilities") && <p role="alert" className="mb-2 text-[12px] text-bad">{err("capabilities")}</p>}
+            {err("capabilities") && <p role="alert" className="mb-2 text-[12px] text-bad-ink">{err("capabilities")}</p>}
             <ul className="grid gap-2 sm:grid-cols-2 md:grid-cols-3">
               {capabilityOptions.map((name) => (
                 <li key={name}>
@@ -126,7 +126,7 @@ export function TypeEditor({
           </Card>
         )}
         <Card title={t("sim.types.defs")} actions={!readOnly && <Button type="button" onClick={() => set({ defs: [...draft.defs, emptyDef()] })} disabled={draft.defs.length >= 50}>{t("sim.types.addDef")}</Button>}>
-          {err("defs") && <p role="alert" className="mb-2 text-[12px] text-bad">{err("defs")}</p>}
+          {err("defs") && <p role="alert" className="mb-2 text-[12px] text-bad-ink">{err("defs")}</p>}
           {draft.defs.length === 0 ? (
             <p className="text-[13px] text-muted">{t("sim.types.noDefs")}</p>
           ) : (

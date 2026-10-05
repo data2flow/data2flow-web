@@ -97,7 +97,7 @@ function StepRow({ step }: { step: TestStep }) {
   const chain = step.tlsChain ?? [];
   const leaf = chain[0];
   return (
-    <li className={cx("flex flex-wrap items-baseline gap-2", failed && "text-bad", (step.status === "PENDING" || step.status === "SKIPPED") && "text-muted")}>
+    <li className={cx("flex flex-wrap items-baseline gap-2", failed && "text-bad-ink", (step.status === "PENDING" || step.status === "SKIPPED") && "text-muted")}>
       <span aria-hidden className="w-4 font-mono">
         {ICON[step.status] ?? "·"}
       </span>

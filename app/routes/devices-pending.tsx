@@ -237,7 +237,7 @@ export default function DevicesPending({ loaderData, actionData }: Route.Compone
                         {d.sourceMeta?.deviceName ?? d.name}
                       </Link>
                       {failedById[d.id] && (
-                        <span role="alert" className="block text-[12px] text-bad">
+                        <span role="alert" className="block text-[12px] text-bad-ink">
                           {errorText(t, { code: failedById[d.id] })}
                         </span>
                       )}

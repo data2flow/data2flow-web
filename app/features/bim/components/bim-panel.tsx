@@ -14,9 +14,9 @@ import type { SpaceNode } from "~/lib/spaces";
 import { checkIfcFile, formatBytes, mappingCounts, viewerElements, type ElementState, type IfcFileProblem, type ModelDetail, type ModelSummary } from "../model/bim";
 
 const STATE_CLASS: Record<ElementState, string> = {
-  ALARM: "border-bad bg-bad-soft text-bad",
-  WARNING: "border-warn bg-warn-soft text-warn",
-  NORMAL: "border-good bg-good-soft text-good",
+  ALARM: "border-bad bg-bad-soft text-bad-ink",
+  WARNING: "border-fair bg-fair-soft text-fair-ink",
+  NORMAL: "border-good bg-good-soft text-good-ink",
   UNMAPPED: "border-line bg-bg text-muted",
 };
 const STATE_ICON: Record<ElementState, string> = { ALARM: "▲", WARNING: "!", NORMAL: "✔", UNMAPPED: "–" };
@@ -124,8 +124,8 @@ function BimViewer({ detail, tree, canEdit, editing, onEdit, result }: { detail:
           </div>
         </Form>
       )}
-      {result?.intent === "bimMapping" && result.ok && <p role="status" className="mt-2 text-[12.5px] text-good">{t("common.saved")}</p>}
-      {result?.intent === "bimMapping" && result.error && <p role="alert" className="mt-2 text-[12.5px] text-bad">{t(`errors.${result.error.code}`, { defaultValue: t("errors.UNKNOWN") })}</p>}
+      {result?.intent === "bimMapping" && result.ok && <p role="status" className="mt-2 text-[12.5px] text-good-ink">{t("common.saved")}</p>}
+      {result?.intent === "bimMapping" && result.error && <p role="alert" className="mt-2 text-[12.5px] text-bad-ink">{t(`errors.${result.error.code}`, { defaultValue: t("errors.UNKNOWN") })}</p>}
       {canEdit && (
         <Form method="post" className="mt-3 flex justify-end">
           <CsrfField />
@@ -167,11 +167,11 @@ function IfcUpload({ result }: { result?: FormResult }) {
         </Button>
         <p className="w-full text-[12px] text-muted">{t("bim.limit")}</p>
         {(problem || serverProblem) && (
-          <p role="alert" className="w-full text-[12px] text-bad">
+          <p role="alert" className="w-full text-[12px] text-bad-ink">
             {problem ? t(`bim.problem.${problem}`) : t(`errors.${serverProblem}`, { defaultValue: t("errors.UNKNOWN") })}
           </p>
         )}
-        {result?.intent === "bimUpload" && result.ok && <p role="status" className="w-full text-[12.5px] text-good">{t("bim.uploaded")}</p>}
+        {result?.intent === "bimUpload" && result.ok && <p role="status" className="w-full text-[12.5px] text-good-ink">{t("bim.uploaded")}</p>}
       </Form>
     </Card>
   );

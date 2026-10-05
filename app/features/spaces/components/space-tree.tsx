@@ -73,7 +73,7 @@ export function SpaceTree({ spaces, selectedId, canEdit, result }: { spaces: Spa
               <span className="flex-1">{s.name}</span>
               {s.node.virtual && <VirtualBadge />}
               {s.node.counts?.devices ? <span className="font-mono text-[11px] text-muted">{s.node.counts.devices}</span> : null}
-              {s.node.counts?.offline ? <span className="rounded bg-warn-soft px-1 text-[11px] text-warn">{t("spaces.tree.offline", { n: s.node.counts.offline })}</span> : null}
+              {s.node.counts?.offline ? <span className="rounded bg-fair-soft px-1 text-[11px] text-fair-ink">{t("spaces.tree.offline", { n: s.node.counts.offline })}</span> : null}
             </Link>
           </li>
         ))}
@@ -116,7 +116,7 @@ function ErrorLine({ result }: { result?: TreeActionResult }) {
   const { t } = useTranslation();
   if (!result?.error) return null;
   return (
-    <p role="alert" className="text-[12.5px] text-bad">
+    <p role="alert" className="text-[12.5px] text-bad-ink">
       {t(`errors.${result.error.code}`, { defaultValue: result.error.message || t("errors.UNKNOWN") })}
     </p>
   );
@@ -236,7 +236,7 @@ export function DeleteDialog({ space, result, onClose }: { space: FlatSpace; res
         <TextField label={t("spaces.tree.typeName", { name: space.name })} value={typed} onChange={(e) => setTyped(e.target.value)} />
         <ErrorLine result={result?.intent === "delete" ? result : undefined} />
         {blockers && (
-          <div role="alert" className="text-[12.5px] text-bad">
+          <div role="alert" className="text-[12.5px] text-bad-ink">
             <p>{t("spaces.tree.blockers", { children: blockers.children ?? 0, devices: blockers.devices ?? 0, markers: blockers.markers ?? 0, workOrders: blockers.workOrders ?? 0 })}</p>
             <Link className="text-accent underline" to={`/devices?spaceId=${space.id}`}>
               {t("spaces.tree.viewDevices")}

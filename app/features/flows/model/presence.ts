@@ -4,6 +4,7 @@
  * 잠금이 거절된 노드는 설정 패널이 읽기 전용("○○님이 편집 중")이 된다. 잠금은 서버(Redis TTL 60초)가 정하고, 최종 보호는 저장 때 낙관적 잠금이다.
  */
 import type { LiveConnectionState } from "./live";
+import { LIGHT_TOKENS } from "~/lib/tokens";
 
 export interface Participant {
   userId: string;
@@ -100,7 +101,7 @@ export function othersSelection(state: PresenceState, me: string | undefined): M
   const out = new Map<string, { name: string; color: string }>();
   for (const p of state.participants) {
     if (p.userId === me) continue;
-    for (const nodeId of p.selected ?? []) if (!out.has(nodeId)) out.set(nodeId, { name: p.name, color: p.color ?? "#2f6fde" });
+    for (const nodeId of p.selected ?? []) if (!out.has(nodeId)) out.set(nodeId, { name: p.name, color: p.color ?? LIGHT_TOKENS.accent });
   }
   return out;
 }

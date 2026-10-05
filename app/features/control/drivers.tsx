@@ -156,7 +156,7 @@ export function DriverManager({ initial, failed, timezone, lang, api = controlAd
                   <td>
                     <Badge tone={driverTone(row.status)}>{t(`control.drivers.statuses.${row.status}`, { defaultValue: row.status })}</Badge>
                     {row.metrics?.circuit?.state === "OPEN" && row.metrics.circuit.openedAt && (
-                      <span className="ml-1 text-[12px] text-warn">{t("control.drivers.openedAt", { at: formatDateTime(row.metrics.circuit.openedAt, timezone, lang, true) })}</span>
+                      <span className="ml-1 text-[12px] text-fair-ink">{t("control.drivers.openedAt", { at: formatDateTime(row.metrics.circuit.openedAt, timezone, lang, true) })}</span>
                     )}
                   </td>
                   <td className="font-mono">{pct(row.metrics?.errorRate)}</td>

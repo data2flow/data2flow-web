@@ -192,7 +192,7 @@ export default function Silences({ loaderData, actionData }: Route.ComponentProp
                         </label>
                       ))}
                       {problem("days") && (
-                        <p role="alert" className="w-full text-[12px] text-bad">
+                        <p role="alert" className="w-full text-[12px] text-bad-ink">
                           {problem("days")}
                         </p>
                       )}

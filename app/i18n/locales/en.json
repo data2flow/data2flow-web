@@ -23,6 +23,9 @@
   },
   "nav": {
     "label": "Main menu",
+    "section": "Menu",
+    "more": "More",
+    "openMenu": "Open menu",
     "home": "Home",
     "admin": "Admin",
     "members": "Members",

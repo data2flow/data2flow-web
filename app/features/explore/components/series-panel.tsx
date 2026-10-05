@@ -3,10 +3,11 @@
  */
 import { useTranslation } from "react-i18next";
 import { Button, cx } from "~/components/ui";
+import { LIGHT_PALETTE } from "~/lib/palette";
 import { AGGS, MAX_SERIES, removeSeries, updateSeries, type ExploreState } from "../model/state";
 
-/** 차트 계열 색과 같은 순서(lib/chart-model 팔레트) */
-export const SERIES_COLORS = ["#206bc4", "#2f9e44", "#b7791f", "#ae3ec9", "#d63939", "#0ca678", "#f76707", "#4263eb"];
+/** 차트 계열 색과 같은 순서(lib/palette, 밝은 화면 팔레트 — 견본 칸은 양쪽 테마에서 읽힌다) */
+export const SERIES_COLORS: readonly string[] = LIGHT_PALETTE;
 
 export function SeriesPanel({ state, onChange, onAdd }: { state: ExploreState; onChange: (next: ExploreState) => void; onAdd: () => void }) {
   const { t } = useTranslation();
@@ -46,7 +47,7 @@ export function SeriesPanel({ state, onChange, onAdd }: { state: ExploreState; o
                 <button type="button" className="text-accent hover:underline" onClick={() => onChange(updateSeries(state, index, { hidden: !s.hidden }))}>
                   {s.hidden ? t("explore.series.show") : t("explore.series.hide")}
                 </button>
-                <button type="button" className="text-bad hover:underline" aria-label={t("explore.series.removeOf", { name: s.label })} onClick={() => onChange(removeSeries(state, index))}>
+                <button type="button" className="text-bad-ink hover:underline" aria-label={t("explore.series.removeOf", { name: s.label })} onClick={() => onChange(removeSeries(state, index))}>
                   {t("common.remove")}
                 </button>
               </div>

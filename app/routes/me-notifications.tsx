@@ -111,7 +111,7 @@ export default function MeNotifications({ loaderData, actionData }: Route.Compon
           </div>
           <Checkbox label={t("notify.prefs.dndAllowCritical")} name="dndAllowCritical" defaultChecked={dnd?.dndAllowCritical ?? true} />
           <p className="text-[12.5px] text-muted">{t("notify.prefs.dndHint")}</p>
-          {at("dnd")?.fieldErrors?.dnd && <p className="text-[12.5px] text-bad">{t(`notify.prefs.errors.${at("dnd")?.fieldErrors?.dnd}`)}</p>}
+          {at("dnd")?.fieldErrors?.dnd && <p className="text-[12.5px] text-bad-ink">{t(`notify.prefs.errors.${at("dnd")?.fieldErrors?.dnd}`)}</p>}
           <div className="flex justify-end">
             <Button type="submit" variant="primary">
               {t("common.save")}

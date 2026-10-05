@@ -144,7 +144,7 @@ export function PhysicsForm({
           </Button>
         </div>
         {previewError && (
-          <p role="alert" className="text-[12.5px] text-bad">
+          <p role="alert" className="text-[12.5px] text-bad-ink">
             {previewError}
           </p>
         )}

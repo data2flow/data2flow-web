@@ -255,7 +255,7 @@ export function SceneEditor({ scene, devices, spaces, capabilities, canManage, c
           </Table>
           {rows.length === 0 && <EmptyState title={t("control.scenes.noItems")} />}
           {submitted && fieldError("items") && (
-            <p role="alert" className="mt-1 text-[12.5px] text-bad">
+            <p role="alert" className="mt-1 text-[12.5px] text-bad-ink">
               {fieldError("items")?.code === "SCENE_ITEM_LIMIT_EXCEEDED" ? t("errors.SCENE_ITEM_LIMIT_EXCEEDED") : t("control.scenes.itemsRequired")}
             </p>
           )}
@@ -317,7 +317,7 @@ export function SceneEditor({ scene, devices, spaces, capabilities, canManage, c
                   <td className="font-mono">{p.willChange ? stateText(p.target) : t("control.scenes.noChange")}</td>
                   <td>
                     {p.predictedBlock && (
-                      <span className="text-bad" title={p.predictedBlock.message ?? undefined}>
+                      <span className="text-bad-ink" title={p.predictedBlock.message ?? undefined}>
                         ⚠ {t("control.scenes.predictedBlock", { message: p.predictedBlock.message ?? p.predictedBlock.reason })}
                       </span>
                     )}

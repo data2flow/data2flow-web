@@ -33,7 +33,7 @@ describe("UI-RUL-07 템플릿 편집기", () => {
     const body = await screen.findByLabelText("본문");
     await userEvent.type(body, " {{{{foo}}");
     expect(screen.getByText("알 수 없는 변수: foo")).toBeInTheDocument();
-    expect(screen.getByText(`${(body as HTMLTextAreaElement).value.length} / 20자`)).toHaveClass("text-bad");
+    expect(screen.getByText(`${(body as HTMLTextAreaElement).value.length} / 20자`)).toHaveClass("text-bad-ink");
     expect(screen.getByText("미리 볼 최근 알람이 없습니다")).toBeInTheDocument();
   });
 

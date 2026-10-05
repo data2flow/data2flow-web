@@ -63,7 +63,7 @@ export function ShadowPanel({ shadow, activeVersion, now, timezone, canWrite, bu
         </tbody>
       </Table>
       {(candidate.command ?? 0) !== (active.command ?? 0) && <p className="font-semibold">{t("flows.shadow.wouldControl", { v, delta: signed((candidate.command ?? 0) - (active.command ?? 0)) })}</p>}
-      <p className={(shadow.stats?.errors?.shadow ?? 0) > 0 ? "text-bad" : "text-muted"}>{t("flows.shadow.errors", { n: shadow.stats?.errors?.shadow ?? 0 })}</p>
+      <p className={(shadow.stats?.errors?.shadow ?? 0) > 0 ? "text-bad-ink" : "text-muted"}>{t("flows.shadow.errors", { n: shadow.stats?.errors?.shadow ?? 0 })}</p>
       {(shadow.diffs ?? []).length > 0 && (
         <details>
           <summary className="cursor-pointer">{t("flows.shadow.diffs", { n: shadow.diffs!.length })}</summary>

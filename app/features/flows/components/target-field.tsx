@@ -140,7 +140,7 @@ export function TargetField({
       )}
       <p className="text-[12px] text-muted">{t("flows.target.count", { n: count })}</p>
       {error && (
-        <p role="alert" className="text-[12px] text-bad">
+        <p role="alert" className="text-[12px] text-bad-ink">
           {error}
         </p>
       )}

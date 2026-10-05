@@ -12,10 +12,10 @@ const PATHS: Record<NotifyTab, string> = { policies: "/notifications/policies", 
 export function NotifyTabs({ current }: { current: NotifyTab }) {
   const { t } = useTranslation();
   const items = (Object.keys(PATHS) as NotifyTab[]).map((key) => ({ key, label: t(`notify.tabs.${key}`), to: PATHS[key] }));
-  return <Tabs items={items} current={current} />;
+  return <Tabs section items={items} current={current} />;
 }
 
-const SEVERITY_TONE: Record<Severity, "danger" | "warning" | "info" | "neutral"> = { CRITICAL: "danger", MAJOR: "warning", MINOR: "info", WARNING: "info", INFO: "neutral" };
+const SEVERITY_TONE: Record<Severity, "danger" | "major" | "warning" | "neutral"> = { CRITICAL: "danger", MAJOR: "major", MINOR: "warning", WARNING: "warning", INFO: "neutral" };
 
 export function SeverityBadge({ severity }: { severity: Severity }) {
   const { t } = useTranslation();

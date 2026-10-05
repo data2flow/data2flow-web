@@ -32,9 +32,9 @@ describe("[DSH-05.04] 알람·제어 주석", () => {
     const first = (option.series as { markLine: { data: Record<string, unknown>[] }; markArea: { data: unknown[] } }[])[0];
     const [raised, cleared, control, note] = first.markLine.data;
     expect(first.markLine.data).toHaveLength(4);
-    expect(raised).toMatchObject({ xAxis: Date.parse("2026-10-03T01:10:00Z"), label: { formatter: "▲ 실습실 고온" }, lineStyle: { type: "solid", color: "#d63939" }, tooltip: { formatter: "▲ 실습실 고온 · 10-03 10:10" } });
+    expect(raised).toMatchObject({ xAxis: Date.parse("2026-10-03T01:10:00Z"), label: { formatter: "▲ 실습실 고온" }, lineStyle: { type: "solid", color: "#D63939" }, tooltip: { formatter: "▲ 실습실 고온 · 10-03 10:10" } });
     expect(cleared).toMatchObject({ label: { formatter: "✔ 실습실 고온" } });
-    expect(control).toMatchObject({ symbol: ["none", "pin"], label: { formatter: "⚙ 냉방 24℃" }, lineStyle: { type: "dashed", color: "#206bc4" }, tooltip: { formatter: "⚙ 냉방 24℃ · 10-03 10:15" } });
+    expect(control).toMatchObject({ symbol: ["none", "pin"], label: { formatter: "⚙ 냉방 24℃" }, lineStyle: { type: "dashed", color: "#206BC4" }, tooltip: { formatter: "⚙ 냉방 24℃ · 10-03 10:15" } });
     expect(note).toMatchObject({ label: { formatter: "필터 교체" } });
     expect(first.markArea.data).toHaveLength(1);
   });

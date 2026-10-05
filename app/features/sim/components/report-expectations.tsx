@@ -52,7 +52,7 @@ export function ReportExpectations({ items, definitions, timezone, lang, deviceN
               <td className="text-[12.5px]">
                 {at && (link ? <Link to={link} className="font-mono text-accent hover:underline">{at}</Link> : <span className="font-mono">{at}</span>)}
                 {x.evidence?.value !== undefined && x.evidence.value !== null && <span className="ml-2 font-mono">{show(x.evidence.value)}</span>}
-                {verdict === "FAILED" && x.evidence?.actual !== undefined && x.evidence.actual !== null && <span className="ml-2 font-semibold text-bad">{t("sim.reportX.actual", { value: show(x.evidence.actual) })}</span>}
+                {verdict === "FAILED" && x.evidence?.actual !== undefined && x.evidence.actual !== null && <span className="ml-2 font-semibold text-bad-ink">{t("sim.reportX.actual", { value: show(x.evidence.actual) })}</span>}
                 {alarmIds.length > 0 && (
                   <span className="ml-2">
                     {alarmIds.map((id) => (

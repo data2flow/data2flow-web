@@ -219,7 +219,7 @@ export function CommissionWizard({ spaces, timezone, api = fieldApi, queue: inje
             {photos.map((p, i) => (
               <li key={`${p.name}-${i}`} className="flex items-center gap-1 rounded border border-line px-2 py-1">
                 {p.name}
-                <button type="button" className="text-bad" aria-label={t("field.commission.removePhoto", { name: p.name })} onClick={() => setPhotos((list) => list.filter((_, j) => j !== i))}>
+                <button type="button" className="text-bad-ink" aria-label={t("field.commission.removePhoto", { name: p.name })} onClick={() => setPhotos((list) => list.filter((_, j) => j !== i))}>
                   ×
                 </button>
               </li>
@@ -240,7 +240,7 @@ export function CommissionWizard({ spaces, timezone, api = fieldApi, queue: inje
         <Card title={t("field.commission.queueTitle")}>
           <ul className="flex flex-col gap-2 text-[13px]">
             {queued.map((op) => (
-              <li key={op.id} className="text-warn">
+              <li key={op.id} className="text-fair-ink">
                 {t("field.commission.queued", { name: op.label })}
               </li>
             ))}
@@ -269,12 +269,12 @@ function spaceName(spaces: SpaceNode[], id: string | null | undefined): string {
 function SentResult({ result, mine, timezone, lang, spaces }: { result: QueueResult; mine?: Pending; timezone: string; lang: string; spaces: SpaceNode[] }) {
   const { t } = useTranslation();
   const { op, outcome } = result;
-  if (outcome.ok) return <li className="text-good">{t("field.commission.sent", { name: op.label })}</li>;
+  if (outcome.ok) return <li className="text-good-ink">{t("field.commission.sent", { name: op.label })}</li>;
   if (outcome.code === "COMMISSION_CONFLICT") {
     const server = (outcome.response ?? {}) as ServerCommission;
     return (
       <li role="alert" className="rounded border border-bad p-2">
-        <p className="font-semibold text-bad">{t("field.commission.conflict", { name: op.label })}</p>
+        <p className="font-semibold text-bad-ink">{t("field.commission.conflict", { name: op.label })}</p>
         <table className="mt-1 w-full text-[12.5px]">
           <thead>
             <tr>
@@ -304,7 +304,7 @@ function SentResult({ result, mine, timezone, lang, spaces }: { result: QueueRes
       </li>
     );
   }
-  return <li className="text-bad">{t("field.commission.failed", { name: op.label, code: outcome.code ?? outcome.status })}</li>;
+  return <li className="text-bad-ink">{t("field.commission.failed", { name: op.label, code: outcome.code ?? outcome.status })}</li>;
 }
 
 /** ⑥ 첫 수신 대기(타이머, 체크리스트) */
@@ -343,7 +343,7 @@ export function FirstDataWait({ pending, result, api, timezone, now, live, onNex
       <StatusDot tone={commissionTone(status.status)} label={t(`field.commission.status.${status.status}`, { defaultValue: status.status })} />
       {status.status === "VERIFIED" && (
         <div role="status" className="mt-2 text-[13px]">
-          <p className="font-semibold text-good">{t("field.commission.firstData", { at: formatDateTime(status.firstSeenAt ?? null, timezone, i18n.language) })}</p>
+          <p className="font-semibold text-good-ink">{t("field.commission.firstData", { at: formatDateTime(status.firstSeenAt ?? null, timezone, i18n.language) })}</p>
           <ul className="mt-1 font-mono">
             {latest.map((m, i) => (
               <li key={m.metricKey ?? m.key ?? i}>{`${m.metricKey ?? m.key}: ${String(m.value)}${m.unit ?? ""}`}</li>
@@ -354,7 +354,7 @@ export function FirstDataWait({ pending, result, api, timezone, now, live, onNex
       {!done && <p className="mt-2 text-[13px] text-muted">{t("field.commission.waiting")}</p>}
       {status.status === "PROBLEM" && (
         <div role="alert" className="mt-2 text-[13px]">
-          <p className="font-semibold text-bad">{t("field.commission.problem")}</p>
+          <p className="font-semibold text-bad-ink">{t("field.commission.problem")}</p>
           <ul className="mt-1 list-disc pl-5">
             {failedChecks(status.checklist).map((k) => (
               <li key={k}>{t(`field.commission.hint.${k}`, { defaultValue: t(`field.commission.check.${k}`) })}</li>

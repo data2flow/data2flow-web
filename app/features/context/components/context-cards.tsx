@@ -55,7 +55,7 @@ export function ContextCards({ site, stations, canAdmin, result, timezone, lang 
   return (
     <div className="flex flex-col gap-4">
       {site.locationRequired && (
-        <p role="note" className="rounded-md border border-warn/30 bg-warn-soft px-3 py-2 text-[13px] text-warn">
+        <p role="note" className="rounded-md border border-fair/30 bg-fair-soft px-3 py-2 text-[13px] text-fair-ink">
           {t("context.locationRequired")}{" "}
           <Link to={`/spaces/${site.siteId}?tab=props`} className="underline">
             {t("context.openSpace")}
@@ -105,7 +105,7 @@ function LastLine({ view, timezone, lang }: { view: ContextSourceView; timezone:
         {sync?.error ? ` · ${sync.error}` : ""}
       </span>
       {usage && (
-        <span className={cx(usage.exhausted ? "text-bad" : usage.warning ? "text-warn" : undefined)}>
+        <span className={cx(usage.exhausted ? "text-bad-ink" : usage.warning ? "text-fair-ink" : undefined)}>
           {usage.quota ? t("context.callsQuota", { calls: usage.calls, quota: usage.quota }) : t("context.calls", { calls: usage.calls })}
           {usage.failures ? ` · ${t("context.failures", { n: usage.failures })}` : ""}
           {usage.exhausted ? ` · ${t("context.exhausted")}` : usage.warning ? ` · ${t("context.warn80")}` : ""}
@@ -125,12 +125,12 @@ function SaveForm({ type, children, disabled, result }: { type: string; children
       <input type="hidden" name="type" value={type} />
       {children}
       {mine && result.ok && (
-        <p role="status" className="text-[12.5px] text-good">
+        <p role="status" className="text-[12.5px] text-good-ink">
           {t("common.saved")}
         </p>
       )}
       {mine && result.error && (
-        <p role="alert" className="text-[12.5px] text-bad">
+        <p role="alert" className="text-[12.5px] text-bad-ink">
           {t(`errors.${result.error.code}`, { defaultValue: result.error.message || t("errors.UNKNOWN") })}
         </p>
       )}
@@ -309,7 +309,7 @@ function IcalCard({ view, canAdmin, result, timezone, lang }: CardProps) {
             />
             {fileKey && <span>{t("context.icalFileStored")}</span>}
             {fileProblem && (
-              <span role="alert" className="text-bad">
+              <span role="alert" className="text-bad-ink">
                 {t(`context.validation.${fileProblem}`)}
               </span>
             )}
@@ -357,7 +357,7 @@ function RefreshNow({ view, result }: { view: ContextSourceView; result?: Contex
       <input type="hidden" name="type" value={view.type} />
       <input type="hidden" name="sourceId" value={view.sourceId ?? ""} />
       {mine && result.refresh && <span role="status" className="text-[12px] text-muted">{t("context.refreshed", { status: t(`context.syncStatus.${result.refresh.status}`, { defaultValue: result.refresh.status }), delta: syncDelta(result.refresh) })}</span>}
-      {mine && result.error && <span role="alert" className="text-[12px] text-bad">{t(`errors.${result.error.code}`, { defaultValue: t("errors.UNKNOWN") })}</span>}
+      {mine && result.error && <span role="alert" className="text-[12px] text-bad-ink">{t(`errors.${result.error.code}`, { defaultValue: t("errors.UNKNOWN") })}</span>}
       <Button type="submit">{t("context.refreshNow")}</Button>
     </Form>
   );
@@ -386,14 +386,14 @@ export function UsageBars({ title, days, today, lang }: { title: string; days: U
                   data-day={d.day}
                   data-level={level}
                   title={`${d.day} ${d.calls}${d.quota ? `/${d.quota}` : ""}`}
-                  className={cx("w-1 min-w-[2px] flex-1", level === "exhausted" ? "bg-bad" : level === "warn" ? "bg-warn" : "bg-accent")}
+                  className={cx("w-1 min-w-[2px] flex-1", level === "exhausted" ? "bg-bad" : level === "warn" ? "bg-fair" : "bg-accent")}
                   style={{ height: `${Math.max(2, (d.calls / max) * 100)}%` }}
                 />
               );
             })}
           </div>
           {latest && latestLevel && (
-            <p className={cx("text-[12px]", latestLevel.level === "exhausted" ? "text-bad" : latestLevel.level === "warn" ? "text-warn" : "text-muted")}>
+            <p className={cx("text-[12px]", latestLevel.level === "exhausted" ? "text-bad-ink" : latestLevel.level === "warn" ? "text-fair-ink" : "text-muted")}>
               {latest.quota ? t("context.callsQuota", { calls: latest.calls, quota: latest.quota }) : t("context.calls", { calls: latest.calls })}
               {latest.failures ? ` · ${t("context.failures", { n: latest.failures })}` : ""}
               {latestLevel.pct !== null ? ` · ${latestLevel.pct}%` : ""}

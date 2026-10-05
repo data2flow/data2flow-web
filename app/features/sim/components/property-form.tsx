@@ -115,7 +115,7 @@ export function PropertyForm({ rows, layer, canEdit, onSave, title }: PropertyFo
                   )}
                   {range && <span className="ml-2 text-[11.5px] text-muted">{range}</span>}
                   {error && (
-                    <p role="alert" className="text-[12px] text-bad">
+                    <p role="alert" className="text-[12px] text-bad-ink">
                       {error}
                     </p>
                   )}
@@ -143,7 +143,7 @@ export function PropertyForm({ rows, layer, canEdit, onSave, title }: PropertyFo
         </tbody>
       </Table>
       {notice && (
-        <p role="status" className={notice.tone === "good" ? "text-[12.5px] text-good" : "text-[12.5px] text-bad"}>
+        <p role="status" className={notice.tone === "good" ? "text-[12.5px] text-good-ink" : "text-[12.5px] text-bad-ink"}>
           {notice.text}
         </p>
       )}

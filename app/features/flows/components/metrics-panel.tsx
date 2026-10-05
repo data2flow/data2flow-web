@@ -82,7 +82,7 @@ export function MetricsPanel({ flowId, api, initial, nameOf }: { flowId: string;
           {series.length > 0 && (
             <div aria-label={t("flows.metrics.series")} role="img" className="flex h-16 items-end gap-px">
               {series.map((p) => (
-                <span key={p.t} title={`${p.t} · ${p.executions}`} className={p.errors > 0 ? "flex-1 bg-warn" : "flex-1 bg-accent"} style={{ height: `${Math.max(2, Math.round((p.executions / peak) * 100))}%` }} />
+                <span key={p.t} title={`${p.t} · ${p.executions}`} className={p.errors > 0 ? "flex-1 bg-fair" : "flex-1 bg-accent"} style={{ height: `${Math.max(2, Math.round((p.executions / peak) * 100))}%` }} />
               ))}
             </div>
           )}
@@ -101,7 +101,7 @@ export function MetricsPanel({ flowId, api, initial, nameOf }: { flowId: string;
                   <tr key={node.nodeId}>
                     <td>{nameOf(node.nodeId)}</td>
                     <td>{n(node.processed)}</td>
-                    <td className={node.errors > 0 ? "text-bad" : undefined}>{n(node.errors)}</td>
+                    <td className={node.errors > 0 ? "text-bad-ink" : undefined}>{n(node.errors)}</td>
                     <td>{(node.avgMs ?? 0).toFixed(1)}</td>
                   </tr>
                 ))}

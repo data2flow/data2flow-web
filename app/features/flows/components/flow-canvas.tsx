@@ -120,7 +120,7 @@ export function FlowCanvas(props: FlowCanvasProps) {
         sourceHandle: w.port,
         target: w.to,
         label: w.port === "out" ? undefined : w.port,
-        className: w.port === "error" ? "text-bad" : undefined,
+        className: w.port === "error" ? "text-bad-ink" : undefined,
         deletable: !readOnly,
         // 메시지가 방금 지나간 와이어는 움직인다(FLW-03.01)
         animated: live ? isWireActive(live, w.from, w.port, now) : false,

@@ -73,7 +73,7 @@ export function MappingEditor({ value, onChange, readOnly = false }: { value: st
           ))}
         </tbody>
       </Table>
-      {problemOf("metrics") && <p className="text-[12px] text-bad">{problemText(t, problemOf("metrics"))}</p>}
+      {problemOf("metrics") && <p className="text-[12px] text-bad-ink">{problemText(t, problemOf("metrics"))}</p>}
       {!readOnly && (
         <div>
           <Button onClick={() => update({ ...mapping, metrics: [...mapping.metrics, { path: "$.", key: "" }] })}>{t("sources.mapping.addMetric")}</Button>

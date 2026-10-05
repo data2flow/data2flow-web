@@ -166,7 +166,7 @@ export default function Rules({ loaderData, actionData }: Route.ComponentProps) 
                 <span className="min-w-0 flex-1 basis-48 font-mono text-[12.5px]">{r.conditionSummary ?? "–"}</span>
                 <span className="text-muted">
                   {scopeText(r, spaces, t)}
-                  {r.scope.targetCount === 0 && <span className="ml-1 text-warn">⚠</span>}
+                  {r.scope.targetCount === 0 && <span className="ml-1 text-fair-ink">⚠</span>}
                 </span>
                 <SeverityBadge severity={r.severity} short />
                 <span title={t("rules.list.raised7d")} className="font-mono">

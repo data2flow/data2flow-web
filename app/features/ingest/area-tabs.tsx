@@ -15,6 +15,7 @@ export function IngestAreaTabs({ current }: { current: IngestArea }) {
   const permissions = root?.me?.permissions;
   return (
     <Tabs
+      section
       current={current}
       items={[
         { key: "monitor", label: t("ingest.area.monitor"), to: "/ingest/monitor" },

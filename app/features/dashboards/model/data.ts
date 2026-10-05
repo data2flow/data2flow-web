@@ -7,6 +7,7 @@
 import type { ChartSeries } from "~/lib/chart-model";
 import { formatDateTime } from "~/lib/format";
 import { seriesColor } from "~/lib/palette";
+import { tokens } from "~/lib/tokens";
 import type { WidgetState, AlarmItem, FloorplanPayload, GaugePayload, HeatmapPayload, SeriesPayload, StatPayload, StatusItem, TablePayload, WidgetData } from "./types";
 
 export function isForbidden(data: unknown): boolean {
@@ -158,7 +159,7 @@ export function barOption(payload: SeriesPayload | null | undefined, options: Re
   if (options.sort === "desc") order = order.sort((a, b) => (values[b] ?? -Infinity) - (values[a] ?? -Infinity));
   const horizontal = options.orientation === "horizontal";
   const categories = order.map((i) => series[i].label);
-  const text = dark ? "#94a3b5" : "#66768a";
+  const text = tokens(dark).text2;
   const category = { type: "category", data: categories, axisLabel: { color: text } };
   const value = { type: "value", axisLabel: { color: text } };
   return {
@@ -199,7 +200,7 @@ export function gaugeOption(g: GaugePayload | null | undefined, dark: boolean): 
         min,
         max,
         progress: { show: true, itemStyle: { color: seriesColor(0, dark) } },
-        detail: { valueAnimation: false, formatter: `{value}${g?.unit ? ` ${g.unit}` : ""}`, color: dark ? "#e3e9f0" : "#1d2733", fontSize: 18 },
+        detail: { valueAnimation: false, formatter: `{value}${g?.unit ? ` ${g.unit}` : ""}`, color: tokens(dark).text, fontSize: 18 },
         data: [{ value: g?.value ?? null }],
       },
     ],
@@ -210,7 +211,7 @@ export function heatmapOption(h: HeatmapPayload | null | undefined, dark: boolea
   const data: [number, number, number | null][] = [];
   (h?.values ?? []).forEach((row, y) => row.forEach((v, x) => data.push([x, y, v])));
   const nums = data.map((d) => d[2]).filter((v): v is number => typeof v === "number");
-  const text = dark ? "#94a3b5" : "#66768a";
+  const text = tokens(dark).text2;
   return {
     animation: false,
     grid: { left: 48, right: 16, top: 8, bottom: 56 },
@@ -218,7 +219,7 @@ export function heatmapOption(h: HeatmapPayload | null | undefined, dark: boolea
     xAxis: { type: "category", data: h?.xLabels ?? [], axisLabel: { color: text } },
     yAxis: { type: "category", data: h?.yLabels ?? [], axisLabel: { color: text } },
     // 단일 색상 명도 계단(색약에도 밝기로 구분)
-    visualMap: { min: nums.length ? Math.min(...nums) : 0, max: nums.length ? Math.max(...nums) : 1, calculable: false, orient: "horizontal", left: "center", bottom: 0, inRange: { color: dark ? ["#1f3550", "#56B4E9"] : ["#e8f0fa", "#0072B2"] }, textStyle: { color: text } },
-    series: [{ type: "heatmap", data, emphasis: { itemStyle: { borderColor: "#000", borderWidth: 1 } } }],
+    visualMap: { min: nums.length ? Math.min(...nums) : 0, max: nums.length ? Math.max(...nums) : 1, calculable: false, orient: "horizontal", left: "center", bottom: 0, inRange: { color: [tokens(dark).accentSoft, seriesColor(0, dark)] }, textStyle: { color: text } },
+    series: [{ type: "heatmap", data, emphasis: { itemStyle: { borderColor: tokens(dark).text, borderWidth: 1 } } }],
   };
 }

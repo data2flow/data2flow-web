@@ -169,12 +169,12 @@ export function WorkOrderPanel({ initial, canWrite, meId, timezone, compact = fa
         </div>
         <h1 className="text-[18px] font-semibold">{`#${order.id} ${order.title}`}</h1>
         {order.dueAt && (
-          <p className={cx("text-[13px]", overdue ? "font-semibold text-bad" : "text-muted")}>
+          <p className={cx("text-[13px]", overdue ? "font-semibold text-bad-ink" : "text-muted")}>
             {overdue ? t("field.list.overdueAt", { at: formatDateTime(order.dueAt, timezone, i18n.language) }) : t("field.list.dueAt", { at: formatDateTime(order.dueAt, timezone, i18n.language) })}
           </p>
         )}
         {queuedTransition && (
-          <p role="status" className="text-[13px] font-semibold text-warn">
+          <p role="status" className="text-[13px] font-semibold text-fair-ink">
             {t("field.offline.pendingAction", { action: t(`field.actions.${String(queuedTransition.target.action)}`) })}
           </p>
         )}
@@ -246,7 +246,7 @@ export function WorkOrderPanel({ initial, canWrite, meId, timezone, compact = fa
                   </a>
                 )}
                 {canWrite && !compact && (
-                  <button type="button" className="text-left text-bad" aria-label={t("field.attachments.remove", { name: a.fileName })} onClick={() => void removeAttachment(a)}>
+                  <button type="button" className="text-left text-bad-ink" aria-label={t("field.attachments.remove", { name: a.fileName })} onClick={() => void removeAttachment(a)}>
                     {t("common.delete")}
                   </button>
                 )}
@@ -255,7 +255,7 @@ export function WorkOrderPanel({ initial, canWrite, meId, timezone, compact = fa
             {pendingHere
               .filter((op) => op.kind === "attachment")
               .map((op) => (
-                <li key={op.id} className="flex aspect-square items-center justify-center rounded border border-dashed border-warn p-1 text-center text-[11.5px] text-warn">
+                <li key={op.id} className="flex aspect-square items-center justify-center rounded border border-dashed border-fair p-1 text-center text-[11.5px] text-fair-ink">
                   {t("field.offline.whenOnline")}
                 </li>
               ))}

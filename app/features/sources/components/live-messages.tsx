@@ -100,7 +100,7 @@ export function LiveMessages({ sourceId, timezone, now = Date.now, streamOptions
       </form>
       <p className="text-[12px] text-muted" role="status">
         {paused ? t("sources.live.pausedWaiting", { n: buffer.current.waiting }) : t("sources.live.rate")}
-        {skipped > 0 && <span className="ml-2 text-warn">{t("sources.live.skipped", { n: skipped })}</span>}
+        {skipped > 0 && <span className="ml-2 text-fair-ink">{t("sources.live.skipped", { n: skipped })}</span>}
         {copied && <span className="ml-2">{t("common.copied")}</span>}
       </p>
       {items.length === 0 ? (
@@ -115,7 +115,7 @@ export function LiveMessages({ sourceId, timezone, now = Date.now, streamOptions
                   <span className="font-mono">{formatDateTime(m.receivedAt, timezone, i18n.language, true)}</span>
                   <span className="font-mono">{m.topic}</span>
                   <span className="text-muted">{m.sizeBytes ?? m.size ?? raw.length}B</span>
-                  {m.truncated && <span className="text-warn">{t("sources.live.truncated")}</span>}
+                  {m.truncated && <span className="text-fair-ink">{t("sources.live.truncated")}</span>}
                 </button>
                 {open === m.seq && (
                   <div className="mt-1 grid gap-2 md:grid-cols-2">

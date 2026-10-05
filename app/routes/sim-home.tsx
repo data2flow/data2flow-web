@@ -82,9 +82,9 @@ export default function SimHome({ loaderData, actionData }: Route.ComponentProps
         title={t("sim.home.title")}
         actions={
           <p className="flex flex-wrap gap-3 text-[12.5px]" aria-label={t("sim.home.usage")}>
-            <span className={cx(usageTone(usage.devices, usage.devicesLimit) === "warn" && "font-semibold text-warn")}>{t("sim.home.devices", { n: usage.devices, max: usage.devicesLimit })}</span>
-            <span className={cx(usageTone(usage.runningRuns, usage.runsLimit) === "warn" && "font-semibold text-warn")}>{t("sim.home.runs", { n: usage.runningRuns, max: usage.runsLimit })}</span>
-            <span className={cx(usage.virtualThroughputPct >= 40 && "font-semibold text-warn")}>{t("sim.home.throughput", { n: usage.virtualThroughputPct })}</span>
+            <span className={cx(usageTone(usage.devices, usage.devicesLimit) === "warn" && "font-semibold text-fair-ink")}>{t("sim.home.devices", { n: usage.devices, max: usage.devicesLimit })}</span>
+            <span className={cx(usageTone(usage.runningRuns, usage.runsLimit) === "warn" && "font-semibold text-fair-ink")}>{t("sim.home.runs", { n: usage.runningRuns, max: usage.runsLimit })}</span>
+            <span className={cx(usage.virtualThroughputPct >= 40 && "font-semibold text-fair-ink")}>{t("sim.home.throughput", { n: usage.virtualThroughputPct })}</span>
           </p>
         }
       />
@@ -142,7 +142,7 @@ export default function SimHome({ loaderData, actionData }: Route.ComponentProps
                   <Link className="text-accent hover:underline" to={`/sim/runs/${encodeURIComponent(r.runId)}/report`}>
                     {`R-${r.runId}`}
                   </Link>
-                  <span className={cx("ml-2", r.passed === r.total ? "text-good" : "text-bad")}>{t("sim.home.passed", { passed: r.passed, total: r.total })}</span>
+                  <span className={cx("ml-2", r.passed === r.total ? "text-good-ink" : "text-bad-ink")}>{t("sim.home.passed", { passed: r.passed, total: r.total })}</span>
                   <span className="ml-2 text-muted">{formatDateTime(r.finishedAt, timezone, i18n.language)}</span>
                 </li>
               ))}

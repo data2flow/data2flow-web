@@ -138,7 +138,7 @@ function ArrayField({ name, path, schema, root, errors, showErrors, readOnly, on
           )}
         </div>
       ))}
-      {error && <p className="text-[12px] text-bad">{error}</p>}
+      {error && <p className="text-[12px] text-bad-ink">{error}</p>}
       {!readOnly && (
         <div>
           <Button onClick={() => onChange(path, [...items, newItem(itemSchema)])} disabled={items.length >= max}>

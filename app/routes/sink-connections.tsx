@@ -334,7 +334,7 @@ export default function SinkConnections({ loaderData, actionData }: Route.Compon
                           <input type="checkbox" name="ids" value={d.id} aria-label={t("flowops.sinks.dlSelect", { id: d.id })} />
                         </td>
                         <td>{d.target}</td>
-                        <td className="text-bad">{[d.errorKind, d.lastError].filter(Boolean).join(": ") || "–"}</td>
+                        <td className="text-bad-ink">{[d.errorKind, d.lastError].filter(Boolean).join(": ") || "–"}</td>
                         <td>{d.attempts}</td>
                         <td>{d.deadAt ? formatDateTime(d.deadAt, tz, i18n.language) : "–"}</td>
                         <td className="font-mono text-[12px]">{d.recordCount}</td>

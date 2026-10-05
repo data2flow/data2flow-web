@@ -114,7 +114,7 @@ export default function CalendarPage({ loaderData, actionData }: Route.Component
   return (
     <>
       <PageHeader title={t("calendar.title")} crumb={t("nav.spaces")} />
-      <Tabs current="calendar" items={[{ key: "spaces", label: t("nav.spaces"), to: "/spaces" }, { key: "sites", label: t("sites.title"), to: "/sites" }, { key: "calendar", label: t("calendar.title"), to: "/calendar" }]} />
+      <Tabs section current="calendar" items={[{ key: "spaces", label: t("nav.spaces"), to: "/spaces" }, { key: "sites", label: t("sites.title"), to: "/sites" }, { key: "calendar", label: t("calendar.title"), to: "/calendar" }]} />
       <Card>
         <CalendarToolbar view={view} anchor={anchor} today={today} spaceId={spaceId} spaces={spaces} hrefFor={hrefFor} canWrite={canWrite} onAdd={() => setDialog({ event: null })} />
         {failed && (
@@ -123,7 +123,7 @@ export default function CalendarPage({ loaderData, actionData }: Route.Component
           </Alert>
         )}
         {result?.ok && (
-          <p role="status" className="mb-2 text-[12.5px] text-good">
+          <p role="status" className="mb-2 text-[12.5px] text-good-ink">
             {t(`calendar.done.${result.intent}`, { defaultValue: t("common.saved") })}
           </p>
         )}

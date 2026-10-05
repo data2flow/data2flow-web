@@ -52,7 +52,8 @@ describe("[DSH-02.01][AT-DSH-02.1] 공간 알람 모델", () => {
     expect(alarmCountByDevice(undefined).size).toBe(0);
     expect(severityTone("CRITICAL")).toEqual({ tone: "danger", icon: "▲" });
     expect(severityTone("MAJOR").icon).toBe("!");
-    expect(severityTone("WARNING").tone).toBe("info");
+    expect(severityTone("MAJOR").tone).toBe("major");
+    expect(severityTone("WARNING").tone).toBe("warning");
     expect(severityTone("INFO").tone).toBe("neutral");
   });
 });

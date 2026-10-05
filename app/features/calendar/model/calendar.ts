@@ -170,11 +170,11 @@ export function eventPatch(before: CalendarEvent, input: EventInput & { affectsM
 
 /** 유형별 색(색 + 글자로 표시, NFR-08.03) */
 export const TYPE_CLASS: Record<string, string> = {
-  HOLIDAY: "border-bad bg-bad-soft text-bad",
-  CLOSURE: "border-bad bg-bad-soft text-bad",
-  VACATION: "border-warn bg-warn-soft text-warn",
+  HOLIDAY: "border-bad bg-bad-soft text-bad-ink",
+  CLOSURE: "border-bad bg-bad-soft text-bad-ink",
+  VACATION: "border-fair bg-fair-soft text-fair-ink",
   EXAM: "border-accent bg-accent-soft text-accent",
-  EVENT: "border-good bg-good-soft text-good",
+  EVENT: "border-good bg-good-soft text-good-ink",
   OTHER: "border-line bg-panel text-muted",
 };
 

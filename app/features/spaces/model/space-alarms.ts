@@ -69,9 +69,9 @@ export function alarmCountByDevice(alarms: SpaceAlarm[] | undefined): Map<string
 }
 
 /** 심각도 배지 색·기호(색만으로 구분하지 않는다) */
-export function severityTone(severity: string): { tone: "danger" | "warning" | "info" | "neutral"; icon: string } {
+export function severityTone(severity: string): { tone: "danger" | "major" | "warning" | "neutral"; icon: string } {
   if (severity === "CRITICAL") return { tone: "danger", icon: "▲" };
-  if (severity === "MAJOR") return { tone: "warning", icon: "!" };
-  if (severity === "MINOR" || severity === "WARNING") return { tone: "info", icon: "·" };
+  if (severity === "MAJOR") return { tone: "major", icon: "!" };
+  if (severity === "MINOR" || severity === "WARNING") return { tone: "warning", icon: "·" };
   return { tone: "neutral", icon: "i" };
 }

@@ -26,7 +26,7 @@ export function FlowOpsTabs({ current }: { current: FlowOpsArea }) {
   const { t } = useTranslation();
   const root = useRouteLoaderData("root") as RootData | undefined;
   const items = AREAS.filter((a) => hasAny(root?.me?.permissions, a.anyOf)).map((a) => ({ key: a.key, label: t(`flowops.areas.${a.key}`), to: a.to }));
-  return <Tabs items={items} current={current} />;
+  return <Tabs section items={items} current={current} />;
 }
 
 /**
@@ -104,7 +104,7 @@ export function ChecksList({ checks }: { checks: { name: string; passed: boolean
   return (
     <ul className="flex flex-col gap-0.5 text-[12.5px]">
       {checks.map((c) => (
-        <li key={c.name} className={c.passed ? "text-good" : "text-bad"}>
+        <li key={c.name} className={c.passed ? "text-good-ink" : "text-bad-ink"}>
           {`${c.passed ? t("flowops.checks.passed") : t("flowops.checks.failed")} · ${t(`flowops.checks.names.${c.name}`, { defaultValue: c.name })}`}
           {c.detail ? ` — ${c.detail}` : ""}
         </li>
@@ -129,10 +129,10 @@ export function SnapshotCompareView({ compare, names }: { compare: SnapshotCompa
           <h3 className="mb-1 text-[13px] font-semibold">{flow.flowName ?? flow.flowId}</h3>
           <ul className="flex flex-col gap-0.5 text-[12.5px]">
             {flow.added.map((n) => (
-              <li key={`a-${n}`} className="text-good">{t("flowops.snapshots.nodeAdded", { node: n })}</li>
+              <li key={`a-${n}`} className="text-good-ink">{t("flowops.snapshots.nodeAdded", { node: n })}</li>
             ))}
             {flow.removed.map((n) => (
-              <li key={`r-${n}`} className="text-bad">{t("flowops.snapshots.nodeRemoved", { node: n })}</li>
+              <li key={`r-${n}`} className="text-bad-ink">{t("flowops.snapshots.nodeRemoved", { node: n })}</li>
             ))}
             {flow.changed.map((c) => (
               <li key={`c-${c.nodeId}-${c.field}`}>{t("flowops.snapshots.nodeChanged", { node: c.nodeId, field: c.field, from: show(c.from), to: show(c.to) })}</li>

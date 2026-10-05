@@ -20,7 +20,7 @@ export function CaseDiff({ diff }: { diff: unknown }) {
   const lines = caseDiffLines(diff);
   if (lines.length === 0) return null;
   return (
-    <ul className="font-mono text-[12px] text-bad">
+    <ul className="font-mono text-[12px] text-bad-ink">
       {lines.map((line, i) => (
         <li key={`${line.key}-${i}`}>
           {line.kind === "changed"
@@ -115,7 +115,7 @@ export function TestCasesTab({ scriptId, initialCases, canWrite, api }: { script
           {t("scripts.cases.runSummary", { passed: run.passed, total: run.passed + run.failed })}
         </Alert>
       )}
-      {cases.length >= MAX_TEST_CASES && canWrite && <p className="text-[12px] text-warn">{t("scripts.cases.validation.quota", { max: MAX_TEST_CASES })}</p>}
+      {cases.length >= MAX_TEST_CASES && canWrite && <p className="text-[12px] text-fair-ink">{t("scripts.cases.validation.quota", { max: MAX_TEST_CASES })}</p>}
       {cases.length === 0 ? (
         <EmptyState title={t("scripts.cases.empty")} />
       ) : (
@@ -152,7 +152,7 @@ export function TestCasesTab({ scriptId, initialCases, canWrite, api }: { script
                       <>
                         <Badge tone="danger">{`✖ ${t("scripts.cases.failed")}`}</Badge>
                         <CaseDiff diff={diff} />
-                        {latest?.error?.message && <p className="text-[12px] text-bad">{latest.error.message}</p>}
+                        {latest?.error?.message && <p className="text-[12px] text-bad-ink">{latest.error.message}</p>}
                       </>
                     )}
                   </td>

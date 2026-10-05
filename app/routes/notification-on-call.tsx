@@ -100,7 +100,7 @@ export default function NotificationOnCall({ loaderData, actionData }: Route.Com
               </SelectField>
             </div>
             <ShiftEditor initial={schedule.shifts} users={users} usersAvailable={usersAvailable} />
-            {scheduleError && <p className="text-[12.5px] text-bad">{scheduleError}</p>}
+            {scheduleError && <p className="text-[12.5px] text-bad-ink">{scheduleError}</p>}
             <div className="flex justify-end">
               <Button type="submit" variant="primary">
                 {t("common.save")}
@@ -178,7 +178,7 @@ export default function NotificationOnCall({ loaderData, actionData }: Route.Com
               </>
             )}
             <Button type="submit">{t("notify.onCall.addOverride")}</Button>
-            {overrideError && <p className="w-full text-[12.5px] text-bad">{overrideError}</p>}
+            {overrideError && <p className="w-full text-[12.5px] text-bad-ink">{overrideError}</p>}
           </Form>
         )}
       </Card>

@@ -136,7 +136,7 @@ export function ConfigVersions({ versions, canAdmin, timezone, lang }: { version
                   <td className="font-mono text-[12px]">{Array.isArray(v.targets) ? v.targets.map((x) => (x as { connectorKey?: string }).connectorKey ?? "?").join(", ") : "–"}</td>
                   <td>
                     {v.result ? <Badge tone={v.result === "APPLIED" ? "success" : v.result.startsWith("FAILED") ? "danger" : "neutral"}>{t(`sources.edges.resultOf.${v.result}`, { defaultValue: v.result })}</Badge> : "–"}
-                    {v.error && <span className="ml-1 text-[12px] text-bad">{v.error}</span>}
+                    {v.error && <span className="ml-1 text-[12px] text-bad-ink">{v.error}</span>}
                   </td>
                   <td>{v.deployedAt ? formatDateTime(v.deployedAt, timezone, lang) : "–"}</td>
                   <td>

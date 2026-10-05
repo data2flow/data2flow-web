@@ -36,7 +36,7 @@ export function FloorSwitcher({ nav, total, hrefFor }: { nav: FloorNav; total: n
         {nav.current.name}
       </strong>
       <span className="text-[12px] text-muted">{t("floor.switch.position", { n: nav.index + 1, total })}</span>
-      {!nav.current.hasFloorplan && <span className="text-[12px] text-warn">{t("floor.switch.noPlan")}</span>}
+      {!nav.current.hasFloorplan && <span className="text-[12px] text-fair-ink">{t("floor.switch.noPlan")}</span>}
     </div>
   );
 }

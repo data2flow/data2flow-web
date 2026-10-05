@@ -224,7 +224,7 @@ function WidgetFrame(props: FrameProps) {
     body = <p className="flex h-full items-center justify-center rounded bg-bg text-[13px] text-muted">🔒 {t("dashboards.widget.forbidden")}</p>;
   } else if (state.status === "error") {
     body = (
-      <div role="alert" className="flex h-full flex-col items-center justify-center gap-2 text-[13px] text-bad">
+      <div role="alert" className="flex h-full flex-col items-center justify-center gap-2 text-[13px] text-bad-ink">
         <span>▲ {t("dashboards.widget.error", { code: state.code })}</span>
         {props.onRetry && (
           <Button onClick={() => props.onRetry?.(w.id)} className="no-export">

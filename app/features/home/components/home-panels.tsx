@@ -6,20 +6,16 @@ import { useCallback, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { LiveBanner, useLiveStream, type UseLiveStreamOptions } from "~/components/live";
-import { Badge, Card, Table, Term } from "~/components/ui";
+import { Badge, Card, Kpi, Table, Term } from "~/components/ui";
 import { liveUrl } from "~/lib/event-stream";
 import { formatDateTime, formatNumber } from "~/lib/format";
 import { causeText, comfortTone, mergeSummary, severityParts, timelineIcon, timelineLink, topComfort, totalAlarms, type HomeSummary } from "../model/home";
 
 function SummaryCard({ label, value, to }: { label: string; value: ReactNode; to?: string }) {
-  const body = (
-    <div className="min-h-[44px] rounded-lg border border-line bg-panel px-4 py-3">
-      <p className="text-[10.5px] font-semibold uppercase tracking-wide text-muted">{label}</p>
-      <p className="mt-1 text-[22px] font-semibold">{value}</p>
-    </div>
-  );
+  // 목업 지표 타일(H.kpi)
+  const body = <Kpi label={label} value={value} className="h-full" />;
   return to ? (
-    <Link to={to} className="block hover:opacity-90">
+    <Link to={to} className="block rounded-lg hover:opacity-90">
       {body}
     </Link>
   ) : (
@@ -37,7 +33,7 @@ function AlarmValue({ summary }: { summary: HomeSummary }) {
       <span>{totalAlarms(summary)}</span>
       <span className="flex flex-wrap gap-2 text-[13px] font-normal">
         {parts.map((p) => (
-          <span key={p.key} data-severity={p.key} className={p.key === "critical" ? "text-bad" : p.key === "major" ? "text-warn" : "text-muted"}>
+          <span key={p.key} data-severity={p.key} className={p.key === "critical" ? "text-bad-ink" : p.key === "major" ? "text-poor-ink" : "text-muted"}>
             <span aria-hidden>{p.icon}</span>
             {p.count}
             <span className="sr-only">{` ${t(`home.severity.${p.key}`)}`}</span>
@@ -119,7 +115,7 @@ export function Timeline({ summary, timezone, lang }: { summary: HomeSummary; ti
           {items.slice(0, 20).map((item, index) => (
             <li key={`${item.at}-${index}`} className="flex flex-wrap items-baseline gap-x-2" data-timeline={item.type}>
               <span className="font-mono text-[12px] text-muted">{formatDateTime(item.at, timezone, lang)}</span>
-              <span className={item.type === "ALARM_RAISED" ? "text-bad" : item.type === "ALARM_CLEARED" ? "text-good" : "text-accent"} aria-hidden>
+              <span className={item.type === "ALARM_RAISED" ? "text-bad-ink" : item.type === "ALARM_CLEARED" ? "text-good-ink" : "text-accent"} aria-hidden>
                 {timelineIcon(item.type)}
               </span>
               <span className="sr-only">{t(`home.timeline.type.${item.type}`, { defaultValue: item.type })}</span>

@@ -135,7 +135,7 @@ export function RawReplayPanel({
       </div>
       {count !== null && <p className="mt-3 text-[13px]">{t("sim.replay.rawCount", { n: formatNumber(count, i18n.language) })}</p>}
       {error && (
-        <p role="alert" className="mt-2 text-[12.5px] text-bad">
+        <p role="alert" className="mt-2 text-[12.5px] text-bad-ink">
           {error}
         </p>
       )}

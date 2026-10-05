@@ -119,6 +119,6 @@ export function projectSites(sites: SiteView[], width: number, height: number, p
 
 export const STATUS_STYLE: Record<SiteStatus, { color: string; icon: string }> = {
   ALARM: { color: "var(--color-bad)", icon: "▲" },
-  OFFLINE: { color: "var(--color-warn)", icon: "!" },
+  OFFLINE: { color: "var(--color-fair)", icon: "!" },
   OK: { color: "var(--color-good)", icon: "✔" },
 };

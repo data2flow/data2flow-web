@@ -22,7 +22,7 @@ export function OfflineBand({ online, pending }: { online: boolean; pending: num
   const { t } = useTranslation();
   if (online && pending === 0) return null;
   return (
-    <div role="status" className={cx("px-4 py-2 text-[13px]", online ? "bg-accent-soft text-accent" : "bg-warn-soft text-warn")}>
+    <div role="status" className={cx("px-4 py-2 text-[13px]", online ? "bg-accent-soft text-accent" : "bg-fair-soft text-fair-ink")}>
       {online ? t("field.offline.sending", { count: pending }) : t("field.offline.band", { count: pending })}
     </div>
   );
@@ -40,7 +40,7 @@ export function TouchButton({ children, onClick, disabled, variant = "secondary"
         "min-h-11 min-w-11 flex-1 rounded-md px-3 text-[14px] font-semibold disabled:opacity-50",
         variant === "primary" && "bg-accent text-white",
         variant === "secondary" && "border border-line bg-panel text-text",
-        variant === "danger" && "border border-bad text-bad",
+        variant === "danger" && "border border-bad text-bad-ink",
       )}
     >
       {children}

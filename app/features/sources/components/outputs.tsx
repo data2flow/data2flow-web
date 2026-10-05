@@ -138,7 +138,7 @@ export function OutputForm({ initial, mode, readOnly, configuredKinds = [], base
                 <TextField label={t("sources.form.username")} value={v.username} autoComplete="off" onChange={(e) => set("username", e.target.value)} />
                 {topic.ok && sample && <p className="col-span-full font-mono text-[12px] text-muted">{t("sources.outputs.topicPreview", { topic: renderTopic(v.topicTemplate, { deviceId: sample.id, deviceName: sample.name, spaceCode: "room-301", metric: "temperature" }) })}</p>}
                 {!topic.ok && topic.unknown.length > 0 && (
-                  <p role="alert" className="col-span-full text-[12.5px] text-bad">
+                  <p role="alert" className="col-span-full text-[12.5px] text-bad-ink">
                     {t("sources.outputs.renderError", { vars: topic.unknown.map((x) => `{${x}}`).join(", ") })}
                   </p>
                 )}
@@ -203,7 +203,7 @@ export function OutputForm({ initial, mode, readOnly, configuredKinds = [], base
                 <>
                   <TextArea label={t("sources.outputs.template")} value={v.template} error={msg("template")} spellCheck={false} onChange={(e) => set("template", e.target.value)} />
                   <p className="text-[12px] text-muted">{t("sources.outputs.templateVars", { vars: TEMPLATE_VARS.map((x) => `{{${x}}}`).join(" ") })}</p>
-                  {unknownBody.length > 0 && <p className="text-[12px] text-warn">{t("sources.outputs.unknownBodyVars", { vars: unknownBody.join(", ") })}</p>}
+                  {unknownBody.length > 0 && <p className="text-[12px] text-fair-ink">{t("sources.outputs.unknownBodyVars", { vars: unknownBody.join(", ") })}</p>}
                 </>
               )}
             </div>

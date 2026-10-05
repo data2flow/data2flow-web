@@ -94,7 +94,7 @@ export function ExportJobsPanel({ initial, failed, timezone, lang, api = default
                   <td className="font-mono">{formatBytes(job.bytes)}</td>
                   <td>
                     <Badge tone={statusTone(job.status)}>{t(`data.jobs.statuses.${job.status}`, { defaultValue: job.status })}</Badge>
-                    {job.error && <p className="text-[12px] text-bad">{job.error}</p>}
+                    {job.error && <p className="text-[12px] text-bad-ink">{job.error}</p>}
                   </td>
                   <td>{job.expiresAt ? formatDateTime(job.expiresAt, timezone, lang) : "–"}</td>
                   <td className="whitespace-nowrap">
@@ -203,7 +203,7 @@ export function SchedulesPanel({ initial, failed, timezone, lang, api = defaultD
                       <Badge tone={s.lastStatus === "SUCCEEDED" ? "success" : s.lastStatus === "FAILED" ? "danger" : "info"}>
                         {`${s.lastStatus === "SUCCEEDED" ? "✔" : s.lastStatus === "FAILED" ? "✖" : "…"} ${t(`data.jobs.statuses.${s.lastStatus}`, { defaultValue: s.lastStatus })}${s.lastFileVersion ? ` v${s.lastFileVersion}` : ""}`}
                       </Badge>
-                      {s.lastStatus === "FAILED" && s.lastError && <p className="text-[12px] text-bad">{s.lastError}</p>}
+                      {s.lastStatus === "FAILED" && s.lastError && <p className="text-[12px] text-bad-ink">{s.lastError}</p>}
                       {s.lastRunAt && <p className="text-[12px] text-muted">{formatDateTime(s.lastRunAt, timezone, lang)}</p>}
                     </>
                   )}

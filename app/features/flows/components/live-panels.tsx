@@ -31,7 +31,7 @@ export function LiveIndicator({ live }: { live: LiveState }) {
   const { t } = useTranslation();
   const on = live.connection === "open";
   return (
-    <span className={cx("text-[12px]", on ? "text-good" : "text-muted")} title={live.version ? t("flows.live.version", { v: live.version }) : undefined}>
+    <span className={cx("text-[12px]", on ? "text-good-ink" : "text-muted")} title={live.version ? t("flows.live.version", { v: live.version }) : undefined}>
       ● {on ? t("flows.live.on") : t(`flows.live.state.${live.connection}`)}
     </span>
   );
@@ -66,7 +66,7 @@ export function NodeInspector({ nodeName, samples, skipped, droppedPerSec, timez
   return (
     <section aria-label={t("flows.inspector.label", { name: nodeName })} className="flex flex-col gap-2 text-[12.5px]">
       <p className="font-semibold">{t("flows.inspector.title", { name: nodeName })}</p>
-      {(droppedPerSec ?? 0) > 0 && <p className="text-[11.5px] text-warn">{t("flows.inspector.sampling", { n: droppedPerSec })}</p>}
+      {(droppedPerSec ?? 0) > 0 && <p className="text-[11.5px] text-fair-ink">{t("flows.inspector.sampling", { n: droppedPerSec })}</p>}
       {(skipped ?? 0) > 0 && <p className="text-[11.5px] text-muted">{t("flows.inspector.skipped", { n: skipped })}</p>}
       {rows.length === 0 ? (
         <p className="text-muted">{t("flows.inspector.empty")}</p>
@@ -78,7 +78,7 @@ export function NodeInspector({ nodeName, samples, skipped, droppedPerSec, timez
                 <span>{formatDateTime(row.t, timezone, i18n.language, true)}</span>
                 <span className="font-mono">{row.messageId}</span>
                 {row.outputs.map((o) => (
-                  <span key={`${o.port}`} className={cx("rounded px-1 font-semibold", o.port === "error" ? "bg-bad-soft text-bad" : "bg-accent-soft text-accent")}>
+                  <span key={`${o.port}`} className={cx("rounded px-1 font-semibold", o.port === "error" ? "bg-bad-soft text-bad-ink" : "bg-accent-soft text-accent")}>
                     → {o.port ?? "out"}
                   </span>
                 ))}
@@ -151,7 +151,7 @@ export function TraceView({ trace, nameOf, timezone, onSelectNode }: { trace: Tr
                 )}
               </button>
               {step.error && (
-                <p role="alert" className="text-[11.5px] text-bad">
+                <p role="alert" className="text-[11.5px] text-bad-ink">
                   {t("flows.trace.error", { code: step.error.code ?? step.error.errorType ?? "", message: step.error.message ?? "" })}
                   {step.error.line !== undefined ? ` ${t("flows.trace.line", { line: step.error.line })}` : ""}
                 </p>
@@ -168,7 +168,7 @@ export function TraceView({ trace, nameOf, timezone, onSelectNode }: { trace: Tr
         })}
       </ol>
       {trace.error && !trace.steps.some((s) => s.error) && (
-        <p role="alert" className="text-bad">
+        <p role="alert" className="text-bad-ink">
           {t("flows.trace.error", { code: trace.error.code ?? trace.error.errorType ?? "", message: trace.error.message ?? "" })}
         </p>
       )}

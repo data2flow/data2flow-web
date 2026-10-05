@@ -209,7 +209,7 @@ describe("SCR-03.02 TC-SCR-046 테스트 실행 패널", () => {
     expect(await screen.findByText(/"value": 22.8/)).toBeInTheDocument();
     await userEvent.click(screen.getByRole("tab", { name: "차이" }));
     expect(screen.getByText("추가 dew_point: 9.4")).toHaveAttribute("data-diff", "added");
-    expect(screen.getByText("변경 temperature: 22.3 → 22.8")).toHaveClass("text-warn");
+    expect(screen.getByText("변경 temperature: 22.3 → 22.8")).toHaveClass("text-fair-ink");
     await userEvent.click(screen.getByRole("tab", { name: "로그" }));
     expect(screen.getByText("x 3")).toBeInTheDocument();
     await userEvent.click(screen.getByRole("tab", { name: "정보" }));

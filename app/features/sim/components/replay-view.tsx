@@ -141,7 +141,7 @@ export function ReplayView({
             {t("sim.replay.upload")}
           </Button>
           {fileProblem && (
-            <p role="alert" className="w-full text-[12.5px] text-bad">
+            <p role="alert" className="w-full text-[12.5px] text-bad-ink">
               {problemText(fileProblem)}
             </p>
           )}
@@ -193,7 +193,7 @@ export function ReplayView({
               ))}
           </fieldset>
           {problems.metrics && (
-            <p role="alert" className="mt-1 text-[12px] text-bad">
+            <p role="alert" className="mt-1 text-[12px] text-bad-ink">
               {problemText(problems.metrics)}
             </p>
           )}
@@ -242,7 +242,7 @@ export function ReplayView({
           </div>
           {count !== null && <p className="mt-3 text-[13px]">{t("sim.replay.count", { n: count })}</p>}
           {error && (
-            <p role="alert" className="mt-2 text-[12.5px] text-bad">
+            <p role="alert" className="mt-2 text-[12.5px] text-bad-ink">
               {error}
             </p>
           )}

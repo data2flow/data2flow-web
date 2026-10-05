@@ -84,7 +84,7 @@ export function SpaceAlarms({
                     <Link to={`/alarms/${encodeURIComponent(a.id)}`} className="text-accent hover:underline">
                       {a.title}
                     </Link>
-                    {a.flapping && <span className="ml-1 text-[12px] text-warn">{t("spaces.alarms.flapping")}</span>}
+                    {a.flapping && <span className="ml-1 text-[12px] text-fair-ink">{t("spaces.alarms.flapping")}</span>}
                   </td>
                   <td>{a.device ? <Link to={`/devices/${encodeURIComponent(a.device.id)}`} className="hover:underline">{a.device.name ?? a.device.id}</Link> : "–"}</td>
                   <td>{t(`spaces.alarms.state.${a.status}`, { defaultValue: a.status })}</td>

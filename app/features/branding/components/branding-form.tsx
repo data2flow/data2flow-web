@@ -120,7 +120,7 @@ export function BrandingForm({ initial, api = defaultBrandingApi }: { initial: B
             <TextField label={t("branding.primaryColor")} value={form.primaryColor} maxLength={7} onChange={(e) => set({ primaryColor: e.target.value })} error={errors.primaryColor ? t("branding.errors.COLOR") : undefined} />
           </div>
           {contrast.label && (
-            <p className={contrast.low ? "text-[13px] text-warn" : "text-[13px] text-good"} role="status">
+            <p className={contrast.low ? "text-[13px] text-fair-ink" : "text-[13px] text-good-ink"} role="status">
               {contrast.low ? `! ${t("branding.lowContrast", { ratio: contrast.label, min: formatRatio(AA_TEXT) })}` : `✔ ${t("branding.contrastOk", { ratio: contrast.label })}`}
             </p>
           )}

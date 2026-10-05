@@ -29,7 +29,7 @@ export function ModelExportButtons({ modelId, code, api, download = browserDownl
       <Button onClick={() => void run("data2flow")}>{t("devmodel.models.exportData2flow")}</Button>
       <Button onClick={() => void run("dtdl")}>{t("devmodel.models.exportDtdl")}</Button>
       {error && (
-        <span role="alert" className="text-[12.5px] text-bad">
+        <span role="alert" className="text-[12.5px] text-bad-ink">
           {error}
         </span>
       )}
@@ -129,7 +129,7 @@ export function ModelImportDialog({ open, onClose, api, onImported }: { open: bo
           {preview.scripts.length > 0 && <p>{t("devmodel.models.scripts", { names: preview.scripts.map((s) => `${s.name} (${s.kind})`).join(", ") })}</p>}
           {preview.unmapped.length > 0 ? (
             <Table>
-              <caption className="text-left text-[12.5px] text-warn">{t("devmodel.models.unmapped", { n: preview.unmapped.length })}</caption>
+              <caption className="text-left text-[12.5px] text-fair-ink">{t("devmodel.models.unmapped", { n: preview.unmapped.length })}</caption>
               <thead>
                 <tr>
                   <th scope="col">{t("devmodel.models.path")}</th>
@@ -148,7 +148,7 @@ export function ModelImportDialog({ open, onClose, api, onImported }: { open: bo
               </tbody>
             </Table>
           ) : (
-            <p className="text-good">{t("devmodel.models.allMapped")}</p>
+            <p className="text-good-ink">{t("devmodel.models.allMapped")}</p>
           )}
         </section>
       )}

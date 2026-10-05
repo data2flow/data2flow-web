@@ -117,7 +117,7 @@ export function RuleEditor(props: RuleEditorProps) {
 
             <ConditionBuilder root={form.condition} metrics={metrics} problems={shown.condition} onChange={(condition) => set("condition", condition)} />
             {fieldError("condition") && (
-              <p role="alert" className="text-[12px] text-bad">
+              <p role="alert" className="text-[12px] text-bad-ink">
                 {fieldError("condition")}
               </p>
             )}
@@ -145,7 +145,7 @@ export function RuleEditor(props: RuleEditorProps) {
                 </div>
               )}
               {fieldError("time") && (
-                <p role="alert" className="text-[12px] text-bad">
+                <p role="alert" className="text-[12px] text-bad-ink">
                   {fieldError("time")}
                 </p>
               )}
@@ -247,10 +247,10 @@ function ScopeFields({
       {form.scopeType === "SPACE" && <Checkbox label={t("rules.form.includeChildren")} checked={form.includeChildren} onChange={(e) => setForm((f) => ({ ...f, includeChildren: e.target.checked }))} />}
       <p className="text-[12.5px]" role="status" aria-label={t("rules.form.targetCountLabel")}>
         {t("rules.form.targetCount", { n: targetCount })} {savedCount !== null && <Badge tone="neutral">{t("rules.form.savedCount", { n: savedCount })}</Badge>}
-        {targetCount === 0 && form.scopeIds.length > 0 && <span className="ml-2 text-warn">{t("rules.form.noTargetWarn")}</span>}
+        {targetCount === 0 && form.scopeIds.length > 0 && <span className="ml-2 text-fair-ink">{t("rules.form.noTargetWarn")}</span>}
       </p>
       {error && (
-        <p role="alert" className="text-[12px] text-bad">
+        <p role="alert" className="text-[12px] text-bad-ink">
           {error}
         </p>
       )}

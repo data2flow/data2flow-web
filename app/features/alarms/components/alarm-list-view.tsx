@@ -203,7 +203,7 @@ export function AlarmListView({ alarms: initial, counts: initialCounts, filter, 
         <span className="text-muted">{formatDuration(durationSec(alarm, nowMs), t)}</span>
         <span className="text-muted">{t("alarms.times", { n: alarm.occurrenceCount ?? 1 })}</span>
         {alarm.ackedBy && <span className="text-muted">{alarm.ackedBy.name}</span>}
-        {result && <span className={result.ok ? "text-good" : "text-bad"}>{result.ok ? (result.alreadyAcked ? t("alarms.bulk.already") : t("alarms.bulk.ok")) : (errorText(t, { code: result.code ?? "UNKNOWN" }) ?? "")}</span>}
+        {result && <span className={result.ok ? "text-good-ink" : "text-bad-ink"}>{result.ok ? (result.alreadyAcked ? t("alarms.bulk.already") : t("alarms.bulk.ok")) : (errorText(t, { code: result.code ?? "UNKNOWN" }) ?? "")}</span>}
       </li>
     );
   };
@@ -301,7 +301,7 @@ export function AlarmListView({ alarms: initial, counts: initialCounts, filter, 
                     </option>
                   ))}
                 </select>
-                {selected.size > BULK_LIMIT && <span className="text-bad">{t("errors.ALARM_BULK_LIMIT_EXCEEDED")}</span>}
+                {selected.size > BULK_LIMIT && <span className="text-bad-ink">{t("errors.ALARM_BULK_LIMIT_EXCEEDED")}</span>}
               </div>
             )}
             <ul aria-label={t("alarms.title")}>

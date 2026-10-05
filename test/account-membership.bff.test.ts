@@ -108,8 +108,10 @@ describe("IAM-04.05 메뉴 숨김(보조)과 서버 거부", () => {
 
   it("ADMIN은 회원·역할·보안 설정·감사 로그·시스템 설정 메뉴가 보인다", async () => {
     const browser = await admin();
-    const nav = navOf((await browser.get("/")).body);
-    for (const path of ["/admin/members", "/admin/roles", "/admin/security", "/admin/audit", "/admin/settings"]) expect(nav).toContain(`href="${path}"`);
+    // 상단은 "관리" 하나(DSH-07.02 목업 틀), 관리 화면의 왼쪽 막대에 항목이 모두 나온다
+    expect(navOf((await browser.get("/")).body)).toContain('href="/admin/members"');
+    const page = (await browser.get("/admin/members")).body;
+    for (const path of ["/admin/members", "/admin/roles", "/admin/security", "/admin/audit", "/admin/settings"]) expect(page).toContain(`href="${path}"`);
   });
 
   it("TC-IAM-105 AT-IAM-14.5 2단계 인증이 필수인데 없는 ADMIN은 설정 화면으로 보내고 다른 화면을 막는다", async () => {

@@ -148,7 +148,7 @@ export function TargetsEditor({ data, metrics, canEdit, result }: { data: Target
                   <td>
                     {t("spaces.targets.direct")}
                     {errors[index] && (
-                      <p role="alert" className="text-[12px] text-bad">
+                      <p role="alert" className="text-[12px] text-bad-ink">
                         {t(`spaces.validation.${errors[index]}`)}
                       </p>
                     )}
@@ -229,7 +229,7 @@ export function ScheduleEditor({ data, canEdit, result }: { data: ScheduleData; 
                 </Button>
               )}
               {errors[index] && (
-                <span role="alert" className="text-[12px] text-bad">
+                <span role="alert" className="text-[12px] text-bad-ink">
                   {t(`spaces.validation.${errors[index]}`)}
                 </span>
               )}

@@ -118,7 +118,7 @@ export function ModuleEditor({ module, canWrite, timezone, api, editorFactory }:
               ●
             </span>
           )}
-          <span className={tooLarge ? "ml-auto text-[12px] text-bad" : "ml-auto text-[12px] text-muted"}>{tooLarge ? t("scripts.editor.tooLarge") : t("scripts.editor.size", { kb: (byteSize(code) / 1024).toFixed(1) })}</span>
+          <span className={tooLarge ? "ml-auto text-[12px] text-bad-ink" : "ml-auto text-[12px] text-muted"}>{tooLarge ? t("scripts.editor.tooLarge") : t("scripts.editor.size", { kb: (byteSize(code) / 1024).toFixed(1) })}</span>
           {canWrite && (
             <>
               <Button disabled={busy || !dirty || tooLarge} onClick={() => void save()}>

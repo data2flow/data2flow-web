@@ -22,7 +22,7 @@ export function AttributeSchemaEditor({ initial, readOnly }: { initial: string; 
         <input type="hidden" name="attributeSchema" value={text} />
         <TextArea label={t("catalog.package.schema")} rows={12} value={text} readOnly={readOnly} onChange={(e) => setText(e.target.value)} spellCheck={false} />
         {parsed.ok ? (
-          <p role="status" className="text-[12px] text-good">
+          <p role="status" className="text-[12px] text-good-ink">
             {t("catalog.package.schemaOk", { n: fields.length })}
           </p>
         ) : (

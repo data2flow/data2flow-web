@@ -49,7 +49,7 @@ export function AnnotationList({ items, timezone, meId, canEdit }: { items: ApiA
               <CsrfField />
               <input type="hidden" name="intent" value="delete-annotation" />
               <input type="hidden" name="id" value={a.id} />
-              <button type="submit" className="text-bad hover:underline" aria-label={t("explore.annotations.deleteOf", { title: a.title })}>
+              <button type="submit" className="text-bad-ink hover:underline" aria-label={t("explore.annotations.deleteOf", { title: a.title })}>
                 {t("common.delete")}
               </button>
             </Form>

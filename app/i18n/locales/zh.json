@@ -23,6 +23,9 @@
   },
   "nav": {
     "label": "主菜单",
+    "section": "菜单",
+    "more": "更多",
+    "openMenu": "打开菜单",
     "home": "首页",
     "admin": "管理",
     "members": "成员",

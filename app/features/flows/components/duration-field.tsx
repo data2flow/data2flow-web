@@ -40,7 +40,7 @@ export function DurationField({ label, value, onChange, error, disabled }: { lab
         </select>
       </div>
       {error && (
-        <p role="alert" className="text-[12px] text-bad">
+        <p role="alert" className="text-[12px] text-bad-ink">
           {error}
         </p>
       )}

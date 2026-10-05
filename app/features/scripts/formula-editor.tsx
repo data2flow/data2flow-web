@@ -58,7 +58,7 @@ export function MarkedExpression({ expression, check }: { expression: string; ch
   return (
     <pre aria-hidden="true" className="mt-1 overflow-x-auto font-mono text-[12.5px] text-muted">
       {expression.slice(0, offset)}
-      <span data-testid="formula-error-mark" className="text-bad underline decoration-wavy">
+      <span data-testid="formula-error-mark" className="text-bad-ink underline decoration-wavy">
         {expression.slice(offset, end) || " "}
       </span>
       {expression.slice(end)}
@@ -295,7 +295,7 @@ export function FormulaEditor({ formulas, targets, metricKeys, canWrite, timezon
           {check && !check.ok && draft.expression.trim() !== "" && (
             <>
               <MarkedExpression expression={draft.expression} check={check} />
-              <p role="alert" className="text-[12px] text-bad">
+              <p role="alert" className="text-[12px] text-bad-ink">
                 {formulaMessage(check)}
               </p>
             </>

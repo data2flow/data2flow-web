@@ -49,7 +49,7 @@ export default function IngestReprocess({ loaderData }: Route.ComponentProps) {
     <>
       <PageHeader crumb={t("ingest.crumb")} title={t("ingest.reprocess.title")} />
       <IngestAreaTabs current="reprocess" />
-      {loaderData.jobsFailed && <p className="mb-2 text-[12.5px] text-warn">{t("ingest.reprocess.jobsFailed")}</p>}
+      {loaderData.jobsFailed && <p className="mb-2 text-[12.5px] text-fair-ink">{t("ingest.reprocess.jobsFailed")}</p>}
       <ReprocessView
         sources={loaderData.sources}
         devices={loaderData.devices}

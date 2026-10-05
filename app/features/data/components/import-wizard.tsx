@@ -125,7 +125,7 @@ export function ImportWizard({ timezone, api = defaultDataApi, onCreated, readHe
             </label>
             <input id="import-file" type="file" accept=".csv,text/csv" onChange={(e) => void pick(e.target.files?.[0] ?? null)} />
             {errors.file && (
-              <p role="alert" className="text-[12px] text-bad">
+              <p role="alert" className="text-[12px] text-bad-ink">
                 {err("file")}
               </p>
             )}
@@ -234,7 +234,7 @@ export function ImportWizard({ timezone, api = defaultDataApi, onCreated, readHe
                 </fieldset>
               )}
               {errors.metricColumns && (
-                <p role="alert" className="text-[12px] text-bad">
+                <p role="alert" className="text-[12px] text-bad-ink">
                   {err("metricColumns")}
                 </p>
               )}

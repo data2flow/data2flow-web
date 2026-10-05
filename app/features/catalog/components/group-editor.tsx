@@ -118,9 +118,9 @@ export function CriteriaBuilder({
         {criteriaSize(criteria) === 0 ? (
           t("catalog.groups.criteriaRequired")
         ) : error === "GROUP_SIZE_EXCEEDED" || (result && result.count > GROUP_LIMIT) ? (
-          <span className="text-bad">{t("catalog.validation.groupLimit")}</span>
+          <span className="text-bad-ink">{t("catalog.validation.groupLimit")}</span>
         ) : error ? (
-          <span className="text-bad">{t(`errors.${error}`, { defaultValue: t("errors.UNKNOWN") })}</span>
+          <span className="text-bad-ink">{t(`errors.${error}`, { defaultValue: t("errors.UNKNOWN") })}</span>
         ) : result ? (
           <>
             {t("catalog.groups.matchCount", { n: result.count })}
@@ -188,7 +188,7 @@ export function DevicePicker({ initial = [], search = defaultSearch, name = "dev
         {selected.map((d) => (
           <li key={d.id} className="flex items-center gap-1 rounded border border-line px-2 py-0.5 text-[12.5px]">
             {d.name}
-            <button type="button" aria-label={t("catalog.groups.unselect", { name: d.name })} className="text-muted hover:text-bad" onClick={() => setSelected((s) => s.filter((x) => x.id !== d.id))}>
+            <button type="button" aria-label={t("catalog.groups.unselect", { name: d.name })} className="text-muted hover:text-bad-ink" onClick={() => setSelected((s) => s.filter((x) => x.id !== d.id))}>
               ×
             </button>
           </li>

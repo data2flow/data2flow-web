@@ -21,7 +21,7 @@ export function PipelineDiagram({ stages }: { stages: StageSnapshot[] }) {
             <span className="text-[12px] font-semibold">{t(`ingest.stage.${stage.key}`)}</span>
             <span className="font-mono text-[13px]">{t("ingest.monitor.inPerMin", { n: formatNumber(stage.inPerMin ?? 0, lang) })}</span>
             {failing ? (
-              <span className="font-mono text-[12px] text-bad">{t("ingest.monitor.failPerMin", { n: formatNumber(stage.failPerMin ?? 0, lang) })}</span>
+              <span className="font-mono text-[12px] text-bad-ink">{t("ingest.monitor.failPerMin", { n: formatNumber(stage.failPerMin ?? 0, lang) })}</span>
             ) : (
               <span className="text-[12px] text-muted">{t("ingest.monitor.noFailure")}</span>
             )}

@@ -57,7 +57,7 @@ describe("[DSH-09.01][AT-DSH-09.1] UI-DSH-09 사이트 지도", () => {
     expect(markers).toHaveLength(3);
     expect(markers[0].getAttribute("aria-label")).toBe("광주캠퍼스 · 열린 알람 있음");
     expect(markers[0].querySelector("circle")!.getAttribute("fill")).toBe("var(--color-bad)");
-    expect(markers[1].querySelector("circle")!.getAttribute("fill")).toBe("var(--color-warn)");
+    expect(markers[1].querySelector("circle")!.getAttribute("fill")).toBe("var(--color-fair)");
     expect(markers[0].querySelector("title")!.textContent).toBe("광주캠퍼스 · 오프라인 1 · 알람 2");
     expect(screen.getByText("위치 없음 1곳(목록에만 표시)")).toBeInTheDocument();
   });

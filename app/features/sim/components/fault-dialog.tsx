@@ -116,7 +116,7 @@ export function FaultDialog({
           ))}
           {targets.length > virtualTargets.length && <p className="text-[12px] text-muted">{t("sim.fault.realHidden", { n: targets.length - virtualTargets.length })}</p>}
           {problems.targetIds && (
-            <p role="alert" className="text-[12px] text-bad">
+            <p role="alert" className="text-[12px] text-bad-ink">
               {problemText(problems.targetIds)}
             </p>
           )}
@@ -165,12 +165,12 @@ export function FaultDialog({
         <TextField label={t("sim.fault.durationMin")} value={durationMin} inputMode="numeric" onChange={(e) => setDurationMin(e.target.value)} error={problemText(problems.durationMin)} />
       </div>
       {error && (
-        <p role="alert" className="text-[12.5px] text-bad">
+        <p role="alert" className="text-[12.5px] text-bad-ink">
           {error}
         </p>
       )}
       {notice && (
-        <p role="status" className="text-[12.5px] text-good">
+        <p role="status" className="text-[12.5px] text-good-ink">
           {notice}
         </p>
       )}

@@ -21,13 +21,62 @@ describe("TC-IAM-008 AT-IAM-01.1 상단 메뉴(IAM-04.05 보조 숨김)", () => 
     const { unmount } = await renderRoute(<AppShell me={meOf("ADMIN")}>본문</AppShell>, { session: meOf("ADMIN") });
     await screen.findByText("본문");
     const links = screen.getByRole("navigation", { name: "주 메뉴" }).querySelectorAll("a");
-    expect([...links].map((a) => a.getAttribute("href"))).toEqual(["/", "/spaces", "/devices", "/explore", "/ingest/monitor", "/alarms", "/automation/flows", "/control/commands", "/sim", "/dashboards", "/admin/members", "/admin/roles", "/admin/security", "/admin/audit", "/admin/settings", "/admin/maintenance", "/admin/channels", "/admin/system", "/settings/data-retention", "/admin/branding"]);
+    // 상단은 업무 메뉴 + "관리" 하나(첫 관리 화면으로). 관리 항목은 관리 화면의 왼쪽 막대에 모두 나온다(DSH-07.02 목업 틀)
+    expect([...links].map((a) => a.getAttribute("href"))).toEqual(["/", "/spaces", "/devices", "/explore", "/ingest/monitor", "/alarms", "/automation/flows", "/control/commands", "/sim", "/dashboards", "/admin/members"]);
+    expect(screen.getByRole("link", { name: "관리" })).toHaveAttribute("href", "/admin/members");
     expect(screen.getByRole("link", { name: "김운영" })).toHaveAttribute("href", "/me");
     unmount();
     await renderRoute(<AppShell me={meOf("OPERATOR")}>본문</AppShell>, { session: meOf("OPERATOR") });
     await screen.findByText("본문");
     expect(screen.getByRole("navigation", { name: "주 메뉴" }).querySelectorAll("a")).toHaveLength(11);
     expect(document.querySelector('input[name="_csrf"]')).toHaveValue("csrf-test-token");
+  });
+});
+
+describe("[DSH-07.02] 목업 화면 틀: 왼쪽 막대와 사용자 표시", () => {
+  it("관리 화면에서는 왼쪽 막대에 관리 항목이 나오고 현재 화면을 표시한다, 사용자 칸은 이름·역할", async () => {
+    await renderRoute(<AppShell me={meOf("ADMIN")}>본문</AppShell>, { session: meOf("ADMIN"), path: "/admin/roles", url: "/admin/roles" });
+    await screen.findByText("본문");
+    const rail = screen.getByRole("navigation", { name: "관리" });
+    expect(rail.querySelector('a[aria-current="page"]')).toHaveAttribute("href", "/admin/roles");
+    expect(rail.querySelectorAll("a").length).toBeGreaterThan(5);
+    expect(screen.getByRole("link", { name: "관리" })).toHaveAttribute("aria-current", "page");
+    expect(screen.getByText("관리자")).toBeInTheDocument();
+  });
+
+  it("넓이가 모자라면 메뉴 이름을 줄바꿈하지 않고 남는 항목을 [더보기]로 넘긴다", async () => {
+    const offset = vi.spyOn(HTMLElement.prototype, "offsetWidth", "get").mockReturnValue(100);
+    const client = vi.spyOn(HTMLElement.prototype, "clientWidth", "get").mockReturnValue(450);
+    try {
+      await renderRoute(<AppShell me={meOf("ADMIN")}>본문</AppShell>, { session: meOf("ADMIN"), path: "/admin/roles", url: "/admin/roles" });
+      await screen.findByText("본문");
+      const nav = screen.getByRole("navigation", { name: "주 메뉴" });
+      const more = nav.querySelector("details")!;
+      expect(more.querySelector("summary")).toHaveTextContent("더보기");
+      expect(more.querySelector("summary")).toHaveAttribute("aria-current", "page");
+      expect([...more.querySelectorAll("a")].map((a) => a.getAttribute("href"))).toContain("/admin/members");
+      expect(nav.querySelectorAll(":scope > a")).toHaveLength(3);
+    } finally {
+      offset.mockRestore();
+      client.mockRestore();
+    }
+  });
+
+  it("좁은 화면용 햄버거 단추가 왼쪽 서랍 메뉴를 열고 닫는다", async () => {
+    await renderRoute(<AppShell me={meOf("ADMIN")}>본문</AppShell>, { session: meOf("ADMIN") });
+    await screen.findByText("본문");
+    await userEvent.click(screen.getByRole("button", { name: "메뉴 열기" }));
+    const drawers = screen.getAllByRole("navigation", { name: "주 메뉴" });
+    expect(drawers).toHaveLength(2);
+    expect(drawers[0].querySelectorAll("a").length).toBeGreaterThanOrEqual(11);
+    await userEvent.click(screen.getByRole("button", { name: "닫기" }));
+    expect(screen.getAllByRole("navigation", { name: "주 메뉴" })).toHaveLength(1);
+  });
+
+  it("홈에는 왼쪽 막대가 없다", async () => {
+    await renderRoute(<AppShell me={meOf("ADMIN")}>본문</AppShell>, { session: meOf("ADMIN") });
+    await screen.findByText("본문");
+    expect(screen.getAllByRole("navigation")).toHaveLength(1);
   });
 });
 

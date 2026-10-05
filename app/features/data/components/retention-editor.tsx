@@ -119,7 +119,7 @@ export function RetentionEditor({ effective, stats, archives, canSave, timezone,
                     onChange={(e) => setOrgRow(row.dataClass, { retainDays: e.target.value })}
                   />
                   {errors[`org.${row.dataClass}`] && (
-                    <p role="alert" className="text-[12px] text-bad">
+                    <p role="alert" className="text-[12px] text-bad-ink">
                       {errText(`org.${row.dataClass}`)}
                     </p>
                   )}
@@ -203,7 +203,7 @@ export function RetentionEditor({ effective, stats, archives, canSave, timezone,
                   <td>
                     <input aria-label={t("data.retention.overrideDaysOf", { n: i + 1 })} aria-invalid={errors[`ov.${row.key}`] ? true : undefined} disabled={!canSave} className={inputClass} inputMode="numeric" value={row.retainDays} onChange={(e) => setOv(row.key, { retainDays: e.target.value })} />
                     {errors[`ov.${row.key}`] && (
-                      <p role="alert" className="text-[12px] text-bad">
+                      <p role="alert" className="text-[12px] text-bad-ink">
                         {errText(`ov.${row.key}`)}
                       </p>
                     )}

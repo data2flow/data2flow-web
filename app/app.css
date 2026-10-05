@@ -1,74 +1,162 @@
 @import "tailwindcss";
 
-/* 디자인 규칙: storyboards/README.md §3 (관리 콘솔, 파랑 강조 하나, 카드 1px 테두리·모서리 8px) */
+/*
+ * 디자인 토큰: data2flow-docs/storyboards/lib.js의 라이트·다크 토큰과 같은 값(DSH-07.02, storyboards/README.md §3).
+ * 상태색 good(정상·좋음)·fair(주의·보통)·poor(주요·나쁨)·bad(위험·매우 나쁨), virt(가상), ai1~ai3(AI 표시).
+ * 글자로 쓰는 상태색은 `text-*-ink`를 쓴다(라이트에서 흰 바탕 대비 4.5:1 이상).
+ */
 @theme {
   --font-sans: "Inter", "Noto Sans KR", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
   --color-bg: var(--d2f-bg);
   --color-panel: var(--d2f-panel);
+  --color-panel2: var(--d2f-panel2);
   --color-line: var(--d2f-line);
+  --color-line2: var(--d2f-line2);
   --color-text: var(--d2f-text);
-  --color-muted: var(--d2f-muted);
+  --color-text2: var(--d2f-text2);
+  --color-text3: var(--d2f-text3);
+  --color-inv: var(--d2f-inv);
+  --color-on-inv: var(--d2f-on-inv);
   --color-accent: var(--d2f-accent);
   --color-accent-soft: var(--d2f-accent-soft);
   --color-good: var(--d2f-good);
   --color-good-soft: var(--d2f-good-soft);
-  --color-warn: var(--d2f-warn);
-  --color-warn-soft: var(--d2f-warn-soft);
+  --color-fair: var(--d2f-fair);
+  --color-fair-soft: var(--d2f-fair-soft);
+  --color-poor: var(--d2f-poor);
+  --color-poor-soft: var(--d2f-poor-soft);
   --color-bad: var(--d2f-bad);
   --color-bad-soft: var(--d2f-bad-soft);
+  --color-virt: var(--d2f-virt);
+  --color-virt-soft: var(--d2f-virt-soft);
+  --color-ai1: var(--d2f-ai1);
+  --color-ai2: var(--d2f-ai2);
+  --color-ai3: var(--d2f-ai3);
+  /* 예전 이름: muted는 보조 글자(text2) */
+  --color-muted: var(--d2f-text2);
+  --color-good-ink: var(--d2f-good-ink);
+  --color-fair-ink: var(--d2f-fair-ink);
+  --color-poor-ink: var(--d2f-poor-ink);
+  --color-bad-ink: var(--d2f-bad-ink);
+  --color-virt-ink: var(--d2f-virt-ink);
+  --shadow-card: var(--d2f-shadow);
+  --radius-card: 8px;
 }
 
 :root {
-  --d2f-bg: #f6f8fb;
-  --d2f-panel: #ffffff;
-  --d2f-line: #e1e6ee;
-  --d2f-text: #1d2733;
-  --d2f-muted: #66768a;
-  --d2f-accent: #206bc4;
-  --d2f-accent-soft: #e8f0fa;
-  --d2f-good: #2f9e44;
-  --d2f-good-soft: #e6f4ea;
-  --d2f-warn: #b7791f;
-  --d2f-warn-soft: #fdf3e1;
-  --d2f-bad: #d63939;
-  --d2f-bad-soft: #fbe9e9;
+  --d2f-bg: #F6F8FB;
+  --d2f-panel: #FFFFFF;
+  --d2f-panel2: #F9FAFB;
+  --d2f-line: #E6E8EB;
+  --d2f-line2: #EFF1F4;
+  --d2f-text: #1D273B;
+  --d2f-text2: #49566B;
+  --d2f-text3: #8590A2;
+  --d2f-inv: #1D273B;
+  --d2f-on-inv: #FFFFFF;
+  --d2f-accent: #206BC4;
+  --d2f-accent-soft: #E8F0FA;
+  --d2f-good: #2FB344;
+  --d2f-good-soft: #EAF7EC;
+  --d2f-fair: #F59F00;
+  --d2f-fair-soft: #FEF5E6;
+  --d2f-poor: #F76707;
+  --d2f-poor-soft: #FEF0E6;
+  --d2f-bad: #D63939;
+  --d2f-bad-soft: #FBEBEB;
+  --d2f-virt: #AE3EC9;
+  --d2f-virt-soft: #F7ECFA;
+  --d2f-ai1: #206BC4;
+  --d2f-ai2: #4299E1;
+  --d2f-ai3: #AE3EC9;
+  --d2f-grid: rgba(29,39,59,.05);
+  --d2f-shadow: 0 1px 2px rgba(29,39,59,.04);
+  --d2f-code: #1D273B;
+  --d2f-code-text: #DCE3EE;
+  --d2f-good-ink: color-mix(in srgb, var(--d2f-good) 52%, var(--d2f-text));
+  --d2f-fair-ink: color-mix(in srgb, var(--d2f-fair) 52%, var(--d2f-text));
+  --d2f-poor-ink: color-mix(in srgb, var(--d2f-poor) 52%, var(--d2f-text));
+  --d2f-bad-ink: color-mix(in srgb, var(--d2f-bad) 52%, var(--d2f-text));
+  --d2f-virt-ink: color-mix(in srgb, var(--d2f-virt) 52%, var(--d2f-text));
 }
 
 /* 테마(DSH-07.02): 기본은 시스템 설정을 따르고, 사용자가 고르면 html[data-theme]로 고정한다 */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --d2f-bg: #151f2c;
-    --d2f-panel: #1c2836;
-    --d2f-line: #2c3a4b;
-    --d2f-text: #e3e9f0;
-    --d2f-muted: #94a3b5;
-    --d2f-accent: #4c8dde;
-    --d2f-accent-soft: #1f3550;
-    --d2f-good: #51b96a;
-    --d2f-good-soft: #1d3a27;
-    --d2f-warn: #e0a743;
-    --d2f-warn-soft: #3d3020;
-    --d2f-bad: #ec6b6b;
-    --d2f-bad-soft: #432426;
+    --d2f-bg: #151F2C;
+    --d2f-panel: #1B2636;
+    --d2f-panel2: #202C3D;
+    --d2f-line: #2A3749;
+    --d2f-line2: #243143;
+    --d2f-text: #E2E7EF;
+    --d2f-text2: #A9B4C4;
+    --d2f-text3: #76839A;
+    --d2f-inv: #E2E7EF;
+    --d2f-on-inv: #151F2C;
+    --d2f-accent: #4C8DDE;
+    --d2f-accent-soft: #1E3350;
+    --d2f-good: #4CC461;
+    --d2f-good-soft: #1C3326;
+    --d2f-fair: #F7B32B;
+    --d2f-fair-soft: #3A2F17;
+    --d2f-poor: #FA8A3C;
+    --d2f-poor-soft: #3B2719;
+    --d2f-bad: #E86161;
+    --d2f-bad-soft: #3A2026;
+    --d2f-virt: #C47ADB;
+    --d2f-virt-soft: #33233F;
+    --d2f-ai1: #4C8DDE;
+    --d2f-ai2: #63A6EE;
+    --d2f-ai3: #C47ADB;
+    --d2f-grid: rgba(226,231,239,.05);
+    --d2f-shadow: 0 1px 2px rgba(0,0,0,.25);
+    --d2f-code: #0F1722;
+    --d2f-code-text: #D0D8E4;
+    --d2f-good-ink: var(--d2f-good);
+    --d2f-fair-ink: var(--d2f-fair);
+    --d2f-poor-ink: var(--d2f-poor);
+    --d2f-bad-ink: var(--d2f-bad);
+    --d2f-virt-ink: var(--d2f-virt);
     color-scheme: dark;
   }
 }
 
 :root[data-theme="dark"] {
-  --d2f-bg: #151f2c;
-  --d2f-panel: #1c2836;
-  --d2f-line: #2c3a4b;
-  --d2f-text: #e3e9f0;
-  --d2f-muted: #94a3b5;
-  --d2f-accent: #4c8dde;
-  --d2f-accent-soft: #1f3550;
-  --d2f-good: #51b96a;
-  --d2f-good-soft: #1d3a27;
-  --d2f-warn: #e0a743;
-  --d2f-warn-soft: #3d3020;
-  --d2f-bad: #ec6b6b;
-  --d2f-bad-soft: #432426;
+  --d2f-bg: #151F2C;
+  --d2f-panel: #1B2636;
+  --d2f-panel2: #202C3D;
+  --d2f-line: #2A3749;
+  --d2f-line2: #243143;
+  --d2f-text: #E2E7EF;
+  --d2f-text2: #A9B4C4;
+  --d2f-text3: #76839A;
+  --d2f-inv: #E2E7EF;
+  --d2f-on-inv: #151F2C;
+  --d2f-accent: #4C8DDE;
+  --d2f-accent-soft: #1E3350;
+  --d2f-good: #4CC461;
+  --d2f-good-soft: #1C3326;
+  --d2f-fair: #F7B32B;
+  --d2f-fair-soft: #3A2F17;
+  --d2f-poor: #FA8A3C;
+  --d2f-poor-soft: #3B2719;
+  --d2f-bad: #E86161;
+  --d2f-bad-soft: #3A2026;
+  --d2f-virt: #C47ADB;
+  --d2f-virt-soft: #33233F;
+  --d2f-ai1: #4C8DDE;
+  --d2f-ai2: #63A6EE;
+  --d2f-ai3: #C47ADB;
+  --d2f-grid: rgba(226,231,239,.05);
+  --d2f-shadow: 0 1px 2px rgba(0,0,0,.25);
+  --d2f-code: #0F1722;
+  --d2f-code-text: #D0D8E4;
+  --d2f-good-ink: var(--d2f-good);
+  --d2f-fair-ink: var(--d2f-fair);
+  --d2f-poor-ink: var(--d2f-poor);
+  --d2f-bad-ink: var(--d2f-bad);
+  --d2f-virt-ink: var(--d2f-virt);
   color-scheme: dark;
 }
 
@@ -77,4 +165,28 @@ body {
   background: var(--d2f-bg);
   color: var(--d2f-text);
   font-size: 13.5px;
+  line-height: 1.45;
+  letter-spacing: -0.003em;
+  font-feature-settings: "cv03", "cv04", "cv11";
+}
+
+/* 측정값·ID·경로(JetBrains Mono, 숫자 폭 고정) */
+.font-mono {
+  font-feature-settings: "tnum";
+  letter-spacing: 0;
+}
+
+/* 회색 대문자 소제목 10.5px(README §3) */
+@utility cap {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--d2f-text2);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* 초점 표시: 키보드 이동 때 강조색 고리 */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--d2f-accent);
+  outline-offset: 2px;
 }

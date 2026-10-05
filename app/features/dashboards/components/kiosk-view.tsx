@@ -133,7 +133,7 @@ export function KioskView({ boards, interval, timezone, loadDashboard = defaultL
         </div>
       )}
       <h1 className="mb-2 pr-48 text-[16px] font-semibold">{shown && shown !== "failed" ? shown.name : ""}</h1>
-      {shown === "failed" && <p className="text-[13px] text-bad">▲ {t("dashboards.kiosk.loadFailed")}</p>}
+      {shown === "failed" && <p className="text-[13px] text-bad-ink">▲ {t("dashboards.kiosk.loadFailed")}</p>}
       {shown && shown !== "failed" && (
         <DashboardView
           key={shown.id}

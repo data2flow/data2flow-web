@@ -131,7 +131,7 @@ export function AssetPanel({ deviceId, deviceName, canEdit, canPlace, api = fiel
             <li key={url} className="flex flex-col gap-1">
               <img src={browserUrl(url) ?? undefined} alt={t("field.asset.photoAlt", { n: i + 1 })} className="aspect-square w-full rounded border border-line object-cover" />
               {canEdit && (
-                <button type="button" className="text-left text-[12px] text-bad" aria-label={t("field.asset.removePhoto", { n: i + 1 })} onClick={() => void removePhoto(url)}>
+                <button type="button" className="text-left text-[12px] text-bad-ink" aria-label={t("field.asset.removePhoto", { n: i + 1 })} onClick={() => void removePhoto(url)}>
                   {t("common.delete")}
                 </button>
               )}

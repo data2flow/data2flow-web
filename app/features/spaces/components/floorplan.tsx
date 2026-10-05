@@ -50,7 +50,7 @@ export function FloorplanUpload({ result }: { result?: FormResult }) {
         {t("spaces.floorplan.upload")}
       </Button>
       {(invalid || failed) && (
-        <p role="alert" className="w-full text-[12px] text-bad">
+        <p role="alert" className="w-full text-[12px] text-bad-ink">
           {t("errors.FLOORPLAN_IMAGE_INVALID")}
         </p>
       )}
@@ -115,7 +115,7 @@ export function FloorplanPanel({ view, devices, canEdit, result }: { view: Floor
               {m.deviceName ?? m.deviceId}
               {m.metrics?.[0] && <span className="ml-1 font-mono">{`${m.metrics[0].value ?? "–"}${m.metrics[0].unit ?? ""}`}</span>}
               {editing && (
-                <button type="button" className="ml-1 text-bad" aria-label={t("spaces.floorplan.removeMarker", { name: m.deviceName ?? m.deviceId })} onClick={(e) => { e.stopPropagation(); setMarkers((c) => c.filter((x) => x.deviceId !== m.deviceId)); }}>
+                <button type="button" className="ml-1 text-bad-ink" aria-label={t("spaces.floorplan.removeMarker", { name: m.deviceName ?? m.deviceId })} onClick={(e) => { e.stopPropagation(); setMarkers((c) => c.filter((x) => x.deviceId !== m.deviceId)); }}>
                   ×
                 </button>
               )}
@@ -136,9 +136,9 @@ export function FloorplanPanel({ view, devices, canEdit, result }: { view: Floor
           </Form>
         </div>
       )}
-      {(result?.intent === "markers" || result?.intent === "floorplan") && result.ok && <p role="status" className="mt-2 text-[12.5px] text-good">{t("common.saved")}</p>}
+      {(result?.intent === "markers" || result?.intent === "floorplan") && result.ok && <p role="status" className="mt-2 text-[12.5px] text-good-ink">{t("common.saved")}</p>}
       {!editing && (result?.intent === "markers" || result?.intent === "floorplan") && result.error && (
-        <p role="alert" className="mt-2 text-[12.5px] text-bad">
+        <p role="alert" className="mt-2 text-[12.5px] text-bad-ink">
           {t(`errors.${result.error.code}`, { defaultValue: t("errors.UNKNOWN") })}
         </p>
       )}

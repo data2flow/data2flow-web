@@ -90,7 +90,7 @@ export function WorkOrderTable({ orders, timezone, nowMs, deviceNames = {}, comp
   };
   const due = (o: WorkOrder) =>
     o.dueAt ? (
-      <span className={cx(isOverdue(o, nowMs) && "font-semibold text-bad", isDueSoon(o, nowMs) && "font-semibold text-warn")}>
+      <span className={cx(isOverdue(o, nowMs) && "font-semibold text-bad-ink", isDueSoon(o, nowMs) && "font-semibold text-fair-ink")}>
         {formatDateTime(o.dueAt, timezone, i18n.language)}
         {isOverdue(o, nowMs) && ` · ${t("field.views.overdue")}`}
       </span>
@@ -248,7 +248,7 @@ export function CreateWorkOrderDialog({ open, onClose, devices, spaces, defaultD
           ))}
         </SelectField>
         {err("targets") && (
-          <p role="alert" className="text-[12px] text-bad">
+          <p role="alert" className="text-[12px] text-bad-ink">
             {err("targets")}
           </p>
         )}

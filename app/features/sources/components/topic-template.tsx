@@ -26,7 +26,7 @@ export function TopicTemplateHelper({ decoderKey, decoderConfig, sampleTopic = "
       </div>
       {levels && <p className="font-mono text-[12px] text-muted">{t("sources.topicTemplate.filter", { filter: subscriptionFilter(levels) })}</p>}
       {levels && sample.trim() && !values && (
-        <p role="status" className="text-[12.5px] text-warn">
+        <p role="status" className="text-[12.5px] text-fair-ink">
           {t("sources.topicTemplate.unmatched")}
         </p>
       )}

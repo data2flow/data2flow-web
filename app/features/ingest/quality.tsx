@@ -12,7 +12,7 @@ import { errorText } from "~/lib/error-text";
 import type { QualityApi } from "./m5-api";
 import { distributionRows, qualityLink, scoreTone, sortByScore, trendSeries, type QualityGroup, type QualityItem, type QualitySummary, type QualityTrendPoint } from "./model/m5";
 
-const toneClass = { bad: "text-bad", warn: "text-warn", good: "text-good" } as const;
+const toneClass = { bad: "text-bad-ink", warn: "text-fair-ink", good: "text-good-ink" } as const;
 
 export function QualityView({
   items,

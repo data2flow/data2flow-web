@@ -14,7 +14,7 @@ import type { FlowNode, PortSpec } from "../model/types";
 /** 오류 툴팁 최대 길이(TC-FLW-069: 최근 오류 메시지 500자 절단) */
 export const LAST_ERROR_MAX = 500;
 
-const HEALTH_CLASS: Record<NodeHealth, string> = { OK: "bg-good-soft text-good", WARN: "bg-warn-soft text-warn", ERROR: "bg-bad-soft text-bad" };
+const HEALTH_CLASS: Record<NodeHealth, string> = { OK: "bg-good-soft text-good-ink", WARN: "bg-fair-soft text-fair-ink", ERROR: "bg-bad-soft text-bad-ink" };
 
 /** 노드 상태 배지(FLW-03.03, TC-FLW-070): 색 + 접근 가능한 이름, 오류면 최근 오류를 툴팁으로 */
 export function NodeStatusBadge({ stats }: { stats: NodeStats }) {
@@ -51,7 +51,7 @@ export interface FlowNodeData extends Record<string, unknown> {
 
 export type FlowNodeView = Node<FlowNodeData, "flowNode">;
 
-const DIFF_CLASS = { added: "border-good", changed: "border-warn", removed: "border-bad border-dashed" } as const;
+const DIFF_CLASS = { added: "border-good", changed: "border-fair", removed: "border-bad border-dashed" } as const;
 
 export function FlowNodeCard({ data, selected }: NodeProps<FlowNodeView>) {
   const { t } = useTranslation();
@@ -79,12 +79,12 @@ export function FlowNodeCard({ data, selected }: NodeProps<FlowNodeView>) {
         <span className="text-[10.5px] font-semibold uppercase text-muted">{t(`flows.category.${data.category}`, { defaultValue: data.category })}</span>
         <span className="flex gap-1">
           {hasError && (
-            <span className="rounded bg-bad-soft px-1 text-[10.5px] text-bad" title={badge!.errors.map((c) => t(`flows.issue.${c}`, { defaultValue: c })).join(", ")}>
+            <span className="rounded bg-bad-soft px-1 text-[10.5px] text-bad-ink" title={badge!.errors.map((c) => t(`flows.issue.${c}`, { defaultValue: c })).join(", ")}>
               {t("flows.node.errorBadge", { n: badge!.errors.length })}
             </span>
           )}
           {hasWarning && (
-            <span className="rounded bg-warn-soft px-1 text-[10.5px] text-warn" title={badge!.warnings.map((c) => t(`flows.issue.${c}`, { defaultValue: c })).join(", ")}>
+            <span className="rounded bg-fair-soft px-1 text-[10.5px] text-fair-ink" title={badge!.warnings.map((c) => t(`flows.issue.${c}`, { defaultValue: c })).join(", ")}>
               {badge!.warnings.map((c) => t(`flows.issue.${c}`, { defaultValue: c })).join(", ")}
             </span>
           )}
@@ -92,11 +92,11 @@ export function FlowNodeCard({ data, selected }: NodeProps<FlowNodeView>) {
       </div>
       <p className="truncate font-semibold">{node.name}</p>
       <p className="truncate font-mono text-[11px] text-muted">{data.summary || node.type}</p>
-      {errorCount ? <p className="text-[11px] text-bad">{t("flows.node.errors1h", { n: errorCount })}</p> : null}
+      {errorCount ? <p className="text-[11px] text-bad-ink">{t("flows.node.errors1h", { n: errorCount })}</p> : null}
       {data.newerVersion !== undefined && <p className="text-[10.5px] text-accent">{t("flows.subflow.newer", { v: data.newerVersion })}</p>}
       {(data.bypassed || data.debug) && (
         <p className="flex gap-1 text-[10.5px]">
-          {data.bypassed && <span className="rounded bg-warn-soft px-1 text-warn">{t("flows.overlay.bypassed")}</span>}
+          {data.bypassed && <span className="rounded bg-fair-soft px-1 text-fair-ink">{t("flows.overlay.bypassed")}</span>}
           {data.debug && <span className="rounded bg-accent-soft px-1 text-accent">{t("flows.overlay.debugOn")}</span>}
         </p>
       )}
@@ -112,7 +112,7 @@ export function FlowNodeCard({ data, selected }: NodeProps<FlowNodeView>) {
       <div className="mt-1 flex flex-col items-end gap-0.5">
         {data.outputs.map((port) => (
           <div key={port.name} className="relative flex items-center gap-1 pr-1 text-[10.5px] text-muted">
-            <span className={port.name === "error" ? "text-bad" : undefined}>{port.name}</span>
+            <span className={port.name === "error" ? "text-bad-ink" : undefined}>{port.name}</span>
             {live?.out?.[port.name] !== undefined && <span className="font-mono text-text">{live.out[port.name]}</span>}
             {data.replay?.[port.name] !== undefined && (
               <span className="rounded bg-accent-soft px-1 font-mono text-accent" title={t("flows.replay.portCount")}>

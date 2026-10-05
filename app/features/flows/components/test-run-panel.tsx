@@ -186,7 +186,7 @@ export function TestRunPanel(props: TestRunPanelProps) {
           <TextArea label={t("flows.test.message")} rows={10} className="font-mono text-[11.5px]" value={text} onChange={(e) => setText(e.target.value)} />
         )}
         {inputError && (
-          <p role="alert" className="text-bad">
+          <p role="alert" className="text-bad-ink">
             {inputError}
           </p>
         )}
@@ -214,7 +214,7 @@ export function TestRunPanel(props: TestRunPanelProps) {
           </SelectField>
         </div>
         {rangeError && (
-          <p role="alert" className="text-bad">
+          <p role="alert" className="text-bad-ink">
             {rangeError}
           </p>
         )}

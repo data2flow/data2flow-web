@@ -9,7 +9,7 @@ export function RuleStatusBadge({ status, reason }: { status: RuleStatus | strin
   return (
     <span className="inline-flex flex-wrap items-center gap-1">
       <Badge tone={tone}>{t(`rules.status.${status}`, { defaultValue: status })}</Badge>
-      {status === "ERROR" && reason && <span className="text-[12px] text-bad">{t(`rules.errorReasons.${reason}`, { defaultValue: reason })}</span>}
+      {status === "ERROR" && reason && <span className="text-[12px] text-bad-ink">{t(`rules.errorReasons.${reason}`, { defaultValue: reason })}</span>}
     </span>
   );
 }

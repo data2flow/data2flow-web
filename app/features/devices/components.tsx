@@ -40,7 +40,7 @@ export function BatteryBar({ value }: { value?: number | null }) {
       <span aria-hidden className="inline-block h-2 w-10 overflow-hidden rounded bg-bg">
         <span className={cx("block h-full", low ? "bg-bad" : "bg-good")} style={{ width: `${Math.max(0, Math.min(100, value))}%` }} />
       </span>
-      <span className={cx("font-mono text-[12px]", low && "text-bad")}>{value}%</span>
+      <span className={cx("font-mono text-[12px]", low && "text-bad-ink")}>{value}%</span>
     </span>
   );
 }
@@ -58,7 +58,7 @@ export function LatestValueCards({ latest, lang }: { latest: LatestValue[]; lang
           </p>
           <p className="mt-1 font-mono text-[20px] font-semibold">{formatNumber(m.value, lang, { unit: m.unit ?? undefined })}</p>
           {m.quality !== undefined && m.quality !== null && m.quality !== 0 && (
-            <p className="text-[11.5px] text-warn">
+            <p className="text-[11.5px] text-fair-ink">
               <Term term="quality">{t("devices.quality", { code: m.quality })}</Term>
             </p>
           )}
@@ -77,7 +77,7 @@ export function OnboardingChecklist({ onboarding, links }: { onboarding: DeviceD
         const done = Boolean(onboarding?.[key]);
         const href = !done ? links?.(key) : undefined;
         return (
-          <li key={key} className={done ? "text-good" : "text-muted"}>
+          <li key={key} className={done ? "text-good-ink" : "text-muted"}>
             {done ? "✓" : "✗"} {t(`devices.onboarding.${key}`)}
             <span className="sr-only">{done ? t("devices.onboarding.done") : t("devices.onboarding.todo")}</span>
             {href && (
@@ -279,7 +279,7 @@ export function DeviceDataPanel({
         )}
       </div>
       {error && (
-        <p role="alert" className="mb-2 text-[13px] text-bad">
+        <p role="alert" className="mb-2 text-[13px] text-bad-ink">
           {t("devices.data.error")}{" "}
           <Button variant="ghost" onClick={() => setReload((n) => n + 1)}>
             {t("common.retry")}

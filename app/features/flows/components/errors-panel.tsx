@@ -33,7 +33,7 @@ export function ErrorsPanel({ metrics, nameOf }: { metrics: FlowMetrics | null; 
                   {nameOf(n.nodeId)} <span className="font-mono text-muted">{n.nodeId}</span>
                 </td>
                 <td className="font-mono">{n.processed}</td>
-                <td className="font-mono text-bad">{n.errors}</td>
+                <td className="font-mono text-bad-ink">{n.errors}</td>
               </tr>
             ))}
           </tbody>

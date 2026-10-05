@@ -66,8 +66,8 @@ export function TemplateEditor({ template, variables, maxLength, alarms, api, re
           />
         </label>
         <div className="flex justify-between text-[12px] text-muted">
-          <span>{unknown.length > 0 && <span className="text-warn">{t("notify.template.unknown", { names: unknown.join(", ") })}</span>}</span>
-          <span className={body.length > maxLength ? "text-bad" : undefined}>{t("notify.template.length", { count: body.length, max: maxLength })}</span>
+          <span>{unknown.length > 0 && <span className="text-fair-ink">{t("notify.template.unknown", { names: unknown.join(", ") })}</span>}</span>
+          <span className={body.length > maxLength ? "text-bad-ink" : undefined}>{t("notify.template.length", { count: body.length, max: maxLength })}</span>
         </div>
         {error && <Alert tone="danger">{error}</Alert>}
       </div>

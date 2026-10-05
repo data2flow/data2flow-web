@@ -23,6 +23,9 @@
   },
   "nav": {
     "label": "주 메뉴",
+    "section": "메뉴",
+    "more": "더보기",
+    "openMenu": "메뉴 열기",
     "home": "홈",
     "admin": "관리",
     "members": "회원",

@@ -258,7 +258,7 @@ export function AlarmDetailView({
                     <td>
                       {d.status}
                       {d.skipReason ? `_${d.skipReason}` : ""}
-                      {d.lastError ? <span className="ml-1 text-bad">{d.lastError}</span> : null}
+                      {d.lastError ? <span className="ml-1 text-bad-ink">{d.lastError}</span> : null}
                     </td>
                     <td className="font-mono">{d.attempts ?? 0}</td>
                     <td className="font-mono">{d.sentAt ? formatDateTime(d.sentAt, timezone, lang) : "–"}</td>

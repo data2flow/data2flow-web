@@ -41,7 +41,7 @@ export function LiveBanner({ status }: { status: StreamStatus }) {
   const { t } = useTranslation();
   if (status !== "retrying") return null;
   return (
-    <div role="status" className="mb-3 rounded-md border border-warn/30 bg-warn-soft px-3 py-2 text-[13px] text-warn">
+    <div role="status" className="mb-3 rounded-md border border-fair/30 bg-fair-soft px-3 py-2 text-[13px] text-fair-ink">
       {t("live.disconnected")}
     </div>
   );
@@ -50,7 +50,7 @@ export function LiveBanner({ status }: { status: StreamStatus }) {
 /** 제목줄 옆 작은 연결 표시 */
 export function LiveDot({ status }: { status: StreamStatus }) {
   const { t } = useTranslation();
-  const tone = status === "open" ? "bg-good" : status === "retrying" ? "bg-warn" : "bg-muted";
+  const tone = status === "open" ? "bg-good" : status === "retrying" ? "bg-fair" : "bg-muted";
   return (
     <span className="inline-flex items-center gap-1 text-[12px] text-muted">
       <span aria-hidden className={`inline-block h-2 w-2 rounded-full ${tone}`} />

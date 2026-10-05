@@ -91,7 +91,7 @@ export function ControlFields({ value, onChange, api, disabled }: { value: Contr
 
   return (
     <div className="flex flex-col gap-2">
-      {loadError && <p className="text-[12px] text-warn">{t("flows.control.loadFailed")}</p>}
+      {loadError && <p className="text-[12px] text-fair-ink">{t("flows.control.loadFailed")}</p>}
       <SelectField label={t("flows.control.capability")} value={value.capability ?? ""} disabled={disabled} onChange={(e) => onChange({ capability: e.target.value, command: undefined, args: {} })}>
         <option value="">{t("flows.control.choose")}</option>
         {[...new Set([...(value.capability ? [value.capability] : []), ...list.map((c) => c.name)])].map((name) => (

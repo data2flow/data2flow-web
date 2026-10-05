@@ -28,7 +28,7 @@ export function ProblemsList({ problems, checking, onSelect }: { problems: Probl
             <li key={`${p.line}:${p.col}:${i}`}>
               <button type="button" onClick={() => onSelect(p)} className="flex w-full items-center gap-2 px-3 py-1 text-left text-[12.5px] hover:bg-bg">
                 <Badge tone={p.severity === "ERROR" ? "danger" : "warning"}>{t(`scripts.problems.${p.severity}`)}</Badge>
-                <span className={p.severity === "ERROR" ? "text-bad" : "text-warn"}>{problemText(p)}</span>
+                <span className={p.severity === "ERROR" ? "text-bad-ink" : "text-fair-ink"}>{problemText(p)}</span>
               </button>
             </li>
           ))}

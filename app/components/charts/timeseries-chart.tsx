@@ -114,7 +114,7 @@ export function TimeseriesChart({ series, timezone, annotations, target, loading
   return (
     <figure className="m-0" aria-label={title ?? t("chart.label")}>
       {failed.length > 0 && (
-        <p role="status" className="mb-1 text-[12px] text-warn">
+        <p role="status" className="mb-1 text-[12px] text-fair-ink">
           {t("chart.partialError", { names: failed.map((s) => s.label).join(", ") })}
         </p>
       )}

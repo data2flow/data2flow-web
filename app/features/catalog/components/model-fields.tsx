@@ -40,7 +40,7 @@ export function ModelFields({ model, metrics, creating, fieldErrors }: { model?:
             ))}
           </div>
           {err("metrics") && (
-            <p role="alert" className="text-[12px] text-bad">
+            <p role="alert" className="text-[12px] text-bad-ink">
               {err("metrics")}
             </p>
           )}

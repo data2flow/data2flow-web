@@ -75,10 +75,10 @@ export function DeviceQueryBar({ initial, counts, problem, saved: initialSaved, 
             className="w-full rounded-md border border-line bg-panel px-3 py-1.5 font-mono text-[13px]"
           />
           {shownProblem ? (
-            <p id={`${inputId}-error`} role="alert" className="text-[12.5px] text-bad">
+            <p id={`${inputId}-error`} role="alert" className="text-[12.5px] text-bad-ink">
               <span className="font-mono whitespace-pre" aria-hidden="true">
                 {splitAtColumn(text, shownProblem.column).before}
-                <mark className="bg-bad/20 text-bad underline decoration-wavy">{splitAtColumn(text, shownProblem.column).at}</mark>
+                <mark className="bg-bad/20 text-bad-ink underline decoration-wavy">{splitAtColumn(text, shownProblem.column).at}</mark>
                 {splitAtColumn(text, shownProblem.column).after}
               </span>
               <span className="block">{t("devmodel.query.errorAt", { column: shownProblem.column, message: shownProblem.message })}</span>

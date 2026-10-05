@@ -142,7 +142,7 @@ export function ScriptEditor({ script, canWrite, canForce, recent, recentFailed,
           {(script.bindings ?? []).map((b) => (
             <Badge key={`${b.targetType}:${b.targetId}`} tone="neutral">{`${b.targetType} ${b.name ?? b.targetId}`}</Badge>
           ))}
-          <span className={tooLarge ? "ml-auto text-[12px] text-bad" : "ml-auto text-[12px] text-muted"}>
+          <span className={tooLarge ? "ml-auto text-[12px] text-bad-ink" : "ml-auto text-[12px] text-muted"}>
             {tooLarge ? t("scripts.editor.tooLarge") : t("scripts.editor.size", { kb: (byteSize(code) / 1024).toFixed(1) })}
           </span>
           {canWrite && (
@@ -300,7 +300,7 @@ function DeployDialog({
     <Dialog title={t("scripts.deploy.title")} open onClose={onClose}>
       <p className="text-[13px]">{t("scripts.deploy.target", { n: draft.versionNo })}</p>
       <p className="text-[13px]">
-        {t("scripts.deploy.check")}: <span className={hasErrors ? "text-bad" : "text-good"}>{hasErrors ? `✖ ${t("scripts.deploy.checkFail")}` : `✔ ${t("scripts.deploy.checkOk")}`}</span>
+        {t("scripts.deploy.check")}: <span className={hasErrors ? "text-bad-ink" : "text-good-ink"}>{hasErrors ? `✖ ${t("scripts.deploy.checkFail")}` : `✔ ${t("scripts.deploy.checkOk")}`}</span>
       </p>
       <p className="text-[12.5px] text-muted">{t("scripts.deploy.impact", { bindings: script.bindings?.length ?? 0, processed })}</p>
       {casesState !== "idle" && (
@@ -313,7 +313,7 @@ function DeployDialog({
           ) : (cases?.passed ?? 0) + (cases?.failed ?? 0) === 0 ? (
             <span className="text-muted">{t("scripts.deploy.noCases")}</span>
           ) : (
-            <span className={casesFailed ? "text-bad" : "text-good"}>{`${casesFailed ? "✖" : "✔"} ${t("scripts.cases.runSummary", { passed: cases?.passed ?? 0, total: (cases?.passed ?? 0) + (cases?.failed ?? 0) })}`}</span>
+            <span className={casesFailed ? "text-bad-ink" : "text-good-ink"}>{`${casesFailed ? "✖" : "✔"} ${t("scripts.cases.runSummary", { passed: cases?.passed ?? 0, total: (cases?.passed ?? 0) + (cases?.failed ?? 0) })}`}</span>
           )}
           {casesFailed && (
             <ul className="mt-1">
@@ -323,7 +323,7 @@ function DeployDialog({
                   <li key={r.caseId}>
                     <span className="font-semibold">{r.name ?? r.caseId}</span>
                     <CaseDiff diff={r.diff} />
-                    {r.error?.message && <p className="text-[12px] text-bad">{r.error.message}</p>}
+                    {r.error?.message && <p className="text-[12px] text-bad-ink">{r.error.message}</p>}
                   </li>
                 ))}
             </ul>

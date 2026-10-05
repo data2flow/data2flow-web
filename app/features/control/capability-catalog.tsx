@@ -233,7 +233,7 @@ export function CapabilityCatalog({ initial, failed, canManage, api = controlAdm
             <div>
               <TextArea label={t("control.capabilities.json")} value={editor.text} rows={18} onChange={(e) => setEditor({ ...editor, text: e.target.value })} />
               {parsed && parsed.problems.length > 0 && (
-                <ul role="alert" className="mt-1 text-[12.5px] text-bad">
+                <ul role="alert" className="mt-1 text-[12.5px] text-bad-ink">
                   {parsed.problems.map((p) => (
                     <li key={p}>{p === "CAPABILITY_NAME_RESERVED" ? t("errors.CAPABILITY_NAME_RESERVED") : t(`control.capabilities.problems.${p}`)}</li>
                   ))}

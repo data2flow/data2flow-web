@@ -155,7 +155,7 @@ export function BulkControlDialog({
                     }}
                   />
                   {problem && (
-                    <p role="alert" className="text-[12px] text-bad">
+                    <p role="alert" className="text-[12px] text-bad-ink">
                       {t("control.validation.range", { min: range.min ?? "", max: range.max ?? "", unit: range.unit ?? "" })}
                     </p>
                   )}
@@ -179,7 +179,7 @@ export function BulkControlDialog({
                     <td className="font-mono">
                       {d.willChange ? stateText(d.target) : t("control.scenes.noChange")}
                       {(d.warnings ?? []).map((w) => (
-                        <span key={w} className="ml-1 text-warn">
+                        <span key={w} className="ml-1 text-fair-ink">
                           ⚠ {t(`control.reason.${w}`, { defaultValue: w })}
                         </span>
                       ))}

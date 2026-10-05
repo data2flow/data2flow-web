@@ -202,7 +202,7 @@ function PlaceDialog({
           <option value="RUN_ONLY">{t("sim.catalog.RUN_ONLY")}</option>
         </SelectField>
         {result?.error && (
-          <p role="alert" className="text-[12.5px] text-bad">
+          <p role="alert" className="text-[12.5px] text-bad-ink">
             {placementError(t, result.error, remaining)}
           </p>
         )}
@@ -263,7 +263,7 @@ function KitDialog({ kit, spaces, result, idempotencyKey, onClose }: { kit: SimK
           </tbody>
         </Table>
         {result?.error && (
-          <p role="alert" className="text-[12.5px] text-bad">
+          <p role="alert" className="text-[12.5px] text-bad-ink">
             {simErrorText(t, result.error)}
           </p>
         )}

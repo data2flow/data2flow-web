@@ -8,10 +8,10 @@ import { formatDateTime } from "~/lib/format";
 import type { Problem } from "../model/sim";
 import type { RunStatus } from "../model/types";
 
-/** 가상 표시 배지(보라). 색 토큰이 없어 라이트·다크 모두 읽히는 보라를 직접 쓴다 */
+/** 가상 표시 배지(보라, 토큰 virt) */
 export function VirtualBadge() {
   const { t } = useTranslation();
-  return <span className="inline-flex items-center rounded border border-[#7c5cd6]/40 bg-[#7c5cd6]/10 px-1.5 py-0.5 text-[11.5px] font-medium text-[#7c5cd6]">{t("sim.virtual")}</span>;
+  return <Badge tone="virtual">{t("sim.virtual")}</Badge>;
 }
 
 export type SimArea = "home" | "catalog" | "profiles" | "spaces" | "scenarios" | "replay";
@@ -26,7 +26,7 @@ export function SimAreaTabs({ current }: { current: SimArea }) {
     { key: "scenarios", to: "/sim/scenarios" },
     { key: "replay", to: "/sim/replay" },
   ];
-  return <Tabs current={current} items={items.map((i) => ({ key: i.key, label: t(`sim.area.${i.key}`), to: i.to }))} />;
+  return <Tabs section current={current} items={items.map((i) => ({ key: i.key, label: t(`sim.area.${i.key}`), to: i.to }))} />;
 }
 
 const STATUS_TONE: Record<RunStatus, "info" | "success" | "warning" | "danger" | "neutral"> = {

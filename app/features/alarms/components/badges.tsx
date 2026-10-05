@@ -6,14 +6,15 @@ import { useTranslation } from "react-i18next";
 import { Badge, StatusDot } from "~/components/ui";
 import type { Alarm, AlarmStatus, Severity } from "../model/alarms";
 
-const SEVERITY_TONE: Record<Severity, "bad" | "warn" | "accent" | "muted"> = { CRITICAL: "bad", MAJOR: "bad", MINOR: "warn", WARNING: "warn", INFO: "accent" };
+// 목업 심각도 색: 위험=bad, 주요=poor, 경미·경고=fair, 정보=회색(storyboards 06-alarm)
+const SEVERITY_TONE: Record<Severity, "bad" | "poor" | "fair" | "muted"> = { CRITICAL: "bad", MAJOR: "poor", MINOR: "fair", WARNING: "fair", INFO: "muted" };
 const STATUS_TONE: Record<AlarmStatus, "danger" | "warning" | "info" | "success" | "neutral"> = { ACTIVE: "danger", ACKNOWLEDGED: "warning", SUPPRESSED: "neutral", CLEARED: "success" };
 
 export function SeverityBadge({ severity, short = false }: { severity: Severity | string; short?: boolean }) {
   const { t } = useTranslation();
   const tone = SEVERITY_TONE[severity as Severity] ?? "muted";
   return (
-    <span className={severity === "CRITICAL" ? "font-semibold text-bad" : undefined} data-severity={severity}>
+    <span className={severity === "CRITICAL" ? "font-semibold text-bad-ink" : undefined} data-severity={severity}>
       <StatusDot tone={tone} label={short ? t(`alarms.severityShort.${severity}`, { defaultValue: severity }) : t(`alarms.severity.${severity}`, { defaultValue: severity })} />
     </span>
   );

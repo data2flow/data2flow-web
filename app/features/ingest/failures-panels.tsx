@@ -49,7 +49,7 @@ export function ReprocessResultPanel({ result }: { result: ReprocessResult }) {
 export function SelectionNotice({ count }: { count: number }) {
   const { t } = useTranslation();
   const problem = reprocessProblem(count);
-  if (problem === "tooMany") return <p role="alert" className="text-[12.5px] text-bad">{t("ingest.failures.tooMany", { max: MAX_REPROCESS.toLocaleString("en-US") })}</p>;
+  if (problem === "tooMany") return <p role="alert" className="text-[12.5px] text-bad-ink">{t("ingest.failures.tooMany", { max: MAX_REPROCESS.toLocaleString("en-US") })}</p>;
   return <span className="text-[12.5px] text-muted">{t("common.selectedCount", { n: count })}</span>;
 }
 
@@ -115,7 +115,7 @@ export function RawMessagePanel({ rawMessageId, timezone, onClose, load = defaul
             <dd className="font-mono">{result.data.topic ?? "–"}</dd>
             <dt className="text-muted">{t("ingest.raw.status")}</dt>
             <dd>
-              {result.data.status} {result.data.errorCode && <span className="font-mono text-bad">{result.data.errorCode}</span>} {detailText(result.data.errorDetail)}
+              {result.data.status} {result.data.errorCode && <span className="font-mono text-bad-ink">{result.data.errorCode}</span>} {detailText(result.data.errorDetail)}
             </dd>
           </dl>
           {traceSteps(result.data.trace).length > 0 && (

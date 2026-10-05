@@ -128,7 +128,7 @@ export function RunPanel({ run, title, spaceNames, actuatorNames, targets, canRu
           </div>
         )}
         {error && (
-          <p role="alert" className="mt-2 text-[12.5px] text-bad">
+          <p role="alert" className="mt-2 text-[12.5px] text-bad-ink">
             {error}
           </p>
         )}

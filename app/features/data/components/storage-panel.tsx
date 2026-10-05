@@ -35,10 +35,10 @@ export function StoragePanel({ metrics, timezone, lang, chartFactory }: { metric
             <>
               <div className="flex items-center gap-2">
                 <meter aria-label={t("data.storage.diskFree")} className="w-full" min={0} max={100} low={DISK_WARN_PERCENT} optimum={100} value={metrics.diskFreePercent ?? 0} />
-                <span className={cx("font-mono text-[15px]", level === "warn" && "text-bad")}>{`${formatNumber(metrics.diskFreePercent ?? 0, lang, { precision: 0 })}%`}</span>
+                <span className={cx("font-mono text-[15px]", level === "warn" && "text-bad-ink")}>{`${formatNumber(metrics.diskFreePercent ?? 0, lang, { precision: 0 })}%`}</span>
               </div>
               {level === "warn" && (
-                <p role="alert" className="mt-1 text-[12.5px] text-bad">
+                <p role="alert" className="mt-1 text-[12.5px] text-bad-ink">
                   {`⚠ ${t("data.storage.diskWarn", { n: DISK_WARN_PERCENT })}`}
                 </p>
               )}

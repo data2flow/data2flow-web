@@ -57,7 +57,7 @@ export function RuleEditorPage({ data, actionData, api = rulesApi }: { data: Rul
   const warnings = (data.warnings ?? []).map((w) => t(`rules.warnings.${w}`, { defaultValue: w }));
   return (
     <>
-      {data.saved && <p role="status" className="mb-3 rounded-md border border-good/30 bg-good-soft px-3 py-2 text-[13px] text-good">{t("common.saved")}</p>}
+      {data.saved && <p role="status" className="mb-3 rounded-md border border-good/30 bg-good-soft px-3 py-2 text-[13px] text-good-ink">{t("common.saved")}</p>}
       <RuleEditor
         key={`${rule?.ruleId ?? "new"}:${rule?.version ?? 0}`}
         initial={initial}

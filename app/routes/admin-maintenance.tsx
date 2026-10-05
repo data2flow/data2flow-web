@@ -130,7 +130,7 @@ function CreateForm({ spaces, devices, errors, timezone, idempotencyKey }: { spa
           {endMode === "at" && <TextField label={t("ops.maintenance.endAt")} name="endsAt" type="datetime-local" />}
         </fieldset>
       </div>
-      {err("range") && <p className="text-[12.5px] text-bad">{err("range")}</p>}
+      {err("range") && <p className="text-[12.5px] text-bad-ink">{err("range")}</p>}
       <div className="flex flex-wrap gap-4">
         <Checkbox label={t("ops.maintenance.pauseAutomation")} name="pauseAutomation" defaultChecked />
         <Checkbox label={t("ops.maintenance.excludeFromAnalytics")} name="excludeFromAnalytics" defaultChecked />

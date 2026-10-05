@@ -132,7 +132,7 @@ function NewSnapshotForm({ flows, result }: { flows: FlowOption[]; result?: Acti
             </label>
           ))}
           {errors?.flowIds && (
-            <p role="alert" className="text-[12px] text-bad">
+            <p role="alert" className="text-[12px] text-bad-ink">
               {t(`flowops.snapshots.errors.flowIds.${errors.flowIds}`)}
             </p>
           )}

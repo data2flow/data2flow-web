@@ -36,7 +36,7 @@ export default function Sites() {
   return (
     <>
       <PageHeader title={t("sites.title")} crumb={t("nav.spaces")} actions={sites.length > 0 && <SiteViewToggle view={view} />} />
-      <Tabs current="sites" items={[{ key: "spaces", label: t("nav.spaces"), to: "/spaces" }, { key: "sites", label: t("sites.title"), to: "/sites" }, { key: "calendar", label: t("calendar.title"), to: "/calendar" }]} />
+      <Tabs section current="sites" items={[{ key: "spaces", label: t("nav.spaces"), to: "/spaces" }, { key: "sites", label: t("sites.title"), to: "/sites" }, { key: "calendar", label: t("calendar.title"), to: "/calendar" }]} />
       {error && <Alert tone="danger">{t(`errors.${error}`, { defaultValue: t("errors.UNKNOWN") })}</Alert>}
       {!error && sites.length === 0 && <EmptyState title={t("sites.empty")} action={<Link className="text-accent underline" to="/spaces">{t("sites.goSpaces")}</Link>} />}
       {sites.length > 0 && view === "map" && (

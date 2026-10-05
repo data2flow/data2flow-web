@@ -48,7 +48,7 @@ export default function Share({ loaderData }: Route.ComponentProps) {
       <header className="flex flex-wrap items-center gap-3 border-b border-line bg-panel px-4 py-2">
         {logo ? <img src={logo} alt="" className="h-6" /> : <Logo to="#" />}
         <h1 className="text-[15px] font-semibold">{d.name}</h1>
-        <p role="note" className="ml-auto rounded bg-warn-soft px-2 py-0.5 text-[12px] text-warn">
+        <p role="note" className="ml-auto rounded bg-fair-soft px-2 py-0.5 text-[12px] text-fair-ink">
           {t("dashboards.shareView.banner", { date: formatDateTime(shared.expiresAt, timezone, i18n.language) })}
         </p>
       </header>

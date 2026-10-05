@@ -204,7 +204,7 @@ function WidgetSettings({ widget, info, variables, targetOptions, errors, onChan
       {info && info.targetRule.max > 0 && (
         <fieldset className="flex flex-col gap-2">
           <legend className="font-semibold">{t("dashboards.fields.targets", { min: info.targetRule.min, max })}</legend>
-          {errors.includes("targets") && <p className="text-bad">{t("dashboards.errors.targetCount", { min: info.targetRule.min, max })}</p>}
+          {errors.includes("targets") && <p className="text-bad-ink">{t("dashboards.errors.targetCount", { min: info.targetRule.min, max })}</p>}
           {targets.map((target, i) => {
             const idField = idFieldOf(target.kind);
             const listId = `${widget.id}-t${i}-${idField}`;

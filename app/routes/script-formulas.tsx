@@ -51,7 +51,7 @@ export default function ScriptFormulas({ loaderData }: Route.ComponentProps) {
       <PageHeader crumb={t("scripts.crumb")} title={t("scripts.formulas.title")} />
       <IngestAreaTabs current="scripts" />
       <ScriptAreaTabs current="formulas" />
-      {loaderData.failed && <p className="mb-2 text-[12.5px] text-warn">{t("scripts.formulas.loadFailed")}</p>}
+      {loaderData.failed && <p className="mb-2 text-[12.5px] text-fair-ink">{t("scripts.formulas.loadFailed")}</p>}
       <FormulaEditor
         formulas={loaderData.formulas}
         targets={loaderData.targets}

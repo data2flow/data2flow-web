@@ -35,11 +35,11 @@ describe("TC-DEV-237 목록", () => {
     expect(screen.getByRole("link", { name: "마감 임박 (1)" })).toHaveAttribute("href", "/work-orders?view=dueSoon&spaceId=31");
     expect(screen.getByTestId("work-order-stats")).toHaveTextContent("열린 3 · 지연 1 · 평균 처리 6.3시간");
     const rows = screen.getAllByRole("row");
-    expect(within(rows[1]).getByText(/지연/).className).toContain("text-bad");
+    expect(within(rows[1]).getByText(/지연/).className).toContain("text-bad-ink");
     expect(within(rows[1]).getByText("AM107-067999")).toBeInTheDocument();
     expect(within(rows[2]).getByText("기기 2대")).toBeInTheDocument();
     expect(within(rows[2]).getByText("미배정")).toBeInTheDocument();
-    expect(within(rows[2]).getByText(/2026/).className).toContain("text-warn");
+    expect(within(rows[2]).getByText(/2026/).className).toContain("text-fair-ink");
     expect(within(rows[3]).getByText("공간 1곳")).toBeInTheDocument();
   });
 

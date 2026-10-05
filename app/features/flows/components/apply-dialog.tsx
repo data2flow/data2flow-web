@@ -71,7 +71,7 @@ export function ApplyDialog({
     >
       <p className="text-[13px]">{t("flows.apply.counts", { errors: result.errors.length, warnings: result.warnings.length })}</p>
       {result.errors.length > 0 && (
-        <ul aria-label={t("flows.apply.errors")} className="flex flex-col gap-1 text-[12.5px] text-bad">
+        <ul aria-label={t("flows.apply.errors")} className="flex flex-col gap-1 text-[12.5px] text-bad-ink">
           {result.errors.map((issue, i) => (
             <li key={`e${i}`}>
               <button type="button" className="text-left underline-offset-2 hover:underline" onClick={() => issueNodeIds(issue)[0] && onFocusNode(issueNodeIds(issue)[0])}>
@@ -82,7 +82,7 @@ export function ApplyDialog({
         </ul>
       )}
       {result.warnings.length > 0 && (
-        <ul aria-label={t("flows.apply.warnings")} className="flex flex-col gap-1 text-[12.5px] text-warn">
+        <ul aria-label={t("flows.apply.warnings")} className="flex flex-col gap-1 text-[12.5px] text-fair-ink">
           {result.warnings.map((issue, i) => (
             <li key={`w${i}`}>{issueText(t, issue, nameOf)}</li>
           ))}
@@ -119,8 +119,8 @@ export function ApplyDialog({
       )}
       {result.approvalRequired && <Alert tone="info">{t("flows.apply.approvalRequired")}</Alert>}
       {risky && (
-        <div className="flex flex-col gap-1 rounded-md border border-warn/40 p-2">
-          <p className="text-[12.5px] text-warn">{result.risky?.controlNodesChanged ? t("flows.apply.riskControl") : t("flows.apply.riskMode")}</p>
+        <div className="flex flex-col gap-1 rounded-md border border-fair/40 p-2">
+          <p className="text-[12.5px] text-fair-ink">{result.risky?.controlNodesChanged ? t("flows.apply.riskControl") : t("flows.apply.riskMode")}</p>
           <Checkbox label={t("flows.apply.acknowledge")} checked={ack} onChange={(e) => setAck(e.target.checked)} />
         </div>
       )}

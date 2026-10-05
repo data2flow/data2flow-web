@@ -23,6 +23,9 @@
   },
   "nav": {
     "label": "メインメニュー",
+    "section": "メニュー",
+    "more": "その他",
+    "openMenu": "メニューを開く",
     "home": "ホーム",
     "admin": "管理",
     "members": "メンバー",

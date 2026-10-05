@@ -158,7 +158,7 @@ export default function DevicesNew({ loaderData, actionData }: Route.ComponentPr
                   </option>
                 ))}
               </SelectField>
-              {mismatch && <p className="mt-1 text-[12px] text-warn">{t("devices.new.kindMismatch")}</p>}
+              {mismatch && <p className="mt-1 text-[12px] text-fair-ink">{t("devices.new.kindMismatch")}</p>}
             </div>
             <SpaceSelect spaces={spaces} label={t("devices.space")} name="spaceId" defaultValue={values?.spaceId ?? ""} error={err("spaceId")} />
             <TextField label={t("devices.new.interval")} name="expectedIntervalSec" type="number" defaultValue={values?.expectedIntervalSec ?? ""} error={err("expectedIntervalSec")} hint={t("devices.new.intervalHint")} />
@@ -206,7 +206,7 @@ function ImportPanel({ result }: { result?: ActionResult }) {
             </label>
             <input id="device-csv" type="file" name="file" accept=".csv,text/csv" />
             {result?.fieldErrors?.file && (
-              <p role="alert" className="text-[12px] text-bad">
+              <p role="alert" className="text-[12px] text-bad-ink">
                 {t("devices.errors.fileRequired")}
               </p>
             )}

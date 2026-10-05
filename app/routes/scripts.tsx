@@ -135,7 +135,7 @@ export default function Scripts({ loaderData, actionData }: Route.ComponentProps
       />
       <IngestAreaTabs current="scripts" />
       <ScriptAreaTabs current="scripts" />
-      {quotaReached && canWrite && <p className="mb-2 text-[12.5px] text-warn">{t("scripts.quotaReached")}</p>}
+      {quotaReached && canWrite && <p className="mb-2 text-[12.5px] text-fair-ink">{t("scripts.quotaReached")}</p>}
       {dialogOpen && (
         <CreateScriptDialog
           open
@@ -221,7 +221,7 @@ export default function Scripts({ loaderData, actionData }: Route.ComponentProps
                     <td className="font-mono">{s.activeVersion ? `v${s.activeVersion}` : "–"}</td>
                     <td>{s.hasDraft && <span title={t("scripts.hasDraft")} aria-label={t("scripts.hasDraft")} className="text-accent">●</span>}</td>
                     <td className="font-mono">{s.stats24h?.processed == null ? "–" : s.stats24h.processed.toLocaleString(i18n.language)}</td>
-                    <td className={isHighErrorRate(rate) ? "font-mono text-bad" : "font-mono"}>{rate == null ? "–" : `${(rate * 100).toFixed(1)}%`}</td>
+                    <td className={isHighErrorRate(rate) ? "font-mono text-bad-ink" : "font-mono"}>{rate == null ? "–" : `${(rate * 100).toFixed(1)}%`}</td>
                     <td className="font-mono">
                       {s.stats24h?.p95Ms ?? "–"}
                       {isSlow(s.stats24h?.p95Ms) && (

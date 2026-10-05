@@ -8,6 +8,7 @@ import { bff } from "~/bff/middleware.server";
 import { guardUser } from "~/bff/user.server";
 import { MobileShell } from "~/features/field/components/mobile";
 import { onLogout } from "~/lib/session-broadcast";
+import { LIGHT_TOKENS } from "~/lib/tokens";
 import type { Route } from "./+types/m-layout";
 
 export const middleware: Route.MiddlewareFunction[] = [
@@ -18,7 +19,7 @@ export const middleware: Route.MiddlewareFunction[] = [
 ];
 
 export function meta() {
-  return [{ title: "data2flow" }, { name: "theme-color", content: "#2563eb" }];
+  return [{ title: "data2flow" }, { name: "theme-color", content: LIGHT_TOKENS.accent }];
 }
 
 export default function MobileLayout() {

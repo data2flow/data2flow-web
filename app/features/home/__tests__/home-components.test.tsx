@@ -75,7 +75,7 @@ describe("[DSH-01.01][AT-DSH-01.1] 홈 요약 카드", () => {
     const critical = (await screen.findByText("위험", { exact: false, selector: ".sr-only" })).parentElement!;
     expect(critical).toHaveAttribute("data-severity", "critical");
     expect(critical).toHaveTextContent("▲1 위험");
-    expect(critical).toHaveClass("text-bad");
+    expect(critical).toHaveClass("text-bad-ink");
     expect(document.querySelector('[data-severity="major"]')).toHaveTextContent("!3 주요");
     expect(screen.getByText("4").closest("a")).toHaveAttribute("href", "/alarms?state=ACTIVE");
     expect(screen.getByText("2대").closest("a")).toHaveAttribute("href", "/devices?connectivity=OFFLINE");

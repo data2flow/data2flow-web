@@ -287,7 +287,7 @@ function CapabilityCard({
                   <span className="font-mono">{fmtValue(reported, range.unit)}</span>
                 )}
                 {problem && (
-                  <p role="alert" className="mt-1 text-[12.5px] text-bad">
+                  <p role="alert" className="mt-1 text-[12.5px] text-bad-ink">
                     {problem.kind === "range" ? t("control.validation.range", { min: range.min ?? "", max: range.max ?? "", unit: range.unit ?? "" }) : problem.kind === "enum" ? t("control.validation.enum") : t("control.validation.type")}
                   </p>
                 )}
@@ -414,7 +414,7 @@ export function CommandProgress({ command, expectedAt }: { command: Pick<Tracked
   if (progress.failed) {
     const reason = command.status === "TIMEOUT" ? t("control.panel.timeout") : command.reason ? (t(`errors.${command.reason}`, { defaultValue: "" }) || command.reason) : undefined;
     return (
-      <span role="status" aria-label={t("control.panel.progressLabel", { status: statusText })} className="text-[12.5px] text-bad">
+      <span role="status" aria-label={t("control.panel.progressLabel", { status: statusText })} className="text-[12.5px] text-bad-ink">
         {statusText}
         {reason && ` — ${reason}`}
       </span>
@@ -423,7 +423,7 @@ export function CommandProgress({ command, expectedAt }: { command: Pick<Tracked
   return (
     <span role="status" aria-label={t("control.panel.progressLabel", { status: statusText })} className="inline-flex flex-wrap items-center gap-2 text-[12.5px]">
       {PROGRESS_STEPS.map((step, index) => (
-        <span key={step} className={index < progress.done ? "text-good" : "text-muted"}>
+        <span key={step} className={index < progress.done ? "text-good-ink" : "text-muted"}>
           {index < progress.done ? "✓" : "○"} {t(`control.step.${step}`)}
         </span>
       ))}

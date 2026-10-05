@@ -38,7 +38,7 @@ export default function Kiosk({ loaderData }: Route.ComponentProps) {
   if (errors.length) {
     return (
       <main className="mx-auto max-w-lg p-6">
-        <div role="alert" className="rounded-md border border-bad/30 bg-bad-soft px-3 py-2 text-[13px] text-bad">
+        <div role="alert" className="rounded-md border border-bad/30 bg-bad-soft px-3 py-2 text-[13px] text-bad-ink">
           {errors.includes("BOARDS") && <p>{t("dashboards.kiosk.boardsInvalid", { max: MAX_BOARDS })}</p>}
           {errors.includes("INTERVAL") && <p>{t("dashboards.kiosk.intervalInvalid", { min: MIN_INTERVAL, max: MAX_INTERVAL })}</p>}
         </div>

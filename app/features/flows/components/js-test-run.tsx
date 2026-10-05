@@ -62,7 +62,7 @@ export function JsTestRun({ nodeId, code, runner }: { nodeId: string; code: stri
       <legend className="text-[12.5px] font-medium text-muted">{t("flows.jsTest.title")}</legend>
       <TextArea label={t("flows.jsTest.message")} rows={6} className="font-mono text-[11px]" value={text} onChange={(e) => setText(e.target.value)} />
       {!runner && <p className="text-[11.5px] text-muted">{t("flows.jsTest.saveFirst")}</p>}
-      {tooLarge && <p className="text-[11.5px] text-bad">{t("flows.jsTest.tooLarge", { max: JS_CODE_LIMIT_BYTES })}</p>}
+      {tooLarge && <p className="text-[11.5px] text-bad-ink">{t("flows.jsTest.tooLarge", { max: JS_CODE_LIMIT_BYTES })}</p>}
       <div>
         <Button onClick={() => void run()} disabled={!runner || busy || tooLarge}>
           {busy ? t("common.processing") : t("flows.jsTest.run")}
@@ -70,7 +70,7 @@ export function JsTestRun({ nodeId, code, runner }: { nodeId: string; code: stri
       </div>
       {error && <Alert tone="danger">{error}</Alert>}
       {failure && (
-        <p role="alert" className="text-[12px] text-bad">
+        <p role="alert" className="text-[12px] text-bad-ink">
           {t("flows.trace.error", { code: failure.code ?? failure.errorType ?? "SCRIPT_ERROR", message: failure.message ?? "" })}
           {failure.line !== undefined ? ` ${t("flows.trace.line", { line: failure.line })}` : ""}
         </p>

@@ -126,12 +126,12 @@ export function JobWizard({ deviceIds, groups, models, spaces, canControl, api =
             )}
           </div>
           {submitted && problems.includes("targetEmpty") && (
-            <p role="alert" className="mt-1 text-[12.5px] text-bad">
+            <p role="alert" className="mt-1 text-[12.5px] text-bad-ink">
               {t("devices.jobs.targetEmpty")}
             </p>
           )}
           {problems.includes("targetLimit") && (
-            <p role="alert" className="mt-1 text-[12.5px] text-bad">
+            <p role="alert" className="mt-1 text-[12.5px] text-bad-ink">
               {t("devices.jobs.targetLimit")}
             </p>
           )}

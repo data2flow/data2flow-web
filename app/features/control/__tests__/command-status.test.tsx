@@ -28,7 +28,7 @@ async function applyCooling(api = fakeApi()) {
 const steps = () =>
   screen
     .getByRole("status", { name: /^명령 상태/ })
-    .querySelectorAll("span.text-good").length;
+    .querySelectorAll("span.text-good-ink").length;
 
 describe("TC-ACT-085 AT-ACT-01.6 명령 상태 실시간 표시(ACT-04.02)", () => {
   it("REQUESTED→SENT→ACKED→APPLIED 순서로 진행, 뒤늦은 SENT는 무시, APPLIED면 섀도를 다시 읽는다(가상 에어컨 냉방 24℃)", async () => {

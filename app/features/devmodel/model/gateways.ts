@@ -2,6 +2,7 @@
  * UI-DEV-10 게이트웨이(DEV-05.01~03). 목록 API-DEV-60, 수신 분포 API-DEV-61(DEV-05.02: 게이트웨이별 수신 기기 수, 기기별 평균 rssi·snr·최적 경로 비율,
  * rssi 분포), 수정 API-DEV-62(이름·공간·오프라인 기준 60~86400초). 필드는 core GatewayDtos.
  */
+import { LIGHT_TOKENS } from "~/lib/tokens";
 
 export interface Gateway {
   id: string;
@@ -54,7 +55,8 @@ export function checkGatewayInput(input: { name: string; offlineAfterSec: string
   return errors;
 }
 
-const PALETTE = { bar: "#2f6fde", hist: "#7a52c7" };
+/** 막대 색: 강조 파랑(업링크), AI·분포 보조색(RSSI 분포). 차트 캔버스라 토큰 값을 직접 쓴다 */
+const PALETTE = { bar: LIGHT_TOKENS.accent, hist: LIGHT_TOKENS.ai2 };
 
 /** 시간대별 업링크 막대(UI-DEV-10 상세) */
 export function uplinkChartOption(stats: Pick<GatewayStats, "uplinksByHour">, labels: { uplinks: string }, formatHour: (iso: string) => string): Record<string, unknown> {

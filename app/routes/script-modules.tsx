@@ -52,7 +52,7 @@ export default function ScriptModules({ loaderData }: Route.ComponentProps) {
         <CreateModuleDialog open onClose={() => navigate("/scripts/modules")} onCreated={(m) => navigate(`/scripts/modules/${encodeURIComponent(m.id)}`)} api={moduleApi} />
       )}
       <Card>
-        {loaderData.failed && <p className="mb-2 text-[12.5px] text-warn">{t("scripts.modules.loadFailed")}</p>}
+        {loaderData.failed && <p className="mb-2 text-[12.5px] text-fair-ink">{t("scripts.modules.loadFailed")}</p>}
         {modules.length === 0 ? (
           <EmptyState title={t("scripts.modules.empty")} body={t("scripts.modules.emptyBody")} />
         ) : (

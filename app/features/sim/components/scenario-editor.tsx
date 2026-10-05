@@ -130,7 +130,7 @@ export function ScenarioEditor({ initial, spaces, devices, canEdit, canRun, api,
         title={t("sim.scenario.header")}
         actions={
           <>
-            {state.dirty && <span className="text-[12px] text-warn">{t("sim.scenario.unsaved")}</span>}
+            {state.dirty && <span className="text-[12px] text-fair-ink">{t("sim.scenario.unsaved")}</span>}
             {canEdit && (
               <Button variant="primary" onClick={save} disabled={saving}>
                 {t("common.save")}
@@ -184,7 +184,7 @@ export function ScenarioEditor({ initial, spaces, devices, canEdit, canRun, api,
             </label>
           ))}
           {problems.spaceIds && (
-            <p role="alert" className="text-[12px] text-bad">
+            <p role="alert" className="text-[12px] text-bad-ink">
               {problemText(problems.spaceIds)}
             </p>
           )}
@@ -234,7 +234,7 @@ export function ScenarioEditor({ initial, spaces, devices, canEdit, canRun, api,
                         onPointerDown={(ev) => onPointerDown(ev, e.id, "move")}
                         className={cx(
                           "absolute top-1 flex h-6 cursor-grab items-center overflow-hidden rounded border px-1 text-[11px]",
-                          problem ? "border-bad bg-bad-soft text-bad" : "border-accent/40 bg-accent-soft text-accent",
+                          problem ? "border-bad bg-bad-soft text-bad-ink" : "border-accent/40 bg-accent-soft text-accent",
                           e.id === state.selectedId && "ring-2 ring-accent",
                         )}
                         style={{ left: pct(e.atSec), width }}
@@ -467,7 +467,7 @@ export function RunOptionsDialog({ scenarioId, api, navigate, onClose, defaultAc
       </SelectField>
       <TextField label={t("sim.scenario.seed")} inputMode="numeric" value={seed} onChange={(e) => setSeed(e.target.value)} hint={t("sim.scenario.seedHint")} />
       {error && (
-        <p role="alert" className="text-[12.5px] text-bad">
+        <p role="alert" className="text-[12.5px] text-bad-ink">
           {error}
         </p>
       )}

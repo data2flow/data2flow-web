@@ -67,7 +67,7 @@ describe("기기 하위 탭과 상태 표시", () => {
     expect(await screen.findByText("승인 대기")).toBeInTheDocument();
     expect(screen.getByText("알 수 없음")).toBeInTheDocument();
     expect(screen.getByLabelText("배터리 1%")).toBeInTheDocument();
-    expect(screen.getByText("1%")).toHaveClass("text-bad");
+    expect(screen.getByText("1%")).toHaveClass("text-bad-ink");
     expect(screen.getByText("61℃")).toBeInTheDocument();
     expect(screen.getByText("품질 1")).toBeInTheDocument();
   });

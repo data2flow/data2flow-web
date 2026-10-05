@@ -143,7 +143,7 @@ export default function SourcesContextSite({ loaderData, actionData }: Route.Com
               {usage.map((u) => (
                 <div key={u.type}>
                   <UsageBars title={t(`context.type.${u.type}`)} days={u.days} today={today} lang={i18n.language} />
-                  {u.failed && <p className="text-[12px] text-warn">{t("context.usageFailed")}</p>}
+                  {u.failed && <p className="text-[12px] text-fair-ink">{t("context.usageFailed")}</p>}
                 </div>
               ))}
             </div>

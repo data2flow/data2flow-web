@@ -248,7 +248,7 @@ function PipelineEditor({ pipeline, values, errors }: { pipeline: Pipeline | nul
                 <tr key={i}>
                   <td>
                     <input name={`${p}key`} defaultValue={stage?.key ?? ""} aria-label={t("flowops.pipelines.stageKeyOf", { n: i + 1 })} aria-invalid={Boolean(e?.key)} className="w-28 rounded-md border border-line bg-panel px-2 py-1 text-[13px] aria-[invalid=true]:border-bad" />
-                    {e?.key && <p className="text-[12px] text-bad">{t(`flowops.pipelines.errors.key.${e.key}`)}</p>}
+                    {e?.key && <p className="text-[12px] text-bad-ink">{t(`flowops.pipelines.errors.key.${e.key}`)}</p>}
                   </td>
                   <td>
                     <select name={`${p}env`} defaultValue={stage?.env ?? "TEST"} aria-label={t("flowops.pipelines.envOf", { n: i + 1 })} className="rounded-md border border-line bg-panel px-2 py-1 text-[13px]">
@@ -287,7 +287,7 @@ function PipelineEditor({ pipeline, values, errors }: { pipeline: Pipeline | nul
                       {t("flowops.pipelines.maxNotifications")}
                       <input name={`${p}maxNotifications`} inputMode="numeric" defaultValue={stage ? String(stage.checks.maxNotifications) : ""} className="w-14 rounded-md border border-line bg-panel px-1 py-0.5" />
                     </label>
-                    {e?.checks && <p className="text-[12px] text-bad">{t("flowops.pipelines.errors.checks")}</p>}
+                    {e?.checks && <p className="text-[12px] text-bad-ink">{t("flowops.pipelines.errors.checks")}</p>}
                   </td>
                 </tr>
               );

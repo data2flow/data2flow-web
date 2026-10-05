@@ -487,7 +487,7 @@ export function FlowEditor(props: FlowEditorProps) {
             className="min-w-56 rounded-md border border-transparent bg-transparent px-1 py-0.5 text-[16px] font-bold hover:border-line focus:border-accent aria-[invalid=true]:border-bad"
           />
           {nameError && (
-            <span role="alert" className="text-[12px] text-bad">
+            <span role="alert" className="text-[12px] text-bad-ink">
               {nameError}
             </span>
           )}
@@ -501,7 +501,7 @@ export function FlowEditor(props: FlowEditorProps) {
         {people.shown.length > 0 ? (
           <span aria-label={t("flows.presence.label")} className="flex items-center gap-1">
             {people.shown.map((p) => (
-              <span key={p.userId} title={p.readOnly ? t("flows.presence.viewer", { name: p.name }) : p.name} className="inline-flex h-6 items-center rounded-full px-2 text-[11px] text-white" style={{ backgroundColor: p.color ?? "#2f6fde" }}>
+              <span key={p.userId} title={p.readOnly ? t("flows.presence.viewer", { name: p.name }) : p.name} className="inline-flex h-6 items-center rounded-full px-2 text-[11px] text-white" style={{ backgroundColor: p.color ?? "var(--d2f-accent)" }}>
                 {p.name}
                 {p.readOnly ? ` (${t("flows.presence.readOnly")})` : ""}
               </span>
@@ -561,7 +561,7 @@ export function FlowEditor(props: FlowEditorProps) {
       )}
       {live.flowStatus && live.flowStatus.status !== flow?.status && <Alert tone={live.flowStatus.status === "DEGRADED" ? "warning" : "info"}>{t("flows.live.statusChanged", { status: t(`flows.status.${live.flowStatus.status}`, { defaultValue: live.flowStatus.status }) })}</Alert>}
       {targetsVirtual && (
-        <div role="status" className="flex flex-wrap items-center gap-2 rounded-md border border-[#7c5cc4]/40 bg-[#7c5cc4]/10 px-3 py-2 text-[13px] text-[#6a4bb5]" /* 고정: 가상 보라 */>
+        <div role="status" className="flex flex-wrap items-center gap-2 rounded-md border border-virt/40 bg-virt-soft px-3 py-2 text-[13px] text-virt-ink">
           <span className="rounded border border-current px-1 text-[11px] font-semibold">{t("flows.editor.virtualBadge")}</span>
           <span>{t("flows.editor.virtualTargets")}</span>
           <Link to="/sim" className="font-medium underline">
@@ -731,18 +731,18 @@ export function FlowEditor(props: FlowEditorProps) {
           )}
           {tab === "validation" &&
             (validation.errors.length + validation.warnings.length === 0 ? (
-              <p className="text-[12.5px] text-good">{t("flows.validation.ok")}</p>
+              <p className="text-[12.5px] text-good-ink">{t("flows.validation.ok")}</p>
             ) : (
               <ul className="flex flex-col gap-1 text-[12.5px]">
                 {validation.errors.map((issue, i) => (
-                  <li key={`e${i}`} className="text-bad">
+                  <li key={`e${i}`} className="text-bad-ink">
                     <button type="button" className="text-left hover:underline" onClick={() => issueNodeIds(issue)[0] && dispatch({ type: "select", ids: issueNodeIds(issue) })}>
                       {t("flows.validation.error")}: {issueText(t, issue, nameOf)}
                     </button>
                   </li>
                 ))}
                 {validation.warnings.map((issue, i) => (
-                  <li key={`w${i}`} className="text-warn">
+                  <li key={`w${i}`} className="text-fair-ink">
                     {t("flows.validation.warning")}: {issueText(t, issue, nameOf)}
                   </li>
                 ))}

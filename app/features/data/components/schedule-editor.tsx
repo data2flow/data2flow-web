@@ -100,7 +100,7 @@ export function ScheduleEditor({ schedule, query, api = defaultDataApi, onSaved,
           <TextField label={t("data.schedule.time")} type="time" value={form.repeat.time} onChange={(e) => set({ repeat: { ...form.repeat, time: e.target.value } })} />
         </div>
         {errors.repeat && (
-          <p role="alert" className="text-[12px] text-bad">
+          <p role="alert" className="text-[12px] text-bad-ink">
             {err("repeat")}
           </p>
         )}
@@ -158,7 +158,7 @@ export function ScheduleEditor({ schedule, query, api = defaultDataApi, onSaved,
             ))}
           </div>
           {errors.target && (
-            <p role="alert" className="text-[12px] text-bad">
+            <p role="alert" className="text-[12px] text-bad-ink">
               {err("target")}
             </p>
           )}
@@ -169,7 +169,7 @@ export function ScheduleEditor({ schedule, query, api = defaultDataApi, onSaved,
           {test && "steps" in test && (
             <ul aria-label={t("data.schedule.testResult")} className="flex flex-col gap-1 text-[12.5px]">
               {test.steps.map((s) => (
-                <li key={s.name} className={s.ok ? "text-good" : "text-bad"}>
+                <li key={s.name} className={s.ok ? "text-good-ink" : "text-bad-ink"}>
                   {`${s.ok ? "✔" : "✖"} ${t(`data.schedule.steps.${s.name}`, { defaultValue: s.name })}${s.detail ? ` — ${s.detail}` : ""}`}
                 </li>
               ))}

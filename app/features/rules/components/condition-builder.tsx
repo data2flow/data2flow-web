@@ -92,7 +92,7 @@ function GroupView({ group, root, metrics, problems, onChange }: { group: Editor
           </Button>
         )}
         {!addAllowed && isRoot && (
-          <p role="status" className="text-[12px] text-warn">
+          <p role="status" className="text-[12px] text-fair-ink">
             {t("rules.cond.limitReached", { n: MAX_CONDITIONS })}
           </p>
         )}
@@ -115,7 +115,7 @@ function MetricSelect({ value, metrics, onChange, error, label, optional }: { va
         ))}
       </select>
       {error && (
-        <span role="alert" className="text-[12px] text-bad">
+        <span role="alert" className="text-[12px] text-bad-ink">
           {error}
         </span>
       )}
@@ -139,7 +139,7 @@ function NumberInput({ label, value, onChange, error, unit, step }: { label: str
         {unit && <span className="text-[12px] text-muted">{unit}</span>}
       </span>
       {error && (
-        <span role="alert" className="text-[12px] text-bad">
+        <span role="alert" className="text-[12px] text-bad-ink">
           {error}
         </span>
       )}
@@ -190,7 +190,7 @@ function LeafView({ leaf, root, metrics, problems, onChange, removable }: { leaf
                 <NumberInput label={t("rules.cond.rangeHigh")} value={leaf.range?.[1]} onChange={(v) => patch({ range: [leaf.range?.[0] as number, v as number] })} unit={unit} />
               </span>
               {err("range") && (
-                <span role="alert" className="text-[12px] text-bad">
+                <span role="alert" className="text-[12px] text-bad-ink">
                   {err("range")}
                 </span>
               )}
