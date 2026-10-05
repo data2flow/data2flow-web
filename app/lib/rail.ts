@@ -74,6 +74,13 @@ export const RAIL: Partial<Record<MenuKey | "admin", RailItem[]>> = {
     { label: "control.area.drivers", path: "/control/drivers" },
     { label: "control.area.capabilities", path: "/control/capabilities" },
   ],
+  // M6 분석(UI-ANA-01·04·06)·MCP 연결(UI-AIA-07)
+  analytics: [
+    { label: "analytics.area.templates", path: "/analytics/templates" },
+    { label: "analytics.area.analyses", path: "/analytics", anyOf: ["ANALYTICS_READ"] },
+    { label: "analytics.area.models", path: "/analytics/models" },
+    { label: "analytics.area.mcp", path: "/ai/mcp" },
+  ],
   sim: [
     { label: "sim.area.home", path: "/sim" },
     { label: "sim.area.catalog", path: "/sim/catalog" },

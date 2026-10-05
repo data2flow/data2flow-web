@@ -327,3 +327,22 @@ describe("UI-SCR-01 새 스크립트 대화상자", () => {
     expect(screen.queryByRole("option", { name: /보정 오프셋/ })).toBeNull();
   });
 });
+
+describe("SCR-03.07 AIA-04.01 편집기 안 AI 작성 도우미(UI-AIA-02)", () => {
+  it("TC-AIA-040 AI_USE면 오른쪽에 도우미 패널, [편집기에 넣기]가 편집기 내용을 바꾸고 저장하지 않은 표시가 켜진다", async () => {
+    const assist = {
+      scriptAssist: vi.fn(async () => ({ ok: true as const, status: 200, data: { assistId: "1", attempt: 1, code: "function decode(input) { return { t: 1 }; }", test: { status: "PASS" as const, durationMs: 0.2 } } })),
+    } as unknown as Parameters<typeof ScriptEditor>[0]["aiAssist"];
+    await renderEditor(fakeApi(), { aiAssist: assist });
+    await userEvent.type(await screen.findByLabelText("요구사항"), "온도 디코드");
+    await userEvent.click(screen.getByRole("button", { name: "초안 만들기" }));
+    await userEvent.click(await screen.findByRole("button", { name: "편집기에 넣기" }));
+    expect(screen.getByLabelText("저장하지 않은 변경 있음")).toBeInTheDocument();
+  });
+
+  it("도우미가 없으면(AI_USE 없음) 패널이 없다", async () => {
+    await renderEditor(fakeApi());
+    await screen.findByRole("button", { name: "배포" });
+    expect(screen.queryByText("AI로 작성")).toBeNull();
+  });
+});

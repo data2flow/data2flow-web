@@ -22,13 +22,13 @@ describe("TC-IAM-008 AT-IAM-01.1 상단 메뉴(IAM-04.05 보조 숨김)", () => 
     await screen.findByText("본문");
     const links = screen.getByRole("navigation", { name: "주 메뉴" }).querySelectorAll("a");
     // 상단은 업무 메뉴 + "관리" 하나(첫 관리 화면으로). 관리 항목은 관리 화면의 왼쪽 막대에 모두 나온다(DSH-07.02 목업 틀)
-    expect([...links].map((a) => a.getAttribute("href"))).toEqual(["/", "/spaces", "/devices", "/explore", "/ingest/monitor", "/alarms", "/automation/flows", "/control/commands", "/sim", "/dashboards", "/admin/members"]);
+    expect([...links].map((a) => a.getAttribute("href"))).toEqual(["/", "/spaces", "/devices", "/explore", "/ingest/monitor", "/alarms", "/automation/flows", "/control/commands", "/sim", "/dashboards", "/analytics/templates", "/admin/members"]);
     expect(screen.getByRole("link", { name: "관리" })).toHaveAttribute("href", "/admin/members");
     expect(screen.getByRole("link", { name: "김운영" })).toHaveAttribute("href", "/me");
     unmount();
     await renderRoute(<AppShell me={meOf("OPERATOR")}>본문</AppShell>, { session: meOf("OPERATOR") });
     await screen.findByText("본문");
-    expect(screen.getByRole("navigation", { name: "주 메뉴" }).querySelectorAll("a")).toHaveLength(11);
+    expect(screen.getByRole("navigation", { name: "주 메뉴" }).querySelectorAll("a")).toHaveLength(12);
     expect(document.querySelector('input[name="_csrf"]')).toHaveValue("csrf-test-token");
   });
 });

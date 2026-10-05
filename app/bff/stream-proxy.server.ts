@@ -2,7 +2,7 @@
  * 실시간 연결 중계 `/bff/stream/**` (design/auth.md §8·§9.2, IAM-07.06, DSH-05.01).
  * 브라우저는 세션 쿠키만으로 `EventSource`를 열고, BFF가 세션의 Access 토큰을 붙여 gateway의 SSE에 연결한 뒤 본문을 그대로 흘려 보낸다.
  * - 허용 목록 경로만 중계한다(실시간 구독 API-DSH-20 `/stream/live`, 소스 원본 메시지 API-DSC-10 `/stream/sources/{id}/live`,
- *   가상 환경 실행 API-SIM-31 `/stream/sim/runs/{id}`, 알람 API-RUL-14 `/stream/alarms`)
+ *   가상 환경 실행 API-SIM-31 `/stream/sim/runs/{id}`, 알람 API-RUL-14 `/stream/alarms`, 분석 실행 상태 API-ANA-16 `/stream/analytics/runs/{id}`)
  * - 공통 이벤트 `ready`(받아들인·거부한 토픽)와 15초 `ping`도 그대로 흘린다
  * - 브라우저가 연결을 끊으면(request.signal) gateway 연결도 끊는다
  * - 연결을 맺기 전 Access가 만료되었으면 재발급 후 다시 연결한다(sessionFetch). 연결 중 만료·폐기는 서버가 끊고, 브라우저가 다시 연결한다
@@ -16,7 +16,7 @@ export function streamTarget(rest: string, search: string): string | undefined {
   const clean = rest.replace(/^\/+|\/+$/g, "");
   if (clean.split("/").some((part) => part === ".." || part === "." || part === "")) return undefined;
   // core의 SSE는 모두 `/api/v1/core/stream/**`에 있다: 실시간 구독(API-DSH-20), 소스 원본 메시지(API-DSC-10)
-  if (clean === "live" || clean === "alarms" || /^sources\/\d{1,19}\/live$/.test(clean) || /^sim\/runs\/[A-Za-z0-9_-]{1,64}$/.test(clean)) return `/api/v1/core/stream/${clean}${search}`;
+  if (clean === "live" || clean === "alarms" || /^sources\/\d{1,19}\/live$/.test(clean) || /^sim\/runs\/[A-Za-z0-9_-]{1,64}$/.test(clean) || /^analytics\/runs\/\d{1,19}$/.test(clean)) return `/api/v1/core/stream/${clean}${search}`;
   return undefined;
 }
 

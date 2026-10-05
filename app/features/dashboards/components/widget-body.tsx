@@ -14,6 +14,7 @@ import { barOption, gaugeOption, heatmapOption, thresholdTone, toChartSeries, tr
 import type { AlarmItem, FloorplanPayload, GaugePayload, HeatmapPayload, SeriesPayload, StatPayload, StatusItem, TablePayload, Widget, WidgetData } from "../model/types";
 import type { ZoomWindow } from "../model/time";
 import { DataTable } from "./data-table";
+import { AnalysisWidget, type AnalysisWidgetData } from "./analysis-widget";
 
 /** 게이트웨이 경로(`/api/v1/...`)로 온 이미지 주소를 BFF 경로로 */
 export function toBffUrl(url: string | null | undefined): string | null {
@@ -179,6 +180,8 @@ export function WidgetBody({ widget, data, timezone, height, zoom, onZoom, table
     }
     case "markdown":
       return <div className="whitespace-pre-wrap text-[13px]">{String(options.content ?? "")}</div>;
+    case "analysis":
+      return <AnalysisWidget data={payload as AnalysisWidgetData | null} timezone={timezone} height={height} chartFactory={chartFactory} />;
     default:
       return <p className="text-[13px] text-muted">{t("dashboards.widget.unsupported", { type: widget.type })}</p>;
   }

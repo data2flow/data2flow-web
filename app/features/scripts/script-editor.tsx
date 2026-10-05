@@ -5,6 +5,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { CodeEditor, type EditorApi, type EditorFactory } from "~/components/code-editor";
+import type { AiApi } from "~/features/ai/api";
+import { ScriptAssistPanel } from "~/features/ai/components/script-assist-panel";
 import { Link } from "react-router";
 import { Alert, Badge, Button, Dialog, TextArea, TextField } from "~/components/ui";
 import { errorText } from "~/lib/error-text";
@@ -30,6 +32,8 @@ export interface ScriptEditorProps {
   debounceMs?: number;
   /** 운영 탭 오류 목록에서 넘어온 입력(SCR-05.01) */
   injected?: { input: unknown; seq: number } | null;
+  /** AI 작성 도우미(UI-AIA-02, SCR-03.07). AI_USE가 없으면 넘기지 않는다 */
+  aiAssist?: AiApi | null;
 }
 
 /** 서버 결과에 필수 함수 검사(화면 쪽)를 더한다. 서버가 같은 문제를 주면 하나만 */
@@ -39,7 +43,7 @@ function withRequired(kind: ScriptDetail["kind"], code: string, problems: Proble
   return required ? [{ ...required, message: missingMessage(required.message) }, ...server] : server;
 }
 
-export function ScriptEditor({ script, canWrite, canForce, recent, recentFailed, timezone, api, editorFactory, debounceMs = 500, injected }: ScriptEditorProps) {
+export function ScriptEditor({ script, canWrite, canForce, recent, recentFailed, timezone, api, editorFactory, debounceMs = 500, injected, aiAssist }: ScriptEditorProps) {
   const { t } = useTranslation();
   const missing = useCallback((fn: string) => t("scripts.problems.missingFunction", { fn }), [t]);
   const initialCode = script.draft?.code ?? script.activeVersion?.code ?? "";
@@ -164,7 +168,12 @@ export function ScriptEditor({ script, canWrite, canForce, recent, recentFailed,
         </div>
         <ProblemsList problems={problems} checking={checking} onSelect={(p) => editorApi.current?.reveal(p.line, p.col)} />
       </div>
-      {canWrite && <TestPanel kind={script.kind} code={code} scriptId={script.id} recent={recent} recentFailed={recentFailed} defaultContext={{ device: { attributes: {} }, last: {}, config: script.config ?? {} }} api={api} timezone={timezone} injected={injected} onSaveCase={saveCase} />}
+      {canWrite && (
+        <div className="flex min-w-0 flex-col gap-4">
+          {aiAssist && (script.kind === "DECODE" || script.kind === "TRANSFORM") && <ScriptAssistPanel scriptId={script.id} kind={script.kind} recent={recent} api={aiAssist} onInsert={(value) => onChange(value)} />}
+          <TestPanel kind={script.kind} code={code} scriptId={script.id} recent={recent} recentFailed={recentFailed} defaultContext={{ device: { attributes: {} }, last: {}, config: script.config ?? {} }} api={api} timezone={timezone} injected={injected} onSaveCase={saveCase} />
+        </div>
+      )}
 
       <Dialog title={t("scripts.conflict.title")} open={conflict !== null} onClose={() => setConflict(null)}>
         <p className="text-[13px]">{t("scripts.conflict.body")}</p>

@@ -2,7 +2,7 @@
 
 data2flow 화면과 BFF입니다. React Router v8 프레임워크 모드(SSR, Vite) + React 19 + TypeScript로 만들고, 브라우저는 토큰 없이 HttpOnly 세션 쿠키(`data2flow_session`)만 갖습니다. Access·Refresh 토큰은 BFF가 서버 쪽에 보관하고, 브라우저의 API 호출은 `/bff/api/{svc}/**`로 받아 내부 gateway에 Bearer로 중계합니다(ADR-024, design/auth.md §9). 화면 문구는 한국어·영어·일본어·중국어 4개 언어입니다(ADR-037).
 
-- 관련 스펙: IAM(로그인·세션·회원·권한·감사), OPS-07(조직·외부 서비스 설정), M2 수집 경로 화면(DSC·DEV·DSH·ING·SCR·TSD), M3 폐루프(가상) 화면(FLW·ACT·SIM·DEV-03.03), M4 자동화 완성 화면(RUL·FLW·ACT·OPS-05·06·DSH·DEV-02.07·02.09), M5 데이터 관리 화면(DSH-04·06·08.04·11·13.01 등) (정본은 비공개 저장소 `data2flow-docs`)
+- 관련 스펙: IAM(로그인·세션·회원·권한·감사), OPS-07(조직·외부 서비스 설정), M2 수집 경로 화면(DSC·DEV·DSH·ING·SCR·TSD), M3 폐루프(가상) 화면(FLW·ACT·SIM·DEV-03.03), M4 자동화 완성 화면(RUL·FLW·ACT·OPS-05·06·DSH·DEV-02.07·02.09), M5 데이터 관리 화면(DSH-04·06·08.04·11·13.01 등), M6 분석·AI 화면(ANA·AIA·IAM-05·DSH-04.04·SCR-03.07) (정본은 비공개 저장소 `data2flow-docs`)
 - 포트: 8080. 프로브는 `/healthz`
 
 ## 구조
@@ -200,6 +200,28 @@ data2flow 화면과 BFF입니다. React Router v8 프레임워크 모드(SSR, Vi
 - 토픽 템플릿(DSC-09.08)은 서버 저장 필드가 아직 없어, 기기 ID·측정 항목 위치를 디코더 설정의 토픽 참조(`deviceIdFrom: "topic[i]"`, single-value `metricFrom`)로 옮깁니다. 공간 변수는 미리 보기만 합니다.
 - 연결 테스트는 제한 시간(5~30초) + 3초 안에 응답이 없으면 "시간 초과"로 끝냅니다. core API-DSC-57 새 설정 테스트는 기본 유형만 받으므로, 카탈로그 커넥터는 저장한 뒤 상세·편집의 [연결 테스트](`/sources/{id}/test`)로 확인합니다.
 - 가짜 core: `test/msw/handlers/sources-m5.ts`(카탈로그·템플릿·스키마는 ingress `connectors/*.schema.json`을 묶은 `test/msw/connector-schemas.json`).
+
+## M6 분석·AI 화면
+
+| 경로 | 화면 | 스펙 |
+|---|---|---|
+| `/analytics/templates`, `/analytics/templates/{key}?version=` | 템플릿 갤러리(질문으로 찾기 400ms, 카테고리 탭·범용/도메인 칩은 URL 쿼리, [실행 가능한 템플릿만] + 공간 → 실행 못 하는 카드는 "데이터 없음" 배지와 함께 끝으로), 설명서 9항목·버전 | ANA-01.01·01.04~01.07, ANA-08.01 |
+| `/analytics/new?template={key}` | 분석 만들기 마법사: ① 템플릿 → ② 데이터 연결(역할 후보 API-ANA-19, 기기×측정 항목·공간 집계·파생 항목) → ③ 기간(최근 N일·고정, 집계 단위, 정상 데이터만, 가상 포함) → ④ 파라미터(JSON Schema 폼) → ⑤ 충분성(OK·WARN 확인·FAIL 막음, [1h로 바꾸기] 같은 해결 버튼)·이름·즉시/일정(매일·매주·cron 최소 1시간)·[저장만]/[저장 후 실행]. 초안은 sessionStorage | ANA-03.01~03.04, ANA-04.01 |
+| `/analytics`, `/analytics/{id}` | 분석 목록(마지막 실행·다음 일정·"일정 중지됨"·실시간, [다시 실행]·[삭제]), 실행이 있으면 최근 실행 결과로 이동 | ANA-04.01·04.02 |
+| `/analytics/{id}/runs/{runId}` | 실행 결과: 진행(상태 스트림·5초 폴링 대체·[취소]), 핵심 수치(추정치 범위), ChartSpec 차트(공통 렌더러, [표로 보기]·[대시보드에 고정]), 표([맞음]/[오탐]), 근거, 주의 문구, 실행 비교, 내보내기(CSV·PNG 화면에서, PDF는 API-ANA-12), 오른쪽 탭(결과 읽는 법·AI 해설·메타정보와 모델 상태), 실패·시간 초과·취소·보관 만료 | ANA-04.02·04.04, ANA-05.01~05.08, ANA-07.01, ANA-08.02·08.05 |
+| (결과 화면 AI 해설 탭) | AI 해설: 스트리밍, 검증 상태(숫자 확인됨·미검증 + 불일치 숫자 강조), 숫자마다 근거(핵심 수치·표·차트) 링크, [다시 만들기], 이전 판. AI 꺼짐(409)이면 탭·버튼 없음, 제공자 없음(503)이면 "AI 사용 불가" | ANA-05.04, AIA-01.01~01.03, AIA-07.01 |
+| `/analytics/models` | 모델 관리(버전·상태·학습 기간·MAE/MAPE·정밀도·드리프트, [재학습]·후보 [적용], 성능이 낮으면 확인 뒤 force) | ANA-07.01~07.04 |
+| `/dashboards/{id}` | 분석 결과 위젯(`analysis`): 최근 성공 결과의 차트·핵심 수치, 결과 시각·결과 링크, "삭제된 분석" | DSH-04.04, ANA-05.06 |
+| `/scripts/{id}` | 편집기 오른쪽 AI 작성 도우미: 샘플·요구사항 → 초안 + 정적 검사·시험 실행 결과, [오류로 고쳐 달라고 하기](시도 5회), [편집기에 넣기](저장·배포는 사람) | SCR-03.07, AIA-04.01~04.03 |
+| `/me/tokens`, `/admin/tokens?tab=all\|accounts\|pending` | API 토큰·MCP 토큰(원문 한 번만, 쓰기·제어 범위는 승인 대기, 교체 유예 0~24시간, 만료 7일 전 경고, 마지막 사용 시각·IP), 서비스 계정(만들기·비활성화·키 발급), 승인 대기([승인]·[거절]) | IAM-04.07, IAM-05.01~05.03 |
+| `/ai/mcp` | MCP 연결 안내(엔드포인트, Claude Desktop·Claude Code·일반 클라이언트 예시, 도구 이름·버전·범위), 내 MCP 토큰 | AIA-08.01·08.04 |
+| `/settings/ai?tab=settings\|usage\|eval` | AI 설정(제공자 NONE·FAKE 상태 띠, 준비 중·배포 불가 표시, 한도·보관·평가 기준), 사용량(일·기능·사용자, 비용, 오늘 한도 대비), 평가(평가 셋·실행 결과·[평가 실행]) | AIA-07.04~07.07 |
+| (모든 화면 오른쪽 아래) | [도움말] 대화(HELP 모드, 화면 주소를 맥락으로, 근거 문서 카드, 대화 목록·전체 삭제). 조직 AI가 꺼져 있으면 버튼을 숨긴다 | AIA-09.01 |
+
+- core API: `/core/analytics/**`(API-ANA-01~25), 상태 스트림 `/bff/stream/analytics/runs/{id}`(API-ANA-16, `run-status`·`run-done`), `/core/dashboards/{id}/widgets/pin-analysis`(API-DSH-08), `/core/api-tokens`(+`approve`·`reject`·`rotate`, `owner=me|all`, `kind=MCP`), `/core/service-accounts`(+`disable`). ai API: `/ai/commentaries`(POST는 SSE), `/ai/script-assists`, `/ai/settings`, `/ai/usage`·`/ai/usage/me`, `/ai/evals/cases|runs`, `/ai/mcp/tools`, `/ai/conversations`(HELP).
+- POST 스트림(해설·도움말)은 EventSource가 GET만 되므로 `fetch` 본문을 SSE로 읽는다(`app/features/ai/model/sse.ts`). BFF는 `/bff/api/ai/**`의 `Accept: text/event-stream`을 그대로 넘기고 본문을 흘려보낸다.
+- 결과 CSV·PNG는 화면에서 바로 만든다(UTF-8 BOM). API-ANA-12의 CSV·PNG `downloadPath`(`/bff/download/{exportId}`)는 BFF에 내려받기 경로가 없어 쓰지 않고, PDF만 비동기로 요청해 알림 센터로 받는다.
+- 권한: 분석 조회 ANALYTICS_READ(VIEWER 이상), 마법사·실행·모델 ANALYTICS_RUN, AI 해설 생성 ANALYTICS_RUN + AI_USE, 피드백 ALARM_HANDLE(O 이상), 고정 DASHBOARD_WRITE, 토큰 발급 API_TOKEN_ISSUE(VIEWER 제외), 관리 화면 ADMIN. 데이터 품질 화면(UI-ING-06)은 VIEWER에게도 ANALYTICS_READ가 있어 화면 권한을 INGEST_READ·ANALYTICS_RUN으로 좁혔다.
 
 ## 개발
 

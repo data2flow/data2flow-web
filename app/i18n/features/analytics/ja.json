@@ -1,0 +1,399 @@
+{
+  "nav": {
+    "analytics": "分析",
+    "apiTokens": "APIトークン",
+    "aiSettings": "AI設定"
+  },
+  "me": {
+    "tabs": {
+      "tokens": "APIトークン"
+    }
+  },
+  "analytics": {
+    "crumb": "分析",
+    "area": {
+      "templates": "テンプレートギャラリー",
+      "analyses": "分析一覧",
+      "models": "モデル",
+      "mcp": "MCP接続"
+    },
+    "category": {
+      "ENV_QUALITY": "環境品質",
+      "SPACE_USAGE": "空間活用",
+      "ASSET_HEALTH": "設備・センサーの健全性",
+      "PREDICTION": "予測",
+      "GENERAL": "一般"
+    },
+    "kind": {
+      "GENERAL": "汎用",
+      "DOMAIN": "ドメイン"
+    },
+    "sourceKind": {
+      "DEVICE_METRIC": "機器×測定項目",
+      "SPACE_AGGREGATE": "空間集計",
+      "DERIVED_METRIC": "派生項目"
+    },
+    "agg": {
+      "avg": "平均",
+      "max": "最大",
+      "min": "最小"
+    },
+    "resolution": {
+      "AUTO": "自動",
+      "RAW": "元データ",
+      "1m": "1分",
+      "1h": "1時間",
+      "1d": "1日"
+    },
+    "quality": {
+      "NORMAL_ONLY": "正常データのみ",
+      "INCLUDE_ALL": "すべての品質を含む"
+    },
+    "qualityCode": {
+      "0": "正常",
+      "1": "範囲外",
+      "2": "未検証",
+      "3": "疑わしい",
+      "4": "補正"
+    },
+    "level": {
+      "OK": "十分",
+      "WARN": "警告",
+      "FAIL": "不足"
+    },
+    "status": {
+      "QUEUED": "待機",
+      "PENDING": "準備中",
+      "RUNNING": "実行中",
+      "SUCCEEDED": "成功",
+      "FAILED": "失敗",
+      "TIMEOUT": "タイムアウト",
+      "CANCELLED": "キャンセル"
+    },
+    "stage": {
+      "LOAD": "データ読み込み",
+      "COMPUTE": "計算",
+      "SAVE": "保存"
+    },
+    "modelStatus": {
+      "TRAINING": "学習中",
+      "CANDIDATE": "候補",
+      "ACTIVE": "使用中",
+      "RETIRED": "退役",
+      "FAILED": "失敗"
+    },
+    "weekday": {
+      "1": "月曜日",
+      "2": "火曜日",
+      "3": "水曜日",
+      "4": "木曜日",
+      "5": "金曜日",
+      "6": "土曜日",
+      "7": "日曜日"
+    },
+    "issue": {
+      "MISSING_RATE": "欠損率が基準を超えています",
+      "TOO_MANY_POINTS": "ポイント数が上限を超えています"
+    },
+    "gallery": {
+      "title": "テンプレートギャラリー",
+      "searchLabel": "何を知りたいですか?",
+      "searchPlaceholder": "例: いつ混む? センサー故障",
+      "runnableOnly": "実行可能なテンプレートのみ",
+      "space": "基準空間",
+      "pickSpace": "空間を選ぶと、その空間の機器で実行できるかを表示します。",
+      "keywordFallback": "意味検索が使えないため、キーワード検索で探しました。",
+      "categories": "カテゴリ",
+      "all": "すべて",
+      "empty": "検索に一致するテンプレートがありません",
+      "showAll": "すべて表示",
+      "errorTitle": "分析テンプレートを読み込めませんでした",
+      "noData": "データなし",
+      "missingRoles": "この空間にないデータ: {{roles}}",
+      "questions": "代表的な質問",
+      "needs": "必要データ: {{roles}} · 最低 {{days}} 日",
+      "sample": "{{name}} の結果例",
+      "guide": "説明書を見る",
+      "analyze": "このテンプレートで分析",
+      "myAnalyses": "自分の分析一覧を見る"
+    },
+    "guide": {
+      "sections": {
+        "summary": "概要",
+        "whenToUse": "いつ使うか",
+        "whenNotToUse": "使うべきでない場合",
+        "dataRequirements": "必要なデータ",
+        "params": "パラメータ",
+        "howToRead": "結果の読み方",
+        "caveats": "注意点",
+        "examples": "使用例",
+        "algorithm": "アルゴリズム・参考文献"
+      },
+      "role": "役割",
+      "dataType": "データ種類",
+      "count": "個数",
+      "semantic": "意味条件",
+      "minPeriod": "最低期間",
+      "missing": "許容欠損率(警告/失敗)",
+      "days": "{{n}}日",
+      "param": "パラメータ",
+      "range": "範囲",
+      "default": "既定値",
+      "description": "説明",
+      "version": "バージョン",
+      "disabled": "この組織では無効"
+    },
+    "wizard": {
+      "title": "新しい分析: {{name}}",
+      "titleEmpty": "新しい分析",
+      "pickTemplate": "まずギャラリーでテンプレートを選んでください。",
+      "steps": "分析作成の手順",
+      "step": {
+        "template": "テンプレート",
+        "bindings": "データ接続",
+        "period": "期間",
+        "params": "パラメータ",
+        "confirm": "確認・実行"
+      },
+      "otherTemplate": "別のテンプレート",
+      "roleRange": "{{range}}個",
+      "semantic": "意味条件: {{semantic}}",
+      "semanticOnly": "意味タグが {{semantic}} の項目のみ候補です。",
+      "addData": "+ データ",
+      "pickTitle": "{{role}} に接続するデータ",
+      "agg": "空間集計方法",
+      "candidates": "候補",
+      "noCandidates": "権限範囲内に該当するデータがありません。",
+      "noSources": "まだ接続したデータがありません。",
+      "connected": "{{role}} に接続したデータ",
+      "sourceLabel": "凡例名",
+      "removeSource": "{{label}} を外す",
+      "periodType": "期間の種類",
+      "period": {
+        "RELATIVE": "直近N日",
+        "FIXED": "固定期間"
+      },
+      "days": "日数",
+      "from": "開始",
+      "to": "終了",
+      "resolution": "集計単位",
+      "normalOnly": "正常データのみ",
+      "includeVirtual": "仮想データを含む",
+      "defaults": "既定値に戻す",
+      "noParams": "このテンプレートにはパラメータがありません。",
+      "slider": "{{label}} スライダー",
+      "sufficiency": "データ充足性",
+      "checking": "データが十分か確認中…",
+      "recheck": "再確認",
+      "points": "ポイント {{points}} / 上限 {{max}}",
+      "limitBar": "上限に対するポイント",
+      "missing": "欠損率 {{rate}}%",
+      "virtualPoints": "仮想 {{n}} 件",
+      "effectiveResolution": "実際の単位 {{value}}",
+      "quality": "品質:",
+      "issues": "確認結果",
+      "fixResolution": "{{value}} に変更",
+      "failBlocked": "データ不足で実行できません。期間・対象を変えるか、保存のみにしてください。",
+      "ack": "警告を確認しました",
+      "name": "分析名",
+      "runMode": "実行方法",
+      "mode": {
+        "NOW": "即時",
+        "SCHEDULE": "スケジュール"
+      },
+      "schedule": "スケジュール",
+      "preset": {
+        "DAILY": "毎日",
+        "WEEKLY": "毎週",
+        "CRON": "cronを直接入力"
+      },
+      "cron": "cron(5フィールド)",
+      "cronHint": "最小間隔は1時間。例: 0 6 * * 1(月曜 06:00)",
+      "at": "時刻",
+      "weekday": "曜日",
+      "saveOnly": "保存のみ",
+      "saveAndRun": "保存して実行",
+      "openSaved": "保存した分析を開く",
+      "errors": {
+        "ROLE_COUNT": "{{role}} に {{min}}〜{{max}} 個を接続してください",
+        "DAYS_RANGE": "1〜{{max}} 日の範囲で入力してください",
+        "FIXED_ORDER": "終了は開始より後にしてください",
+        "FIXED_FUTURE": "終了は現在より前にしてください",
+        "REQUIRED": "値を入力してください",
+        "NUMBER": "数値を入力してください",
+        "RANGE": "{{min}}〜{{max}} の値を入力してください",
+        "ENUM": "一覧から選んでください",
+        "LENGTH": "{{max}} 文字以内で入力してください",
+        "NAME": "名前を入力してください(100文字以内)",
+        "SCHEDULE": "スケジュールの形式が正しくありません",
+        "CHECK_FAIL": "データ不足で実行できません",
+        "ACK": "警告を確認してください"
+      }
+    },
+    "list": {
+      "title": "分析一覧",
+      "new": "+ 新しい分析",
+      "owner": "所有者",
+      "ownerMe": "自分",
+      "ownerAll": "すべて",
+      "name": "名前",
+      "template": "テンプレート",
+      "target": "対象",
+      "lastRun": "最後の実行",
+      "next": "次の予定",
+      "realtime": "リアルタイム",
+      "stopped": "スケジュール停止(連続失敗)",
+      "paused": "スケジュール一時停止",
+      "empty": "まだ分析がありません",
+      "emptyBody": "ギャラリーで質問からテンプレートを探し、最初の分析を作りましょう。",
+      "toGallery": "テンプレートギャラリーへ",
+      "deleteTitle": "分析を削除",
+      "deleteBody": "「{{name}}」を削除します。スケジュールとリアルタイム適用が止まり、固定したウィジェットは「削除された分析」と表示されます。",
+      "noRuns": "まだ実行していません",
+      "scheduled": "スケジュール実行後、結果がここに表示されます。",
+      "runNow": "今すぐ実行",
+      "saved": "分析を保存しました。"
+    },
+    "result": {
+      "run": "実行",
+      "chart": "分析チャート",
+      "unsupportedChart": "このチャート種類({{type}})はまだ描画できません。",
+      "virtual": "仮想データを含む",
+      "versionMismatch": "テンプレートのバージョンが異なる",
+      "estimate": "推定値",
+      "rerun": "再実行",
+      "exportCsv": "CSV",
+      "exportPng": "PNG",
+      "exportPdf": "PDF",
+      "aiButton": "AI解説",
+      "progressTitle": "実行の進行",
+      "progress": "進捗",
+      "queued": "待機 {{n}} 番目、開始予定 {{at}}",
+      "failed": {
+        "FAILED": "実行に失敗しました。",
+        "TIMEOUT": "実行がタイムアウトしました。"
+      },
+      "failedHint": "期間を短くするか集計単位を大きくして再実行してください。失敗が続く場合は管理者に連絡してください。",
+      "techLog": "技術ログを見る",
+      "cancelled": "実行をキャンセルしました。",
+      "expired": "結果の保管期間が過ぎました。",
+      "alreadyDone": "すでに終了した実行です。",
+      "pdfQueued": "PDFを作成中です。完了したら通知センターでお知らせします。",
+      "metrics": "主要数値",
+      "pin": "ダッシュボードに固定",
+      "range": "範囲 {{range}}",
+      "compareTitle": "実行 #{{base}} と比較",
+      "compareVersion": "2つの実行のテンプレートバージョンが異なるため、直接比較できない場合があります。",
+      "asTable": "表で見る",
+      "asChart": "チャートで見る",
+      "feedback": "判定",
+      "verdict": {
+        "TRUE_POSITIVE": "正しい",
+        "FALSE_POSITIVE": "誤検知"
+      },
+      "evidence": "根拠",
+      "threshold": "しきい値",
+      "weight": "寄与 {{w}}%",
+      "compare": "実行の比較",
+      "noCompare": "比較できる他の成功実行がありません。",
+      "compareWith": "基準の実行",
+      "compareNone": "比較しない",
+      "side": "結果サイドパネル",
+      "tabs": {
+        "howToRead": "結果の読み方",
+        "ai": "AI解説",
+        "meta": "メタ情報"
+      },
+      "noGuide": "このテンプレートの読み方はありません。",
+      "warnTitle": "データ警告",
+      "warnBody": "データ充足性の警告があります。それでも実行しますか?",
+      "runAnyway": "それでも実行"
+    },
+    "meta": {
+      "targets": "対象",
+      "period": "期間",
+      "resolution": "集計単位",
+      "quality": "品質フィルタ",
+      "template": "テンプレートのバージョン",
+      "algorithm": "アルゴリズム",
+      "ranAt": "実行時刻",
+      "seconds": "{{n}}秒",
+      "points": "データ件数",
+      "missing": "欠損率",
+      "seed": "シード",
+      "expires": "結果の保管期限",
+      "model": "モデル状態",
+      "noModel": "学習モデルなし",
+      "models": "モデル管理"
+    },
+    "models": {
+      "title": "モデル管理",
+      "empty": "学習済みモデルがありません",
+      "emptyBody": "予測・ML異常検知など学習が必要なテンプレートを実行すると、ここにモデルが表示されます。",
+      "drift": "ドリフト検知",
+      "retrain": "再学習",
+      "version": "バージョン",
+      "status": "状態",
+      "trainPeriod": "学習期間",
+      "trainedAt": "学習時刻",
+      "activate": "適用",
+      "activateAnyway": "それでも適用",
+      "activated": "v{{v}} を適用しました。",
+      "trainQueued": "再学習を開始しました(v{{v}})。",
+      "worseTitle": "性能の低い候補",
+      "worseBody": "現在より性能が低いです。それでも適用しますか?"
+    },
+    "pin": {
+      "title": "ダッシュボードに固定",
+      "what": "固定する項目: {{label}}",
+      "dashboard": "ダッシュボード",
+      "noDashboards": "編集できるダッシュボードがありません。",
+      "goDashboards": "ダッシュボードを作成",
+      "latestNote": "ウィジェットは常にこの分析の最新の成功結果を表示します。",
+      "submit": "固定",
+      "done": "「{{name}}」に固定しました。",
+      "open": "ダッシュボードを開く"
+    }
+  },
+  "dashboards": {
+    "analysis": {
+      "deleted": "削除された分析",
+      "noResult": "まだ成功した分析結果がありません。",
+      "reference": "参考用",
+      "resultAt": "結果時刻 {{at}}",
+      "open": "結果を見る"
+    }
+  },
+  "errors": {
+    "ANALYTICS_UNAVAILABLE": "分析サービスに一時的に接続できません。しばらくしてから再試行してください。",
+    "TEMPLATE_NOT_FOUND": "分析テンプレートが見つかりません。",
+    "TEMPLATE_DISABLED": "この組織では無効なテンプレートです。",
+    "ANALYSIS_NOT_FOUND": "分析が見つかりません。",
+    "ANALYSIS_RUN_NOT_FOUND": "実行が見つかりません。",
+    "ANALYSIS_BINDING_INVALID": "接続したデータがテンプレートの条件に合いません。",
+    "ANALYSIS_PARAMS_INVALID": "パラメータの値が正しくありません。",
+    "ANALYSIS_SCHEDULE_INVALID": "スケジュールの形式が正しくありません。",
+    "ANALYSIS_INSUFFICIENT_DATA": "データ不足で実行できません。",
+    "ANALYSIS_WARNING_NOT_ACKNOWLEDGED": "データ警告を確認すると実行できます。",
+    "ANALYSIS_LIMIT_EXCEEDED": "実行上限を超えました。期間を短くするか集計単位を大きくしてください。",
+    "ANALYSIS_RUN_STATE_CONFLICT": "すでに終了した実行です。",
+    "ANALYSIS_EXPORT_TOO_LARGE": "結果が大きすぎてエクスポートできません。",
+    "MODEL_WORSE_THAN_ACTIVE": "現在より性能の低いモデルです。",
+    "ML_MODEL_NOT_FOUND": "モデルが見つかりません。",
+    "TEMPLATE_REQUIRED": "テンプレートを選んでください。",
+    "SCRIPT_AI_UNAVAILABLE": "AI作成アシスタントは現在利用できません。",
+    "AI_DISABLED": "この組織ではAI機能が無効です。",
+    "AI_QUOTA_EXCEEDED": "本日のAI使用上限に達しました。",
+    "AI_PROVIDER_UNAVAILABLE": "AIサービスに一時的に接続できません。",
+    "AI_COMMENTARY_SUBJECT_INVALID": "AI解説は成功した実行にのみ作成できます。",
+    "AI_EVAL_BELOW_THRESHOLD": "直近の評価が基準未満のためモデルを変更できません。先に評価を通過してください。",
+    "AI_CONVERSATION_NOT_FOUND": "会話が見つかりません。",
+    "API_TOKEN_SCOPE_EXCEEDED": "ロールが許可していない範囲です。",
+    "API_TOKEN_EXPIRY_INVALID": "有効期限は明日から1年後までです。",
+    "API_TOKEN_LIMIT_EXCEEDED": "組織のトークン上限(50個)を超えました。",
+    "API_TOKEN_NOT_FOUND": "トークンが見つかりません。",
+    "API_TOKEN_STATE_CONFLICT": "現在の状態ではできない操作です。",
+    "SERVICE_ACCOUNT_NOT_FOUND": "サービスアカウントが見つかりません。",
+    "ATTEMPT_LIMIT": "再リクエストは5回までです。"
+  }
+}

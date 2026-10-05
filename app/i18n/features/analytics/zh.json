@@ -1,0 +1,399 @@
+{
+  "nav": {
+    "analytics": "分析",
+    "apiTokens": "API 令牌",
+    "aiSettings": "AI 设置"
+  },
+  "me": {
+    "tabs": {
+      "tokens": "API 令牌"
+    }
+  },
+  "analytics": {
+    "crumb": "分析",
+    "area": {
+      "templates": "模板库",
+      "analyses": "分析列表",
+      "models": "模型",
+      "mcp": "MCP 连接"
+    },
+    "category": {
+      "ENV_QUALITY": "环境质量",
+      "SPACE_USAGE": "空间使用",
+      "ASSET_HEALTH": "设备与传感器健康",
+      "PREDICTION": "预测",
+      "GENERAL": "通用"
+    },
+    "kind": {
+      "GENERAL": "通用",
+      "DOMAIN": "领域"
+    },
+    "sourceKind": {
+      "DEVICE_METRIC": "设备×测量项",
+      "SPACE_AGGREGATE": "空间汇总",
+      "DERIVED_METRIC": "派生项"
+    },
+    "agg": {
+      "avg": "平均",
+      "max": "最大",
+      "min": "最小"
+    },
+    "resolution": {
+      "AUTO": "自动",
+      "RAW": "原始",
+      "1m": "1分钟",
+      "1h": "1小时",
+      "1d": "1天"
+    },
+    "quality": {
+      "NORMAL_ONLY": "仅正常数据",
+      "INCLUDE_ALL": "包含所有质量"
+    },
+    "qualityCode": {
+      "0": "正常",
+      "1": "超出范围",
+      "2": "未验证",
+      "3": "可疑",
+      "4": "已校正"
+    },
+    "level": {
+      "OK": "充足",
+      "WARN": "警告",
+      "FAIL": "不足"
+    },
+    "status": {
+      "QUEUED": "排队",
+      "PENDING": "准备中",
+      "RUNNING": "运行中",
+      "SUCCEEDED": "成功",
+      "FAILED": "失败",
+      "TIMEOUT": "超时",
+      "CANCELLED": "已取消"
+    },
+    "stage": {
+      "LOAD": "加载数据",
+      "COMPUTE": "计算",
+      "SAVE": "保存"
+    },
+    "modelStatus": {
+      "TRAINING": "训练中",
+      "CANDIDATE": "候选",
+      "ACTIVE": "使用中",
+      "RETIRED": "已停用",
+      "FAILED": "失败"
+    },
+    "weekday": {
+      "1": "星期一",
+      "2": "星期二",
+      "3": "星期三",
+      "4": "星期四",
+      "5": "星期五",
+      "6": "星期六",
+      "7": "星期日"
+    },
+    "issue": {
+      "MISSING_RATE": "缺失率高于阈值",
+      "TOO_MANY_POINTS": "数据点超过上限"
+    },
+    "gallery": {
+      "title": "模板库",
+      "searchLabel": "您想了解什么?",
+      "searchPlaceholder": "例如: 什么时候拥挤? 传感器故障",
+      "runnableOnly": "仅可运行的模板",
+      "space": "基准空间",
+      "pickSpace": "选择空间后,显示该空间的设备能否运行。",
+      "keywordFallback": "语义搜索不可用,已改用关键词搜索。",
+      "categories": "类别",
+      "all": "全部",
+      "empty": "没有与搜索匹配的模板",
+      "showAll": "显示全部",
+      "errorTitle": "无法加载分析模板",
+      "noData": "无数据",
+      "missingRoles": "该空间缺少的数据: {{roles}}",
+      "questions": "典型问题",
+      "needs": "所需数据: {{roles}} · 至少 {{days}} 天",
+      "sample": "{{name}} 示例结果",
+      "guide": "查看说明",
+      "analyze": "用此模板分析",
+      "myAnalyses": "查看我的分析"
+    },
+    "guide": {
+      "sections": {
+        "summary": "摘要",
+        "whenToUse": "何时使用",
+        "whenNotToUse": "何时不应使用",
+        "dataRequirements": "所需数据",
+        "params": "参数",
+        "howToRead": "如何解读结果",
+        "caveats": "注意事项",
+        "examples": "使用示例",
+        "algorithm": "算法与参考文献"
+      },
+      "role": "角色",
+      "dataType": "数据类型",
+      "count": "数量",
+      "semantic": "语义条件",
+      "minPeriod": "最短期间",
+      "missing": "允许缺失率(警告/失败)",
+      "days": "{{n}} 天",
+      "param": "参数",
+      "range": "范围",
+      "default": "默认值",
+      "description": "说明",
+      "version": "版本",
+      "disabled": "本组织已停用"
+    },
+    "wizard": {
+      "title": "新分析: {{name}}",
+      "titleEmpty": "新分析",
+      "pickTemplate": "请先在模板库中选择模板。",
+      "steps": "分析创建步骤",
+      "step": {
+        "template": "模板",
+        "bindings": "数据连接",
+        "period": "期间",
+        "params": "参数",
+        "confirm": "确认并运行"
+      },
+      "otherTemplate": "其他模板",
+      "roleRange": "{{range}} 项",
+      "semantic": "语义: {{semantic}}",
+      "semanticOnly": "只有语义标签为 {{semantic}} 的项可选。",
+      "addData": "+ 数据",
+      "pickTitle": "连接到 {{role}} 的数据",
+      "agg": "空间汇总方式",
+      "candidates": "候选",
+      "noCandidates": "您的权限范围内没有匹配的数据。",
+      "noSources": "尚未连接数据。",
+      "connected": "已连接到 {{role}} 的数据",
+      "sourceLabel": "图例名称",
+      "removeSource": "移除 {{label}}",
+      "periodType": "期间类型",
+      "period": {
+        "RELATIVE": "最近 N 天",
+        "FIXED": "固定期间"
+      },
+      "days": "天数",
+      "from": "开始",
+      "to": "结束",
+      "resolution": "汇总粒度",
+      "normalOnly": "仅正常数据",
+      "includeVirtual": "包含虚拟数据",
+      "defaults": "恢复默认值",
+      "noParams": "此模板没有参数。",
+      "slider": "{{label}} 滑块",
+      "sufficiency": "数据充足性",
+      "checking": "正在检查数据是否充足…",
+      "recheck": "重新检查",
+      "points": "数据点 {{points}} / 上限 {{max}}",
+      "limitBar": "相对上限的数据点",
+      "missing": "缺失率 {{rate}}%",
+      "virtualPoints": "虚拟 {{n}} 条",
+      "effectiveResolution": "实际粒度 {{value}}",
+      "quality": "质量:",
+      "issues": "检查结果",
+      "fixResolution": "改为 {{value}}",
+      "failBlocked": "数据不足,无法运行。请更改期间或对象,或仅保存。",
+      "ack": "我已确认警告",
+      "name": "分析名称",
+      "runMode": "运行方式",
+      "mode": {
+        "NOW": "立即",
+        "SCHEDULE": "定时"
+      },
+      "schedule": "计划",
+      "preset": {
+        "DAILY": "每天",
+        "WEEKLY": "每周",
+        "CRON": "自定义 cron"
+      },
+      "cron": "cron(5 字段)",
+      "cronHint": "最小间隔 1 小时。例如: 0 6 * * 1(周一 06:00)",
+      "at": "时间",
+      "weekday": "星期",
+      "saveOnly": "仅保存",
+      "saveAndRun": "保存并运行",
+      "openSaved": "打开已保存的分析",
+      "errors": {
+        "ROLE_COUNT": "请为 {{role}} 连接 {{min}}~{{max}} 项",
+        "DAYS_RANGE": "请输入 1~{{max}} 天",
+        "FIXED_ORDER": "结束时间必须晚于开始时间",
+        "FIXED_FUTURE": "结束时间不能晚于现在",
+        "REQUIRED": "请输入值",
+        "NUMBER": "请输入数字",
+        "RANGE": "请输入 {{min}}~{{max}} 之间的值",
+        "ENUM": "请从列表中选择",
+        "LENGTH": "请输入不超过 {{max}} 个字符",
+        "NAME": "请输入名称(最多 100 个字符)",
+        "SCHEDULE": "计划格式不正确",
+        "CHECK_FAIL": "数据不足,无法运行",
+        "ACK": "请确认警告"
+      }
+    },
+    "list": {
+      "title": "分析列表",
+      "new": "+ 新分析",
+      "owner": "所有者",
+      "ownerMe": "我",
+      "ownerAll": "全部",
+      "name": "名称",
+      "template": "模板",
+      "target": "对象",
+      "lastRun": "最近运行",
+      "next": "下次计划",
+      "realtime": "实时",
+      "stopped": "计划已停止(连续失败)",
+      "paused": "计划已暂停",
+      "empty": "还没有分析",
+      "emptyBody": "在模板库中通过提问找到模板,创建第一个分析。",
+      "toGallery": "前往模板库",
+      "deleteTitle": "删除分析",
+      "deleteBody": "将删除“{{name}}”。计划和实时应用将停止,固定的小组件会显示“已删除的分析”。",
+      "noRuns": "尚未运行",
+      "scheduled": "按计划运行后结果会显示在这里。",
+      "runNow": "立即运行",
+      "saved": "分析已保存。"
+    },
+    "result": {
+      "run": "运行",
+      "chart": "分析图表",
+      "unsupportedChart": "暂不支持绘制此图表类型({{type}})。",
+      "virtual": "包含虚拟数据",
+      "versionMismatch": "模板版本不同",
+      "estimate": "估计值",
+      "rerun": "重新运行",
+      "exportCsv": "CSV",
+      "exportPng": "PNG",
+      "exportPdf": "PDF",
+      "aiButton": "AI 解读",
+      "progressTitle": "运行进度",
+      "progress": "进度",
+      "queued": "排队第 {{n}} 位,预计开始 {{at}}",
+      "failed": {
+        "FAILED": "运行失败。",
+        "TIMEOUT": "运行超时。"
+      },
+      "failedHint": "请缩短期间或增大汇总粒度后重试。如持续失败,请联系管理员。",
+      "techLog": "查看技术日志",
+      "cancelled": "运行已取消。",
+      "expired": "结果保留期已过。",
+      "alreadyDone": "该运行已结束。",
+      "pdfQueued": "正在生成 PDF,完成后会在通知中心通知您。",
+      "metrics": "关键数值",
+      "pin": "固定到仪表板",
+      "range": "范围 {{range}}",
+      "compareTitle": "与运行 #{{base}} 比较",
+      "compareVersion": "两次运行的模板版本不同,结果可能无法直接比较。",
+      "asTable": "以表格查看",
+      "asChart": "以图表查看",
+      "feedback": "判定",
+      "verdict": {
+        "TRUE_POSITIVE": "正确",
+        "FALSE_POSITIVE": "误报"
+      },
+      "evidence": "依据",
+      "threshold": "阈值",
+      "weight": "贡献 {{w}}%",
+      "compare": "比较运行",
+      "noCompare": "没有可比较的其他成功运行。",
+      "compareWith": "基准运行",
+      "compareNone": "不比较",
+      "side": "结果侧栏",
+      "tabs": {
+        "howToRead": "如何解读",
+        "ai": "AI 解读",
+        "meta": "元信息"
+      },
+      "noGuide": "此模板没有解读说明。",
+      "warnTitle": "数据警告",
+      "warnBody": "存在数据充足性警告。仍要运行吗?",
+      "runAnyway": "仍然运行"
+    },
+    "meta": {
+      "targets": "对象",
+      "period": "期间",
+      "resolution": "汇总粒度",
+      "quality": "质量筛选",
+      "template": "模板版本",
+      "algorithm": "算法",
+      "ranAt": "运行时间",
+      "seconds": "{{n}} 秒",
+      "points": "数据条数",
+      "missing": "缺失率",
+      "seed": "随机种子",
+      "expires": "结果保留到期",
+      "model": "模型状态",
+      "noModel": "无训练模型",
+      "models": "管理模型"
+    },
+    "models": {
+      "title": "模型管理",
+      "empty": "没有已训练的模型",
+      "emptyBody": "运行预测、ML 异常检测等需要训练的模板后,模型会显示在这里。",
+      "drift": "检测到漂移",
+      "retrain": "重新训练",
+      "version": "版本",
+      "status": "状态",
+      "trainPeriod": "训练期间",
+      "trainedAt": "训练时间",
+      "activate": "启用",
+      "activateAnyway": "仍然启用",
+      "activated": "已启用 v{{v}}。",
+      "trainQueued": "已开始重新训练(v{{v}})。",
+      "worseTitle": "性能较差的候选",
+      "worseBody": "性能低于当前模型。仍要启用吗?"
+    },
+    "pin": {
+      "title": "固定到仪表板",
+      "what": "要固定的项: {{label}}",
+      "dashboard": "仪表板",
+      "noDashboards": "没有可编辑的仪表板。",
+      "goDashboards": "创建仪表板",
+      "latestNote": "小组件始终显示该分析最近一次成功的结果。",
+      "submit": "固定",
+      "done": "已固定到“{{name}}”。",
+      "open": "打开仪表板"
+    }
+  },
+  "dashboards": {
+    "analysis": {
+      "deleted": "已删除的分析",
+      "noResult": "尚无成功的分析结果。",
+      "reference": "仅供参考",
+      "resultAt": "结果时间 {{at}}",
+      "open": "查看结果"
+    }
+  },
+  "errors": {
+    "ANALYTICS_UNAVAILABLE": "暂时无法连接分析服务,请稍后重试。",
+    "TEMPLATE_NOT_FOUND": "找不到分析模板。",
+    "TEMPLATE_DISABLED": "此模板在本组织已停用。",
+    "ANALYSIS_NOT_FOUND": "找不到分析。",
+    "ANALYSIS_RUN_NOT_FOUND": "找不到运行记录。",
+    "ANALYSIS_BINDING_INVALID": "连接的数据不符合模板要求。",
+    "ANALYSIS_PARAMS_INVALID": "参数值不正确。",
+    "ANALYSIS_SCHEDULE_INVALID": "计划格式不正确。",
+    "ANALYSIS_INSUFFICIENT_DATA": "数据不足,无法运行。",
+    "ANALYSIS_WARNING_NOT_ACKNOWLEDGED": "确认数据警告后才能运行。",
+    "ANALYSIS_LIMIT_EXCEEDED": "超出运行限制。请缩短期间或增大汇总粒度。",
+    "ANALYSIS_RUN_STATE_CONFLICT": "该运行已结束。",
+    "ANALYSIS_EXPORT_TOO_LARGE": "结果过大,无法导出。",
+    "MODEL_WORSE_THAN_ACTIVE": "该模型性能低于当前模型。",
+    "ML_MODEL_NOT_FOUND": "找不到模型。",
+    "TEMPLATE_REQUIRED": "请选择模板。",
+    "SCRIPT_AI_UNAVAILABLE": "AI 脚本助手暂时不可用。",
+    "AI_DISABLED": "本组织已关闭 AI 功能。",
+    "AI_QUOTA_EXCEEDED": "今日的 AI 使用额度已用完。",
+    "AI_PROVIDER_UNAVAILABLE": "暂时无法连接 AI 服务。",
+    "AI_COMMENTARY_SUBJECT_INVALID": "只能为成功的运行生成 AI 解读。",
+    "AI_EVAL_BELOW_THRESHOLD": "最近的评估未达标准,无法更换模型。请先通过评估。",
+    "AI_CONVERSATION_NOT_FOUND": "找不到对话。",
+    "API_TOKEN_SCOPE_EXCEEDED": "您的角色不允许该范围。",
+    "API_TOKEN_EXPIRY_INVALID": "到期日须在明天到一年后之间。",
+    "API_TOKEN_LIMIT_EXCEEDED": "已达到组织令牌上限(50 个)。",
+    "API_TOKEN_NOT_FOUND": "找不到令牌。",
+    "API_TOKEN_STATE_CONFLICT": "当前状态下无法执行该操作。",
+    "SERVICE_ACCOUNT_NOT_FOUND": "找不到服务账号。",
+    "ATTEMPT_LIMIT": "最多可重试 5 次。"
+  }
+}

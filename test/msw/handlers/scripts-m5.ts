@@ -195,7 +195,7 @@ export const scriptsM5Handler: CoreHandler = (core, { method, path, url, body, c
   }
 
   // 품질(API-ING-13, summary·trend)
-  if (!can("INGEST_READ") && !can("ANALYTICS_READ")) return fail(403, "PERMISSION_DENIED");
+  if (!can("INGEST_READ") && !can("ANALYTICS_READ") && !can("ANALYTICS_RUN")) return fail(403, "PERMISSION_DENIED");
   if (path === "/ingest/quality" && method === "GET") {
     if (core.extra["m5.qualityEmpty"]) return list([], url);
     return list(QUALITY, url, { nextCursor: null });

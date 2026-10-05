@@ -12,6 +12,7 @@ import { data, redirect, useNavigate, useRouteLoaderData, useSearchParams } from
 import { callApi, callList, field, orThrow } from "~/bff/api.server";
 import { bff } from "~/bff/middleware.server";
 import { PageHeader, Tabs } from "~/components/ui";
+import { defaultAiApi } from "~/features/ai/api";
 import { IngestAreaTabs } from "~/features/ingest/area-tabs";
 import { scriptApi, type ScriptDetail as Detail } from "~/features/scripts/api";
 import { scriptOpsApi } from "~/features/scripts/m5-api";
@@ -113,6 +114,7 @@ export default function ScriptDetailPage({ loaderData, actionData }: Route.Compo
           timezone={timezone}
           api={scriptApi}
           injected={injected}
+          aiAssist={hasAny(permissions, ["AI_USE"]) ? defaultAiApi : null}
         />
       ) : (
         <ScriptVersions scriptId={script.id} versions={script.versions ?? []} timezone={timezone} api={scriptApi} />

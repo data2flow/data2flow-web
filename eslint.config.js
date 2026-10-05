@@ -5,7 +5,8 @@ import globals from "globals";
 import tseslint from "typescript-eslint";
 
 export default tseslint.config(
-  { ignores: ["build/", "coverage/", ".react-router/", "node_modules/"] },
+  // .worktrees/: 같은 저장소의 다른 작업 트리(git worktree)는 그 트리에서 검사한다
+  { ignores: ["build/", "coverage/", ".react-router/", "node_modules/", ".worktrees/"] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {

@@ -1,5 +1,5 @@
 /**
- * UI-ING-06 데이터 품질(`/ingest/quality`, ING-06.02). 권한 INGEST_READ 또는 ANALYTICS_READ(OPERATOR·ANALYST 이상).
+ * UI-ING-06 데이터 품질(`/ingest/quality`, ING-06.02). 권한 INGEST_READ 또는 ANALYTICS_RUN(OPERATOR·ANALYST 이상 — VIEWER도 ANALYTICS_READ가 있어 화면 권한은 ANALYTICS_RUN으로 가린다).
  * API: 순위 API-ING-13(`day` 기본 어제, `groupBy` device|space|model, `spaceId`), 최하위 10개·문제 유형 분포 `GET /core/ingest/quality/summary`,
  * 30일 추이 `GET /core/ingest/quality/trend`(브라우저에서 BFF로)
  */

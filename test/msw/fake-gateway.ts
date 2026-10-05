@@ -6,6 +6,7 @@
 import { http, HttpResponse, type HttpHandler } from "msw";
 import { CoreState, type CoreRequest } from "./core-fixtures";
 import { CORE_HANDLERS, PUBLIC_HANDLERS } from "./handlers";
+import { aiHandler } from "./handlers/ai";
 
 export const GATEWAY = "http://gateway.test";
 
@@ -216,6 +217,17 @@ export class FakeGateway {
         return new HttpResponse(null, { status: 204, headers: { "Set-Cookie": "data2flow_refresh=; Max-Age=0; Path=/api/v1/auth" } });
       }),
       http.get(`${GATEWAY}/api/v1/core/stream/*`, ({ request }) => gw.openStream(request)),
+      // M6: ai 서비스(API-AIA-01~17). 신원은 core와 같은 introspection으로 확인한다
+      http.all(`${GATEWAY}/api/v1/ai/*`, async ({ request }) => {
+        const url = new URL(request.url);
+        let body: unknown;
+        if (!["GET", "HEAD"].includes(request.method) && (request.headers.get("content-type") ?? "").includes("json")) body = await request.json().catch(() => undefined);
+        gw.record(request, body);
+        const auth = gw.authenticate(request);
+        if (auth instanceof Response) return auth;
+        const user = auth.user;
+        return aiHandler(gw.m2, { request, method: request.method, path: url.pathname.replace("/api/v1/ai", ""), url, body, user, can: (p) => user.permissions.includes(p) });
+      }),
       http.all(`${GATEWAY}/api/v1/core/*`, async ({ request }) => {
         const url = new URL(request.url);
         const path = url.pathname.replace("/api/v1/core", "");

@@ -23,7 +23,7 @@ export function IngestAreaTabs({ current }: { current: IngestArea }) {
         { key: "scripts", label: t("ingest.area.scripts"), to: "/scripts" },
         { key: "failures", label: t("ingest.area.failures"), to: "/ingest/failures" },
         ...(hasAny(permissions, ["INGEST_REPROCESS"]) ? [{ key: "reprocess", label: t("ingest.area.reprocess"), to: "/ingest/reprocess" }] : []),
-        ...(hasAny(permissions, ["INGEST_READ", "ANALYTICS_READ"]) ? [{ key: "quality", label: t("ingest.area.quality"), to: "/ingest/quality" }] : []),
+        ...(hasAny(permissions, ["INGEST_READ", "ANALYTICS_RUN"]) ? [{ key: "quality", label: t("ingest.area.quality"), to: "/ingest/quality" }] : []),
       ]}
     />
   );

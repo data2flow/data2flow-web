@@ -10,6 +10,8 @@ import { callApi, callList } from "~/bff/api.server";
 import { bff } from "~/bff/middleware.server";
 import { guardUser } from "~/bff/user.server";
 import { AppShell, headerBrand, type HeaderBrand } from "~/components/app-shell";
+import { defaultAiApi } from "~/features/ai/api";
+import { HelpLauncher } from "~/features/ai/components/help-chat";
 import { EmergencyStopButton, GlobalBands } from "~/features/control/emergency-stop";
 import type { EmergencyStop, MaintenanceWindow } from "~/features/control/model/admin";
 import { hasAny } from "~/lib/permissions";
@@ -80,6 +82,8 @@ export default function AppLayout({ loaderData }: Route.ComponentProps) {
       }
     >
       <Outlet />
+      {/* 도움말 대화(AIA-09.01): AI_USE가 있으면 오른쪽 아래 버튼. 조직 AI가 꺼져 있으면 버튼이 스스로 숨는다 */}
+      {hasAny(permissions, ["AI_USE"]) && !root?.me?.mustChangePassword && <HelpLauncher api={defaultAiApi} />}
     </AppShell>
   );
 }

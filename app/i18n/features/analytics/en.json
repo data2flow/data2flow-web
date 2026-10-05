@@ -1,0 +1,399 @@
+{
+  "nav": {
+    "analytics": "Analytics",
+    "apiTokens": "API tokens",
+    "aiSettings": "AI settings"
+  },
+  "me": {
+    "tabs": {
+      "tokens": "API tokens"
+    }
+  },
+  "analytics": {
+    "crumb": "Analytics",
+    "area": {
+      "templates": "Template gallery",
+      "analyses": "Analyses",
+      "models": "Models",
+      "mcp": "MCP connection"
+    },
+    "category": {
+      "ENV_QUALITY": "Environment quality",
+      "SPACE_USAGE": "Space usage",
+      "ASSET_HEALTH": "Equipment & sensor health",
+      "PREDICTION": "Prediction",
+      "GENERAL": "General"
+    },
+    "kind": {
+      "GENERAL": "General-purpose",
+      "DOMAIN": "Domain"
+    },
+    "sourceKind": {
+      "DEVICE_METRIC": "Device × metric",
+      "SPACE_AGGREGATE": "Space aggregate",
+      "DERIVED_METRIC": "Derived metric"
+    },
+    "agg": {
+      "avg": "Average",
+      "max": "Maximum",
+      "min": "Minimum"
+    },
+    "resolution": {
+      "AUTO": "Auto",
+      "RAW": "Raw",
+      "1m": "1 minute",
+      "1h": "1 hour",
+      "1d": "1 day"
+    },
+    "quality": {
+      "NORMAL_ONLY": "Normal data only",
+      "INCLUDE_ALL": "All quality codes"
+    },
+    "qualityCode": {
+      "0": "Normal",
+      "1": "Out of range",
+      "2": "Unverified",
+      "3": "Suspect",
+      "4": "Corrected"
+    },
+    "level": {
+      "OK": "Sufficient",
+      "WARN": "Warning",
+      "FAIL": "Insufficient"
+    },
+    "status": {
+      "QUEUED": "Queued",
+      "PENDING": "Pending",
+      "RUNNING": "Running",
+      "SUCCEEDED": "Succeeded",
+      "FAILED": "Failed",
+      "TIMEOUT": "Timed out",
+      "CANCELLED": "Cancelled"
+    },
+    "stage": {
+      "LOAD": "Load data",
+      "COMPUTE": "Compute",
+      "SAVE": "Save"
+    },
+    "modelStatus": {
+      "TRAINING": "Training",
+      "CANDIDATE": "Candidate",
+      "ACTIVE": "Active",
+      "RETIRED": "Retired",
+      "FAILED": "Failed"
+    },
+    "weekday": {
+      "1": "Monday",
+      "2": "Tuesday",
+      "3": "Wednesday",
+      "4": "Thursday",
+      "5": "Friday",
+      "6": "Saturday",
+      "7": "Sunday"
+    },
+    "issue": {
+      "MISSING_RATE": "Missing rate is above the threshold",
+      "TOO_MANY_POINTS": "Too many points"
+    },
+    "gallery": {
+      "title": "Template gallery",
+      "searchLabel": "What would you like to know?",
+      "searchPlaceholder": "e.g. When is it busy? Broken sensor",
+      "runnableOnly": "Runnable templates only",
+      "space": "Space",
+      "pickSpace": "Pick a space to see which templates its devices can run.",
+      "keywordFallback": "Semantic search is unavailable, so keyword search was used.",
+      "categories": "Categories",
+      "all": "All",
+      "empty": "No template matches your search",
+      "showAll": "Show all",
+      "errorTitle": "Couldn't load analysis templates",
+      "noData": "No data",
+      "missingRoles": "Missing in this space: {{roles}}",
+      "questions": "Typical questions",
+      "needs": "Needs: {{roles}} · at least {{days}} days",
+      "sample": "{{name}} sample result",
+      "guide": "View guide",
+      "analyze": "Analyze with this template",
+      "myAnalyses": "View my analyses"
+    },
+    "guide": {
+      "sections": {
+        "summary": "Summary",
+        "whenToUse": "When to use",
+        "whenNotToUse": "When not to use",
+        "dataRequirements": "Required data",
+        "params": "Parameters",
+        "howToRead": "How to read results",
+        "caveats": "Caveats",
+        "examples": "Examples",
+        "algorithm": "Algorithm & references"
+      },
+      "role": "Role",
+      "dataType": "Data type",
+      "count": "Count",
+      "semantic": "Semantic tag",
+      "minPeriod": "Minimum period",
+      "missing": "Allowed missing (warn/fail)",
+      "days": "{{n}} days",
+      "param": "Parameter",
+      "range": "Range",
+      "default": "Default",
+      "description": "Description",
+      "version": "Version",
+      "disabled": "Disabled in this organization"
+    },
+    "wizard": {
+      "title": "New analysis: {{name}}",
+      "titleEmpty": "New analysis",
+      "pickTemplate": "Pick a template from the gallery first.",
+      "steps": "Analysis steps",
+      "step": {
+        "template": "Template",
+        "bindings": "Data",
+        "period": "Period",
+        "params": "Parameters",
+        "confirm": "Review & run"
+      },
+      "otherTemplate": "Other template",
+      "roleRange": "{{range}} items",
+      "semantic": "Semantic: {{semantic}}",
+      "semanticOnly": "Only items tagged {{semantic}} are candidates.",
+      "addData": "+ Data",
+      "pickTitle": "Data for {{role}}",
+      "agg": "Space aggregation",
+      "candidates": "Candidates",
+      "noCandidates": "No matching data in your scope.",
+      "noSources": "No data connected yet.",
+      "connected": "Data connected to {{role}}",
+      "sourceLabel": "Legend label",
+      "removeSource": "Remove {{label}}",
+      "periodType": "Period type",
+      "period": {
+        "RELATIVE": "Last N days",
+        "FIXED": "Fixed range"
+      },
+      "days": "Days",
+      "from": "From",
+      "to": "To",
+      "resolution": "Resolution",
+      "normalOnly": "Normal data only",
+      "includeVirtual": "Include virtual data",
+      "defaults": "Reset to defaults",
+      "noParams": "This template has no parameters.",
+      "slider": "{{label}} slider",
+      "sufficiency": "Data sufficiency",
+      "checking": "Checking data sufficiency…",
+      "recheck": "Check again",
+      "points": "Points {{points}} / limit {{max}}",
+      "limitBar": "Points against limit",
+      "missing": "Missing {{rate}}%",
+      "virtualPoints": "Virtual {{n}}",
+      "effectiveResolution": "Effective resolution {{value}}",
+      "quality": "Quality:",
+      "issues": "Findings",
+      "fixResolution": "Switch to {{value}}",
+      "failBlocked": "Not enough data to run. Change the period or targets, or save only.",
+      "ack": "I acknowledge the warnings",
+      "name": "Analysis name",
+      "runMode": "Run mode",
+      "mode": {
+        "NOW": "Now",
+        "SCHEDULE": "Scheduled"
+      },
+      "schedule": "Schedule",
+      "preset": {
+        "DAILY": "Daily",
+        "WEEKLY": "Weekly",
+        "CRON": "Custom cron"
+      },
+      "cron": "Cron (5 fields)",
+      "cronHint": "At least hourly. e.g. 0 6 * * 1 (Mondays 06:00)",
+      "at": "Time",
+      "weekday": "Weekday",
+      "saveOnly": "Save only",
+      "saveAndRun": "Save and run",
+      "openSaved": "Open saved analysis",
+      "errors": {
+        "ROLE_COUNT": "Connect {{min}}–{{max}} items to {{role}}",
+        "DAYS_RANGE": "Enter 1–{{max}} days",
+        "FIXED_ORDER": "End must be after start",
+        "FIXED_FUTURE": "End can't be in the future",
+        "REQUIRED": "Enter a value",
+        "NUMBER": "Enter a number",
+        "RANGE": "Enter a value between {{min}} and {{max}}",
+        "ENUM": "Choose from the list",
+        "LENGTH": "Use at most {{max}} characters",
+        "NAME": "Enter a name (up to 100 characters)",
+        "SCHEDULE": "Invalid schedule",
+        "CHECK_FAIL": "Not enough data to run",
+        "ACK": "Please acknowledge the warnings"
+      }
+    },
+    "list": {
+      "title": "Analyses",
+      "new": "+ New analysis",
+      "owner": "Owner",
+      "ownerMe": "Me",
+      "ownerAll": "All",
+      "name": "Name",
+      "template": "Template",
+      "target": "Targets",
+      "lastRun": "Last run",
+      "next": "Next run",
+      "realtime": "Real-time",
+      "stopped": "Schedule stopped (repeated failures)",
+      "paused": "Schedule paused",
+      "empty": "No analyses yet",
+      "emptyBody": "Find a template by asking a question in the gallery and create your first analysis.",
+      "toGallery": "Go to template gallery",
+      "deleteTitle": "Delete analysis",
+      "deleteBody": "Delete “{{name}}”? Schedules and real-time stop, and pinned widgets show “Deleted analysis”.",
+      "noRuns": "Not run yet",
+      "scheduled": "Results appear here after the scheduled run.",
+      "runNow": "Run now",
+      "saved": "Analysis saved."
+    },
+    "result": {
+      "run": "Run",
+      "chart": "Analysis chart",
+      "unsupportedChart": "This chart type ({{type}}) can't be drawn yet.",
+      "virtual": "Includes virtual data",
+      "versionMismatch": "Template version differs",
+      "estimate": "Estimate",
+      "rerun": "Run again",
+      "exportCsv": "CSV",
+      "exportPng": "PNG",
+      "exportPdf": "PDF",
+      "aiButton": "AI commentary",
+      "progressTitle": "Run progress",
+      "progress": "Progress",
+      "queued": "Position {{n}} in queue, expected start {{at}}",
+      "failed": {
+        "FAILED": "The run failed.",
+        "TIMEOUT": "The run timed out."
+      },
+      "failedHint": "Try a shorter period or a coarser resolution. If it keeps failing, contact your administrator.",
+      "techLog": "Technical log",
+      "cancelled": "The run was cancelled.",
+      "expired": "The result retention period has passed.",
+      "alreadyDone": "This run has already finished.",
+      "pdfQueued": "Creating the PDF. You'll be notified in the notification center.",
+      "metrics": "Key figures",
+      "pin": "Pin to dashboard",
+      "range": "Range {{range}}",
+      "compareTitle": "Compared with run #{{base}}",
+      "compareVersion": "Template versions differ, so results may not be directly comparable.",
+      "asTable": "View as table",
+      "asChart": "View as chart",
+      "feedback": "Verdict",
+      "verdict": {
+        "TRUE_POSITIVE": "Correct",
+        "FALSE_POSITIVE": "False alarm"
+      },
+      "evidence": "Evidence",
+      "threshold": "Threshold",
+      "weight": "Contribution {{w}}%",
+      "compare": "Compare runs",
+      "noCompare": "No other successful run to compare.",
+      "compareWith": "Baseline run",
+      "compareNone": "No comparison",
+      "side": "Result side panel",
+      "tabs": {
+        "howToRead": "How to read",
+        "ai": "AI commentary",
+        "meta": "Metadata"
+      },
+      "noGuide": "No reading guide for this template.",
+      "warnTitle": "Data warning",
+      "warnBody": "There are data sufficiency warnings. Run anyway?",
+      "runAnyway": "Run anyway"
+    },
+    "meta": {
+      "targets": "Targets",
+      "period": "Period",
+      "resolution": "Resolution",
+      "quality": "Quality filter",
+      "template": "Template version",
+      "algorithm": "Algorithm",
+      "ranAt": "Run time",
+      "seconds": "{{n}}s",
+      "points": "Data points",
+      "missing": "Missing rate",
+      "seed": "Seed",
+      "expires": "Result expires",
+      "model": "Model status",
+      "noModel": "No trained model",
+      "models": "Manage models"
+    },
+    "models": {
+      "title": "Model management",
+      "empty": "No trained models",
+      "emptyBody": "Models appear here after running templates that need training, such as forecast or ML anomaly detection.",
+      "drift": "Drift detected",
+      "retrain": "Retrain",
+      "version": "Version",
+      "status": "Status",
+      "trainPeriod": "Training period",
+      "trainedAt": "Trained at",
+      "activate": "Activate",
+      "activateAnyway": "Activate anyway",
+      "activated": "Activated v{{v}}.",
+      "trainQueued": "Retraining started (v{{v}}).",
+      "worseTitle": "Worse candidate",
+      "worseBody": "It performs worse than the current model. Activate anyway?"
+    },
+    "pin": {
+      "title": "Pin to dashboard",
+      "what": "Pinning: {{label}}",
+      "dashboard": "Dashboard",
+      "noDashboards": "No dashboard you can edit.",
+      "goDashboards": "Create a dashboard",
+      "latestNote": "The widget always shows this analysis's latest successful result.",
+      "submit": "Pin",
+      "done": "Pinned to “{{name}}”.",
+      "open": "Open dashboard"
+    }
+  },
+  "dashboards": {
+    "analysis": {
+      "deleted": "Deleted analysis",
+      "noResult": "No successful result yet.",
+      "reference": "For reference",
+      "resultAt": "Result at {{at}}",
+      "open": "View result"
+    }
+  },
+  "errors": {
+    "ANALYTICS_UNAVAILABLE": "The analytics service is temporarily unavailable. Please try again shortly.",
+    "TEMPLATE_NOT_FOUND": "Analysis template not found.",
+    "TEMPLATE_DISABLED": "This template is disabled in your organization.",
+    "ANALYSIS_NOT_FOUND": "Analysis not found.",
+    "ANALYSIS_RUN_NOT_FOUND": "Run not found.",
+    "ANALYSIS_BINDING_INVALID": "Connected data doesn't match the template's requirements.",
+    "ANALYSIS_PARAMS_INVALID": "Invalid parameter values.",
+    "ANALYSIS_SCHEDULE_INVALID": "Invalid schedule.",
+    "ANALYSIS_INSUFFICIENT_DATA": "Not enough data to run.",
+    "ANALYSIS_WARNING_NOT_ACKNOWLEDGED": "Acknowledge the data warnings to run.",
+    "ANALYSIS_LIMIT_EXCEEDED": "Run limits exceeded. Shorten the period or use a coarser resolution.",
+    "ANALYSIS_RUN_STATE_CONFLICT": "This run has already finished.",
+    "ANALYSIS_EXPORT_TOO_LARGE": "The result is too large to export.",
+    "MODEL_WORSE_THAN_ACTIVE": "This model performs worse than the active one.",
+    "ML_MODEL_NOT_FOUND": "Model not found.",
+    "TEMPLATE_REQUIRED": "Choose a template.",
+    "SCRIPT_AI_UNAVAILABLE": "The AI script assistant is unavailable right now.",
+    "AI_DISABLED": "AI features are turned off for your organization.",
+    "AI_QUOTA_EXCEEDED": "You've used up today's AI quota.",
+    "AI_PROVIDER_UNAVAILABLE": "The AI service is temporarily unavailable.",
+    "AI_COMMENTARY_SUBJECT_INVALID": "AI commentary is available only for successful runs.",
+    "AI_EVAL_BELOW_THRESHOLD": "The latest evaluation is below the threshold, so the model can't be changed. Pass an evaluation first.",
+    "AI_CONVERSATION_NOT_FOUND": "Conversation not found.",
+    "API_TOKEN_SCOPE_EXCEEDED": "Your role doesn't allow that scope.",
+    "API_TOKEN_EXPIRY_INVALID": "Expiry must be between tomorrow and one year from now.",
+    "API_TOKEN_LIMIT_EXCEEDED": "The organization's token limit (50) has been reached.",
+    "API_TOKEN_NOT_FOUND": "Token not found.",
+    "API_TOKEN_STATE_CONFLICT": "That action isn't possible in the token's current state.",
+    "SERVICE_ACCOUNT_NOT_FOUND": "Service account not found.",
+    "ATTEMPT_LIMIT": "You can retry up to 5 times."
+  }
+}

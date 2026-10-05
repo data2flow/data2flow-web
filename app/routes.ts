@@ -41,6 +41,7 @@ export default [
       route("security", "routes/me-security.tsx"),
       route("sessions", "routes/me-sessions.tsx"),
       route("notifications", "routes/me-notifications.tsx"),
+      route("tokens", "routes/me-tokens.tsx"),
     ]),
     route("admin/members", "routes/admin-members.tsx"),
     route("admin/members/:userId", "routes/admin-member-detail.tsx"),
@@ -159,6 +160,18 @@ export default [
     route("outputs/:outputId", "routes/output-detail.tsx"),
     route("sources/edges", "routes/source-edges.tsx"),
     route("sources/edges/:edgeId", "routes/source-edge-detail.tsx"),
+    // M6 분석·AI(spec/detail/00-navigation.md §2): 분석 목록·갤러리·설명서·마법사·결과·모델(UI-ANA-01~06), MCP 연결(UI-AIA-07),
+    // AI 설정·사용량·평가(UI-AIA-06), API 토큰·서비스 계정 관리(UI-IAM-10). 내 토큰은 /me/tokens
+    route("analytics", "routes/analytics.tsx"),
+    route("analytics/templates", "routes/analytics-templates.tsx"),
+    route("analytics/templates/:templateKey", "routes/analytics-template.tsx"),
+    route("analytics/new", "routes/analytics-new.tsx"),
+    route("analytics/models", "routes/analytics-models.tsx"),
+    route("analytics/:analysisId", "routes/analytics-detail.tsx"),
+    route("analytics/:analysisId/runs/:runId", "routes/analytics-run.tsx"),
+    route("ai/mcp", "routes/ai-mcp.tsx"),
+    route("settings/ai", "routes/settings-ai.tsx"),
+    route("admin/tokens", "routes/admin-tokens.tsx"),
   ]),
 
   // M5 field: 모바일 셸(UI-DSH-14, UI-DEV-17·21)과 QR 딥링크(`/d/{qrToken}`, 로그인 필요) — 00-navigation.md §2·§3
