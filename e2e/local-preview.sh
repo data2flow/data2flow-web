@@ -485,9 +485,11 @@ start_service() { # 서비스 하나 시작(전체 시작과 restart가 같이 �
     simulator) start_java simulator "${COMMON_ENV[@]}" DATA2FLOW_SIM_ORGANIZATION_IDS="$(sql "SELECT min(id) FROM data2flow_core.organizations")" -- \
       --data2flow.sim.flyway-mode=migrate;;
     ingress) start_ingress;;
-    # ai: LLM 키 없음 → 제공자 NONE(수치 요약 템플릿). 스키마 data2flow_ai(pgvector)는 로컬 DB에만 migrate
+    # ai: LLM 키 없음 → 기본 제공자 NONE(수치 요약 템플릿). 시연용 가짜 제공자 FAKE는 고를 수 있게 열어 둔다
+    #     (AI 설정 화면 또는 e2e/m56-demo.sh가 FAKE 평가 뒤 전환, ADR-040). 스키마 data2flow_ai(pgvector)는 로컬 DB에만 migrate
     ai) start_java ai "${COMMON_ENV[@]}" DATA2FLOW_ANALYTICS_URI=http://127.0.0.1:$ANALYTICS_PORT \
-      DATA2FLOW_PIPELINE_BASE_URL=http://127.0.0.1:$PIPELINE_PORT DATA2FLOW_WEB_BASE_URL="$WEB" -- --data2flow.ai.flyway-mode=migrate;;
+      DATA2FLOW_PIPELINE_BASE_URL=http://127.0.0.1:$PIPELINE_PORT DATA2FLOW_WEB_BASE_URL="$WEB" \
+      DATA2FLOW_AI_ALLOWED_PROVIDERS=NONE,FAKE,ANTHROPIC -- --data2flow.ai.flyway-mode=migrate;;
     analytics) start_analytics;;
     auth) start_java auth DATA2FLOW_AUTH_JWT_KEYS="$JWT_KEY" DATA2FLOW_AUTH_JWT_ACTIVE_KEY_ID=pv DATA2FLOW_CORE_URI=http://127.0.0.1:$CORE_PORT --;;
     api-gateway) start_java api-gateway DATA2FLOW_AUTH_URI=http://127.0.0.1:$AUTH_PORT DATA2FLOW_CORE_URI=http://127.0.0.1:$CORE_PORT \
