@@ -5,7 +5,8 @@
   "compliance": {
     "area": {
       "profiles": "Standard profiles",
-      "status": "Compliance status"
+      "status": "Compliance status",
+      "reports": "Reports"
     },
     "archived": "Archived",
     "kind": {
@@ -264,6 +265,123 @@
       "peak": "Peak {{value}}",
       "alarm": "Alarm #{{id}}",
       "noExcursions": "No excursions"
+    },
+    "reports": {
+      "title": "Reports",
+      "new": "New report",
+      "type": "Type",
+      "statusLabel": "Status",
+      "empty": "No reports yet",
+      "emptyBody": "Pick spaces and a period to create a self-check report, then review the draft and publish it.",
+      "types": {
+        "KR_SELF_CHECK": "Self-check",
+        "RESET_SUPPORT": "Certification support (RESET)",
+        "WELL_A08_SUPPORT": "Certification support (WELL A08)"
+      },
+      "status": {
+        "GENERATING": "Generating",
+        "DRAFT": "Draft",
+        "PUBLISHED": "Published",
+        "FAILED": "Failed"
+      },
+      "col": {
+        "title": "Title",
+        "type": "Type",
+        "period": "Period",
+        "revision": "Rev.",
+        "status": "Status",
+        "published": "Published"
+      },
+      "wizard": {
+        "step1": "1. Type",
+        "step2": "2. Target",
+        "step3": "3. Period",
+        "step4": "4. Options",
+        "soon": "(coming soon)",
+        "title": "Title",
+        "titleHint": "Leave empty to name it after the period.",
+        "spaces": "Spaces",
+        "spacesHint": "{{n}} selected. Selecting a parent includes its children.",
+        "spacesFailed": "Could not load spaces.",
+        "facility": "Facility type",
+        "facilityAuto": "Use the applied profile",
+        "from": "From",
+        "to": "To",
+        "periodHint": "Up to 400 days, until today. Dates use the organization time zone ({{timezone}}).",
+        "includeActions": "Include corrective actions",
+        "includeRawCsv": "Include raw data CSV",
+        "branding": "Organization logo on cover",
+        "submit": "Generate preview"
+      },
+      "validation": {
+        "typeRequired": "Choose a type.",
+        "typeUnsupported": "This type is not available yet.",
+        "spaceRequired": "Choose at least one space.",
+        "profileNotApplied": "No profile is applied to the selected spaces.",
+        "virtualOnly": "Only virtual devices are in these spaces. Choose spaces with real devices.",
+        "facilityRequired": "Choose a facility type.",
+        "facilityInvalid": "Invalid facility type.",
+        "periodRequired": "Enter start and end dates.",
+        "periodOrder": "The end date must be on or after the start date.",
+        "periodFuture": "Future dates are not allowed.",
+        "periodTooLong": "The period must be 400 days or less.",
+        "titleTooLong": "Use 200 characters or fewer."
+      },
+      "detail": {
+        "publish": "Publish",
+        "regenerate": "Regenerate",
+        "delete": "Delete revision",
+        "revisions": "Revisions",
+        "noRevision": "No revisions",
+        "toc": "Contents",
+        "generating": "Generating the report",
+        "failed": "The report could not be generated.",
+        "draftNote": "This is a draft. Every page is marked \"Draft\"; publishing re-renders it without the mark, so the hash changes.",
+        "preview": "Report preview",
+        "previewMissing": "The preview cannot be opened.",
+        "meta": "Details",
+        "pdf": "Download PDF",
+        "csv": "Raw data CSV"
+      },
+      "sections": {
+        "cover": "Cover and notice",
+        "summary": "Summary",
+        "metrics": "Statistics by metric",
+        "devices": "Devices and calibration",
+        "unmeasurable": "Unmeasurable metrics",
+        "actions": "Corrective actions"
+      },
+      "meta": {
+        "period": "Period",
+        "revision": "Revision",
+        "facility": "Facility type",
+        "noFacility": "Not specified",
+        "profiles": "Profiles",
+        "profileCount": "{{n}} version(s)",
+        "rows": "Data rows",
+        "missing": "Missing ratio",
+        "virtual": "Virtual devices",
+        "virtualCount": "{{n}} excluded",
+        "late": "Late data",
+        "lateCount": "{{n}} rows added since the previous revision",
+        "generated": "Generated",
+        "published": "Published",
+        "hash": "SHA-256",
+        "qualityWarning": "The missing ratio is {{ratio}}%, above 10%. Interpret the figures with care."
+      },
+      "verify": {
+        "title": "Verify hash",
+        "label": "PDF file",
+        "hint": "Upload a report PDF to check that it matches the original made by this organization (50 MB or less).",
+        "checking": "Checking…",
+        "matched": "Matches the original: revision r{{n}}.",
+        "publishedAt": "Published {{at}}.",
+        "draft": "This is a draft file.",
+        "open": "Open report",
+        "mismatch": "No matching report. The file was changed or is not from this organization.",
+        "notPdf": "Only PDF files can be verified.",
+        "tooLarge": "Only files of 50 MB or less can be verified."
+      }
     }
   },
   "errors": {
@@ -276,6 +394,10 @@
     "CMP_FACILITY_TYPE_REQUIRED": "This profile needs a facility type.",
     "CMP_APPLICATION_DUPLICATE": "Already applied to this target.",
     "CMP_APPLICATION_NOT_FOUND": "Application not found.",
-    "CMP_REPORT_PERIOD_INVALID": "The period must start before it ends and span at most 400 days"
+    "CMP_REPORT_PERIOD_INVALID": "The period must start before it ends and span at most 400 days",
+    "CMP_PROFILE_NOT_APPLIED": "No profile is applied to the selected spaces.",
+    "CMP_VIRTUAL_DATA_NOT_ALLOWED": "Spaces with only virtual devices cannot be used in a report.",
+    "CMP_REPORT_NOT_FOUND": "Report not found.",
+    "CMP_REPORT_STATE_CONFLICT": "This is not possible in the current state. Refresh and try again."
   }
 }

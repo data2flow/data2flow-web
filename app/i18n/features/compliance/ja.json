@@ -5,7 +5,8 @@
   "compliance": {
     "area": {
       "profiles": "基準プロファイル",
-      "status": "遵守状況"
+      "status": "遵守状況",
+      "reports": "レポート"
     },
     "archived": "アーカイブ済み",
     "kind": {
@@ -264,6 +265,123 @@
       "peak": "最大 {{value}}",
       "alarm": "アラーム #{{id}}",
       "noExcursions": "逸脱区間はありません"
+    },
+    "reports": {
+      "title": "レポート",
+      "new": "新しいレポート",
+      "type": "種類",
+      "statusLabel": "状態",
+      "empty": "レポートはまだありません",
+      "emptyBody": "空間と期間を選んで自主点検レポートを作ると、下書きを確認して発行できます。",
+      "types": {
+        "KR_SELF_CHECK": "自主点検",
+        "RESET_SUPPORT": "認証補助(RESET)",
+        "WELL_A08_SUPPORT": "認証補助(WELL A08)"
+      },
+      "status": {
+        "GENERATING": "作成中",
+        "DRAFT": "下書き",
+        "PUBLISHED": "発行済み",
+        "FAILED": "失敗"
+      },
+      "col": {
+        "title": "タイトル",
+        "type": "種類",
+        "period": "期間",
+        "revision": "版",
+        "status": "状態",
+        "published": "発行"
+      },
+      "wizard": {
+        "step1": "1. 種類",
+        "step2": "2. 対象",
+        "step3": "3. 期間",
+        "step4": "4. オプション",
+        "soon": "(準備中)",
+        "title": "タイトル",
+        "titleHint": "空欄なら期間から付けます。",
+        "spaces": "対象空間",
+        "spacesHint": "{{n}}件選択。上位の空間を選ぶと下位も含みます。",
+        "spacesFailed": "空間一覧を読み込めませんでした。",
+        "facility": "施設種別",
+        "facilityAuto": "適用プロファイルから決める",
+        "from": "開始日",
+        "to": "終了日",
+        "periodHint": "最大400日、今日まで。日付は組織のタイムゾーン({{timezone}})基準です。",
+        "includeActions": "改善措置を含める",
+        "includeRawCsv": "生データCSVを含める",
+        "branding": "表紙に組織ロゴ",
+        "submit": "プレビューを作成"
+      },
+      "validation": {
+        "typeRequired": "種類を選んでください。",
+        "typeUnsupported": "この種類はまだ作成できません。",
+        "spaceRequired": "空間を1つ以上選んでください。",
+        "profileNotApplied": "選択した空間にプロファイルが適用されていません。",
+        "virtualOnly": "仮想デバイスだけの空間です。実デバイスがある空間を選んでください。",
+        "facilityRequired": "施設種別を選んでください。",
+        "facilityInvalid": "施設種別が正しくありません。",
+        "periodRequired": "開始日と終了日を入力してください。",
+        "periodOrder": "終了日は開始日以降にしてください。",
+        "periodFuture": "未来の日付は選べません。",
+        "periodTooLong": "期間は400日以内にしてください。",
+        "titleTooLong": "タイトルは200文字以内にしてください。"
+      },
+      "detail": {
+        "publish": "発行",
+        "regenerate": "再作成",
+        "delete": "版を削除",
+        "revisions": "版",
+        "noRevision": "版がありません",
+        "toc": "目次",
+        "generating": "レポートを作成しています",
+        "failed": "レポートを作成できませんでした。",
+        "draftNote": "下書きです。すべてのページに「下書き」表示があり、発行すると表示なしで作り直すためハッシュが変わります。",
+        "preview": "レポートのプレビュー",
+        "previewMissing": "プレビューを開けません。",
+        "meta": "情報",
+        "pdf": "PDFをダウンロード",
+        "csv": "生データCSV"
+      },
+      "sections": {
+        "cover": "表紙・告知",
+        "summary": "概要",
+        "metrics": "項目別統計",
+        "devices": "機器・校正",
+        "unmeasurable": "測定不可項目",
+        "actions": "改善措置"
+      },
+      "meta": {
+        "period": "期間",
+        "revision": "版",
+        "facility": "施設種別",
+        "noFacility": "指定なし",
+        "profiles": "基準プロファイル",
+        "profileCount": "バージョン{{n}}件",
+        "rows": "データ行",
+        "missing": "欠測率",
+        "virtual": "仮想デバイス",
+        "virtualCount": "{{n}}台を除外",
+        "late": "遅れて届いたデータ",
+        "lateCount": "前の版から{{n}}件追加",
+        "generated": "作成",
+        "published": "発行",
+        "hash": "SHA-256",
+        "qualityWarning": "欠測率が{{ratio}}%で10%を超えています。数値の解釈に注意してください。"
+      },
+      "verify": {
+        "title": "ハッシュ検証",
+        "label": "PDFファイル",
+        "hint": "受け取ったレポートPDFをアップロードすると、この組織が作った原本と同じか確認します(50MB以下)。",
+        "checking": "確認中…",
+        "matched": "原本と一致します: 版r{{n}}。",
+        "publishedAt": "{{at}}発行。",
+        "draft": "下書きのファイルです。",
+        "open": "レポートを開く",
+        "mismatch": "一致するレポートがありません。ファイルが変更されたか、この組織のレポートではありません。",
+        "notPdf": "PDFファイルだけ検証できます。",
+        "tooLarge": "50MB以下のファイルだけ検証できます。"
+      }
     }
   },
   "errors": {
@@ -276,6 +394,10 @@
     "CMP_FACILITY_TYPE_REQUIRED": "このプロファイルは施設種別の選択が必要です。",
     "CMP_APPLICATION_DUPLICATE": "同じ対象に既に適用されています。",
     "CMP_APPLICATION_NOT_FOUND": "適用が見つかりません。",
-    "CMP_REPORT_PERIOD_INVALID": "期間は開始日が終了日より前で、400日以内である必要があります"
+    "CMP_REPORT_PERIOD_INVALID": "期間は開始日が終了日より前で、400日以内である必要があります",
+    "CMP_PROFILE_NOT_APPLIED": "選択した空間にプロファイルが適用されていません。",
+    "CMP_VIRTUAL_DATA_NOT_ALLOWED": "仮想デバイスだけの空間はレポートに使えません。",
+    "CMP_REPORT_NOT_FOUND": "レポートが見つかりません。",
+    "CMP_REPORT_STATE_CONFLICT": "現在の状態ではできません。再読み込みしてからやり直してください。"
   }
 }

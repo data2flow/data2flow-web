@@ -221,3 +221,81 @@ describe("CMP-01.05·02.01 UI-CMP-05 종합 점수·UI-CMP-06 준수 현황판 S
     expect(other.body).not.toContain("data-score-card");
   });
 });
+
+describe("CMP-02.02·02.04·02.06 UI-CMP-07 리포트 목록·생성, UI-CMP-08 미리 보기·발행", () => {
+  const form = (extra: Record<string, string | string[]> = {}) => ({ type: "KR_SELF_CHECK", title: "", spaceIds: ["31"], facilityType: "GENERAL", periodFrom: "2026-09-01", periodTo: "2026-09-30", includeActions: "true", ...extra });
+
+  it("TC-CMP-045 VIEWER는 목록·미리 보기만: 판·상태·진행률, 초안 PDF는 서명 링크로 연다, 생성·발행 버튼 없음", async () => {
+    const v = await viewer();
+    const page = await v.get("/compliance/reports");
+    expect(page.response.status).toBe(200);
+    expect(page.body).toContain("2026-09 자가 점검(실습실)");
+    expect(page.body).toContain("r2");
+    expect(page.body).toContain("생성 중");
+    expect(page.body).toContain('aria-valuenow="60"');
+    expect(page.body).toContain('href="/compliance/reports"');
+    expect(page.body).not.toContain("새 리포트");
+    expect((await v.get("/compliance/reports/new")).response.status).toBe(403);
+
+    const detail = await v.get("/compliance/reports/801");
+    expect(detail.body).toContain('src="/bff/api/core/compliance/reports/801/revisions/2/content/preview?expires=1791000600&amp;signature=abc"');
+    expect(detail.body).toContain("모든 쪽에 &quot;초안&quot; 표시");
+    expect(detail.body).toContain("결측률이 12.5%로 10%를 넘습니다");
+    expect(detail.body).toContain("이전 판 이후 30건 추가");
+    expect(detail.body).toContain("해시 검증");
+    expect(detail.body).not.toContain('value="publish"');
+    const first = await v.get("/compliance/reports/801?rev=1");
+    expect(first.body).toContain("9f2a…c41");
+    expect(first.body).toContain("김운영");
+    const content = await v.get("/bff/api/core/compliance/reports/801/revisions/1/content/pdf?expires=1&signature=x");
+    expect(content.response.headers.get("content-type")).toContain("application/pdf");
+  });
+
+  it("TC-CMP-046·049 OPERATOR: 마법사 검증, 같은 조건은 판 +1, 초안 발행·재발행 409, 프로필 미적용 공간 안내", async () => {
+    const o = await operator();
+    const wizard = await o.get("/compliance/reports/new");
+    expect(wizard.response.status).toBe(200);
+    expect(wizard.body).toContain("미리 보기 생성");
+    expect(wizard.body).toContain("인증 보조(RESET)");
+
+    const empty = await o.post("/compliance/reports/new", form({ spaceIds: [] }));
+    expect(empty.response.status).toBe(400);
+    expect(empty.body).toContain("공간을 하나 이상 고르세요");
+    const order = await o.post("/compliance/reports/new", form({ periodFrom: "2026-09-30", periodTo: "2026-09-01" }));
+    expect(order.body).toContain("종료일은 시작일 이후여야 합니다");
+    const notApplied = await o.post("/compliance/reports/new", form({ spaceIds: ["32"] }));
+    expect(notApplied.response.status).toBe(409);
+    expect(notApplied.body).toContain("선택한 공간에 프로필이 적용되어 있지 않습니다");
+
+    const created = await o.post("/compliance/reports/new", form());
+    expect(created.response.status).toBe(302);
+    expect(created.response.headers.get("location")).toBe("/compliance/reports/801?rev=3");
+    const generating = await o.get("/compliance/reports/801?rev=3");
+    expect(generating.body).toContain("리포트를 만들고 있습니다");
+    expect(generating.body).not.toContain('value="regenerate"');
+
+    const draft = await o.get("/compliance/reports/801?rev=2");
+    expect(draft.body).toContain('value="publish"');
+    const published = await o.post("/compliance/reports/801?rev=2", { intent: "publish", revisionNo: "2" });
+    expect(published.response.status).toBe(302);
+    expect((await o.get("/compliance/reports/801?rev=2")).body).not.toContain('value="publish"');
+    const again = await o.post("/compliance/reports/801?rev=2", { intent: "publish", revisionNo: "2" });
+    expect(again.response.status).toBe(409);
+    expect(again.body).toContain("지금 상태에서는 할 수 없습니다");
+
+    const regenerated = await o.post("/compliance/reports/801", { intent: "regenerate", revisionNo: "2" });
+    expect(regenerated.response.headers.get("location")).toBe("/compliance/reports/801?rev=4");
+  });
+
+  it("TC-CMP-054 초안 판 삭제, 발행된 판은 409, 마지막 판을 지우면 목록으로", async () => {
+    const o = await operator();
+    const published = await o.post("/compliance/reports/801", { intent: "delete", revisionNo: "1" });
+    expect(published.response.status).toBe(409);
+    const draft = await o.post("/compliance/reports/801", { intent: "delete", revisionNo: "2" });
+    expect(draft.response.headers.get("location")).toBe("/compliance/reports/801");
+    const created = await o.post("/compliance/reports/new", form({ periodFrom: "2026-08-01", periodTo: "2026-08-31" }));
+    const location = created.response.headers.get("location")!;
+    expect(location).toMatch(/^\/compliance\/reports\/\d+\?rev=1$/);
+    expect((await o.get("/compliance/reports?status=GENERATING")).body).toContain("실내공기질 자가 점검 리포트 2026-08-01 ~ 2026-08-31");
+  });
+});

@@ -5,7 +5,8 @@
   "compliance": {
     "area": {
       "profiles": "标准配置",
-      "status": "合规状况"
+      "status": "合规状况",
+      "reports": "报告"
     },
     "archived": "已归档",
     "kind": {
@@ -264,6 +265,123 @@
       "peak": "最高 {{value}}",
       "alarm": "告警 #{{id}}",
       "noExcursions": "没有超标区间"
+    },
+    "reports": {
+      "title": "报告",
+      "new": "新建报告",
+      "type": "类型",
+      "statusLabel": "状态",
+      "empty": "还没有报告",
+      "emptyBody": "选择空间和期间生成自查报告后，可以查看草稿并发布。",
+      "types": {
+        "KR_SELF_CHECK": "自查",
+        "RESET_SUPPORT": "认证辅助(RESET)",
+        "WELL_A08_SUPPORT": "认证辅助(WELL A08)"
+      },
+      "status": {
+        "GENERATING": "生成中",
+        "DRAFT": "草稿",
+        "PUBLISHED": "已发布",
+        "FAILED": "失败"
+      },
+      "col": {
+        "title": "标题",
+        "type": "类型",
+        "period": "期间",
+        "revision": "版本",
+        "status": "状态",
+        "published": "发布"
+      },
+      "wizard": {
+        "step1": "1. 类型",
+        "step2": "2. 对象",
+        "step3": "3. 期间",
+        "step4": "4. 选项",
+        "soon": "(准备中)",
+        "title": "标题",
+        "titleHint": "留空则按期间命名。",
+        "spaces": "对象空间",
+        "spacesHint": "已选 {{n}} 个。选择上级空间会包含其下级空间。",
+        "spacesFailed": "无法加载空间列表。",
+        "facility": "设施类型",
+        "facilityAuto": "按已应用的配置确定",
+        "from": "开始日期",
+        "to": "结束日期",
+        "periodHint": "最多 400 天，截至今天。日期按组织时区({{timezone}})计算。",
+        "includeActions": "包含改进措施",
+        "includeRawCsv": "包含原始数据 CSV",
+        "branding": "封面显示组织标志",
+        "submit": "生成预览"
+      },
+      "validation": {
+        "typeRequired": "请选择类型。",
+        "typeUnsupported": "暂不支持此类型。",
+        "spaceRequired": "请至少选择一个空间。",
+        "profileNotApplied": "所选空间未应用任何标准配置。",
+        "virtualOnly": "这些空间只有虚拟设备。请选择有真实设备的空间。",
+        "facilityRequired": "请选择设施类型。",
+        "facilityInvalid": "设施类型无效。",
+        "periodRequired": "请输入开始和结束日期。",
+        "periodOrder": "结束日期不能早于开始日期。",
+        "periodFuture": "不能选择未来日期。",
+        "periodTooLong": "期间不能超过 400 天。",
+        "titleTooLong": "标题不能超过 200 个字符。"
+      },
+      "detail": {
+        "publish": "发布",
+        "regenerate": "重新生成",
+        "delete": "删除版本",
+        "revisions": "版本",
+        "noRevision": "没有版本",
+        "toc": "目录",
+        "generating": "正在生成报告",
+        "failed": "无法生成报告。",
+        "draftNote": "这是草稿。每页都有“草稿”标记，发布时会去掉标记重新生成，因此哈希会改变。",
+        "preview": "报告预览",
+        "previewMissing": "无法打开预览。",
+        "meta": "信息",
+        "pdf": "下载 PDF",
+        "csv": "原始数据 CSV"
+      },
+      "sections": {
+        "cover": "封面与声明",
+        "summary": "摘要",
+        "metrics": "分项统计",
+        "devices": "设备与校准",
+        "unmeasurable": "无法测量的项目",
+        "actions": "改进措施"
+      },
+      "meta": {
+        "period": "期间",
+        "revision": "版本",
+        "facility": "设施类型",
+        "noFacility": "未指定",
+        "profiles": "标准配置",
+        "profileCount": "{{n}} 个版本",
+        "rows": "数据行",
+        "missing": "缺失率",
+        "virtual": "虚拟设备",
+        "virtualCount": "已排除 {{n}} 台",
+        "late": "迟到数据",
+        "lateCount": "自上一版本新增 {{n}} 条",
+        "generated": "生成",
+        "published": "发布",
+        "hash": "SHA-256",
+        "qualityWarning": "缺失率为 {{ratio}}%，超过 10%。请谨慎解读数值。"
+      },
+      "verify": {
+        "title": "哈希验证",
+        "label": "PDF 文件",
+        "hint": "上传收到的报告 PDF，确认是否与本组织生成的原件一致(50MB 以下)。",
+        "checking": "正在检查…",
+        "matched": "与原件一致：版本 r{{n}}。",
+        "publishedAt": "{{at}} 发布。",
+        "draft": "这是草稿文件。",
+        "open": "打开报告",
+        "mismatch": "没有一致的报告。文件已被修改，或不是本组织的报告。",
+        "notPdf": "只能验证 PDF 文件。",
+        "tooLarge": "只能验证 50MB 以下的文件。"
+      }
     }
   },
   "errors": {
@@ -276,6 +394,10 @@
     "CMP_FACILITY_TYPE_REQUIRED": "此配置需要选择设施类型。",
     "CMP_APPLICATION_DUPLICATE": "已适用于该对象。",
     "CMP_APPLICATION_NOT_FOUND": "找不到适用。",
-    "CMP_REPORT_PERIOD_INVALID": "期间的开始日期必须早于结束日期，且不超过400天"
+    "CMP_REPORT_PERIOD_INVALID": "期间的开始日期必须早于结束日期，且不超过400天",
+    "CMP_PROFILE_NOT_APPLIED": "所选空间未应用任何标准配置。",
+    "CMP_VIRTUAL_DATA_NOT_ALLOWED": "只有虚拟设备的空间不能用于报告。",
+    "CMP_REPORT_NOT_FOUND": "找不到报告。",
+    "CMP_REPORT_STATE_CONFLICT": "当前状态下无法执行。请刷新后重试。"
   }
 }
