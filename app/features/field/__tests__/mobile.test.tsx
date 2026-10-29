@@ -101,7 +101,7 @@ describe("내 알림 탭", () => {
   it("notifications 토픽으로 받은 알림을 위에 쌓는다(링크 있으면 링크)", async () => {
     await renderRoute(<MobileNotifications timezone="Asia/Seoul" live={live} />);
     expect(await screen.findByText("새 알림이 없습니다")).toBeInTheDocument();
-    expect(FakeES.all[0].url).toBe("/bff/stream/live?topics=notifications");
+    await waitFor(() => expect(FakeES.all[0]?.url).toBe("/bff/stream/live?topics=notifications"));
     act(() => {
       FakeES.all[0].emit("notification", { id: "n1", category: "ALARM", title: "CO2 높음", link: "/alarms/9", createdAt: "2026-10-04T00:00:00Z" });
       FakeES.all[0].emit("notification", { notificationId: "n2", message: "작업 지시가 배정되었습니다", at: "2026-10-04T00:01:00Z" });

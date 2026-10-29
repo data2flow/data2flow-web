@@ -142,7 +142,8 @@ describe("DEV-13.06 TC-DEV-332 설치 현황판", () => {
     const api = fakeFieldApi();
     await renderRoute(<InstallationBoard sites={[{ id: "1", name: "광주캠퍼스" }]} siteId="1" initial={FLOORS} timezone="Asia/Seoul" api={api} live={live} />);
     await screen.findByTestId("floor-3");
-    expect(FakeES.all[0].url).toBe("/bff/stream/live?topics=space%3A1");
+    // 구독은 렌더 뒤 effect에서 연다. CI 부하에서는 칸이 먼저 보일 수 있어 구독이 열릴 때까지 기다린다
+    await waitFor(() => expect(FakeES.all[0]?.url).toBe("/bff/stream/live?topics=space%3A1"));
     act(() => {
       FakeES.all[0].emit("commissioning", { deviceId: "1050", spaceId: "32", status: "VERIFIED", checklist: {} });
       FakeES.all[0].emit("commissioning", { deviceId: "1051", spaceId: "32", status: "INSTALLED", checklist: {} });

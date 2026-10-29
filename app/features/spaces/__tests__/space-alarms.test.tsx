@@ -1,7 +1,7 @@
 /**
  * 공간 보기 알람(DSH-02.01, UI-DSH-02 알람 탭·기기 카드 배지): TC-DSH-013, AT-DSH-02.1.
  */
-import { act, screen } from "@testing-library/react";
+import { act, screen, waitFor } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { renderRoute } from "../../../../test/render";
 import type { EventSourceLike } from "~/lib/event-stream";
@@ -66,7 +66,8 @@ describe("[DSH-02.01] UI-DSH-02 알람 탭과 기기 카드 배지", () => {
     expect(screen.getByRole("link", { name: "실습실 고CO2" })).toHaveAttribute("href", "/alarms/9");
     expect(screen.getByText("반복 발생")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "알람 목록에서 보기" })).toHaveAttribute("href", "/alarms?spaceId=31");
-    expect(FakeSource.last.url).toContain("topics=alarms");
+    // 구독은 렌더 뒤 effect에서 연다. CI 부하에서는 표가 먼저 보일 수 있다
+    await waitFor(() => expect(FakeSource.last?.url).toContain("topics=alarms"));
     emit({ alarmId: 20, state: "ACTIVE", severity: "MAJOR", spaceId: 311, title: "하위 공간 고온" });
     expect(screen.getByRole("link", { name: "하위 공간 고온" })).toBeInTheDocument();
     emit({ alarmId: 9, state: "CLEARED", severity: "CRITICAL", spaceId: 31 });

@@ -7,12 +7,14 @@
  * M3: 플로우(FLW)·가상 환경(SIM)·제어(ACT), M4: 규칙·알람(RUL)·알림·운영(OPS-05·06)·자동화 부가 화면(FLW-04·11)
  * M5 floor: 층·IFC 모델(DSH-12.04)·조직 달력(DEV-12.01)·운영 모드 수동 지정·외부 맥락(DSC-06)
  * M5 data: 내보내기·가져오기·보관·사전(TSD-04·05·07)·저장 지표(OPS-01.03)
+ * M7: 환경 기준(CMP) 프로필·적용
  * M6: 분석(ANA)·장기 토큰·서비스 계정(IAM-05)·분석 위젯 고정(API-DSH-08). ai 서비스는 handlers/ai.ts(gateway `/api/v1/ai/**`)
  */
 import type { CoreHandler } from "../core-fixtures";
 import { analyticsHandler } from "./analytics";
 import { requirementScreensHandler } from "./requirement-screens";
 import { baseHandler } from "./base";
+import { complianceHandler } from "./compliance";
 import { controlHandler } from "./control";
 import { dataHandler } from "./data";
 import { fieldHandler } from "./field";
@@ -39,7 +41,7 @@ import { telemetryHandler } from "./telemetry";
 // M5 scripts: scriptsM5Handler는 /scripts·/ingest 핸들러보다 먼저 M5 경로를 받는다
 // M6: analyticsHandler는 대시보드 핸들러보다 먼저 pin-analysis(API-DSH-08)를 받는다
 // 요구사항 시험 화면 보강(UI-ACT-08·TSD-06·ANA-07·ANA-09): 분석 핸들러보다 먼저 데이터셋·템플릿 설정을 받는다
-export const CORE_HANDLERS: CoreHandler[] = [requirementScreensHandler, analyticsHandler, dashboardsHandler, scriptsM5Handler, fieldHandler, devModelHandler, dataHandler, floorHandler, rulesHandler, notifyHandler, flowopsHandler, flowsHandler, simHandler, controlHandler, spacesHandler, devicesHandler, modelsHandler, groupsHandler, sourcesM5Handler, sourcesHandler, telemetryHandler, ingestHandler, scriptsHandler, homeHandler, baseHandler];
+export const CORE_HANDLERS: CoreHandler[] = [requirementScreensHandler, complianceHandler, analyticsHandler, dashboardsHandler, scriptsM5Handler, fieldHandler, devModelHandler, dataHandler, floorHandler, rulesHandler, notifyHandler, flowopsHandler, flowsHandler, simHandler, controlHandler, spacesHandler, devicesHandler, modelsHandler, groupsHandler, sourcesM5Handler, sourcesHandler, telemetryHandler, ingestHandler, scriptsHandler, homeHandler, baseHandler];
 
 /** 공개 경로(로그인 없음, `/public/**`) 핸들러. M5: 공유 링크 보기·브랜딩(API-DSH-15·25) */
 export const PUBLIC_HANDLERS = [dashboardsPublicHandler];
