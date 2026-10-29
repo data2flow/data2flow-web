@@ -448,6 +448,103 @@
         "workOrderNotFound": "存在しない作業指示があります",
         "alarmNotFound": "存在しないアラームがあります"
       }
+    },
+    "schedules": {
+      "title": "定期発行",
+      "new": "新しい定期発行",
+      "editTitle": "定期発行の編集",
+      "hint": "スケジュールは組織のタイムゾーン（{{timezone}}）で実行し、発行すると受信者に通知します。",
+      "empty": "定期発行のスケジュールがありません",
+      "emptyBody": "毎月または四半期ごとに自己点検レポートを自動で作成・発行し、受信者に通知できます。",
+      "col": {
+        "name": "名前",
+        "type": "種類",
+        "cadence": "周期",
+        "next": "次回発行予定",
+        "last": "前回の結果"
+      },
+      "every": {
+        "MONTHLY": "毎月{{day}}日 {{time}}",
+        "QUARTERLY": "四半期の最初の月{{day}}日 {{time}}"
+      },
+      "disabled": "オフ",
+      "runNow": "今すぐ実行",
+      "retry": "再試行",
+      "history": "履歴",
+      "historyOf": "実行履歴: {{name}}",
+      "noRuns": "まだ実行していません",
+      "runStatus": {
+        "PENDING": "待機",
+        "RUNNING": "作成中",
+        "SUCCEEDED": "成功",
+        "FAILED": "失敗"
+      },
+      "run": {
+        "at": "予定時刻",
+        "trigger": "実行",
+        "result": "結果",
+        "report": "レポート",
+        "deliveries": "受信者"
+      },
+      "trigger": {
+        "SCHEDULED": "スケジュール",
+        "MANUAL": "今すぐ実行"
+      },
+      "attempts": "{{n}}回試行",
+      "openReport": "レポートを開く",
+      "delivery": {
+        "REQUESTED": "通知依頼",
+        "UNSUPPORTED": "メール未対応"
+      },
+      "basics": "基本",
+      "name": "名前",
+      "timing": "スケジュール",
+      "cadence": "周期",
+      "cadences": {
+        "MONTHLY": "毎月",
+        "QUARTERLY": "四半期"
+      },
+      "day": "実行日（1〜28）",
+      "time": "発行時刻",
+      "periodRule": "対象期間",
+      "periodRules": {
+        "PREVIOUS_MONTH": "前月",
+        "PREVIOUS_QUARTER": "前四半期"
+      },
+      "dayHint": {
+        "MONTHLY": "毎月その日のその時刻（{{timezone}}）に作成します。",
+        "QUARTERLY": "1・4・7・10月のその日のその時刻（{{timezone}}）に作成します。"
+      },
+      "recipients": "受信者",
+      "users": "ユーザー",
+      "usersFailed": "ユーザー一覧を読み込めませんでした。",
+      "emails": "メール",
+      "emailsHint": "カンマか改行で区切ります。メール送信はチャネルの準備ができ次第始まります。",
+      "output": "形式と使用",
+      "format": "形式",
+      "formats": {
+        "PDF": "PDF",
+        "PDF_CSV": "PDF + CSV"
+      },
+      "enabled": "使用",
+      "validation": {
+        "nameRequired": "名前を入力してください。",
+        "nameTooLong": "名前は100文字までです。",
+        "typeUnsupported": "この種類はまだ定期発行できません。",
+        "spaceRequired": "空間を1つ以上選んでください。",
+        "profileNotApplied": "選択した空間にプロファイルが適用されていません。",
+        "facilityRequired": "施設種別を選んでください。",
+        "titleTooLong": "タイトルは200文字以内にしてください。",
+        "cadenceRequired": "周期を選んでください。",
+        "dayRange": "実行日は1〜28の間です。",
+        "timeFormat": "発行時刻はHH:mm形式です。",
+        "periodRuleRequired": "対象期間を選んでください。",
+        "formatRequired": "形式を選んでください。",
+        "recipientsRequired": "受信者を1人以上指定してください。",
+        "tooManyRecipients": "受信者は{{max}}人までです。",
+        "emailInvalid": "メールアドレスの形式が正しくありません。",
+        "userNotFound": "存在しないユーザーがいます。"
+      }
     }
   },
   "errors": {
@@ -467,6 +564,8 @@
     "CMP_REPORT_STATE_CONFLICT": "現在の状態ではできません。再読み込みしてからやり直してください。",
     "CMP_ACTION_INVALID": "改善措置の内容を確認してください。",
     "CMP_EXCURSION_NOT_FOUND": "逸脱区間が見つかりません。",
-    "CMP_ACTION_NOT_FOUND": "改善措置が見つかりません。"
+    "CMP_ACTION_NOT_FOUND": "改善措置が見つかりません。",
+    "CMP_SCHEDULE_INVALID": "定期発行の設定を確認してください。",
+    "CMP_SCHEDULE_NOT_FOUND": "定期発行のスケジュールが見つかりません。"
   }
 }

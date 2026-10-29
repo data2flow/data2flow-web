@@ -448,6 +448,103 @@
         "workOrderNotFound": "存在不存在的工单",
         "alarmNotFound": "存在不存在的告警"
       }
+    },
+    "schedules": {
+      "title": "定期发布",
+      "new": "新建定期发布",
+      "editTitle": "编辑定期发布",
+      "hint": "计划按组织时区（{{timezone}}）运行，发布后通知接收人。",
+      "empty": "暂无定期发布计划",
+      "emptyBody": "可每月或每季度自动生成并发布自检报告，并通知接收人。",
+      "col": {
+        "name": "名称",
+        "type": "类型",
+        "cadence": "周期",
+        "next": "下次发布",
+        "last": "上次结果"
+      },
+      "every": {
+        "MONTHLY": "每月{{day}}日 {{time}}",
+        "QUARTERLY": "每季度首月{{day}}日 {{time}}"
+      },
+      "disabled": "已关闭",
+      "runNow": "立即运行",
+      "retry": "重试",
+      "history": "历史",
+      "historyOf": "运行历史：{{name}}",
+      "noRuns": "尚未运行",
+      "runStatus": {
+        "PENDING": "等待",
+        "RUNNING": "生成中",
+        "SUCCEEDED": "成功",
+        "FAILED": "失败"
+      },
+      "run": {
+        "at": "计划时间",
+        "trigger": "触发",
+        "result": "结果",
+        "report": "报告",
+        "deliveries": "接收人"
+      },
+      "trigger": {
+        "SCHEDULED": "计划",
+        "MANUAL": "立即运行"
+      },
+      "attempts": "尝试{{n}}次",
+      "openReport": "打开报告",
+      "delivery": {
+        "REQUESTED": "已请求通知",
+        "UNSUPPORTED": "暂不支持邮件"
+      },
+      "basics": "基本",
+      "name": "名称",
+      "timing": "计划",
+      "cadence": "周期",
+      "cadences": {
+        "MONTHLY": "每月",
+        "QUARTERLY": "每季度"
+      },
+      "day": "执行日（1~28）",
+      "time": "发布时间",
+      "periodRule": "目标期间",
+      "periodRules": {
+        "PREVIOUS_MONTH": "上个月",
+        "PREVIOUS_QUARTER": "上个季度"
+      },
+      "dayHint": {
+        "MONTHLY": "每月该日该时间（{{timezone}}）生成。",
+        "QUARTERLY": "在1、4、7、10月的该日该时间（{{timezone}}）生成。"
+      },
+      "recipients": "接收人",
+      "users": "用户",
+      "usersFailed": "无法加载用户列表。",
+      "emails": "邮箱",
+      "emailsHint": "用逗号或换行分隔。邮件通道就绪后开始发送。",
+      "output": "格式与启用",
+      "format": "格式",
+      "formats": {
+        "PDF": "PDF",
+        "PDF_CSV": "PDF + CSV"
+      },
+      "enabled": "启用",
+      "validation": {
+        "nameRequired": "请输入名称。",
+        "nameTooLong": "名称最多100个字符。",
+        "typeUnsupported": "该类型暂不支持定期发布。",
+        "spaceRequired": "请至少选择一个空间。",
+        "profileNotApplied": "所选空间未应用配置文件。",
+        "facilityRequired": "请选择设施类型。",
+        "titleTooLong": "标题不超过200个字符。",
+        "cadenceRequired": "请选择周期。",
+        "dayRange": "执行日必须在1到28之间。",
+        "timeFormat": "发布时间格式为HH:mm。",
+        "periodRuleRequired": "请选择目标期间。",
+        "formatRequired": "请选择格式。",
+        "recipientsRequired": "请至少指定一个接收人。",
+        "tooManyRecipients": "接收人最多{{max}}个。",
+        "emailInvalid": "邮箱格式不正确。",
+        "userNotFound": "存在不存在的用户。"
+      }
     }
   },
   "errors": {
@@ -467,6 +564,8 @@
     "CMP_REPORT_STATE_CONFLICT": "当前状态下无法执行。请刷新后重试。",
     "CMP_ACTION_INVALID": "请检查改进措施信息。",
     "CMP_EXCURSION_NOT_FOUND": "找不到超标区间。",
-    "CMP_ACTION_NOT_FOUND": "找不到改进措施。"
+    "CMP_ACTION_NOT_FOUND": "找不到改进措施。",
+    "CMP_SCHEDULE_INVALID": "请检查定期发布设置。",
+    "CMP_SCHEDULE_NOT_FOUND": "找不到定期发布计划。"
   }
 }

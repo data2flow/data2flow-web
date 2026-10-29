@@ -385,3 +385,109 @@ describe("CMP-02.05 UI-CMP-10 개선 조치 기록", () => {
     expect((await o.get("/compliance/excursions/1234")).response.status).toBe(404);
   });
 });
+
+describe("CMP-02.04 UI-CMP-09 정기 발행", () => {
+  const scheduleForm = (extra: Record<string, string | string[]> = {}) => ({
+    intent: "save",
+    name: "분기 자가 점검",
+    type: "KR_SELF_CHECK",
+    title: "",
+    spaceIds: "31",
+    facilityType: "",
+    cadence: "QUARTERLY",
+    dayOfPeriod: "5",
+    publishTime: "08:30",
+    periodRule: "PREVIOUS_QUARTER",
+    userIds: ["7", "9"],
+    emails: "Audit@Example.com",
+    format: "PDF_CSV",
+    enabled: "true",
+    ...extra,
+  });
+
+  it("목록: 주기·다음 발행·마지막 실패 원인과 [재시도], [이력], 지금 실행", async () => {
+    const o = await operator();
+    expect((await o.get("/compliance/reports")).body).toContain('href="/compliance/reports/schedules"');
+    const page = await o.get("/compliance/reports/schedules");
+    expect(page.response.status).toBe(200);
+    expect(page.body).toContain("월간 자가 점검");
+    expect(page.body).toContain("매월 1일 09:00");
+    expect(page.body).toContain("실패");
+    expect(page.body).toContain("선택한 공간에 프로필이 적용되어 있지 않습니다.");
+    expect(page.body).toContain("재시도");
+
+    const history = await o.get("/compliance/reports/schedules?runs=701");
+    expect(history.body).toContain("실행 이력: 월간 자가 점검");
+    expect(history.body).toContain("3번 시도");
+
+    const run = await o.post("/compliance/reports/schedules", { intent: "runNow", scheduleId: "701" });
+    expect(run.response.status).toBe(302);
+    expect(run.response.headers.get("location")).toBe("/compliance/reports/schedules?runs=701");
+    const after = await o.get("/compliance/reports/schedules?runs=701");
+    expect(after.body).toContain("지금 실행");
+    expect(after.body).toContain("대기");
+    expect(cmpState(app.gateway.m2).runs).toHaveLength(2);
+  });
+
+  it("TC-CMP-059 만들기 검증(실행일·이메일·수신자), 프로필 없는 공간, 저장, 고치기(버전), 삭제", async () => {
+    const o = await operator();
+    const page = await o.get("/compliance/reports/schedules/new");
+    expect(page.response.status).toBe(200);
+    expect(page.body).toContain("수신자");
+    expect(page.body).toContain("김운영");
+
+    const day = await o.post("/compliance/reports/schedules/new", scheduleForm({ dayOfPeriod: "32" }));
+    expect(day.response.status).toBe(400);
+    expect(day.body).toContain("실행일은 1~28 사이여야 합니다.");
+    const email = await o.post("/compliance/reports/schedules/new", scheduleForm({ emails: "not-an-email" }));
+    expect(email.body).toContain("이메일 형식이 올바르지 않습니다.");
+    const none = await o.post("/compliance/reports/schedules/new", scheduleForm({ userIds: [], emails: "" }));
+    expect(none.body).toContain("수신자를 한 명 이상 정하세요.");
+    const office = await o.post("/compliance/reports/schedules/new", scheduleForm({ spaceIds: "32" }));
+    expect(office.response.status).toBe(409);
+    expect(office.body).toContain("선택한 공간에 프로필이 적용되어 있지 않습니다.");
+
+    const saved = await o.post("/compliance/reports/schedules/new", scheduleForm());
+    expect(saved.response.status).toBe(302);
+    const created = cmpState(app.gateway.m2).schedules[1];
+    expect(created).toMatchObject({
+      name: "분기 자가 점검",
+      cadence: "QUARTERLY",
+      dayOfPeriod: 5,
+      publishTime: "08:30",
+      recipients: { userIds: ["7", "9"], emails: ["audit@example.com"] },
+      format: "PDF_CSV",
+      enabled: true,
+    });
+    const id = created.reportScheduleId as string;
+    expect((await o.get("/compliance/reports/schedules")).body).toContain("분기 첫 달 5일 08:30");
+
+    const edit = await o.get(`/compliance/reports/schedules/${id}`);
+    expect(edit.body).toContain("정기 발행 고치기");
+    expect(edit.body).toContain("audit@example.com");
+    const off = await o.post(`/compliance/reports/schedules/${id}`, scheduleForm({ version: "0", enabled: "" }));
+    expect(off.response.status).toBe(302);
+    expect(cmpState(app.gateway.m2).schedules[1]).toMatchObject({ enabled: false, nextRunAt: null, version: 1 });
+    expect((await o.get("/compliance/reports/schedules")).body).toContain("꺼짐");
+    const stale = await o.post(`/compliance/reports/schedules/${id}`, scheduleForm({ version: "0" }));
+    expect(stale.response.status).toBe(409);
+    expect(stale.body).toContain("다른 사용자가 먼저 수정했습니다");
+
+    const removed = await o.post(`/compliance/reports/schedules/${id}`, { intent: "delete" });
+    expect(removed.response.status).toBe(302);
+    expect(cmpState(app.gateway.m2).schedules).toHaveLength(1);
+    expect((await o.get(`/compliance/reports/schedules/${id}`)).response.status).toBe(404);
+  });
+
+  it("VIEWER는 목록과 이력만 보고 만들기·지금 실행은 없다", async () => {
+    const v = await viewer();
+    const page = await v.get("/compliance/reports/schedules?runs=701");
+    expect(page.response.status).toBe(200);
+    expect(page.body).toContain("월간 자가 점검");
+    expect(page.body).not.toContain("새 정기 발행");
+    expect(page.body).not.toContain('value="runNow"');
+    expect((await v.get("/compliance/reports/schedules/new")).response.status).toBe(403);
+    const denied = await v.post("/compliance/reports/schedules", { intent: "runNow", scheduleId: "701" });
+    expect(denied.response.status).toBe(403);
+  });
+});

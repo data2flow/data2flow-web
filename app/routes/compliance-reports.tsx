@@ -53,11 +53,14 @@ export default function ComplianceReports({ loaderData }: Route.ComponentProps) 
         title={t("compliance.reports.title")}
         crumb={t("nav.compliance")}
         actions={
-          canReport && (
-            <ButtonLink to="/compliance/reports/new" variant="primary">
-              {t("compliance.reports.new")}
-            </ButtonLink>
-          )
+          <div className="flex gap-2">
+            <ButtonLink to="/compliance/reports/schedules">{t("compliance.schedules.title")}</ButtonLink>
+            {canReport && (
+              <ButtonLink to="/compliance/reports/new" variant="primary">
+                {t("compliance.reports.new")}
+              </ButtonLink>
+            )}
+          </div>
         }
       />
       <Form method="get" className="mb-4 flex flex-wrap items-end gap-3">

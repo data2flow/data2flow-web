@@ -181,6 +181,9 @@ export default [
     route("compliance/excursions/:excursionId", "routes/compliance-excursion-actions.tsx"),
     route("compliance/reports", "routes/compliance-reports.tsx"),
     route("compliance/reports/new", "routes/compliance-report-new.tsx"),
+    route("compliance/reports/schedules", "routes/compliance-report-schedules.tsx"),
+    route("compliance/reports/schedules/new", "routes/compliance-report-schedule-edit.tsx", { id: "routes/compliance-report-schedule-new" }),
+    route("compliance/reports/schedules/:scheduleId", "routes/compliance-report-schedule-edit.tsx"),
     route("compliance/reports/:reportId", "routes/compliance-report-detail.tsx"),
   ]),
 
