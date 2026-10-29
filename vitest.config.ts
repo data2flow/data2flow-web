@@ -41,6 +41,8 @@ export default defineConfig({
           environment: "jsdom",
           include: ["app/**/*.test.tsx"],
           setupFiles: ["test/setup.client.ts"],
+          // 기본 5초는 CI(파일 200개를 함께 돌림)에서 사용자 입력이 많은 시험이 넘기곤 한다
+          testTimeout: 15_000,
         },
       },
     ],

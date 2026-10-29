@@ -1,7 +1,7 @@
 /**
  * 서브플로우(FLW-01.04, UI-FLW-11, BR-FLW-17).
  */
-import { fireEvent, screen, within } from "@testing-library/react";
+import { fireEvent, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createFlowGraph } from "../model/flow-graph";
@@ -17,6 +17,8 @@ describe("FLW-01.04 TC-FLW-014 AT-FLW-13.1 서브플로우로 만들기", () => 
     const onReload = vi.fn();
     const api = fakeApi();
     const { container } = await renderEditor({ role: "OPERATOR", detail: detailOf(coolingGraph()), api, onReload });
+    // 캔버스가 노드를 그린 뒤에 고른다(부하가 큰 CI에서는 첫 그리기가 늦다)
+    await waitFor(() => expect(nodeEl(container, "n-thr00001")).not.toBeNull());
     fireEvent.click(nodeEl(container, "n-agg00001"));
     fireEvent.keyDown(document.body, { key: "Shift" });
     fireEvent.click(nodeEl(container, "n-thr00001"), { shiftKey: true });
