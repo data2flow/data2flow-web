@@ -88,8 +88,9 @@ describe("UI-DEV-17 모바일 기기 상세", () => {
   it("오프라인이면 사진을 대기열에 넣는다", async () => {
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
     const api = fakeFieldApi();
-    await renderRoute(<MobileDevice device={DEVICE} orders={[order({ status: "IN_PROGRESS" })]} alarms={[]} canWrite timezone="Asia/Seoul" now={NOW} api={api} />);
+    // 렌더 전에 끊어 둔다: 마운트 때 연결 상태를 읽으므로 리스너 등록 시점과 경합하지 않는다
     setOnline(false);
+    await renderRoute(<MobileDevice device={DEVICE} orders={[order({ status: "IN_PROGRESS" })]} alarms={[]} canWrite timezone="Asia/Seoul" now={NOW} api={api} />);
     await user.upload(await screen.findByLabelText("사진"), new File([new Uint8Array([1])], "after.jpg", { type: "image/jpeg" }));
     expect(await screen.findByText("연결되면 전송합니다")).toBeInTheDocument();
     expect(api.attach).not.toHaveBeenCalled();
