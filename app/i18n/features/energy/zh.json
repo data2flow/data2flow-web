@@ -1,0 +1,146 @@
+{
+  "nav": {
+    "energy": "能源"
+  },
+  "energy": {
+    "area": {
+      "meters": "计量与账单",
+      "settings": "能源设置"
+    },
+    "settings": {
+      "title": "能源设置",
+      "tabs": {
+        "tariffs": "电价",
+        "factors": "排放系数"
+      },
+      "noRecalc": "修改后的电价和系数从开始日期起生效。已计算的过去期间不会重新计算。",
+      "noTariffs": "尚无电价",
+      "scope": "适用范围",
+      "scopeOrg": "整个组织",
+      "period": "期间",
+      "range": "{{from}} ~ {{to}}",
+      "mode": "方式",
+      "modes": {
+        "FLAT": "单一电价",
+        "TOU": "分时电价"
+      },
+      "rate": "电价·时段",
+      "baseCharge": "基本电费(韩元/月)",
+      "perKwh": "{{rate}} 韩元/kWh",
+      "dayType": {
+        "WEEKDAY": "工作日",
+        "WEEKEND_HOLIDAY": "周末·节假日"
+      },
+      "band": {
+        "from": "开始",
+        "to": "结束",
+        "rate": "韩元/kWh",
+        "label": "名称(低谷等)",
+        "remove": "删除",
+        "add": "+ 时段"
+      },
+      "addTariff": "添加电价期间",
+      "validFrom": "开始日期",
+      "flatRate": "电价(韩元/kWh)",
+      "touHint": "请将工作日和周末·节假日分别从 00:00 到 24:00 无间隙地划分时段。节假日以组织日历为准。",
+      "add": "添加",
+      "addFactor": "添加排放系数期间",
+      "factor": "系数(tCO2eq/MWh)",
+      "sourceTitle": "来源文件",
+      "sourceYear": "基准年份",
+      "source": "来源",
+      "systemDefault": "默认值(只读)",
+      "sourceOf": "{{title}}({{year}}年基准)",
+      "factorValue": "{{value}} tCO2eq/MWh",
+      "delete": "删除",
+      "validation": {
+        "dateRequired": "请输入开始日期",
+        "ratePositive": "电价必须大于0(最多两位小数)",
+        "coverage": "请覆盖全部24小时",
+        "modeRequired": "请选择方式",
+        "wholeWon": "请输入整数韩元",
+        "factorRange": "请输入0~2之间的数字(最多四位小数)",
+        "sourceRequired": "请输入来源",
+        "sourceTooLong": "来源最多200个字符",
+        "yearRange": "请输入1990~2100之间的年份"
+      }
+    },
+    "meters": {
+      "title": "计量与账单",
+      "spaces": "空间",
+      "noSpaces": "没有空间",
+      "sourcesOf": "{{name}}的能源来源",
+      "meteredFirst": "该空间同时有实测和估算来源。合计使用实测值,估算值仅用于比较。",
+      "noSources": "尚未连接能源来源",
+      "noSourcesBody": "请连接电能表或智能插座,或按设备额定功率估算。",
+      "col": {
+        "kind": "类型",
+        "target": "对象",
+        "scope": "覆盖范围",
+        "status": "状态",
+        "month": "月份",
+        "billKwh": "账单 kWh",
+        "amount": "金额(韩元)",
+        "meteredKwh": "实测合计 kWh",
+        "diff": "差异"
+      },
+      "kind": {
+        "METERED": "实测",
+        "ESTIMATED": "估算"
+      },
+      "cumulative": "{{metric}} · 累计型",
+      "instant": "{{metric}} · 瞬时型",
+      "rated": "额定 {{rated}}W · 待机 {{standby}}W",
+      "integrated": "将功率(W)按时间积分计算为 kWh",
+      "coversDescendants": "含下级空间合计",
+      "thisSpace": "本空间",
+      "status": {
+        "OK": "正常",
+        "NO_DATA": "24小时无数据",
+        "DISABLED": "已关闭"
+      },
+      "remove": "删除",
+      "addMetered": "添加实测",
+      "noCandidates": "该空间没有带 energy·power 测量项的设备。",
+      "meter": "设备·测量项",
+      "autoDetect": "energy 自动识别为累计型(kWh),power 为瞬时型(W)。",
+      "coversDescendantsLabel": "包含下级空间合计的总表",
+      "add": "连接",
+      "addEstimated": "添加估算",
+      "equipment": "设备",
+      "choose": "请选择",
+      "ratedPowerW": "额定功率(W)",
+      "standbyPowerW": "待机功率(W)",
+      "bills": "{{year}}年账单",
+      "prevYear": "‹ 上一年",
+      "nextYear": "下一年 ›",
+      "noBills": "尚未录入账单",
+      "noMetered": "无实测合计",
+      "diff": "差异 {{value}}",
+      "overwriteConfirm": "{{month}}的账单已存在。要覆盖吗?",
+      "overwrite": "覆盖",
+      "cancel": "取消",
+      "saveBill": "保存账单",
+      "billsSiteOnly": "账单按站点·建筑录入。",
+      "validation": {
+        "deviceRequired": "请选择设备",
+        "powerRequired": "请输入额定功率数字",
+        "monthRequired": "请选择月份",
+        "kwhPositive": "用量必须大于0(最多一位小数)",
+        "wholeWon": "请输入整数韩元"
+      }
+    }
+  },
+  "errors": {
+    "ENE_RATE_PERIOD_OVERLAP": "期间重叠",
+    "ENE_EMISSION_FACTOR_SYSTEM_READONLY": "系统默认排放系数不可修改。请为新期间添加组织系数",
+    "ENE_RATE_INVALID": "请检查电价设置",
+    "ENE_SOURCE_CONFLICT": "该电表已连接到其他空间,或与总表重叠",
+    "ENE_SOURCE_METRIC_INVALID": "不是能源测量项",
+    "ENE_BILL_DUPLICATE": "该月份已录入",
+    "ENE_TARIFF_NOT_FOUND": "找不到电价",
+    "ENE_EMISSION_FACTOR_NOT_FOUND": "找不到排放系数",
+    "ENE_SOURCE_NOT_FOUND": "找不到能源来源",
+    "ENE_BILL_NOT_FOUND": "找不到电费账单"
+  }
+}

@@ -1,0 +1,145 @@
+/**
+ * M7 에너지 설정 화면 SSR + BFF 통합: UI-ENE-01 단가·배출계수(TC-ENE-015), UI-ENE-02 계량·고지서(TC-ENE-008).
+ * 가짜 gateway: test/msw/handlers/energy.ts.
+ */
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
+import { TestBrowser, startApp, type AppContext } from "./app-harness";
+import { eneState } from "./msw/handlers/energy";
+
+let app: AppContext;
+beforeAll(async () => {
+  app = await startApp();
+});
+afterAll(async () => {
+  await app.close();
+});
+beforeEach(() => app.reset());
+
+async function as(loginId: string, password: string) {
+  const browser = new TestBrowser(app);
+  const result = await browser.login(loginId, password);
+  expect(result.response.status).toBe(302);
+  await browser.get("/");
+  return browser;
+}
+const integrator = () => as("lee.int", "Integrator-Pass1");
+const operator = () => as("kim.op", "Correct-Horse-9");
+const viewer = () => as("view.er", "Viewer-Pass-123");
+
+const tou = (weekdaySecondFrom: string) => ({
+  intent: "createTariff",
+  idempotencyKey: "t1",
+  validFrom: "2026-12-01",
+  mode: "TOU",
+  "WEEKDAY.from": ["00:00", weekdaySecondFrom],
+  "WEEKDAY.to": ["09:00", "24:00"],
+  "WEEKDAY.rate": ["100", "200"],
+  "WEEKDAY.label": ["경부하", ""],
+  "WEEKEND_HOLIDAY.from": ["00:00"],
+  "WEEKEND_HOLIDAY.to": ["24:00"],
+  "WEEKEND_HOLIDAY.rate": ["100"],
+  "WEEKEND_HOLIDAY.label": [""],
+});
+
+describe("ENE-01.02 UI-ENE-01 에너지 설정", () => {
+  it("TC-ENE-015 기본 배출계수 옆에 출처 문서명과 기준 연도, 과거 재계산 안내", async () => {
+    const i = await integrator();
+    const factors = await i.get("/energy/settings?tab=factors");
+    expect(factors.response.status).toBe(200);
+    expect(factors.body).toContain("0.4567 tCO2eq/MWh");
+    expect(factors.body).toContain("국가 온실가스 배출·흡수계수 — 전력 배출계수 (2023년 기준)");
+    expect(factors.body).toContain("기본값(읽기 전용)");
+    expect(factors.body).toContain("과거 기간은 다시 계산하지 않습니다");
+    expect(factors.body).not.toContain('name="intent" value="deleteFactor"');
+
+    const tariffs = await i.get("/energy/settings");
+    expect(tariffs.body).toContain("150.00 원/kWh");
+    expect(tariffs.body).toContain("2026-01-01 ~ 2026-09-30");
+    expect(tariffs.body).toContain("00:00–09:00 경부하 98");
+    expect(tariffs.body).toContain('href="/energy/meters"');
+  });
+
+  it("TC-ENE-015 TOU가 24시간을 덮지 않으면 저장할 수 없고, 덮으면 저장된다", async () => {
+    const i = await integrator();
+    const gap = await i.post("/energy/settings", tou("10:00"));
+    expect(gap.response.status).toBe(400);
+    expect(gap.body).toContain("24시간을 모두 지정하세요");
+    expect(eneState(app.gateway.m2).tariffs).toHaveLength(2);
+    const saved = await i.post("/energy/settings", tou("09:00"));
+    expect(saved.response.status).toBe(302);
+    const added = eneState(app.gateway.m2).tariffs.at(-1) as { touSchedule: { seasons: { bands: unknown[] }[] } };
+    expect(added.touSchedule.seasons[0].bands).toHaveLength(3);
+
+    const overlap = await i.post("/energy/settings", { intent: "createTariff", idempotencyKey: "t2", validFrom: "2026-10-01", mode: "FLAT", flatRate: "160" });
+    expect(overlap.response.status).toBe(409);
+    expect(overlap.body).toContain("기간이 겹칩니다");
+    const zero = await i.post("/energy/settings", { intent: "createTariff", validFrom: "2027-01-01", mode: "FLAT", flatRate: "0" });
+    expect(zero.response.status).toBe(400);
+
+    const system = await i.post("/energy/settings?tab=factors", { intent: "deleteFactor", id: "1" });
+    expect(system.response.status).toBe(409);
+    expect(system.body).toContain("시스템 기본 배출계수는 바꿀 수 없습니다");
+    const factor = await i.post("/energy/settings?tab=factors", { intent: "createFactor", validFrom: "2026-01-01", factor: "0.44", sourceTitle: "한전 공시", sourceYear: "2025" });
+    expect(factor.response.status).toBe(302);
+    expect((await i.get("/energy/settings?tab=factors")).body).toContain("2020-01-01 ~ 2025-12-31");
+  });
+
+  it("OPERATOR는 설정 화면에 들어갈 수 없고 VIEWER는 에너지 메뉴가 없다", async () => {
+    const o = await operator();
+    expect((await o.get("/energy/settings")).response.status).toBe(403);
+    const v = await viewer();
+    expect((await v.get("/")).body).not.toContain('href="/energy/meters"');
+    expect((await v.get("/energy/meters")).response.status).toBe(403);
+  });
+});
+
+describe("ENE-01.01 UI-ENE-02 계량·고지서", () => {
+  it("TC-ENE-008 측정·추정 배지, 고지서와 측정 합계 차이 7.8%", async () => {
+    const o = await operator();
+    const room = await o.get("/energy/meters?spaceId=31");
+    expect(room.response.status).toBe(200);
+    expect(room.body).toContain("실습실의 에너지 출처");
+    expect(room.body).toContain(">측정<");
+    expect(room.body).toContain(">추정<");
+    expect(room.body).toContain("합계에는 측정값을 쓰고");
+    expect(room.body).toContain("정격 1200W · 대기 5W");
+    expect(room.body).toContain("고지서는 사이트·건물 단위로 입력합니다.");
+    expect(room.body).not.toContain('name="intent" value="addMetered"');
+
+    const building = await o.get("/energy/meters?spaceId=2&year=2026");
+    expect(building.body).toContain("2026년 고지서");
+    expect(building.body).toContain("3,200");
+    expect(building.body).toContain("2,950");
+    expect(building.body).toContain("차이 7.8%");
+  });
+
+  it("TC-ENE-008 같은 달 고지서는 409 뒤 덮어쓰기 확인, 확인하면 저장된다", async () => {
+    const i = await integrator();
+    const first = await i.post("/energy/meters?year=2026", { intent: "putBill", spaceId: "2", month: "2026-09", kwh: "3300", amountKrw: "" });
+    expect(first.response.status).toBe(409);
+    expect(first.body).toContain("2026-09 고지서가 이미 있습니다. 새 값으로 덮어쓸까요?");
+    expect(first.body).toContain('name="overwrite" value="true"');
+    const confirmed = await i.post("/energy/meters?year=2026", { intent: "putBill", spaceId: "2", month: "2026-09", kwh: "3300", amountKrw: "", overwrite: "true" });
+    expect(confirmed.response.status).toBe(302);
+    expect(eneState(app.gateway.m2).bills[0]).toMatchObject({ month: "2026-09", kwh: 3300 });
+    const bad = await i.post("/energy/meters", { intent: "putBill", spaceId: "2", month: "2026-10", kwh: "0" });
+    expect(bad.response.status).toBe(400);
+    expect(bad.body).toContain("사용량은 0보다 커야 합니다");
+  });
+
+  it("측정 추가는 아직 연결 안 된 power만 후보로, 같은 계량기는 409", async () => {
+    const i = await integrator();
+    const page = await i.get("/energy/meters?spaceId=31");
+    expect(page.body).toContain('value="2001|power"');
+    expect(page.body).not.toContain('value="2001|energy"');
+    const added = await i.post("/energy/meters", { intent: "addMetered", spaceId: "31", meter: "2001|power", idempotencyKey: "m1" });
+    expect(added.response.status).toBe(302);
+    expect(eneState(app.gateway.m2).sources.at(-1)).toMatchObject({ metricKey: "power", cumulative: false });
+    const again = await i.post("/energy/meters", { intent: "addMetered", spaceId: "2", meter: "2001|power", idempotencyKey: "m2" });
+    expect(again.response.status).toBe(409);
+    expect(again.body).toContain("이미 다른 공간에 연결된 계량기");
+    const noPower = await i.post("/energy/meters", { intent: "addEstimated", spaceId: "31", deviceId: "1042", ratedPowerW: "" });
+    expect(noPower.response.status).toBe(400);
+    expect(noPower.body).toContain("정격 소비 전력을 숫자로 입력하세요");
+  });
+});

@@ -88,6 +88,11 @@ export const RAIL: Partial<Record<MenuKey | "admin", RailItem[]>> = {
     { label: "compliance.area.reports", path: "/compliance/reports" },
     { label: "compliance.area.coverage", path: "/compliance/coverage" },
   ],
+  // M7 에너지: 계량·고지서(UI-ENE-02)·설정(UI-ENE-01)
+  energy: [
+    { label: "energy.area.meters", path: "/energy/meters" },
+    { label: "energy.area.settings", path: "/energy/settings" },
+  ],
   sim: [
     { label: "sim.area.home", path: "/sim" },
     { label: "sim.area.catalog", path: "/sim/catalog" },
