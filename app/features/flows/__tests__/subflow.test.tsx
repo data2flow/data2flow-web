@@ -71,6 +71,8 @@ describe("FLW-01.04 TC-FLW-016 AT-FLW-13.2 새 버전 있음", () => {
     graph.wires.push({ from: "n-trg00001", port: "out", to: "n-sub00001" });
     const api = fakeApi({ subflow: vi.fn(() => Promise.resolve({ ok: true as const, status: 200, data: { subflowId: "sf-1", version: 2, usedBy: [] } })) });
     const { container } = await renderEditor({ role: "OPERATOR", detail: detailOf(graph), api });
+    // 바쁜 CI에서는 캔버스 노드가 늦게 그려진다(간헐 실패)
+    await waitFor(() => expect(nodeEl(container, "n-sub00001")).not.toBeNull());
     expect(await within(nodeEl(container, "n-sub00001")).findByText("새 버전 있음(v2)")).toBeInTheDocument();
     fireEvent.click(nodeEl(container, "n-sub00001"));
     expect(screen.getByText("지금 v1 · 새 버전 v2이 있습니다")).toBeInTheDocument();
