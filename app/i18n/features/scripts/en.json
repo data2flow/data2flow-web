@@ -115,6 +115,8 @@
       "force": "Force deploy",
       "forceReason": "Reason for force deployment",
       "applied": "Deployed. Applied on {{reported}}/{{total}} instances",
+      "applying": "Deployed. Applying to instances ({{reported}}/{{total}})",
+      "appliedPartial": "Deployed. Still applying ({{reported}}/{{total}}) — remaining instances apply on the next config sync",
       "blocked": "Errors block deployment. Warnings alone do not.",
       "cases": "Test cases",
       "casesUnavailable": "Could not check (the server checks again on deploy)",

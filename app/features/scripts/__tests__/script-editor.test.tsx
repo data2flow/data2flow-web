@@ -169,6 +169,44 @@ describe("SCR-03.04 배포 대화상자(UI-SCR-02)", () => {
     expect(screen.getByText("ACTIVE v5")).toBeInTheDocument();
   });
 
+  const deployWith = async (api: ScriptApi) => {
+    await renderEditor(api, { script: clean() });
+    await userEvent.click(await screen.findByRole("button", { name: "배포" }));
+    const dialog = await screen.findByRole("dialog", { name: "배포" });
+    await userEvent.type(within(dialog).getByLabelText("배포 메모(2~200자)"), "오프셋 조정");
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    fireEvent.click(within(dialog).getByRole("button", { name: "배포" }));
+    return dialog;
+  };
+  const appliedDetail = (reported: number, total: number) => ({
+    ok: true as const,
+    status: 200,
+    data: detail({ activeVersion: { versionId: "805", versionNo: 5, code: "function transform(msg){ return msg }", applied: { reported, total } }, draft: null }),
+  });
+
+  it("SCR-03.04 배포 응답이 0/2면 상세를 다시 읽어 적용 보고가 모두 오면 2/2로 바꾼다", async () => {
+    const detailFn = vi.fn().mockResolvedValueOnce(appliedDetail(1, 2)).mockResolvedValue(appliedDetail(2, 2));
+    const api = fakeApi({ deploy: vi.fn(async () => ({ ok: true as const, status: 200, data: { activeVersionId: "805", applied: { reported: 0, total: 2 } } })), detail: detailFn });
+    const dialog = await deployWith(api);
+    expect(await within(dialog).findByText("배포했습니다. 인스턴스에 적용하는 중(0/2)")).toBeInTheDocument();
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(2000);
+    });
+    expect(await within(dialog).findByText("배포했습니다. 인스턴스 적용 2/2")).toBeInTheDocument();
+    expect(detailFn).toHaveBeenCalledTimes(2);
+  });
+
+  it("UC-SCR 4a 10초 안에 일부 인스턴스가 보고하지 않으면 '적용 중(1/2)' 경고", async () => {
+    const detailFn = vi.fn().mockResolvedValue(appliedDetail(1, 2));
+    const api = fakeApi({ deploy: vi.fn(async () => ({ ok: true as const, status: 200, data: { activeVersionId: "805", applied: { reported: 0, total: 2 } } })), detail: detailFn });
+    const dialog = await deployWith(api);
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(11000);
+    });
+    expect(await within(dialog).findByText(/^배포했습니다\. 적용 중\(1\/2\)/)).toBeInTheDocument();
+    expect(detailFn).toHaveBeenCalledTimes(10);
+  });
+
   it("TC-SCR-079 서버가 SCRIPT_STATIC_CHECK_FAILED로 거부하면 문구, 저장 안 한 변경은 배포되지 않는다는 안내", async () => {
     const api = fakeApi({ deploy: vi.fn(async () => ({ ok: false as const, status: 400, code: "SCRIPT_STATIC_CHECK_FAILED", message: "" })) });
     await renderEditor(api, { script: clean() });

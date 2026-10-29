@@ -115,6 +115,8 @@
       "force": "強制デプロイ",
       "forceReason": "強制デプロイの理由",
       "applied": "デプロイしました。インスタンス適用 {{reported}}/{{total}}",
+      "applying": "デプロイしました。インスタンスに適用中({{reported}}/{{total}})",
+      "appliedPartial": "デプロイしました。適用中({{reported}}/{{total}}) — 未報告のインスタンスは次の設定同期で適用されます",
       "blocked": "エラーがあるためデプロイできません。警告のみならデプロイできます。",
       "cases": "テストケース",
       "casesUnavailable": "確認できませんでした(デプロイ時にサーバーが再確認します)",
