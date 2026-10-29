@@ -186,6 +186,8 @@ export default [
     route("compliance/reports/schedules/new", "routes/compliance-report-schedule-edit.tsx", { id: "routes/compliance-report-schedule-new" }),
     route("compliance/reports/schedules/:scheduleId", "routes/compliance-report-schedule-edit.tsx"),
     route("compliance/reports/:reportId", "routes/compliance-report-detail.tsx"),
+    route("energy/meters", "routes/energy-meters.tsx"),
+    route("energy/settings", "routes/energy-settings.tsx"),
   ]),
 
   // M5 field: 모바일 셸(UI-DSH-14, UI-DEV-17·21)과 QR 딥링크(`/d/{qrToken}`, 로그인 필요) — 00-navigation.md §2·§3
