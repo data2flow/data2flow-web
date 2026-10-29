@@ -1,7 +1,7 @@
 /**
  * 라이브 편집(FLW-06): 상태 정책 요약(06.03), 바이패스·디버그(06.04), 적용 충돌(06.09), 노드 한도(10.01), JS 노드 시험 실행.
  */
-import { act, fireEvent, screen, within } from "@testing-library/react";
+import { act, fireEvent, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createFlowGraph, toDefinition } from "../model/flow-graph";
@@ -12,6 +12,11 @@ beforeEach(() => stubReactFlowDom());
 afterEach(() => vi.useRealTimers());
 
 const nodeEl = (container: HTMLElement, id: string) => container.querySelector(`.react-flow__node[data-id="${id}"]`) as HTMLElement;
+/** 노드 카드가 그려질 때까지 기다린다(부하가 크면 React Flow 첫 그리기가 늦다) */
+const nodeOf = async (container: HTMLElement, id: string) => {
+  await waitFor(() => expect(nodeEl(container, id)).not.toBeNull());
+  return nodeEl(container, id);
+};
 const active = (overrides: object = {}) => ({ ...detailOf(coolingGraph(), { status: "ACTIVE", activeVersion: 13, draftVersion: null }), overlay: { bypass: [], debug: [], revision: 4 }, ...overrides });
 
 describe("FLW-06.03 TC-FLW-138 AT-FLW-03.3 노드 상태 이어받기 요약", () => {
@@ -42,7 +47,7 @@ describe("FLW-06.04 TC-FLW-147 바이패스·디버그(overlay)", () => {
   it("INTEGRATOR: 알림·제어 노드 바이패스를 켜면 PUT overlay(revision), 노드 카드 점선과 배지, 버전은 그대로", async () => {
     const api = fakeApi();
     const { container } = await renderEditor({ role: "INTEGRATOR", detail: active(), api });
-    fireEvent.click(nodeEl(container, "n-act00001"));
+    fireEvent.click(await nodeOf(container, "n-act00001"));
     await userEvent.click(screen.getByRole("checkbox", { name: "바이패스(일시 해제)" }));
     expect(api.overlay).toHaveBeenCalledWith("f-7f3a", { bypass: ["n-act00001"], debug: [], revision: 4 });
     expect(await screen.findByText(/노드를 바이패스했습니다$/)).toBeInTheDocument();
@@ -56,10 +61,10 @@ describe("FLW-06.04 TC-FLW-147 바이패스·디버그(overlay)", () => {
     const onReload = vi.fn();
     const api = fakeApi({ overlay: vi.fn(() => Promise.resolve({ ok: false as const, status: 409, code: "FLOW_VERSION_CONFLICT", message: "" })) });
     const { container } = await renderEditor({ role: "OPERATOR", detail: active(), api, onReload });
-    fireEvent.click(nodeEl(container, "n-act00001"));
+    fireEvent.click(await nodeOf(container, "n-act00001"));
     expect(await screen.findByRole("checkbox", { name: "바이패스(일시 해제)" })).toBeDisabled();
     expect((await screen.findAllByText("제어 노드 바이패스는 제어 배포 권한이 필요합니다")).length).toBeGreaterThan(0);
-    fireEvent.click(nodeEl(container, "n-thr00001"));
+    fireEvent.click(await nodeOf(container, "n-thr00001"));
     await userEvent.click(await screen.findByRole("checkbox", { name: "디버그" }));
     expect(await screen.findByText("다른 사람이 먼저 바이패스·디버그를 바꿨습니다. 새로 불러왔습니다")).toBeInTheDocument();
     expect(onReload).toHaveBeenCalled();
@@ -68,14 +73,14 @@ describe("FLW-06.04 TC-FLW-147 바이패스·디버그(overlay)", () => {
   it("서버가 403이면 권한 안내, 승인 필요(202)면 승인 요청 안내, 적용 전 플로우에는 토글이 없다", async () => {
     const overlay = vi.fn().mockResolvedValueOnce({ ok: false, status: 403, code: "PERMISSION_DENIED", message: "" }).mockResolvedValueOnce({ ok: true, status: 202, data: { approvalId: "ap-1" } });
     const { container, unmount } = await renderEditor({ role: "INTEGRATOR", detail: active(), api: fakeApi({ overlay }) });
-    fireEvent.click(nodeEl(container, "n-act00001"));
+    fireEvent.click(await nodeOf(container, "n-act00001"));
     await userEvent.click(await screen.findByRole("checkbox", { name: "바이패스(일시 해제)" }));
     expect(await screen.findByText("제어 노드 바이패스는 제어 배포 권한이 필요합니다", { selector: "[role=alert], [role=alert] *" })).toBeInTheDocument();
     await userEvent.click(screen.getByRole("checkbox", { name: "바이패스(일시 해제)" }));
     expect(await screen.findByText("승인 요청을 보냈습니다")).toBeInTheDocument();
     unmount();
     const draft = await renderEditor({ role: "INTEGRATOR", detail: detailOf(coolingGraph()) });
-    fireEvent.click(nodeEl(draft.container, "n-act00001"));
+    fireEvent.click(await nodeOf(draft.container, "n-act00001"));
     expect(screen.queryByRole("checkbox", { name: "바이패스(일시 해제)" })).toBeNull();
   });
 });
@@ -115,7 +120,7 @@ describe("FLW-07 JS 노드 [노드 시험 실행](설정 패널)", () => {
     const graph = createFlowGraph(catalog).node("trigger.telemetry", "n-trg00001").node("transform.js", "n-js000001", { code: "return {...msg, payload: {t: msg.payload.temperature / 10}};", outputs: 1 }).wire("n-trg00001", "out", "n-js000001").build();
     const api = fakeApi({ testRun: vi.fn(() => Promise.resolve({ ok: true as const, status: 200, data: { trace: { messageId: "m", steps: [{ nodeId: "n-js000001", type: "transform.js", outputs: [{ port: "out1", payload: { payload: { t: 2.81 } } }] }] } } })) });
     const { container } = await renderEditor({ role: "OPERATOR", detail: detailOf(graph), api });
-    fireEvent.click(nodeEl(container, "n-js000001"));
+    fireEvent.click(await nodeOf(container, "n-js000001"));
     await userEvent.click(screen.getByRole("button", { name: "노드 시험 실행" }));
     expect(api.testRun).toHaveBeenCalledWith("f-7f3a", expect.objectContaining({ startNodeId: "n-js000001", input: { message: expect.objectContaining({ payload: { temperature: 28.1, humidity: 41 } }) }, definition: expect.objectContaining({ nodes: expect.any(Array) }) }));
     expect(await screen.findByText(/"t": 2.81/)).toBeInTheDocument();

@@ -10,6 +10,13 @@ beforeEach(() => stubReactFlowDom());
 afterEach(() => vi.useRealTimers());
 
 const activeDetail = () => detailOf(coolingGraph(), { status: "ACTIVE", activeVersion: 13, draftVersion: null });
+/** 라이브 소켓은 effect에서 열리므로 생길 때까지 기다린다(부하가 큰 전체 실행에서도 안정) */
+const liveSocket = <S extends { url: string }>(sockets: { sockets: S[] }) =>
+  vi.waitFor(() => {
+    const found = sockets.sockets.find((s) => !s.url.endsWith("/presence"));
+    if (!found) throw new Error("live socket not opened yet");
+    return found;
+  });
 const nodeEl = (container: HTMLElement, id: string) => container.querySelector(`.react-flow__node[data-id="${id}"]`) as HTMLElement;
 const stats = (inCount: number, extra: object = {}) => ({ type: "node.stats", t: "2026-10-04T00:00:01Z", version: 13, nodes: [{ nodeId: "n-thr00001", in: inCount, out: { true: 2, false: inCount - 2 }, errors: 0, status: "OK", ...extra }] });
 const sample = (i: number, extra: object = {}) => ({ type: "node.sample", t: "2026-10-04T00:00:01Z", version: 13, nodeId: "n-thr00001", messageId: `m-${i}`, direction: "out", port: "true", payload: { temperature: 28 + i / 100 }, masked: false, ...extra });
@@ -17,7 +24,7 @@ const sample = (i: number, extra: object = {}) => ({ type: "node.sample", t: "20
 describe("FLW-03.01 TC-FLW-065 AT-FLW-04.1 AT-FLW-04.2 실시간 흐름 표시", () => {
   it("ACTIVE 플로우를 열면 /bff/stream/flows/{id}로 구독하고, 노드 카운터가 늘고, 화면 샘플은 노드당 초당 5건까지", async () => {
     const { container, sockets } = await renderEditor({ role: "OPERATOR", detail: activeDetail() });
-    const live = sockets.byPath("/bff/stream/flows/f-7f3a").find((s) => !s.url.endsWith("/presence"))!;
+    const live = await liveSocket({ get sockets() { return sockets.byPath("/bff/stream/flows/f-7f3a"); } });
     expect(live.url).toMatch(/^ws:\/\/[^/]+\/bff\/stream\/flows\/f-7f3a$/);
     act(() => live.open());
     expect(live.sent).toEqual([{ type: "subscribe", samples: true }]);
@@ -39,6 +46,7 @@ describe("FLW-03.01 TC-FLW-065 AT-FLW-04.1 AT-FLW-04.2 실시간 흐름 표시",
 
   it("연결이 끊기면 '다시 연결 중' 띠를 보이고 1초 뒤 다시 연결해 구독한다", async () => {
     const { sockets } = await renderEditor({ role: "OPERATOR", detail: activeDetail() });
+    await liveSocket(sockets);
     vi.useFakeTimers();
     const liveSockets = () => sockets.sockets.filter((s) => !s.url.endsWith("/presence"));
     act(() => liveSockets()[0].open());
@@ -72,7 +80,7 @@ describe("FLW-03.01 TC-FLW-065 AT-FLW-04.1 AT-FLW-04.2 실시간 흐름 표시",
 
   it("apply.status로 적용 수렴, flow.status로 엔진 판정 상태를 보여 준다(FLW-06.01·06.02)", async () => {
     const { sockets } = await renderEditor({ role: "OPERATOR", detail: activeDetail() });
-    const live = sockets.sockets.find((s) => !s.url.endsWith("/presence"))!;
+    const live = await liveSocket(sockets);
     act(() => live.open());
     act(() => live.emit({ type: "apply.status", targetVersion: 14, instances: [{ instanceId: "e-1", appliedVersion: 13 }], converged: false }));
     expect(await screen.findByText("v14 적용 중…")).toBeInTheDocument();
@@ -87,7 +95,7 @@ describe("FLW-03.01 TC-FLW-065 AT-FLW-04.1 AT-FLW-04.2 실시간 흐름 표시",
 describe("FLW-03.01 TC-FLW-063 AT-FLW-04.3 권한 밖 공간 메시지는 가린다", () => {
   it("masked 샘플은 내용 없이 '권한 밖 데이터'", async () => {
     const { container, sockets } = await renderEditor({ role: "OPERATOR", detail: activeDetail() });
-    const live = sockets.sockets.find((s) => !s.url.endsWith("/presence"))!;
+    const live = await liveSocket(sockets);
     act(() => live.open());
     act(() => {
       live.emit(sample(1, { direction: "in", port: null, masked: true, payload: { floor: 2, temperature: 30 } }));
@@ -103,7 +111,7 @@ describe("FLW-03.01 TC-FLW-063 AT-FLW-04.3 권한 밖 공간 메시지는 가린
 describe("FLW-03.03 TC-FLW-070 노드 상태 배지", () => {
   it("정상·경고·오류 3종 배지와 접근 가능한 이름, 오류는 최근 오류를 툴팁(500자 절단)", async () => {
     const { container, sockets } = await renderEditor({ role: "OPERATOR", detail: activeDetail() });
-    const live = sockets.sockets.find((s) => !s.url.endsWith("/presence"))!;
+    const live = await liveSocket(sockets);
     act(() => live.open());
     const long = "x".repeat(600);
     act(() =>

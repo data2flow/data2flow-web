@@ -92,7 +92,8 @@ describe("UI-DEV-17 모바일 기기 상세", () => {
     setOnline(false);
     await renderRoute(<MobileDevice device={DEVICE} orders={[order({ status: "IN_PROGRESS" })]} alarms={[]} canWrite timezone="Asia/Seoul" now={NOW} api={api} />);
     await user.upload(await screen.findByLabelText("사진"), new File([new Uint8Array([1])], "after.jpg", { type: "image/jpeg" }));
-    expect(await screen.findByText("연결되면 전송합니다")).toBeInTheDocument();
+    // 대기열은 IndexedDB에 쓴 뒤 안내하므로 바쁜 CI에서는 기본 1초를 넘길 수 있다
+    expect(await screen.findByText("연결되면 전송합니다", undefined, { timeout: 5_000 })).toBeInTheDocument();
     expect(api.attach).not.toHaveBeenCalled();
   });
 });
