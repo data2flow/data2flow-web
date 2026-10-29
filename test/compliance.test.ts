@@ -173,3 +173,51 @@ describe("CMP-01.03·01.04 UI-CMP-04 적용 범위", () => {
     expect((await o.post("/compliance/profiles/101", { intent: "unarchive" })).response.status).toBe(403);
   });
 });
+
+describe("CMP-01.05·02.01 UI-CMP-05 종합 점수·UI-CMP-06 준수 현황판 SSR", () => {
+  it("VIEWER는 현황판을 본다: 요약·충족률·이탈 상위·연속 달성·깨짐·품질 경고, CSV 링크, 메뉴", async () => {
+    const v = await viewer();
+    const page = await v.get("/compliance/status?period=7");
+    expect(page.response.status).toBe(200);
+    expect(page.body).toContain('href="/compliance/status"');
+    expect(page.body).toContain("평균 충족률");
+    expect(page.body).toContain("92.4%");
+    expect(page.body).toContain("CO2 18h");
+    expect(page.body).toContain("47/90일");
+    expect(page.body).toMatch(/D-\d+ 깨짐: CO2/);
+    expect(page.body).toContain("데이터 품질 기준 미달(결측 10% 초과)");
+    expect(page.body).toMatch(/href="\/bff\/api\/core\/compliance\/status\.csv\?from=\d{4}-\d{2}-\d{2}&amp;to=\d{4}-\d{2}-\d{2}"/);
+    expect(page.body).not.toContain("data-space-detail");
+  });
+
+  it("줄을 펼치면 일별 막대와 이탈 구간을 보여 준다", async () => {
+    const page = await (await viewer()).get("/compliance/status?open=31:101");
+    expect(page.response.status).toBe(200);
+    expect(page.body).toContain("data-space-detail");
+    expect(page.body).toContain("2026-10-02 충족률 80%, 이탈 275분, 결측 65분");
+    expect(page.body).toContain("최고 1,420");
+    expect(page.body).toContain("알람 #77");
+    expect(page.body).toContain('href="/compliance/status"');
+  });
+
+  it("기간이 400일을 넘으면 안내하고, 프로필을 고르면 그 줄만, 없으면 빈 안내", async () => {
+    const v = await viewer();
+    const tooLong = await v.get("/compliance/status?period=custom&from=2025-09-01&to=2026-10-06");
+    expect(tooLong.body).toContain("400일 이내여야 합니다");
+    const none = await v.get("/compliance/status?profileId=1");
+    expect(none.body).toContain("표시할 준수 현황이 없습니다");
+  });
+
+  it("공간 개요에 종합 점수 카드: 점수·등급, 일부 항목 제외, 감점 1순위, 계산식 입력값", async () => {
+    const page = await (await viewer()).get("/spaces/31");
+    expect(page.response.status).toBe(200);
+    expect(page.body).toContain("data-score-card");
+    expect(page.body).toContain("종합 실내 환경 점수");
+    expect(page.body).toContain("보통");
+    expect(page.body).toContain("일부 항목 제외");
+    expect(page.body).toContain("감점 1순위: CO2 1,180");
+    const other = await (await viewer()).get("/spaces/32");
+    expect(other.response.status).toBe(200);
+    expect(other.body).not.toContain("data-score-card");
+  });
+});

@@ -4,7 +4,8 @@
   },
   "compliance": {
     "area": {
-      "profiles": "Standard profiles"
+      "profiles": "Standard profiles",
+      "status": "Compliance status"
     },
     "archived": "Archived",
     "kind": {
@@ -191,6 +192,78 @@
       "PARTIAL": "Partial",
       "NOT_MEASURABLE": "Not measurable",
       "without": "No device: {{names}}"
+    },
+    "grade": {
+      "GOOD": "Good",
+      "MODERATE": "Moderate",
+      "POOR": "Poor",
+      "BAD": "Very poor"
+    },
+    "metric": {
+      "co2": "CO2",
+      "pm2_5": "PM2.5",
+      "pm10": "PM10",
+      "tvoc": "TVOC",
+      "hcho": "HCHO",
+      "co": "CO",
+      "no2": "NO2",
+      "radon": "Radon",
+      "temperature": "Temperature",
+      "humidity": "Humidity"
+    },
+    "score": {
+      "title": "Indoor environment score",
+      "defaultBasis": "Default criteria",
+      "partial": "Some metrics excluded",
+      "noData": "No data in the last 10 minutes, so the score could not be calculated",
+      "indexOf": "{{metric}} index",
+      "topPenalty": "Top penalty: {{metric}} {{value}}",
+      "at": "Calculated {{time}}",
+      "formula": "Show formula",
+      "formulaText": "Metric indices (1–5) are weight-averaged into a 0–100 score. Score = 100 × Σ weight×(index−1)/4 ÷ Σ weight",
+      "metric": "Metric",
+      "avg5m": "5-min average",
+      "boundary": "Criteria",
+      "weight": "Weight"
+    },
+    "status": {
+      "title": "Compliance status",
+      "csv": "Export CSV",
+      "site": "Site",
+      "profile": "Profile",
+      "period": "Period",
+      "periods": {
+        "7": "Last 7 days",
+        "30": "Last 30 days",
+        "90": "Last 90 days",
+        "custom": "Custom"
+      },
+      "from": "From",
+      "to": "To",
+      "empty": "No compliance status to show",
+      "emptyBody": "Apply a standard profile to a space and it appears here from the next evaluation.",
+      "avgRatio": "Average compliance",
+      "exceededHours": "Exceeded time",
+      "streaking": "Spaces on a streak",
+      "qualityWarnings": "Data quality warnings",
+      "space": "Space",
+      "ratio": "Compliance",
+      "exceeded": "Top exceeded metrics",
+      "missing": "Missing",
+      "streak": "Streak",
+      "score": "Score",
+      "qualityWarning": "Below data quality standard (over 10% missing)",
+      "streakDays": "{{current}}/{{required}} days",
+      "broken": "Broken D-{{days}}: {{metric}}",
+      "detailFailed": "Could not load daily status",
+      "daily": "Daily compliance",
+      "dayLabel": "{{day}} compliance {{ratio}}%, exceeded {{exceeded}} min, missing {{missing}} min",
+      "noDaily": "No evaluated days in this period",
+      "excursions": "Excursions",
+      "ongoing": "Ongoing",
+      "peak": "Peak {{value}}",
+      "alarm": "Alarm #{{id}}",
+      "noExcursions": "No excursions"
     }
   },
   "errors": {
@@ -202,6 +275,7 @@
     "CMP_THRESHOLD_INVALID": "The thresholds are invalid.",
     "CMP_FACILITY_TYPE_REQUIRED": "This profile needs a facility type.",
     "CMP_APPLICATION_DUPLICATE": "Already applied to this target.",
-    "CMP_APPLICATION_NOT_FOUND": "Application not found."
+    "CMP_APPLICATION_NOT_FOUND": "Application not found.",
+    "CMP_REPORT_PERIOD_INVALID": "The period must start before it ends and span at most 400 days"
   }
 }

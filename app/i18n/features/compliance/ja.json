@@ -4,7 +4,8 @@
   },
   "compliance": {
     "area": {
-      "profiles": "基準プロファイル"
+      "profiles": "基準プロファイル",
+      "status": "遵守状況"
     },
     "archived": "アーカイブ済み",
     "kind": {
@@ -191,6 +192,78 @@
       "PARTIAL": "一部",
       "NOT_MEASURABLE": "測定不可",
       "without": "機器なし：{{names}}"
+    },
+    "grade": {
+      "GOOD": "良い",
+      "MODERATE": "普通",
+      "POOR": "悪い",
+      "BAD": "非常に悪い"
+    },
+    "metric": {
+      "co2": "CO2",
+      "pm2_5": "PM2.5",
+      "pm10": "PM10",
+      "tvoc": "TVOC",
+      "hcho": "HCHO",
+      "co": "CO",
+      "no2": "NO2",
+      "radon": "ラドン",
+      "temperature": "温度",
+      "humidity": "湿度"
+    },
+    "score": {
+      "title": "総合室内環境スコア",
+      "defaultBasis": "既定の基準",
+      "partial": "一部項目を除外",
+      "noData": "直近10分のデータがないためスコアを計算できませんでした",
+      "indexOf": "{{metric}} 指数",
+      "topPenalty": "減点1位: {{metric}} {{value}}",
+      "at": "計算 {{time}}",
+      "formula": "計算式を表示",
+      "formulaText": "項目指数(1~5)を加重平均して0~100点に換算します。スコア = 100 × Σ重み×(指数−1)/4 ÷ Σ重み",
+      "metric": "項目",
+      "avg5m": "5分平均",
+      "boundary": "基準",
+      "weight": "重み"
+    },
+    "status": {
+      "title": "遵守状況",
+      "csv": "CSVエクスポート",
+      "site": "サイト",
+      "profile": "プロファイル",
+      "period": "期間",
+      "periods": {
+        "7": "直近7日",
+        "30": "直近30日",
+        "90": "直近90日",
+        "custom": "期間指定"
+      },
+      "from": "開始日",
+      "to": "終了日",
+      "empty": "表示する遵守状況がありません",
+      "emptyBody": "空間に基準プロファイルを適用すると、次の判定からここに表示されます。",
+      "avgRatio": "平均遵守率",
+      "exceededHours": "逸脱時間",
+      "streaking": "連続達成中の空間",
+      "qualityWarnings": "データ品質警告",
+      "space": "空間",
+      "ratio": "遵守率",
+      "exceeded": "逸脱上位項目",
+      "missing": "欠測率",
+      "streak": "連続達成",
+      "score": "スコア",
+      "qualityWarning": "データ品質基準未達(欠測10%超)",
+      "streakDays": "{{current}}/{{required}}日",
+      "broken": "D-{{days}} 途切れ: {{metric}}",
+      "detailFailed": "日別状況を読み込めませんでした",
+      "daily": "日別遵守",
+      "dayLabel": "{{day}} 遵守率 {{ratio}}%、逸脱 {{exceeded}}分、欠測 {{missing}}分",
+      "noDaily": "期間内に判定した日がありません",
+      "excursions": "逸脱区間",
+      "ongoing": "継続中",
+      "peak": "最大 {{value}}",
+      "alarm": "アラーム #{{id}}",
+      "noExcursions": "逸脱区間はありません"
     }
   },
   "errors": {
@@ -202,6 +275,7 @@
     "CMP_THRESHOLD_INVALID": "基準値が正しくありません。",
     "CMP_FACILITY_TYPE_REQUIRED": "このプロファイルは施設種別の選択が必要です。",
     "CMP_APPLICATION_DUPLICATE": "同じ対象に既に適用されています。",
-    "CMP_APPLICATION_NOT_FOUND": "適用が見つかりません。"
+    "CMP_APPLICATION_NOT_FOUND": "適用が見つかりません。",
+    "CMP_REPORT_PERIOD_INVALID": "期間は開始日が終了日より前で、400日以内である必要があります"
   }
 }
