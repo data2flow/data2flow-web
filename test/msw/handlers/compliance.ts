@@ -1,5 +1,6 @@
 /**
- * M7 환경 기준 가짜 core API(design/api/CMP-api.md): 프로필 API-CMP-01~06a, 적용 API-CMP-07, 측정 가능성 API-CMP-08.
+ * M7 환경 기준 가짜 core API(design/api/CMP-api.md): 프로필 API-CMP-01~06a, 적용 API-CMP-07, 측정 가능성 API-CMP-08,
+ * 종합 점수 API-CMP-10, 준수 현황 API-CMP-13·14.
  * 권한은 core와 같게 검사한다(조회 CMP_READ, 쓰기 CMP_ADMIN). 시스템 프로필은 READ_ONLY, 잠긴 버전 PUT도 READ_ONLY.
  * 상태는 core.extra["cmp"].
  */
@@ -135,5 +136,81 @@ export const complianceHandler: CoreHandler = (core, { method, path, url, body, 
       return noContent();
     }
   }
+
+  // 종합 점수 API-CMP-10, 준수 현황 API-CMP-13·14(CMP 2차)
+  const score = /^\/compliance\/spaces\/(\d+)\/score$/.exec(path);
+  if (score && method === "GET") {
+    if (score[1] !== "31") return fail(404, "SPACE_NOT_FOUND");
+    const inputs = url.searchParams.get("include") === "inputs" ? { inputs: SCORE_INPUTS } : {};
+    return ok({ ...SCORE, ...inputs });
+  }
+  if (path === "/compliance/status" && method === "GET") {
+    const from = url.searchParams.get("from");
+    const to = url.searchParams.get("to");
+    if (from && to && (Date.parse(to) - Date.parse(from)) / 86_400_000 + 1 > 400) return fail(400, "CMP_REPORT_PERIOD_INVALID");
+    const profileId = url.searchParams.get("profileId");
+    const rows = STATUS_ROWS.filter((r) => !profileId || r.profile.id === profileId);
+    return ok({ summary: { avgRatio: rows.length ? 88.5 : null, exceededHours: rows.length ? 27 : 0, streakingSpaces: rows.length ? 1 : 0, qualityWarnings: rows.length ? 1 : 0 }, rows });
+  }
+  const spaceStatus = /^\/compliance\/status\/spaces\/(\d+)$/.exec(path);
+  if (spaceStatus && method === "GET") {
+    if (spaceStatus[1] !== "31" && spaceStatus[1] !== "32") return fail(404, "SPACE_NOT_FOUND");
+    return ok(SPACE_STATUS);
+  }
   return undefined;
+};
+
+const SCORE = {
+  spaceId: "31",
+  time: "2026-10-04T00:00:00Z",
+  score: 72,
+  grade: "MODERATE",
+  indices: { co2: 3, pm2_5: 5, temperature: 4, humidity: null },
+  topPenaltyMetric: "co2",
+  topPenaltyValue: 1180,
+  basis: "PROFILE",
+  excludedMetrics: ["humidity"],
+  partial: true,
+  profileVersions: ["101:v2"],
+  formulaVersion: "IEQ-1",
+};
+
+const SCORE_INPUTS = [
+  { metricKey: "co2", avg5m: 1180, unit: "ppm", weight: 1, boundary: { lower: null, upper: 1000 } },
+  { metricKey: "pm2_5", avg5m: 8.2, unit: "μg/m³", weight: 1, boundary: { lower: null, upper: 35 } },
+  { metricKey: "temperature", avg5m: 23.1, unit: "℃", weight: 0.7, boundary: { lower: 20, upper: 26 } },
+];
+
+const STATUS_ROWS = [
+  {
+    space: { id: "31", name: "실습실", path: "광주캠퍼스 › 본관 › 3층 › 실습실" },
+    profile: { id: "101", name: "우리 학교 기준", versionNo: 2 },
+    ratio: 92.4,
+    exceededByMetric: [
+      { metricKey: "co2", hours: 18 },
+      { metricKey: "pm2_5", hours: 0 },
+    ],
+    missingRatio: 2.1,
+    qualityWarning: false,
+    streak: { currentDays: 47, requiredDays: 90 },
+    score: 72,
+  },
+  {
+    space: { id: "32", name: "사무실", path: "광주캠퍼스 › 본관 › 3층 › 사무실" },
+    profile: { id: "101", name: "우리 학교 기준", versionNo: 2 },
+    ratio: 84.6,
+    exceededByMetric: [{ metricKey: "co2", hours: 9 }],
+    missingRatio: 12.5,
+    qualityWarning: true,
+    streak: { currentDays: 0, requiredDays: 90, brokenOn: "2026-10-02", brokenMetric: "co2" },
+    score: 55,
+  },
+];
+
+const SPACE_STATUS = {
+  daily: [
+    { day: "2026-10-02", ratio: 80, metMinutes: 1100, exceededMinutes: 275, missingMinutes: 65, qualityWarning: false, byMetric: [] },
+    { day: "2026-10-03", ratio: 100, metMinutes: 1440, exceededMinutes: 0, missingMinutes: 0, qualityWarning: false, byMetric: [] },
+  ],
+  excursions: [{ id: "9001", metricKey: "co2", startedAt: "2026-10-02T01:00:00Z", endedAt: "2026-10-02T05:35:00Z", peakValue: 1420, alarmId: "77", hasAction: false }],
 };

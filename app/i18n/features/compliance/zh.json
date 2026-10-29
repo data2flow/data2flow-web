@@ -4,7 +4,8 @@
   },
   "compliance": {
     "area": {
-      "profiles": "标准配置"
+      "profiles": "标准配置",
+      "status": "合规状况"
     },
     "archived": "已归档",
     "kind": {
@@ -191,6 +192,78 @@
       "PARTIAL": "部分",
       "NOT_MEASURABLE": "不可测",
       "without": "无设备：{{names}}"
+    },
+    "grade": {
+      "GOOD": "良好",
+      "MODERATE": "一般",
+      "POOR": "差",
+      "BAD": "很差"
+    },
+    "metric": {
+      "co2": "CO2",
+      "pm2_5": "PM2.5",
+      "pm10": "PM10",
+      "tvoc": "TVOC",
+      "hcho": "HCHO",
+      "co": "CO",
+      "no2": "NO2",
+      "radon": "氡",
+      "temperature": "温度",
+      "humidity": "湿度"
+    },
+    "score": {
+      "title": "室内环境综合评分",
+      "defaultBasis": "默认标准",
+      "partial": "部分指标已排除",
+      "noData": "最近10分钟没有数据，无法计算评分",
+      "indexOf": "{{metric}} 指数",
+      "topPenalty": "首要扣分项: {{metric}} {{value}}",
+      "at": "计算于 {{time}}",
+      "formula": "查看计算公式",
+      "formulaText": "将各指标指数(1~5)加权平均换算为0~100分。评分 = 100 × Σ权重×(指数−1)/4 ÷ Σ权重",
+      "metric": "指标",
+      "avg5m": "5分钟平均",
+      "boundary": "标准",
+      "weight": "权重"
+    },
+    "status": {
+      "title": "合规状况",
+      "csv": "导出 CSV",
+      "site": "站点",
+      "profile": "配置",
+      "period": "期间",
+      "periods": {
+        "7": "最近7天",
+        "30": "最近30天",
+        "90": "最近90天",
+        "custom": "自定义"
+      },
+      "from": "开始日期",
+      "to": "结束日期",
+      "empty": "没有可显示的合规状况",
+      "emptyBody": "为空间应用标准配置后，下一次判定起会显示在这里。",
+      "avgRatio": "平均达标率",
+      "exceededHours": "超标时间",
+      "streaking": "连续达标的空间",
+      "qualityWarnings": "数据质量警告",
+      "space": "空间",
+      "ratio": "达标率",
+      "exceeded": "超标前几项",
+      "missing": "缺测率",
+      "streak": "连续达标",
+      "score": "评分",
+      "qualityWarning": "未达数据质量标准(缺测超过10%)",
+      "streakDays": "{{current}}/{{required}}天",
+      "broken": "D-{{days}} 中断: {{metric}}",
+      "detailFailed": "无法加载每日状况",
+      "daily": "每日达标",
+      "dayLabel": "{{day}} 达标率 {{ratio}}%，超标 {{exceeded}}分钟，缺测 {{missing}}分钟",
+      "noDaily": "期间内没有判定的日期",
+      "excursions": "超标区间",
+      "ongoing": "进行中",
+      "peak": "最高 {{value}}",
+      "alarm": "告警 #{{id}}",
+      "noExcursions": "没有超标区间"
     }
   },
   "errors": {
@@ -202,6 +275,7 @@
     "CMP_THRESHOLD_INVALID": "标准值无效。",
     "CMP_FACILITY_TYPE_REQUIRED": "此配置需要选择设施类型。",
     "CMP_APPLICATION_DUPLICATE": "已适用于该对象。",
-    "CMP_APPLICATION_NOT_FOUND": "找不到适用。"
+    "CMP_APPLICATION_NOT_FOUND": "找不到适用。",
+    "CMP_REPORT_PERIOD_INVALID": "期间的开始日期必须早于结束日期，且不超过400天"
   }
 }
