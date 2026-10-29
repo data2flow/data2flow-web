@@ -491,3 +491,38 @@ describe("CMP-02.04 UI-CMP-09 정기 발행", () => {
     expect(denied.response.status).toBe(403);
   });
 });
+
+describe("CMP-03 UI-CMP-11 커버리지 점검", () => {
+  it("TC-CMP-074 부족 1대는 경고, 면적 없는 공간은 판단 불가와 [면적 입력], 교정 초과 기기로 작업 지시", async () => {
+    const o = await operator();
+    const page = await o.get("/compliance/coverage?siteId=1&profileId=101");
+    expect(page.response.status).toBe(200);
+    expect(page.body).toContain("부족 1곳");
+    expect(page.body).toContain("추가 필요 1대");
+    expect(page.body).toContain("판단 불가(면적 없음)");
+    expect(page.body).toContain('href="/spaces/31"');
+    expect(page.body).toContain("초과 1대");
+    expect(page.body).toContain("이 프로필에는 공개 표시 기준이 없습니다.");
+    expect(page.body).toContain("주기 미달 1대");
+    expect(page.body).toContain('name="deviceIds"');
+
+    const none = await o.post("/compliance/coverage?siteId=1&profileId=101", { idempotencyKey: "k1" });
+    expect(none.response.status).toBe(400);
+    expect(none.body).toContain("작업 지시를 만들 기기를 고르세요.");
+    const created = await o.post("/compliance/coverage?siteId=1&profileId=101", { idempotencyKey: "k2", deviceIds: ["d-152590"] });
+    expect(created.response.status).toBe(302);
+    expect(created.response.headers.get("location")).toMatch(/^\/work-orders\/.+/);
+
+    expect((await o.get("/compliance/coverage?siteId=1")).body).toContain("이 프로필에는 설치 밀도 기준이 없습니다.");
+    expect((await o.get("/compliance/coverage?siteId=999")).body).toContain("공간을 찾을 수 없습니다");
+  });
+
+  it("VIEWER는 점검 결과만 보고 작업 지시는 만들 수 없다", async () => {
+    const v = await viewer();
+    const page = await v.get("/compliance/coverage?siteId=1&profileId=101");
+    expect(page.response.status).toBe(200);
+    expect(page.body).toContain("EM500-CO2-152590");
+    expect(page.body).not.toContain('name="deviceIds"');
+    expect(page.body).not.toContain("작업 지시 만들기");
+  });
+});

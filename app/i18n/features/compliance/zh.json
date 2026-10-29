@@ -6,7 +6,8 @@
     "area": {
       "profiles": "标准配置",
       "status": "合规状况",
-      "reports": "报告"
+      "reports": "报告",
+      "coverage": "覆盖检查"
     },
     "archived": "已归档",
     "kind": {
@@ -545,6 +546,73 @@
         "emailInvalid": "邮箱格式不正确。",
         "userNotFound": "存在不存在的用户。"
       }
+    },
+    "coverage": {
+      "title": "覆盖检查",
+      "site": "站点",
+      "profile": "配置文件",
+      "noProfile": "不使用配置文件（默认标准）",
+      "run": "检查",
+      "noSite": "没有可检查的站点",
+      "density": "安装密度",
+      "publicDisplay": "公开显示",
+      "calibration": "校准期限",
+      "quality": "数据质量",
+      "na": "不适用",
+      "ok": "满足",
+      "signal": {
+        "density": "不足 {{n}} 处",
+        "publicDisplay": "不足 {{n}} 个",
+        "calibration": "超期 {{n}} 台",
+        "quality": "未达标 {{n}} 处"
+      },
+      "densityNa": "该配置文件没有安装密度标准。",
+      "displayNa": "该配置文件没有公开显示标准。",
+      "col": {
+        "space": "空间",
+        "usage": "用途",
+        "area": "面积",
+        "required": "需要",
+        "actual": "实际",
+        "shortage": "不足",
+        "device": "设备",
+        "model": "型号",
+        "interval": "建议周期",
+        "last": "上次校准",
+        "elapsed": "已过",
+        "status": "状态",
+        "devices": "设备数",
+        "missing": "缺失率",
+        "intervalViolations": "周期不达标设备",
+        "abnormal": "质量异常"
+      },
+      "usage": {
+        "CLASSROOM": "教室",
+        "OFFICE": "办公室",
+        "MEETING": "会议室",
+        "LAB": "实验室",
+        "CORRIDOR": "走廊",
+        "OTHER": "其他"
+      },
+      "noArea": "无法判断（无面积）",
+      "enterArea": "输入面积",
+      "needMore": "需增加 {{n}} 台",
+      "displayLine": "目标面积 {{area}}㎡ · 需要 {{required}} 个 · 实际公开屏 {{links}} 个、二维码 {{qr}} 个 · 不足 {{shortage}} 个",
+      "displayPending": "公开屏和二维码功能尚未就绪，实际数量按 0 计算。",
+      "recommend": "推荐位置：{{spaces}}",
+      "noDevices": "没有可检查的设备。",
+      "pickDevices": "请选择要创建工单的设备。",
+      "createWorkOrder": "创建工单",
+      "days": "{{n}} 天",
+      "calibrationStatus": {
+        "OK": "正常",
+        "DUE_SOON": "临近",
+        "OVERDUE": "超期",
+        "NO_RECORD": "无记录"
+      },
+      "qualityPeriod": "{{from}} 至 {{to}}",
+      "belowStandard": "数据质量未达标",
+      "violations": "周期不达标 {{n}} 台"
     }
   },
   "errors": {

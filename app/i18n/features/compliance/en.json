@@ -6,7 +6,8 @@
     "area": {
       "profiles": "Standard profiles",
       "status": "Compliance status",
-      "reports": "Reports"
+      "reports": "Reports",
+      "coverage": "Coverage check"
     },
     "archived": "Archived",
     "kind": {
@@ -545,6 +546,73 @@
         "emailInvalid": "An email address is invalid.",
         "userNotFound": "A user does not exist."
       }
+    },
+    "coverage": {
+      "title": "Coverage check",
+      "site": "Site",
+      "profile": "Profile",
+      "noProfile": "No profile (defaults)",
+      "run": "Check",
+      "noSite": "No site to check",
+      "density": "Sensor density",
+      "publicDisplay": "Public display",
+      "calibration": "Calibration",
+      "quality": "Data quality",
+      "na": "N/A",
+      "ok": "Met",
+      "signal": {
+        "density": "{{n}} spaces short",
+        "publicDisplay": "{{n}} short",
+        "calibration": "{{n}} overdue",
+        "quality": "{{n}} below standard"
+      },
+      "densityNa": "This profile has no sensor density rule.",
+      "displayNa": "This profile has no public display rule.",
+      "col": {
+        "space": "Space",
+        "usage": "Usage",
+        "area": "Area",
+        "required": "Required",
+        "actual": "Actual",
+        "shortage": "Shortage",
+        "device": "Device",
+        "model": "Model",
+        "interval": "Interval",
+        "last": "Last calibrated",
+        "elapsed": "Elapsed",
+        "status": "Status",
+        "devices": "Devices",
+        "missing": "Missing",
+        "intervalViolations": "Slow reporting",
+        "abnormal": "Bad quality"
+      },
+      "usage": {
+        "CLASSROOM": "Classroom",
+        "OFFICE": "Office",
+        "MEETING": "Meeting room",
+        "LAB": "Lab",
+        "CORRIDOR": "Corridor",
+        "OTHER": "Other"
+      },
+      "noArea": "Undetermined (no area)",
+      "enterArea": "Enter area",
+      "needMore": "{{n}} more needed",
+      "displayLine": "Area {{area}}㎡ · required {{required}} · actual displays {{links}}, QR {{qr}} · short {{shortage}}",
+      "displayPending": "Public displays and QR codes are not available yet, so the actual count is 0.",
+      "recommend": "Suggested locations: {{spaces}}",
+      "noDevices": "No devices to check.",
+      "pickDevices": "Select devices for the work order.",
+      "createWorkOrder": "Create work order",
+      "days": "{{n}} days",
+      "calibrationStatus": {
+        "OK": "OK",
+        "DUE_SOON": "Due soon",
+        "OVERDUE": "Overdue",
+        "NO_RECORD": "No record"
+      },
+      "qualityPeriod": "{{from}} to {{to}}",
+      "belowStandard": "Below data quality standard",
+      "violations": "{{n}} slow"
     }
   },
   "errors": {

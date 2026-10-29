@@ -1,6 +1,6 @@
 /**
  * M7 환경 기준 가짜 core API(design/api/CMP-api.md): 프로필 API-CMP-01~06a, 적용 API-CMP-07, 측정 가능성 API-CMP-08,
- * 종합 점수 API-CMP-10, 준수 현황 API-CMP-13·14, 리포트 API-CMP-16~20a, 정기 발행 API-CMP-21·22(일정 701), 개선 조치 API-CMP-23·24(이탈 구간 9001).
+ * 종합 점수 API-CMP-10, 준수 현황 API-CMP-13·14, 리포트 API-CMP-16~20a, 정기 발행 API-CMP-21·22(일정 701), 개선 조치 API-CMP-23·24(이탈 구간 9001), 커버리지 점검 API-CMP-25(사이트 1).
  * 권한은 core와 같게 검사한다(조회 CMP_READ, 쓰기 CMP_ADMIN, 리포트 생성·발행 CMP_REPORT, 개선 조치 CMP_ACTION). 시스템 프로필은 READ_ONLY, 잠긴 버전 PUT도 READ_ONLY.
  * 상태는 core.extra["cmp"].
  */
@@ -243,6 +243,12 @@ const detail = (s: CmpState, p: Json) => ({ ...p, currentVersion: current(s, p),
 export const complianceHandler: CoreHandler = (core, { method, path, url, body, can, user }) => {
   if (!path.startsWith("/compliance/")) return undefined;
   if (!can("CMP_READ")) return fail(403, "PERMISSION_DENIED");
+  if (path === "/compliance/coverage" && method === "GET") {
+    if (url.searchParams.get("siteId") !== "1") return fail(404, "SPACE_NOT_FOUND");
+    const profileId = url.searchParams.get("profileId");
+    if (profileId && !cmpState(core).profiles.some((p) => p.profileId === profileId)) return fail(404, "CMP_PROFILE_NOT_FOUND");
+    return ok(coverage(profileId));
+  }
   if (path.startsWith("/compliance/report-schedules")) return schedulesHandler(cmpState(core), { method, path, url, body, can, user } as Parameters<CoreHandler>[1]);
   if (path.startsWith("/compliance/reports")) return reportsHandler(cmpState(core), { method, path, url, body, can, user } as Parameters<CoreHandler>[1]);
   if (path.startsWith("/compliance/excursions") || path.startsWith("/compliance/actions")) return actionsHandler(cmpState(core), { method, path, url, body, can, user } as Parameters<CoreHandler>[1]);
@@ -415,3 +421,26 @@ const SPACE_STATUS = {
   ],
   excursions: [{ id: "9001", metricKey: "co2", startedAt: "2026-10-02T01:00:00Z", endedAt: "2026-10-02T05:35:00Z", peakValue: 1420, alarmId: "77", hasAction: false }],
 };
+
+/** 커버리지 점검: 프로필 101(우리 학교 기준)은 설치 밀도 기준이 있고 공개 표시 기준은 없다 */
+function coverage(profileId: string | null): Json {
+  const withDensity = profileId === "101";
+  return {
+    siteId: "1",
+    profile: profileId ? { profileId, name: profileId === "101" ? "우리 학교 기준" : "실내공기질관리법 다중이용시설", versionNo: 2 } : null,
+    period: { from: "2026-09-04", to: "2026-10-03" },
+    summary: { density: withDensity ? "RED" : "NA", publicDisplay: "NA", calibration: "RED", quality: "YELLOW" },
+    density: withDensity
+      ? [
+          { space: { id: "32", name: "사무실" }, usage: "OFFICE", areaM2: 1200, required: 3, actual: 2, shortage: 1, undeterminedReason: null },
+          { space: { id: "31", name: "실습실" }, usage: "LAB", areaM2: null, required: null, actual: 4, shortage: null, undeterminedReason: "NO_AREA" },
+        ]
+      : [],
+    publicDisplay: null,
+    calibration: [
+      { device: { id: "d-152590", name: "EM500-CO2-152590" }, space: { id: "31", name: "실습실" }, model: "EM500-CO2", intervalDays: 365, lastCalibratedOn: "2025-08-24", dueOn: "2026-08-24", elapsedDays: 405, status: "OVERDUE" },
+      { device: { id: "d-am103", name: "AM103-실습실" }, space: { id: "31", name: "실습실" }, model: "AM103", intervalDays: 365, lastCalibratedOn: null, dueOn: null, elapsedDays: null, status: "NO_RECORD" },
+    ],
+    quality: [{ space: { id: "31", name: "실습실" }, devices: 2, missingRatio: 2.1, intervalViolations: 1, abnormalQualityRatio: 0.4, belowStandard: false }],
+  };
+}
