@@ -4,6 +4,7 @@
   },
   "energy": {
     "area": {
+      "dashboard": "Energy dashboard",
       "meters": "Meters & bills",
       "settings": "Energy settings"
     },
@@ -129,6 +130,61 @@
         "kwhPositive": "Usage must be greater than 0 (up to 1 decimal)",
         "wholeWon": "Enter whole won"
       }
+    },
+    "dashboard": {
+      "title": "Energy",
+      "scope": "Scope",
+      "portfolio": "Portfolio",
+      "period": "Period",
+      "periods": {
+        "thisMonth": "This month",
+        "lastMonth": "Last month",
+        "thisYear": "This year",
+        "custom": "Custom"
+      },
+      "to": "To",
+      "compare": "Compare",
+      "compares": {
+        "BASELINE": "Baseline",
+        "PREVIOUS_PERIOD": "Previous period",
+        "SAME_PERIOD_LAST_YEAR": "Same period last year"
+      },
+      "apply": "Show",
+      "cards": {
+        "kwh": "Usage",
+        "eui": "EUI",
+        "perHour": "Per occupied hour",
+        "krw": "Cost",
+        "tco2": "Carbon"
+      },
+      "won": "KRW",
+      "noArea": "No area",
+      "noOccupancy": "No occupancy hours",
+      "summary": "{{from}} – {{to}} · estimated {{estimated}}",
+      "noBaseline": "No baseline yet",
+      "trend": "Daily usage",
+      "measured": "Metered",
+      "estimated": "Estimated",
+      "baseline": "Baseline",
+      "noData": "No usage aggregated for this period",
+      "children": "Breakdown",
+      "columns": {
+        "name": "Name",
+        "kwh": "Usage (kWh)",
+        "eui": "EUI",
+        "share": "Share",
+        "estimated": "Estimated",
+        "source": "Source"
+      },
+      "sources": {
+        "metered": "Metered",
+        "mixed": "Metered + estimated",
+        "none": "No data"
+      },
+      "other": "Other / common",
+      "noChildren": "No child units",
+      "noSources": "Connect an energy source",
+      "from": "From"
     }
   },
   "errors": {

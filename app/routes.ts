@@ -186,6 +186,7 @@ export default [
     route("compliance/reports/schedules/new", "routes/compliance-report-schedule-edit.tsx", { id: "routes/compliance-report-schedule-new" }),
     route("compliance/reports/schedules/:scheduleId", "routes/compliance-report-schedule-edit.tsx"),
     route("compliance/reports/:reportId", "routes/compliance-report-detail.tsx"),
+    route("energy", "routes/energy.tsx"),
     route("energy/meters", "routes/energy-meters.tsx"),
     route("energy/settings", "routes/energy-settings.tsx"),
   ]),

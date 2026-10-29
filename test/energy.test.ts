@@ -143,3 +143,49 @@ describe("ENE-01.01 UI-ENE-02 계량·고지서", () => {
     expect(noPower.body).toContain("정격 소비 전력을 숫자로 입력하세요");
   });
 });
+
+describe("ENE-01.03 UI-ENE-03 에너지 대시보드", () => {
+  it("VIEWER도 본다: 브레드크럼, 지표 카드, 기준선 없음 안내, 하위 단위와 추정 비율·출처 배지, 기본 기간은 이번 달", async () => {
+    const v = await viewer();
+    const page = await v.get("/energy?scope=2");
+    expect(page.response.status).toBe(200);
+    expect(page.body).toContain(">포트폴리오<");
+    expect(page.body).toContain(">광주캠퍼스<");
+    expect(page.body).toContain(">본관<");
+    expect(page.body).toContain("6,020kWh");
+    expect(page.body).toContain("12.0kWh/㎡");
+    expect(page.body).toContain("924,800원");
+    expect(page.body).toContain("2.75tCO2eq");
+    expect(page.body).toContain("재실 시간 없음");
+    expect(page.body).toContain("기준선이 아직 없습니다");
+    expect(page.body).toContain("추정 비율 12.0%");
+    expect(page.body).toContain('href="/energy?period=thisMonth&amp;compare=BASELINE&amp;scope=3"');
+    expect(page.body).toContain(">측정·추정<");
+    expect(page.body).not.toContain('href="/energy/meters"');
+    const q = eneState(app.gateway.m2).lastMetrics!;
+    expect(q).toMatchObject({ scopeSpaceId: "2", granularity: "DAY", compare: "BASELINE", to: q.to });
+    expect(q.from.endsWith("-01")).toBe(true);
+  });
+
+  it("직전 기간 비교는 증감 배지, 올해 기간은 월 칸, 범위 밖·없는 공간은 경고", async () => {
+    const o = await operator();
+    const prev = await o.get("/energy?scope=2&period=custom&from=2026-10-01&to=2026-10-02&compare=PREVIOUS_PERIOD");
+    expect(prev.body).toContain("−4.1%");
+    expect(prev.body).toContain("직전 기간 6,277kWh");
+    expect(eneState(app.gateway.m2).lastMetrics).toMatchObject({ from: "2026-10-01", to: "2026-10-02", compare: "PREVIOUS_PERIOD" });
+    await o.get("/energy?period=thisYear");
+    expect(eneState(app.gateway.m2).lastMetrics).toMatchObject({ granularity: "MONTH" });
+    expect(eneState(app.gateway.m2).lastMetrics!.scopeSpaceId).toBeUndefined();
+    const missing = await o.get("/energy?scope=999");
+    expect(missing.response.status).toBe(200);
+    expect(missing.body).toContain("공간을 찾을 수 없습니다.");
+  });
+
+  it("출처가 하나도 없으면 연결 안내와 [계량·고지서](OPERATOR+)", async () => {
+    eneState(app.gateway.m2).sources = [];
+    const o = await operator();
+    const page = await o.get("/energy");
+    expect(page.body).toContain("에너지 출처를 연결하세요");
+    expect(page.body).toContain('href="/energy/meters"');
+  });
+});

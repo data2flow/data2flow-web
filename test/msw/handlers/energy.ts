@@ -3,6 +3,7 @@
  * 권한은 core와 같게 검사한다(조회 ENE_READ, 변경 ENE_ADMIN). 시스템 배출계수는 읽기 전용, 같은 범위·시작일 단가는 겹침,
  * 같은 기기·항목 계량은 충돌, 같은 달 고지서는 overwrite가 있어야 덮어쓴다. 상태는 core.extra["ene"].
  * 실습실(31)에 스마트 플러그(2001, energy·power)가 측정으로, AM107(1042)이 추정으로 연결되어 있다. 본관(2) 2026-09 고지서는 측정 합계 2,950kWh와 7.8% 다르다.
+ * 지표 API-ENE-10·하위 단위 API-ENE-11은 analytics 롤업 결과 모양의 고정 값: 본관(2) 6,020kWh(기준선 없음, 직전 기간 대비 −4.1%), 하위 3층(3) 6,020kWh 중 추정 12%.
  */
 import { fail, list, noContent, ok, type CoreHandler, type CoreState } from "../core-fixtures";
 
@@ -14,6 +15,8 @@ export interface EneState {
   sources: Json[];
   bills: Json[];
   seq: number;
+  /** 마지막 API-ENE-10 질의(기간·비교·범위 확인용) */
+  lastMetrics?: Record<string, string>;
 }
 
 const PLUG = { id: "2001", name: "스마트 플러그-01" };
@@ -141,6 +144,29 @@ export const energyHandler: CoreHandler = (core, { method, path, url, body, can 
     const before = s.bills.length;
     s.bills = s.bills.filter((x) => !(x.spaceId === m![1] && x.month === m![2]));
     return before === s.bills.length ? fail(404, "ENE_BILL_NOT_FOUND") : noContent();
+  }
+  if (path === "/energy/metrics" && method === "GET") {
+    const q = Object.fromEntries(url.searchParams);
+    s.lastMetrics = q;
+    const scope = q.scopeSpaceId ?? null;
+    if (scope && !core.spaces.some((sp) => sp.id === scope)) return fail(404, "SPACE_NOT_FOUND");
+    const space = scope ? core.spaces.find((sp) => sp.id === scope)! : null;
+    const compare = q.compare === "BASELINE" ? { kind: "BASELINE", kwh: null, diffRatio: null, reason: "NO_BASELINE" } : { kind: q.compare, kwh: 6277, diffRatio: -0.041 };
+    return ok({
+      scope: { spaceId: scope, name: space?.name ?? null, kind: space?.type ?? null, areaM2: scope === "2" ? 500 : null },
+      totals: { kwh: 6020, krw: 924800, tco2: 2.75, euiKwhPerM2: scope === "2" ? 12.04 : null, euiReason: scope === "2" ? null : "NO_AREA", kwhPerOccupiedHour: null, occupiedHoursSource: null, estimatedRatio: 0.12, otherCommonKwh: 0 },
+      compare,
+      series: [
+        { t: "2026-10-01", kwh: 3100, krw: 470000, tco2: 1.41, estimatedKwh: 400 },
+        { t: "2026-10-02", kwh: 2920, krw: 454800, tco2: 1.34, estimatedKwh: 322.4 },
+      ],
+    });
+  }
+  if (path === "/energy/breakdown" && method === "GET") {
+    const scope = url.searchParams.get("scopeSpaceId");
+    if (scope && !core.spaces.some((sp) => sp.id === scope)) return fail(404, "SPACE_NOT_FOUND");
+    const items = scope === "2" ? [{ id: "3", name: "3층", kind: "FLOOR", kwh: 6020, krw: 924800, tco2: 2.75, euiKwhPerM2: 13.4, estimatedRatio: 0.12, estimated: true, share: 1, diffRatio: -0.041, hasData: true }] : [];
+    return ok({ items, other: { kwh: scope === "2" ? 0 : 0 }, page: 1, size: 50, totalCount: items.length });
   }
   return undefined;
 };
