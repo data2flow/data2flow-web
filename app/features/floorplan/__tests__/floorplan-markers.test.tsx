@@ -2,7 +2,7 @@
  * TC-DSH-014 AT-DSH-02.1 평면도 마커(현재값·상태 색, 팝업, SSE로 값·색 갱신), TC-DSH-017 AT-DSH-02.3 히트 컬러(범례·그라데이션·"보간 추정"),
  * 확대·이동(DSH-12.04).
  */
-import { act, fireEvent, screen } from "@testing-library/react";
+import { act, fireEvent, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { renderRoute } from "../../../../test/render";
@@ -62,7 +62,7 @@ describe("TC-DSH-014 평면도 마커", () => {
     expect(screen.getByRole("button", { name: "CO2 · 알람" })).toHaveTextContent("▲ 1,150ppm");
     expect(screen.getByRole("button", { name: "소음 · 오프라인" })).toHaveAttribute("data-state", "OFFLINE");
     expect(screen.getByRole("img", { name: "공간 평면도" })).toHaveAttribute("src", "/bff/api/core/spaces/31/floorplan/image?v=2");
-    expect(FakeSource.last.url).toBe(`/bff/stream/live?topics=${encodeURIComponent("space:31")}`);
+    await waitFor(() => expect(FakeSource.last?.url).toBe(`/bff/stream/live?topics=${encodeURIComponent("space:31")}`));
 
     await userEvent.click(a);
     const popup = screen.getByRole("dialog", { name: "온습도 A 요약" });
