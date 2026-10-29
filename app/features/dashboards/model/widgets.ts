@@ -110,6 +110,8 @@ export const DEFAULT_SIZE: Record<string, { w: number; h: number }> = {
   "alarm-list": { w: 8, h: 6 },
   floorplan: { w: 12, h: 10 },
   markdown: { w: 6, h: 4 },
+  "energy-kpi": { w: 6, h: 6 },
+  "energy-trend": { w: 12, h: 8 },
 };
 
 /** 라이브러리 아이콘(UI-DSH-04 와이어프레임) */
@@ -125,10 +127,12 @@ export const WIDGET_ICON: Record<string, string> = {
   "alarm-list": "▲",
   floorplan: "⌂",
   markdown: "✎",
+  "energy-kpi": "⚡",
+  "energy-trend": "⚡",
 };
 
 /** 차트 위젯(ECharts로 그리고 PNG를 차트 이미지로 만든다) */
-export const CHART_TYPES = new Set(["line", "area", "bar", "gauge", "heatmap"]);
+export const CHART_TYPES = new Set(["line", "area", "bar", "gauge", "heatmap", "energy-trend"]);
 
 /** 라이브러리에서 고른 종류의 새 위젯(대상은 변수가 있으면 첫 변수로 미리 채운다) */
 export function newWidget(info: WidgetTypeInfo, title: string, defaults: { space?: string | null; device?: string | null; metric?: string | null } = {}): Omit<Widget, "id" | "x" | "y"> {

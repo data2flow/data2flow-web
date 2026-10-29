@@ -73,6 +73,7 @@ export interface TableLabels {
   min: string;
   max: string;
   content: string;
+  total: string;
 }
 
 const cell = (v: unknown): string | number | null => (v === null || v === undefined ? null : typeof v === "number" ? v : String(v));
@@ -125,6 +126,14 @@ export function widgetTable(widget: { type: string }, data: WidgetData | null | 
     case "floorplan": {
       const f = payload as FloorplanPayload;
       return { columns: [labels.device, labels.value, labels.unit, labels.state, labels.x, labels.y], rows: (f.markers ?? []).map((m) => [m.deviceId, cell(m.value), cell(m.unit), cell(m.state), m.x, m.y]) };
+    }
+    case "energy-kpi": {
+      const k = payload as { totals?: { kwh?: number | null; krw?: number | null; tco2?: number | null } | null; children?: { name: string; kwh: number }[] };
+      return { columns: [labels.name, "kWh", "KRW", "tCO2eq"], rows: [[labels.total, cell(k.totals?.kwh), cell(k.totals?.krw), cell(k.totals?.tco2)], ...(k.children ?? []).map((c) => [c.name, cell(c.kwh), null, null])] };
+    }
+    case "energy-trend": {
+      const tr = payload as { series?: { t: string; kwh?: number | null; krw?: number | null; tco2?: number | null; estimatedKwh?: number | null; baselineKwh?: number | null }[] };
+      return { columns: [labels.time, "kWh", "KRW", "tCO2eq"], rows: (tr.series ?? []).map((p) => [p.t, cell(p.kwh), cell(p.krw), cell(p.tco2)]) };
     }
     default:
       return { columns: [], rows: [] };

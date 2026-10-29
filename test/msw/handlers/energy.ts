@@ -6,6 +6,7 @@
  * 지표 API-ENE-10·하위 단위 API-ENE-11은 analytics 롤업 결과 모양의 고정 값: 본관(2) 6,020kWh(기준선 없음, 직전 기간 대비 −4.1%), 하위 3층(3) 6,020kWh 중 추정 12%.
  * 기준선 API-ENE-12(조회 ENE_READ, 계산·적용 ENE_ANALYZE): 본관(2) 기준선 601에 기간 평균 701(ACTIVE, R² 0.82)과 회귀 702(READY, R² 0.41 LOW_FIT).
  * 학습 기간이 30일보다 짧으면 409 ENE_BASELINE_INSUFFICIENT_DATA(errors neededDays), 새 버전은 TRAINING으로 남는다.
+ * 월간 리포트 API-ENE-13(조회 ENE_READ, 생성 ENE_ANALYZE): 본관(2) 2026-09 리포트 801(READY, PDF). 새 리포트는 GENERATING 10%로 남는다.
  */
 import { fail, list, noContent, ok, type CoreHandler, type CoreState } from "../core-fixtures";
 
@@ -23,6 +24,9 @@ export interface EneState {
   versions: Json[];
   /** 마지막 기준선 계산 요청 본문 */
   lastBaselineRequest?: Json;
+  reports: Json[];
+  /** 마지막 월간 리포트 생성 요청 본문 */
+  lastReportRequest?: Json;
 }
 
 const PLUG = { id: "2001", name: "스마트 플러그-01" };
@@ -56,6 +60,10 @@ export function eneState(core: CoreState): EneState {
         params: { coolingBaseC: 24, heatingBaseC: 18, splitWeekday: true, temperatureSource: null }, coefficients: { intercept: 200, cdd: 0, hdd: 0, weekend: -50 },
         residuals: [], createdBy: { userId: "8", name: "이통합" }, createdAt: "2026-06-01T00:00:00Z" },
     ],
+    reports: [
+      { reportId: "801", scopeSpaceId: "2", scopeName: "본관", month: "2026-09", format: "PDF", status: "READY", progress: 100, sha256: "ab12", sizeBytes: 48213,
+        fileUrl: "/api/v1/core/energy/reports/801/file", failureReason: null, createdBy: { userId: "8", name: "이통합" }, createdAt: "2026-10-02T01:00:00Z" },
+    ],
   } satisfies EneState;
   return core.extra.ene as EneState;
 }
@@ -78,6 +86,7 @@ export const energyHandler: CoreHandler = (core, { method, path, url, body, can 
   const b = (body ?? {}) as Json;
   const id = () => String(++s.seq);
   if (path.startsWith("/energy/baselines")) return baselines(core, s, method, path, url, b, can, id);
+  if (path.startsWith("/energy/reports")) return reports(core, s, method, path, url, b, can, id);
   if (method !== "GET" && !can("ENE_ADMIN")) return fail(403, "PERMISSION_DENIED");
 
   if (path === "/energy/tariffs" && method === "GET") return ok(withValidTo(s.tariffs, (r) => (r.scopeSpace as Json | null)?.id ?? null));
@@ -240,4 +249,28 @@ function baselines(core: CoreState, s: EneState, method: string, path: string, u
     return ok(versionView(v));
   }
   return undefined;
+}
+
+/** 월간 리포트 API-ENE-13 */
+function reports(core: CoreState, s: EneState, method: string, path: string, url: URL, b: Json, can: (p: string) => boolean, id: () => string) {
+  if (path === "/energy/reports" && method === "GET") {
+    const scope = url.searchParams.get("scopeSpaceId");
+    return list(s.reports.filter((r) => !scope || r.scopeSpaceId === scope), url);
+  }
+  if (path === "/energy/reports" && method === "POST") {
+    if (!can("ENE_ANALYZE")) return fail(403, "PERMISSION_DENIED");
+    s.lastReportRequest = b;
+    const space = b.scopeSpaceId ? core.spaces.find((sp) => sp.id === b.scopeSpaceId) : null;
+    if (b.scopeSpaceId && !space) return fail(404, "SPACE_NOT_FOUND");
+    const reportId = id();
+    s.reports.unshift({ reportId, scopeSpaceId: space?.id ?? null, scopeName: space?.name ?? null, month: b.month, format: b.format ?? "PDF", status: "GENERATING", progress: 10,
+      sha256: null, sizeBytes: null, fileUrl: null, failureReason: null, createdBy: { userId: "8", name: "이통합" }, createdAt: "2026-10-04T00:00:00Z" });
+    return ok({ jobId: reportId, reportId }, 202);
+  }
+  const m = path.match(/^\/energy\/reports\/([^/]+)$/);
+  if (m && method === "GET") {
+    const r = s.reports.find((x) => x.reportId === m[1]);
+    return r ? ok(r) : fail(404, "ENE_REPORT_NOT_FOUND");
+  }
+  return fail(404, "RESOURCE_NOT_FOUND");
 }

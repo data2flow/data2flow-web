@@ -42,7 +42,9 @@
       "markdown": "メモ",
       "control": "制御",
       "analysis": "分析結果",
-      "kpi": "KPI"
+      "kpi": "KPI",
+      "energy-kpi": "エネルギー指標",
+      "energy-trend": "エネルギー推移"
     },
     "kinds": {
       "DEVICE_METRIC": "機器の計測項目",
@@ -122,7 +124,8 @@
         "device": "機器",
         "min": "最小",
         "max": "最大",
-        "content": "内容"
+        "content": "内容",
+        "total": "合計"
       }
     },
     "tone": {

@@ -250,6 +250,41 @@
         "tooLong": "Cannot exceed 730 days",
         "number": "Enter a number"
       }
+    },
+    "widget": {
+      "estimated": "Includes {{ratio}} estimated",
+      "trendLabel": "{{name}} energy trend ({{from}} – {{to}})"
+    },
+    "reports": {
+      "title": "Monthly reports",
+      "create": "Create report",
+      "month": "Month",
+      "generate": "Create",
+      "hint": "Creates a PDF with metrics, baseline comparison, top-consuming spaces and savings results.",
+      "empty": "No reports yet",
+      "columns": {
+        "scope": "Scope",
+        "month": "Month",
+        "status": "Status",
+        "createdBy": "Created by",
+        "createdAt": "Created at"
+      },
+      "generating": "Generating {{progress}}%",
+      "statuses": {
+        "GENERATING": "Generating",
+        "READY": "Ready",
+        "FAILED": "Failed"
+      },
+      "failures": {
+        "INTERNAL_ERROR": "Internal error",
+        "SERVICE_UNAVAILABLE": "Couldn't reach the analytics service"
+      },
+      "download": "Download PDF",
+      "errors": {
+        "required": "Choose a month",
+        "format": "Use the YYYY-MM format",
+        "future": "Choose this month or an earlier one"
+      }
     }
   },
   "errors": {

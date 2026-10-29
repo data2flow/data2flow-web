@@ -42,7 +42,9 @@
       "markdown": "Note",
       "control": "Control",
       "analysis": "Analysis",
-      "kpi": "KPI"
+      "kpi": "KPI",
+      "energy-kpi": "Energy KPIs",
+      "energy-trend": "Energy trend"
     },
     "kinds": {
       "DEVICE_METRIC": "Device metric",
@@ -122,7 +124,8 @@
         "device": "Device",
         "min": "Min",
         "max": "Max",
-        "content": "Content"
+        "content": "Content",
+        "total": "Total"
       }
     },
     "tone": {

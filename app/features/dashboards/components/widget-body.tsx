@@ -15,6 +15,8 @@ import type { AlarmItem, FloorplanPayload, GaugePayload, HeatmapPayload, SeriesP
 import type { ZoomWindow } from "../model/time";
 import { DataTable } from "./data-table";
 import { AnalysisWidget, type AnalysisWidgetData } from "./analysis-widget";
+import { EnergyKpiWidget, EnergyTrendWidget } from "~/features/energy/components/energy-widgets";
+import type { EnergyKpiPayload, EnergyTrendPayload } from "~/features/energy/model/widgets";
 
 /** 게이트웨이 경로(`/api/v1/...`)로 온 이미지 주소를 BFF 경로로 */
 export function toBffUrl(url: string | null | undefined): string | null {
@@ -180,6 +182,15 @@ export function WidgetBody({ widget, data, timezone, height, zoom, onZoom, table
     }
     case "markdown":
       return <div className="whitespace-pre-wrap text-[13px]">{String(options.content ?? "")}</div>;
+    case "energy-kpi":
+      return <EnergyKpiWidget data={payload as EnergyKpiPayload | null} />;
+    case "energy-trend":
+      return (
+        <>
+          <EnergyTrendWidget data={payload as EnergyTrendPayload | null} height={height} chartFactory={chartFactory} loading={loading} />
+          {tableBlock}
+        </>
+      );
     case "analysis":
       return <AnalysisWidget data={payload as AnalysisWidgetData | null} timezone={timezone} height={height} chartFactory={chartFactory} />;
     default:
