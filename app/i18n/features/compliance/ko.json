@@ -5,7 +5,8 @@
   "compliance": {
     "area": {
       "profiles": "기준 프로필",
-      "status": "준수 현황"
+      "status": "준수 현황",
+      "reports": "리포트"
     },
     "archived": "보관됨",
     "kind": {
@@ -264,6 +265,123 @@
       "peak": "최고 {{value}}",
       "alarm": "알람 #{{id}}",
       "noExcursions": "이탈 구간이 없습니다"
+    },
+    "reports": {
+      "title": "리포트",
+      "new": "새 리포트",
+      "type": "유형",
+      "statusLabel": "상태",
+      "empty": "아직 만든 리포트가 없습니다",
+      "emptyBody": "공간과 기간을 골라 자가 점검 리포트를 만들면 초안을 확인하고 발행할 수 있습니다.",
+      "types": {
+        "KR_SELF_CHECK": "자가 점검",
+        "RESET_SUPPORT": "인증 보조(RESET)",
+        "WELL_A08_SUPPORT": "인증 보조(WELL A08)"
+      },
+      "status": {
+        "GENERATING": "생성 중",
+        "DRAFT": "초안",
+        "PUBLISHED": "발행됨",
+        "FAILED": "실패"
+      },
+      "col": {
+        "title": "제목",
+        "type": "유형",
+        "period": "기간",
+        "revision": "판",
+        "status": "상태",
+        "published": "발행"
+      },
+      "wizard": {
+        "step1": "1. 유형",
+        "step2": "2. 대상",
+        "step3": "3. 기간",
+        "step4": "4. 옵션",
+        "soon": "(준비 중)",
+        "title": "제목",
+        "titleHint": "비워 두면 기간으로 정합니다.",
+        "spaces": "대상 공간",
+        "spacesHint": "{{n}}개 골랐습니다. 상위 공간을 고르면 하위 공간도 포함합니다.",
+        "spacesFailed": "공간 목록을 불러오지 못했습니다.",
+        "facility": "시설 유형",
+        "facilityAuto": "적용된 프로필에서 정하기",
+        "from": "시작일",
+        "to": "종료일",
+        "periodHint": "최대 400일, 오늘까지. 날짜는 조직 시간대({{timezone}}) 기준입니다.",
+        "includeActions": "개선 조치 포함",
+        "includeRawCsv": "원시 데이터 CSV 포함",
+        "branding": "표지에 조직 로고",
+        "submit": "미리 보기 생성"
+      },
+      "validation": {
+        "typeRequired": "유형을 고르세요.",
+        "typeUnsupported": "이 유형은 아직 만들 수 없습니다.",
+        "spaceRequired": "공간을 하나 이상 고르세요.",
+        "profileNotApplied": "선택한 공간에 프로필이 적용되어 있지 않습니다.",
+        "virtualOnly": "가상 기기만 있는 공간입니다. 실제 기기가 있는 공간을 고르세요.",
+        "facilityRequired": "시설 유형을 고르세요.",
+        "facilityInvalid": "시설 유형이 올바르지 않습니다.",
+        "periodRequired": "시작일과 종료일을 입력하세요.",
+        "periodOrder": "종료일은 시작일 이후여야 합니다.",
+        "periodFuture": "미래 날짜는 고를 수 없습니다.",
+        "periodTooLong": "기간은 400일 이내여야 합니다.",
+        "titleTooLong": "제목은 200자 이내로 쓰세요."
+      },
+      "detail": {
+        "publish": "발행",
+        "regenerate": "다시 생성",
+        "delete": "판 삭제",
+        "revisions": "판",
+        "noRevision": "판이 없습니다",
+        "toc": "목차",
+        "generating": "리포트를 만들고 있습니다",
+        "failed": "리포트를 만들지 못했습니다.",
+        "draftNote": "초안입니다. 모든 쪽에 \"초안\" 표시가 있고, 발행하면 표시 없이 다시 만들어 해시가 바뀝니다.",
+        "preview": "리포트 미리 보기",
+        "previewMissing": "미리 보기를 열 수 없습니다.",
+        "meta": "정보",
+        "pdf": "PDF 다운로드",
+        "csv": "원시 데이터 CSV"
+      },
+      "sections": {
+        "cover": "표지·고지",
+        "summary": "요약",
+        "metrics": "항목별 통계",
+        "devices": "기기·교정",
+        "unmeasurable": "측정 불가 항목",
+        "actions": "개선 조치"
+      },
+      "meta": {
+        "period": "기간",
+        "revision": "판",
+        "facility": "시설 유형",
+        "noFacility": "지정 없음",
+        "profiles": "기준 프로필",
+        "profileCount": "버전 {{n}}개",
+        "rows": "데이터 행",
+        "missing": "결측률",
+        "virtual": "가상 기기",
+        "virtualCount": "{{n}}대 제외",
+        "late": "늦게 온 데이터",
+        "lateCount": "이전 판 이후 {{n}}건 추가",
+        "generated": "생성",
+        "published": "발행",
+        "hash": "SHA-256",
+        "qualityWarning": "결측률이 {{ratio}}%로 10%를 넘습니다. 수치 해석에 주의하세요."
+      },
+      "verify": {
+        "title": "해시 검증",
+        "label": "PDF 파일",
+        "hint": "받은 리포트 PDF를 올리면 이 조직이 만든 원본과 같은지 확인합니다(50MB 이하).",
+        "checking": "확인 중…",
+        "matched": "원본과 일치합니다: 판 r{{n}}.",
+        "publishedAt": "{{at}} 발행.",
+        "draft": "초안 파일입니다.",
+        "open": "리포트 열기",
+        "mismatch": "일치하는 리포트가 없습니다. 파일이 바뀌었거나 이 조직의 리포트가 아닙니다.",
+        "notPdf": "PDF 파일만 검증할 수 있습니다.",
+        "tooLarge": "50MB 이하 파일만 검증할 수 있습니다."
+      }
     }
   },
   "errors": {
@@ -276,6 +394,10 @@
     "CMP_FACILITY_TYPE_REQUIRED": "이 프로필은 시설 유형을 골라야 합니다.",
     "CMP_APPLICATION_DUPLICATE": "같은 대상에 이미 적용했습니다.",
     "CMP_APPLICATION_NOT_FOUND": "적용을 찾을 수 없습니다.",
-    "CMP_REPORT_PERIOD_INVALID": "기간은 시작일이 종료일보다 앞이고 400일 이내여야 합니다"
+    "CMP_REPORT_PERIOD_INVALID": "기간은 시작일이 종료일보다 앞이고 400일 이내여야 합니다",
+    "CMP_PROFILE_NOT_APPLIED": "선택한 공간에 프로필이 적용되어 있지 않습니다.",
+    "CMP_VIRTUAL_DATA_NOT_ALLOWED": "가상 기기만 있는 공간은 리포트에 쓸 수 없습니다.",
+    "CMP_REPORT_NOT_FOUND": "리포트를 찾을 수 없습니다.",
+    "CMP_REPORT_STATE_CONFLICT": "지금 상태에서는 할 수 없습니다. 새로고침한 뒤 다시 시도하세요."
   }
 }

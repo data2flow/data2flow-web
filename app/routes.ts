@@ -178,6 +178,9 @@ export default [
     route("compliance/profiles/:profileId", "routes/compliance-profile-detail.tsx"),
     route("compliance/profiles/:profileId/edit", "routes/compliance-profile-edit.tsx"),
     route("compliance/status", "routes/compliance-status.tsx"),
+    route("compliance/reports", "routes/compliance-reports.tsx"),
+    route("compliance/reports/new", "routes/compliance-report-new.tsx"),
+    route("compliance/reports/:reportId", "routes/compliance-report-detail.tsx"),
   ]),
 
   // M5 field: 모바일 셸(UI-DSH-14, UI-DEV-17·21)과 QR 딥링크(`/d/{qrToken}`, 로그인 필요) — 00-navigation.md §2·§3
