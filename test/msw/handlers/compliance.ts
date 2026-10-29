@@ -1,6 +1,6 @@
 /**
  * M7 환경 기준 가짜 core API(design/api/CMP-api.md): 프로필 API-CMP-01~06a, 적용 API-CMP-07, 측정 가능성 API-CMP-08,
- * 종합 점수 API-CMP-10, 준수 현황 API-CMP-13·14, 리포트 API-CMP-16~20a, 개선 조치 API-CMP-23·24(이탈 구간 9001).
+ * 종합 점수 API-CMP-10, 준수 현황 API-CMP-13·14, 리포트 API-CMP-16~20a, 정기 발행 API-CMP-21·22(일정 701), 개선 조치 API-CMP-23·24(이탈 구간 9001).
  * 권한은 core와 같게 검사한다(조회 CMP_READ, 쓰기 CMP_ADMIN, 리포트 생성·발행 CMP_REPORT, 개선 조치 CMP_ACTION). 시스템 프로필은 READ_ONLY, 잠긴 버전 PUT도 READ_ONLY.
  * 상태는 core.extra["cmp"].
  */
@@ -14,6 +14,8 @@ export interface CmpState {
   applications: Json[];
   reports: Json[];
   actions: Json[];
+  schedules: Json[];
+  runs: Json[];
   seq: number;
 }
 
@@ -45,6 +47,15 @@ export function cmpState(core: CoreState): CmpState {
       { reportId: "802", type: "KR_SELF_CHECK", title: "2026-10 자가 점검", spaceIds: ["31"], facilityType: "GENERAL", periodFrom: "2026-10-01", periodTo: "2026-10-03", options: {}, createdAt: "2026-10-04T00:00:00Z", updatedAt: "2026-10-04T00:00:00Z", revisions: [revision("802", 1, "GENERATING", { progress: 60, sha256: null, dataRange: null })] },
     ],
     actions: [],
+    schedules: [
+      {
+        reportScheduleId: "701", name: "월간 자가 점검", reportTemplate: { type: "KR_SELF_CHECK", title: null, spaceIds: ["31"], facilityType: null, options: null }, cadence: "MONTHLY", dayOfPeriod: 1, publishTime: "09:00",
+        periodRule: "PREVIOUS_MONTH", recipients: { userIds: ["7"], emails: ["audit@example.com"] }, format: "PDF", enabled: true, nextRunAt: "2026-11-01T00:00:00Z", version: 0, updatedAt: "2026-10-01T00:00:00Z",
+      },
+    ],
+    runs: [
+      { runId: "7101", scheduleId: "701", scheduledAt: "2026-10-01T00:00:00Z", trigger: "SCHEDULED", status: "FAILED", attempts: 3, reportId: null, revisionNo: null, error: "CMP_PROFILE_NOT_APPLIED", deliveries: [] },
+    ],
     seq: 600,
   } satisfies CmpState;
   return core.extra.cmp as CmpState;
@@ -121,6 +132,63 @@ function reportsHandler(s: CmpState, { method, path, url, body, can }: Parameter
   return undefined;
 }
 
+const EMAIL = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+
+/** 정기 발행 API-CMP-21·22. 공간 32번은 프로필이 없다 */
+function schedulesHandler(s: CmpState, { method, path, url, body, can }: Parameters<CoreHandler>[1]): Response | undefined {
+  const b = (body ?? {}) as Json;
+  const runView = ({ scheduleId: _s, ...r }: Json) => (void _s, r);
+  const view = (x: Json): Json => {
+    const runs = s.runs.filter((r) => r.scheduleId === x.reportScheduleId);
+    return { ...x, lastRun: runs.length ? runView(runs[runs.length - 1]) : null };
+  };
+  const invalid = (field: string, code: string) => fail(400, "CMP_SCHEDULE_INVALID", { errors: [{ field, code, message: "" }] });
+  const save = (existing?: Json): Response => {
+    if (!can("CMP_REPORT")) return fail(403, "PERMISSION_DENIED");
+    const template = (b.reportTemplate ?? {}) as Json;
+    const recipients = (b.recipients ?? {}) as { userIds?: string[]; emails?: string[] };
+    const day = Number(b.dayOfPeriod);
+    if (!String(b.name ?? "").trim()) return invalid("name", "NotBlank");
+    if (!(day >= 1 && day <= 28)) return invalid("dayOfPeriod", "Range");
+    if ((recipients.emails ?? []).some((e) => !EMAIL.test(e))) return invalid("recipients.emails", "Email");
+    if (!(recipients.userIds ?? []).length && !(recipients.emails ?? []).length) return invalid("recipients", "NotEmpty");
+    if (((template.spaceIds as string[] | undefined) ?? []).includes("32")) return fail(409, "CMP_PROFILE_NOT_APPLIED");
+    if (existing && b.version !== existing.version) return fail(409, "VERSION_CONFLICT");
+    const { version: _v, ...rest } = b;
+    void _v;
+    const next: Json = { ...rest, nextRunAt: b.enabled ? (b.cadence === "QUARTERLY" ? "2027-01-01T00:00:00Z" : "2026-11-01T00:00:00Z") : null, updatedAt: NOW };
+    if (existing) {
+      Object.assign(existing, next, { version: Number(existing.version) + 1 });
+      return ok(view(existing));
+    }
+    const created = { reportScheduleId: String(++s.seq), ...next, version: 0 };
+    s.schedules.push(created);
+    return ok(view(created), 201);
+  };
+  if (path === "/compliance/report-schedules" && method === "GET") return list(s.schedules.map(view), url);
+  if (path === "/compliance/report-schedules" && method === "POST") return save();
+  const m = /^\/compliance\/report-schedules\/(\d+)(?:\/(run-now|runs))?$/.exec(path);
+  if (!m) return undefined;
+  const schedule = s.schedules.find((x) => x.reportScheduleId === m[1]);
+  if (!schedule) return fail(404, "CMP_SCHEDULE_NOT_FOUND");
+  if (!m[2] && method === "GET") return ok(view(schedule));
+  if (!m[2] && method === "PUT") return save(schedule);
+  if (!m[2] && method === "DELETE") {
+    if (!can("CMP_REPORT")) return fail(403, "PERMISSION_DENIED");
+    s.schedules = s.schedules.filter((x) => x !== schedule);
+    s.runs = s.runs.filter((r) => r.scheduleId !== m[1]);
+    return noContent();
+  }
+  if (m[2] === "run-now" && method === "POST") {
+    if (!can("CMP_REPORT")) return fail(403, "PERMISSION_DENIED");
+    const run = { runId: String(++s.seq), scheduleId: m[1], scheduledAt: NOW, trigger: "MANUAL", status: "PENDING", attempts: 0, reportId: null, revisionNo: null, error: null, deliveries: [] };
+    s.runs.push(run);
+    return ok({ runId: run.runId, reportScheduleId: m[1], scheduledAt: NOW }, 202);
+  }
+  if (m[2] === "runs" && method === "GET") return list(s.runs.filter((r) => r.scheduleId === m[1]).reverse().map(runView), url);
+  return undefined;
+}
+
 const EXCURSION = { excursionId: "9001", spaceId: "31", spaceName: "실습실", metricKey: "co2", startedAt: "2026-10-02T01:00:00Z", endedAt: "2026-10-02T05:35:00Z", peakValue: 1420, alarmId: "77" };
 
 /** 개선 조치 API-CMP-23·24. 작업 지시 999999·알람 999999는 없다 */
@@ -175,6 +243,7 @@ const detail = (s: CmpState, p: Json) => ({ ...p, currentVersion: current(s, p),
 export const complianceHandler: CoreHandler = (core, { method, path, url, body, can, user }) => {
   if (!path.startsWith("/compliance/")) return undefined;
   if (!can("CMP_READ")) return fail(403, "PERMISSION_DENIED");
+  if (path.startsWith("/compliance/report-schedules")) return schedulesHandler(cmpState(core), { method, path, url, body, can, user } as Parameters<CoreHandler>[1]);
   if (path.startsWith("/compliance/reports")) return reportsHandler(cmpState(core), { method, path, url, body, can, user } as Parameters<CoreHandler>[1]);
   if (path.startsWith("/compliance/excursions") || path.startsWith("/compliance/actions")) return actionsHandler(cmpState(core), { method, path, url, body, can, user } as Parameters<CoreHandler>[1]);
   if (method !== "GET" && !can("CMP_ADMIN")) return fail(403, "PERMISSION_DENIED");
