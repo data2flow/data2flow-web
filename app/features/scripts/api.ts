@@ -26,7 +26,7 @@ export interface ScriptDetail {
   kind: ScriptKind;
   status: string;
   description?: string | null;
-  activeVersion: { versionId: string; versionNo: number; code: string; deployedAt?: string; deployMemo?: string } | null;
+  activeVersion: { versionId: string; versionNo: number; code: string; deployedAt?: string; deployMemo?: string; applied?: AppliedStatus } | null;
   draft: { versionId: string; versionNo: number; code: string; staticCheck: StaticCheck } | null;
   versions?: ScriptVersionRow[];
   bindings?: { targetType: string; targetId: string; name?: string; failurePolicy?: string }[];
@@ -53,10 +53,13 @@ export interface DeployRequest {
   baseActiveVersionId: string | null;
 }
 
+/** 인스턴스 적용 보고(API-SCR-34를 모은 것). total은 최근 24시간 보고한 pipeline 인스턴스 수 */
+export type AppliedStatus = { reported: number; total: number };
+
 export interface DeployResult {
   activeVersionId: string;
   versionNo?: number;
-  applied?: { reported: number; total: number };
+  applied?: AppliedStatus;
   /** 배포 전 테스트 케이스 결과(SCR-03.03) */
   testResult?: { passed?: number; failed?: number } | null;
   /** 배포 후 재처리 제안(SCR-03.06) */
