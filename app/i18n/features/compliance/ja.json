@@ -6,7 +6,8 @@
     "area": {
       "profiles": "基準プロファイル",
       "status": "遵守状況",
-      "reports": "レポート"
+      "reports": "レポート",
+      "coverage": "カバレッジ点検"
     },
     "archived": "アーカイブ済み",
     "kind": {
@@ -545,6 +546,73 @@
         "emailInvalid": "メールアドレスの形式が正しくありません。",
         "userNotFound": "存在しないユーザーがいます。"
       }
+    },
+    "coverage": {
+      "title": "カバレッジ点検",
+      "site": "サイト",
+      "profile": "プロファイル",
+      "noProfile": "プロファイルなし（既定値）",
+      "run": "点検",
+      "noSite": "点検するサイトがありません",
+      "density": "設置密度",
+      "publicDisplay": "公開表示",
+      "calibration": "校正期限",
+      "quality": "データ品質",
+      "na": "対象外",
+      "ok": "充足",
+      "signal": {
+        "density": "不足 {{n}}か所",
+        "publicDisplay": "不足 {{n}}個",
+        "calibration": "超過 {{n}}台",
+        "quality": "未達 {{n}}か所"
+      },
+      "densityNa": "このプロファイルには設置密度の基準がありません。",
+      "displayNa": "このプロファイルには公開表示の基準がありません。",
+      "col": {
+        "space": "空間",
+        "usage": "用途",
+        "area": "面積",
+        "required": "必要",
+        "actual": "実際",
+        "shortage": "不足",
+        "device": "機器",
+        "model": "モデル",
+        "interval": "推奨周期",
+        "last": "前回校正",
+        "elapsed": "経過",
+        "status": "状態",
+        "devices": "機器数",
+        "missing": "欠測率",
+        "intervalViolations": "周期未達機器",
+        "abnormal": "品質異常"
+      },
+      "usage": {
+        "CLASSROOM": "講義室",
+        "OFFICE": "事務室",
+        "MEETING": "会議室",
+        "LAB": "実験室",
+        "CORRIDOR": "廊下",
+        "OTHER": "その他"
+      },
+      "noArea": "判断不可（面積なし）",
+      "enterArea": "面積を入力",
+      "needMore": "追加必要 {{n}}台",
+      "displayLine": "対象面積 {{area}}㎡ · 必要 {{required}}個 · 実際の公開画面 {{links}}個、QR {{qr}}個 · 不足 {{shortage}}個",
+      "displayPending": "公開画面・QR機能の準備前のため、実際の数は0として数えます。",
+      "recommend": "推奨場所: {{spaces}}",
+      "noDevices": "点検する機器がありません。",
+      "pickDevices": "作業指示を作る機器を選んでください。",
+      "createWorkOrder": "作業指示を作成",
+      "days": "{{n}}日",
+      "calibrationStatus": {
+        "OK": "正常",
+        "DUE_SOON": "間近",
+        "OVERDUE": "超過",
+        "NO_RECORD": "記録なし"
+      },
+      "qualityPeriod": "{{from}} 〜 {{to}} 基準",
+      "belowStandard": "データ品質基準未達",
+      "violations": "周期未達 {{n}}台"
     }
   },
   "errors": {

@@ -6,7 +6,8 @@
     "area": {
       "profiles": "기준 프로필",
       "status": "준수 현황",
-      "reports": "리포트"
+      "reports": "리포트",
+      "coverage": "커버리지 점검"
     },
     "archived": "보관됨",
     "kind": {
@@ -545,6 +546,73 @@
         "emailInvalid": "이메일 형식이 올바르지 않습니다.",
         "userNotFound": "없는 사용자가 있습니다."
       }
+    },
+    "coverage": {
+      "title": "커버리지 점검",
+      "site": "사이트",
+      "profile": "프로필",
+      "noProfile": "프로필 없이(기본 기준)",
+      "run": "점검",
+      "noSite": "점검할 사이트가 없습니다",
+      "density": "설치 밀도",
+      "publicDisplay": "공개 표시",
+      "calibration": "교정 기한",
+      "quality": "데이터 품질",
+      "na": "해당 없음",
+      "ok": "충족",
+      "signal": {
+        "density": "부족 {{n}}곳",
+        "publicDisplay": "부족 {{n}}개",
+        "calibration": "초과 {{n}}대",
+        "quality": "미달 {{n}}곳"
+      },
+      "densityNa": "이 프로필에는 설치 밀도 기준이 없습니다.",
+      "displayNa": "이 프로필에는 공개 표시 기준이 없습니다.",
+      "col": {
+        "space": "공간",
+        "usage": "용도",
+        "area": "면적",
+        "required": "필요",
+        "actual": "실제",
+        "shortage": "부족",
+        "device": "기기",
+        "model": "모델",
+        "interval": "권장 주기",
+        "last": "마지막 교정",
+        "elapsed": "경과",
+        "status": "상태",
+        "devices": "기기 수",
+        "missing": "결측률",
+        "intervalViolations": "주기 미달 기기",
+        "abnormal": "품질 비정상"
+      },
+      "usage": {
+        "CLASSROOM": "강의실",
+        "OFFICE": "사무실",
+        "MEETING": "회의실",
+        "LAB": "실험실",
+        "CORRIDOR": "복도",
+        "OTHER": "기타"
+      },
+      "noArea": "판단 불가(면적 없음)",
+      "enterArea": "면적 입력",
+      "needMore": "추가 필요 {{n}}대",
+      "displayLine": "대상 면적 {{area}}㎡ · 필요 {{required}}개 · 실제 공개 화면 {{links}}개, QR {{qr}}개 · 부족 {{shortage}}개",
+      "displayPending": "공개 화면·QR 기능이 준비되기 전이라 실제 수는 0으로 셉니다.",
+      "recommend": "추천 위치: {{spaces}}",
+      "noDevices": "점검할 기기가 없습니다.",
+      "pickDevices": "작업 지시를 만들 기기를 고르세요.",
+      "createWorkOrder": "작업 지시 만들기",
+      "days": "{{n}}일",
+      "calibrationStatus": {
+        "OK": "정상",
+        "DUE_SOON": "임박",
+        "OVERDUE": "초과",
+        "NO_RECORD": "기록 없음"
+      },
+      "qualityPeriod": "{{from}} ~ {{to}} 기준",
+      "belowStandard": "데이터 품질 기준 미달",
+      "violations": "주기 미달 {{n}}대"
     }
   },
   "errors": {

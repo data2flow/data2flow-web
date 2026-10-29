@@ -81,11 +81,12 @@ export const RAIL: Partial<Record<MenuKey | "admin", RailItem[]>> = {
     { label: "analytics.area.models", path: "/analytics/models" },
     { label: "analytics.area.mcp", path: "/ai/mcp" },
   ],
-  // M7 환경 기준(UI-CMP-01~04)·준수 현황판(UI-CMP-06)·리포트(UI-CMP-07·08)
+  // M7 환경 기준(UI-CMP-01~04)·준수 현황판(UI-CMP-06)·리포트(UI-CMP-07·08)·커버리지 점검(UI-CMP-11)
   compliance: [
     { label: "compliance.area.profiles", path: "/compliance/profiles" },
     { label: "compliance.area.status", path: "/compliance/status" },
     { label: "compliance.area.reports", path: "/compliance/reports" },
+    { label: "compliance.area.coverage", path: "/compliance/coverage" },
   ],
   sim: [
     { label: "sim.area.home", path: "/sim" },
