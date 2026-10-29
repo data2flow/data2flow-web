@@ -264,7 +264,9 @@
       "ongoing": "进行中",
       "peak": "最高 {{value}}",
       "alarm": "告警 #{{id}}",
-      "noExcursions": "没有超标区间"
+      "noExcursions": "没有超标区间",
+      "recordAction": "记录改进措施",
+      "viewActions": "查看措施"
     },
     "reports": {
       "title": "报告",
@@ -382,6 +384,70 @@
         "notPdf": "只能验证 PDF 文件。",
         "tooLarge": "只能验证 50MB 以下的文件。"
       }
+    },
+    "actions": {
+      "title": "改进措施记录",
+      "back": "返回达标状况",
+      "target": "对象超标",
+      "space": "空间",
+      "metric": "项目",
+      "period": "期间",
+      "peak": "最高值",
+      "alarmLabel": "告警",
+      "alarm": "告警 #{{id}}",
+      "workOrder": "工单 #{{id}}",
+      "recorded": "已记录措施 {{n}} 条",
+      "empty": "尚无记录的措施",
+      "newTitle": "新措施",
+      "editTitle": "编辑措施",
+      "cause": "原因",
+      "causePlaceholder": "请选择原因",
+      "causeNote": "原因备注",
+      "actionText": "措施内容",
+      "actor": "执行人",
+      "actedAt": "执行时间",
+      "actedAtHint": "按{{timezone}}，超标开始之后",
+      "alarms": "关联告警",
+      "workOrders": "关联工单",
+      "idsHint": "用逗号分隔 ID",
+      "createWorkOrder": "创建工单",
+      "resultMode": "结果确认",
+      "autoHint": "24 小时后记录结果(措施后 24 小时达标率)",
+      "resultNote": "结果备注",
+      "causes": {
+        "VENTILATION": "通风不足",
+        "EQUIPMENT": "设备故障",
+        "OUTDOOR_INFLOW": "室外流入",
+        "CROWDING": "人员过密",
+        "SENSOR": "传感器异常",
+        "OTHER": "其他"
+      },
+      "modes": {
+        "AUTO": "自动(措施后 24 小时达标率)",
+        "MANUAL": "手动输入"
+      },
+      "result": {
+        "confirmed": "措施后达标率 {{ratio}}%",
+        "recorded": "结果: {{note}}",
+        "pending": "等待自动确认",
+        "unverifiable": "无法确认(数据缺失)"
+      },
+      "validation": {
+        "causeRequired": "请选择原因",
+        "causeNoteRequired": "请填写其他原因",
+        "causeNoteTooLong": "原因备注最多 200 字",
+        "actionRequired": "请填写措施内容",
+        "actionTooLong": "措施内容最多 1000 字",
+        "actorRequired": "请选择执行人",
+        "actedAtRequired": "请输入执行时间",
+        "beforeExcursion": "不能输入超标之前的时间",
+        "future": "不能输入未来的时间",
+        "resultModeRequired": "请选择结果确认方式",
+        "resultNoteRequired": "请填写结果",
+        "resultNoteTooLong": "结果备注最多 500 字",
+        "workOrderNotFound": "存在不存在的工单",
+        "alarmNotFound": "存在不存在的告警"
+      }
     }
   },
   "errors": {
@@ -398,6 +464,9 @@
     "CMP_PROFILE_NOT_APPLIED": "所选空间未应用任何标准配置。",
     "CMP_VIRTUAL_DATA_NOT_ALLOWED": "只有虚拟设备的空间不能用于报告。",
     "CMP_REPORT_NOT_FOUND": "找不到报告。",
-    "CMP_REPORT_STATE_CONFLICT": "当前状态下无法执行。请刷新后重试。"
+    "CMP_REPORT_STATE_CONFLICT": "当前状态下无法执行。请刷新后重试。",
+    "CMP_ACTION_INVALID": "请检查改进措施信息。",
+    "CMP_EXCURSION_NOT_FOUND": "找不到超标区间。",
+    "CMP_ACTION_NOT_FOUND": "找不到改进措施。"
   }
 }

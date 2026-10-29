@@ -178,6 +178,7 @@ export default [
     route("compliance/profiles/:profileId", "routes/compliance-profile-detail.tsx"),
     route("compliance/profiles/:profileId/edit", "routes/compliance-profile-edit.tsx"),
     route("compliance/status", "routes/compliance-status.tsx"),
+    route("compliance/excursions/:excursionId", "routes/compliance-excursion-actions.tsx"),
     route("compliance/reports", "routes/compliance-reports.tsx"),
     route("compliance/reports/new", "routes/compliance-report-new.tsx"),
     route("compliance/reports/:reportId", "routes/compliance-report-detail.tsx"),

@@ -264,7 +264,9 @@
       "ongoing": "継続中",
       "peak": "最大 {{value}}",
       "alarm": "アラーム #{{id}}",
-      "noExcursions": "逸脱区間はありません"
+      "noExcursions": "逸脱区間はありません",
+      "recordAction": "改善措置を記録",
+      "viewActions": "措置を見る"
     },
     "reports": {
       "title": "レポート",
@@ -382,6 +384,70 @@
         "notPdf": "PDFファイルだけ検証できます。",
         "tooLarge": "50MB以下のファイルだけ検証できます。"
       }
+    },
+    "actions": {
+      "title": "改善措置の記録",
+      "back": "遵守状況へ戻る",
+      "target": "対象の逸脱",
+      "space": "空間",
+      "metric": "項目",
+      "period": "期間",
+      "peak": "最高値",
+      "alarmLabel": "アラーム",
+      "alarm": "アラーム #{{id}}",
+      "workOrder": "作業指示 #{{id}}",
+      "recorded": "記録された措置 {{n}}件",
+      "empty": "まだ記録された措置はありません",
+      "newTitle": "新しい措置",
+      "editTitle": "措置を編集",
+      "cause": "原因",
+      "causePlaceholder": "原因を選択してください",
+      "causeNote": "原因メモ",
+      "actionText": "措置内容",
+      "actor": "実施者",
+      "actedAt": "実施日時",
+      "actedAtHint": "{{timezone}}基準、逸脱開始以降",
+      "alarms": "関連アラーム",
+      "workOrders": "関連作業指示",
+      "idsHint": "IDをカンマで区切って入力します",
+      "createWorkOrder": "作業指示を作成",
+      "resultMode": "結果確認",
+      "autoHint": "24時間後に結果が記録されます(措置後24時間の充足率)",
+      "resultNote": "結果メモ",
+      "causes": {
+        "VENTILATION": "換気不足",
+        "EQUIPMENT": "機器故障",
+        "OUTDOOR_INFLOW": "外部流入",
+        "CROWDING": "在室過密",
+        "SENSOR": "センサー異常",
+        "OTHER": "その他"
+      },
+      "modes": {
+        "AUTO": "自動(措置後24時間の充足率)",
+        "MANUAL": "手動入力"
+      },
+      "result": {
+        "confirmed": "措置後の充足率 {{ratio}}%",
+        "recorded": "結果: {{note}}",
+        "pending": "自動確認待ち",
+        "unverifiable": "確認不可(データ欠測)"
+      },
+      "validation": {
+        "causeRequired": "原因を選択してください",
+        "causeNoteRequired": "その他の原因を入力してください",
+        "causeNoteTooLong": "原因メモは200文字までです",
+        "actionRequired": "措置内容を入力してください",
+        "actionTooLong": "措置内容は1000文字までです",
+        "actorRequired": "実施者を選択してください",
+        "actedAtRequired": "実施日時を入力してください",
+        "beforeExcursion": "逸脱前の時刻は入力できません",
+        "future": "未来の時刻は入力できません",
+        "resultModeRequired": "結果確認の方法を選択してください",
+        "resultNoteRequired": "結果を入力してください",
+        "resultNoteTooLong": "結果メモは500文字までです",
+        "workOrderNotFound": "存在しない作業指示があります",
+        "alarmNotFound": "存在しないアラームがあります"
+      }
     }
   },
   "errors": {
@@ -398,6 +464,9 @@
     "CMP_PROFILE_NOT_APPLIED": "選択した空間にプロファイルが適用されていません。",
     "CMP_VIRTUAL_DATA_NOT_ALLOWED": "仮想デバイスだけの空間はレポートに使えません。",
     "CMP_REPORT_NOT_FOUND": "レポートが見つかりません。",
-    "CMP_REPORT_STATE_CONFLICT": "現在の状態ではできません。再読み込みしてからやり直してください。"
+    "CMP_REPORT_STATE_CONFLICT": "現在の状態ではできません。再読み込みしてからやり直してください。",
+    "CMP_ACTION_INVALID": "改善措置の内容を確認してください。",
+    "CMP_EXCURSION_NOT_FOUND": "逸脱区間が見つかりません。",
+    "CMP_ACTION_NOT_FOUND": "改善措置が見つかりません。"
   }
 }

@@ -1,5 +1,6 @@
 /**
  * UI-CMP-06 준수 현황판 본문(CMP-02.01): 요약 카드, 공간 표(충족률·이탈 상위 3·결측률·연속 달성 막대·점수), 펼친 줄의 일별 막대와 이탈 구간.
+ * 이탈 구간마다 [개선 조치 기록](UI-CMP-10) 링크가 있고, 조치가 있으면 [조치 보기]다.
  * 연속 달성이 깨진 줄은 빨간 테두리와 "D-n 깨짐: 항목", 결측률 10% 초과는 "데이터 품질 기준 미달" 경고.
  */
 import { Fragment } from "react";
@@ -172,6 +173,9 @@ export function SpaceDetail({ detail, timezone, lang }: { detail: SpaceStatus; t
                 <span className="font-medium">{metricName(t, x.metricKey)}</span>
                 <span>{t("compliance.status.peak", { value: formatNumber(x.peakValue, lang, { precision: 1 }) })}</span>
                 {x.alarmId && <span className="text-muted">{t("compliance.status.alarm", { id: x.alarmId })}</span>}
+                <Link className="text-accent hover:underline" to={`/compliance/excursions/${x.id}`}>
+                  {x.hasAction ? t("compliance.status.viewActions") : t("compliance.status.recordAction")}
+                </Link>
               </li>
             ))}
           </ul>
