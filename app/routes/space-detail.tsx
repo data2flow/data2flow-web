@@ -20,6 +20,8 @@ import { buildingOf, floorNav, locationPath, type FloorItem, type FloorNav } fro
 import { FloorplanPanel, type FloorplanView } from "~/features/spaces/components/floorplan";
 import { ModeCard, PropsForm, ScheduleEditor, TargetsEditor, type FormResult, type ModeData, type ScheduleData, type SpaceDetail, type TargetsData } from "~/features/spaces/components/space-manage";
 import { SpaceAlarms } from "~/features/spaces/components/space-alarms";
+import { ScoreCard } from "~/features/compliance/components/score-card";
+import type { ScoreView } from "~/features/compliance/model/status";
 import { ChildSpaces, ComfortBadge, ComfortCauses, DeviceCards } from "~/features/spaces/components/space-overview";
 import type { SpaceAlarm } from "~/features/spaces/model/space-alarms";
 import { SpaceTree, type TreeActionResult } from "~/features/spaces/components/space-tree";
@@ -98,7 +100,12 @@ export async function loader({ request, context, params }: Route.LoaderArgs) {
   let models: ModelSummary[] = [];
   let modelDetail: ModelDetail | null = null;
   const edit = url.searchParams.get("edit") === "1";
-  if (tab === "alarms") {
+  // UI-CMP-05 종합 점수(API-CMP-10). 권한이 없거나 실패하면 카드를 그리지 않는다
+  let score: ScoreView | null = null;
+  if (tab === "overview") {
+    const s = await callApi<ScoreView>(ctx, request, `/api/v1/core/compliance/spaces/${id}/score?include=inputs`);
+    score = s.ok ? s.data : null;
+  } else if (tab === "alarms") {
     // 공간 하위 열린 알람(API-RUL-10, spaceId는 하위 포함, 기본 상태 ACTIVE·ACKNOWLEDGED·SUPPRESSED)
     const list = await callList<SpaceAlarm>(ctx, request, `/api/v1/core/alarms?spaceId=${id}&size=100`);
     if (list.ok) alarms = list.list.responses.map((a) => ({ ...a, id: String(a.id) }));
@@ -159,6 +166,7 @@ export async function loader({ request, context, params }: Route.LoaderArgs) {
     spaceDevices,
     alarms,
     alarmsFailed,
+    score,
     floors,
     floorNav: floorNavState,
     floorBase,
@@ -322,6 +330,7 @@ export default function SpaceDetailPage() {
         <Tabs items={tabs} current={tab} />
         {tab === "overview" && (
           <div className="flex flex-col gap-4">
+            {loaded.score && <ScoreCard score={loaded.score} timezone={timezone} lang={lang} />}
             <DeviceCards spaceId={space.id} devices={overview?.devices ?? []} alarms={overview?.openAlarms} now={loaded.now} lang={lang} />
             <ChildSpaces>{children}</ChildSpaces>
           </div>

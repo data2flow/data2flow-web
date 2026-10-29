@@ -4,7 +4,8 @@
   },
   "compliance": {
     "area": {
-      "profiles": "기준 프로필"
+      "profiles": "기준 프로필",
+      "status": "준수 현황"
     },
     "archived": "보관됨",
     "kind": {
@@ -191,6 +192,78 @@
       "PARTIAL": "일부",
       "NOT_MEASURABLE": "측정 불가",
       "without": "기기 없음: {{names}}"
+    },
+    "grade": {
+      "GOOD": "좋음",
+      "MODERATE": "보통",
+      "POOR": "나쁨",
+      "BAD": "매우 나쁨"
+    },
+    "metric": {
+      "co2": "CO2",
+      "pm2_5": "PM2.5",
+      "pm10": "PM10",
+      "tvoc": "TVOC",
+      "hcho": "HCHO",
+      "co": "CO",
+      "no2": "NO2",
+      "radon": "라돈",
+      "temperature": "온도",
+      "humidity": "습도"
+    },
+    "score": {
+      "title": "종합 실내 환경 점수",
+      "defaultBasis": "기본 기준",
+      "partial": "일부 항목 제외",
+      "noData": "최근 10분 데이터가 없어 점수를 계산하지 못했습니다",
+      "indexOf": "{{metric}} 지수",
+      "topPenalty": "감점 1순위: {{metric}} {{value}}",
+      "at": "계산 {{time}}",
+      "formula": "계산식 보기",
+      "formulaText": "항목 지수(1~5)를 가중 평균해 0~100점으로 바꿉니다. 점수 = 100 × Σ가중치×(지수−1)/4 ÷ Σ가중치",
+      "metric": "항목",
+      "avg5m": "5분 평균",
+      "boundary": "기준",
+      "weight": "가중치"
+    },
+    "status": {
+      "title": "준수 현황",
+      "csv": "CSV 내보내기",
+      "site": "사이트",
+      "profile": "프로필",
+      "period": "기간",
+      "periods": {
+        "7": "최근 7일",
+        "30": "최근 30일",
+        "90": "최근 90일",
+        "custom": "직접 지정"
+      },
+      "from": "시작일",
+      "to": "종료일",
+      "empty": "표시할 준수 현황이 없습니다",
+      "emptyBody": "공간에 기준 프로필을 적용하면 다음 판정부터 여기에 보입니다.",
+      "avgRatio": "평균 충족률",
+      "exceededHours": "이탈 시간",
+      "streaking": "연속 달성 중인 공간",
+      "qualityWarnings": "데이터 품질 경고",
+      "space": "공간",
+      "ratio": "충족률",
+      "exceeded": "이탈 상위 항목",
+      "missing": "결측률",
+      "streak": "연속 달성",
+      "score": "점수",
+      "qualityWarning": "데이터 품질 기준 미달(결측 10% 초과)",
+      "streakDays": "{{current}}/{{required}}일",
+      "broken": "D-{{days}} 깨짐: {{metric}}",
+      "detailFailed": "일별 현황을 불러오지 못했습니다",
+      "daily": "일별 충족",
+      "dayLabel": "{{day}} 충족률 {{ratio}}%, 이탈 {{exceeded}}분, 결측 {{missing}}분",
+      "noDaily": "기간 안에 판정한 날이 없습니다",
+      "excursions": "이탈 구간",
+      "ongoing": "진행 중",
+      "peak": "최고 {{value}}",
+      "alarm": "알람 #{{id}}",
+      "noExcursions": "이탈 구간이 없습니다"
     }
   },
   "errors": {
@@ -202,6 +275,7 @@
     "CMP_THRESHOLD_INVALID": "기준값이 올바르지 않습니다.",
     "CMP_FACILITY_TYPE_REQUIRED": "이 프로필은 시설 유형을 골라야 합니다.",
     "CMP_APPLICATION_DUPLICATE": "같은 대상에 이미 적용했습니다.",
-    "CMP_APPLICATION_NOT_FOUND": "적용을 찾을 수 없습니다."
+    "CMP_APPLICATION_NOT_FOUND": "적용을 찾을 수 없습니다.",
+    "CMP_REPORT_PERIOD_INVALID": "기간은 시작일이 종료일보다 앞이고 400일 이내여야 합니다"
   }
 }
