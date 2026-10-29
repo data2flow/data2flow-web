@@ -299,3 +299,89 @@ describe("CMP-02.02·02.04·02.06 UI-CMP-07 리포트 목록·생성, UI-CMP-08 
     expect((await o.get("/compliance/reports?status=GENERATING")).body).toContain("실내공기질 자가 점검 리포트 2026-08-01 ~ 2026-08-31");
   });
 });
+
+describe("CMP-02.05 UI-CMP-10 개선 조치 기록", () => {
+  const actionForm = (extra: Record<string, string | string[]> = {}) => ({
+    intent: "save",
+    actionId: "",
+    startedAt: "2026-10-02T01:00:00Z",
+    cause: "VENTILATION",
+    causeNote: "",
+    actionText: "환기 장치 필터 교체",
+    actorUserId: "7",
+    actedAt: "2026-10-02T11:00",
+    linkedAlarmIds: "77",
+    linkedWorkOrderIds: "",
+    resultMode: "AUTO",
+    resultNote: "",
+    ...extra,
+  });
+
+  it("TC-CMP-064 OPERATOR: 검증(원인·이탈 이전 시각·없는 작업 지시), 작업 지시 만들기로 연결, 저장하면 현황판에 [조치 보기]", async () => {
+    const o = await operator();
+    const status = await o.get("/compliance/status?open=31:101");
+    expect(status.body).toContain('href="/compliance/excursions/9001"');
+    expect(status.body).toContain("개선 조치 기록");
+
+    const page = await o.get("/compliance/excursions/9001");
+    expect(page.response.status).toBe(200);
+    expect(page.body).toContain("대상 이탈");
+    expect(page.body).toContain("실습실");
+    expect(page.body).toContain("아직 기록된 조치가 없습니다");
+    expect(page.body).toContain("24시간 후 결과가 기록됩니다");
+
+    const noCause = await o.post("/compliance/excursions/9001", actionForm({ cause: "" }));
+    expect(noCause.response.status).toBe(400);
+    expect(noCause.body).toContain("원인을 선택하세요");
+    const early = await o.post("/compliance/excursions/9001", actionForm({ actedAt: "2026-10-02T09:30" }));
+    expect(early.body).toContain("이탈 이전 시각은 입력할 수 없습니다");
+    const manual = await o.post("/compliance/excursions/9001", actionForm({ resultMode: "MANUAL" }));
+    expect(manual.body).toContain("결과를 적어 주세요");
+    const missing = await o.post("/compliance/excursions/9001", actionForm({ linkedWorkOrderIds: "999999" }));
+    expect(missing.response.status).toBe(404);
+    expect(missing.body).toContain("없는 작업 지시가 있습니다");
+
+    const withOrder = await o.post("/compliance/excursions/9001", actionForm({ intent: "createWorkOrder" }));
+    expect(withOrder.response.status).toBe(200);
+    const orderId = /name="linkedWorkOrderIds"[^>]*value="(\d+)"/.exec(withOrder.body)?.[1];
+    expect(orderId).toBeTruthy();
+
+    const saved = await o.post("/compliance/excursions/9001", actionForm({ linkedWorkOrderIds: orderId! }));
+    expect(saved.response.status).toBe(302);
+    expect(saved.response.headers.get("location")).toBe("/compliance/excursions/9001");
+    const action = cmpState(app.gateway.m2).actions[0];
+    expect(action).toMatchObject({ cause: "VENTILATION", actedAt: "2026-10-02T02:00:00Z", linkedAlarmIds: ["77"], linkedWorkOrderIds: [orderId], resultMode: "AUTO" });
+    const after = await o.get("/compliance/excursions/9001");
+    expect(after.body).toContain("기록된 조치 1건");
+    expect(after.body).toContain("환기 장치 필터 교체");
+    expect(after.body).toContain("자동 확인 대기 중");
+    expect(after.body).toContain(`href="/work-orders/${orderId}"`);
+    expect((await o.get("/compliance/status?open=31:101")).body).toContain("조치 보기");
+  });
+
+  it("편집하면 값이 채워지고 수동 결과로 바꿀 수 있다, 삭제, VIEWER는 보기만", async () => {
+    const o = await operator();
+    await o.post("/compliance/excursions/9001", actionForm());
+    const id = cmpState(app.gateway.m2).actions[0].actionId as string;
+    const edit = await o.get(`/compliance/excursions/9001?edit=${id}`);
+    expect(edit.body).toContain("조치 고치기");
+    expect(edit.body).toContain("환기 장치 필터 교체");
+    expect(edit.body).toContain('value="2026-10-02T11:00"');
+    const updated = await o.post(`/compliance/excursions/9001?edit=${id}`, actionForm({ actionId: id, resultMode: "MANUAL", resultNote: "다음 날 정상" }));
+    expect(updated.response.status).toBe(302);
+    expect((await o.get("/compliance/excursions/9001")).body).toContain("결과: 다음 날 정상");
+
+    const v = await viewer();
+    const view = await v.get("/compliance/excursions/9001");
+    expect(view.body).toContain("환기 장치 필터 교체");
+    expect(view.body).not.toContain("새 조치");
+    expect(view.body).not.toContain('value="delete"');
+    const denied = await v.post("/compliance/excursions/9001", { intent: "delete", actionId: id });
+    expect(denied.response.status).toBe(403);
+
+    const removed = await o.post("/compliance/excursions/9001", { intent: "delete", actionId: id });
+    expect(removed.response.status).toBe(302);
+    expect(cmpState(app.gateway.m2).actions).toHaveLength(0);
+    expect((await o.get("/compliance/excursions/1234")).response.status).toBe(404);
+  });
+});

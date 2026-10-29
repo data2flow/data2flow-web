@@ -264,7 +264,9 @@
       "ongoing": "Ongoing",
       "peak": "Peak {{value}}",
       "alarm": "Alarm #{{id}}",
-      "noExcursions": "No excursions"
+      "noExcursions": "No excursions",
+      "recordAction": "Record action",
+      "viewActions": "View actions"
     },
     "reports": {
       "title": "Reports",
@@ -382,6 +384,70 @@
         "notPdf": "Only PDF files can be verified.",
         "tooLarge": "Only files of 50 MB or less can be verified."
       }
+    },
+    "actions": {
+      "title": "Corrective actions",
+      "back": "Back to compliance status",
+      "target": "Excursion",
+      "space": "Space",
+      "metric": "Metric",
+      "period": "Period",
+      "peak": "Peak",
+      "alarmLabel": "Alarm",
+      "alarm": "Alarm #{{id}}",
+      "workOrder": "Work order #{{id}}",
+      "recorded": "{{n}} recorded actions",
+      "empty": "No actions recorded yet",
+      "newTitle": "New action",
+      "editTitle": "Edit action",
+      "cause": "Cause",
+      "causePlaceholder": "Select a cause",
+      "causeNote": "Cause note",
+      "actionText": "Action taken",
+      "actor": "Taken by",
+      "actedAt": "Taken at",
+      "actedAtHint": "In {{timezone}}, after the excursion started",
+      "alarms": "Linked alarms",
+      "workOrders": "Linked work orders",
+      "idsHint": "Separate IDs with commas",
+      "createWorkOrder": "Create work order",
+      "resultMode": "Result check",
+      "autoHint": "The result is recorded after 24 hours (compliance ratio for 24 hours after the action)",
+      "resultNote": "Result note",
+      "causes": {
+        "VENTILATION": "Poor ventilation",
+        "EQUIPMENT": "Equipment failure",
+        "OUTDOOR_INFLOW": "Outdoor inflow",
+        "CROWDING": "Overcrowding",
+        "SENSOR": "Sensor issue",
+        "OTHER": "Other"
+      },
+      "modes": {
+        "AUTO": "Automatic (24-hour compliance ratio)",
+        "MANUAL": "Manual entry"
+      },
+      "result": {
+        "confirmed": "Compliance after action {{ratio}}%",
+        "recorded": "Result: {{note}}",
+        "pending": "Waiting for automatic check",
+        "unverifiable": "Cannot verify (missing data)"
+      },
+      "validation": {
+        "causeRequired": "Select a cause",
+        "causeNoteRequired": "Describe the other cause",
+        "causeNoteTooLong": "Cause note is limited to 200 characters",
+        "actionRequired": "Describe the action",
+        "actionTooLong": "Action is limited to 1000 characters",
+        "actorRequired": "Select who took the action",
+        "actedAtRequired": "Enter when the action was taken",
+        "beforeExcursion": "The time cannot be before the excursion",
+        "future": "The time cannot be in the future",
+        "resultModeRequired": "Select how to check the result",
+        "resultNoteRequired": "Describe the result",
+        "resultNoteTooLong": "Result note is limited to 500 characters",
+        "workOrderNotFound": "A work order does not exist",
+        "alarmNotFound": "An alarm does not exist"
+      }
     }
   },
   "errors": {
@@ -398,6 +464,9 @@
     "CMP_PROFILE_NOT_APPLIED": "No profile is applied to the selected spaces.",
     "CMP_VIRTUAL_DATA_NOT_ALLOWED": "Spaces with only virtual devices cannot be used in a report.",
     "CMP_REPORT_NOT_FOUND": "Report not found.",
-    "CMP_REPORT_STATE_CONFLICT": "This is not possible in the current state. Refresh and try again."
+    "CMP_REPORT_STATE_CONFLICT": "This is not possible in the current state. Refresh and try again.",
+    "CMP_ACTION_INVALID": "Check the corrective action details.",
+    "CMP_EXCURSION_NOT_FOUND": "Excursion not found.",
+    "CMP_ACTION_NOT_FOUND": "Corrective action not found."
   }
 }

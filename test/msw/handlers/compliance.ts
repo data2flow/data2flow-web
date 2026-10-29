@@ -1,7 +1,7 @@
 /**
  * M7 환경 기준 가짜 core API(design/api/CMP-api.md): 프로필 API-CMP-01~06a, 적용 API-CMP-07, 측정 가능성 API-CMP-08,
- * 종합 점수 API-CMP-10, 준수 현황 API-CMP-13·14, 리포트 API-CMP-16~20a.
- * 권한은 core와 같게 검사한다(조회 CMP_READ, 쓰기 CMP_ADMIN, 리포트 생성·발행 CMP_REPORT). 시스템 프로필은 READ_ONLY, 잠긴 버전 PUT도 READ_ONLY.
+ * 종합 점수 API-CMP-10, 준수 현황 API-CMP-13·14, 리포트 API-CMP-16~20a, 개선 조치 API-CMP-23·24(이탈 구간 9001).
+ * 권한은 core와 같게 검사한다(조회 CMP_READ, 쓰기 CMP_ADMIN, 리포트 생성·발행 CMP_REPORT, 개선 조치 CMP_ACTION). 시스템 프로필은 READ_ONLY, 잠긴 버전 PUT도 READ_ONLY.
  * 상태는 core.extra["cmp"].
  */
 import { NOW, fail, list, noContent, ok, type CoreHandler, type CoreState } from "../core-fixtures";
@@ -13,6 +13,7 @@ export interface CmpState {
   versions: Record<string, Json[]>;
   applications: Json[];
   reports: Json[];
+  actions: Json[];
   seq: number;
 }
 
@@ -43,6 +44,7 @@ export function cmpState(core: CoreState): CmpState {
       },
       { reportId: "802", type: "KR_SELF_CHECK", title: "2026-10 자가 점검", spaceIds: ["31"], facilityType: "GENERAL", periodFrom: "2026-10-01", periodTo: "2026-10-03", options: {}, createdAt: "2026-10-04T00:00:00Z", updatedAt: "2026-10-04T00:00:00Z", revisions: [revision("802", 1, "GENERATING", { progress: 60, sha256: null, dataRange: null })] },
     ],
+    actions: [],
     seq: 600,
   } satisfies CmpState;
   return core.extra.cmp as CmpState;
@@ -119,6 +121,54 @@ function reportsHandler(s: CmpState, { method, path, url, body, can }: Parameter
   return undefined;
 }
 
+const EXCURSION = { excursionId: "9001", spaceId: "31", spaceName: "실습실", metricKey: "co2", startedAt: "2026-10-02T01:00:00Z", endedAt: "2026-10-02T05:35:00Z", peakValue: 1420, alarmId: "77" };
+
+/** 개선 조치 API-CMP-23·24. 작업 지시 999999·알람 999999는 없다 */
+function actionsHandler(s: CmpState, { method, path, url, body, can, user }: Parameters<CoreHandler>[1]): Response | undefined {
+  const b = (body ?? {}) as Json;
+  const save = (existing?: Json): Response => {
+    if (!can("CMP_ACTION")) return fail(403, "PERMISSION_DENIED");
+    if (!b.cause || !b.actionText || !b.actedAt || Date.parse(b.actedAt as string) < Date.parse(EXCURSION.startedAt)) return fail(400, "CMP_ACTION_INVALID");
+    if (((b.linkedWorkOrderIds as string[] | undefined) ?? []).includes("999999")) return fail(404, "WORKORDER_NOT_FOUND");
+    if (((b.linkedAlarmIds as string[] | undefined) ?? []).includes("999999")) return fail(404, "ALARM_NOT_FOUND");
+    const actorId = (b.actorUserId as string | undefined) ?? user.id;
+    const mode = (b.resultMode as string | undefined) ?? "AUTO";
+    const next: Json = {
+      ...(existing ?? { actionId: String(++s.seq), excursionId: EXCURSION.excursionId }),
+      excursion: { spaceId: EXCURSION.spaceId, metricKey: EXCURSION.metricKey, startedAt: EXCURSION.startedAt, endedAt: EXCURSION.endedAt, peakValue: EXCURSION.peakValue },
+      cause: b.cause, causeNote: b.causeNote ?? null, actionText: b.actionText, actor: { userId: actorId, name: actorId === user.id ? user.name : null }, actedAt: b.actedAt,
+      linkedAlarmIds: b.linkedAlarmIds ?? [], linkedWorkOrderIds: b.linkedWorkOrderIds ?? [], resultMode: mode, resultRatio24h: null, resultNote: b.resultNote ?? null,
+      resultStatus: mode === "MANUAL" ? "RECORDED" : "PENDING", updatedAt: NOW,
+    };
+    if (existing) Object.assign(existing, next);
+    else s.actions.push(next);
+    return ok(next, existing ? 200 : 201);
+  };
+  if (path === "/compliance/actions" && method === "GET") {
+    const excursionId = url.searchParams.get("excursionId");
+    return list(s.actions.filter((a) => !excursionId || a.excursionId === excursionId), url);
+  }
+  const x = /^\/compliance\/excursions\/(\d+)(\/actions)?$/.exec(path);
+  if (x) {
+    if (x[1] !== EXCURSION.excursionId) return fail(404, "CMP_EXCURSION_NOT_FOUND");
+    if (!x[2] && method === "GET") return ok({ ...EXCURSION, actions: s.actions.filter((a) => a.excursionId === x[1]) });
+    if (x[2] && method === "POST") return save();
+    return undefined;
+  }
+  const a = /^\/compliance\/actions\/(\d+)$/.exec(path);
+  if (!a) return undefined;
+  const action = s.actions.find((r) => r.actionId === a[1]);
+  if (!action) return fail(404, "CMP_ACTION_NOT_FOUND");
+  if (method === "GET") return ok(action);
+  if (method === "PUT") return save(action);
+  if (method === "DELETE") {
+    if (!can("CMP_ACTION")) return fail(403, "PERMISSION_DENIED");
+    s.actions = s.actions.filter((r) => r !== action);
+    return noContent();
+  }
+  return undefined;
+}
+
 const current = (s: CmpState, p: Json) => s.versions[p.profileId as string].find((v) => v.versionNo === p.currentVersionNo)!;
 const detail = (s: CmpState, p: Json) => ({ ...p, currentVersion: current(s, p), applications: s.applications.filter((a) => a.profileId === p.profileId) });
 
@@ -126,6 +176,7 @@ export const complianceHandler: CoreHandler = (core, { method, path, url, body, 
   if (!path.startsWith("/compliance/")) return undefined;
   if (!can("CMP_READ")) return fail(403, "PERMISSION_DENIED");
   if (path.startsWith("/compliance/reports")) return reportsHandler(cmpState(core), { method, path, url, body, can, user } as Parameters<CoreHandler>[1]);
+  if (path.startsWith("/compliance/excursions") || path.startsWith("/compliance/actions")) return actionsHandler(cmpState(core), { method, path, url, body, can, user } as Parameters<CoreHandler>[1]);
   if (method !== "GET" && !can("CMP_ADMIN")) return fail(403, "PERMISSION_DENIED");
   const s = cmpState(core);
   const b = (body ?? {}) as Json;
@@ -235,7 +286,8 @@ export const complianceHandler: CoreHandler = (core, { method, path, url, body, 
   const spaceStatus = /^\/compliance\/status\/spaces\/(\d+)$/.exec(path);
   if (spaceStatus && method === "GET") {
     if (spaceStatus[1] !== "31" && spaceStatus[1] !== "32") return fail(404, "SPACE_NOT_FOUND");
-    return ok(SPACE_STATUS);
+    const withActions = new Set(s.actions.map((a) => a.excursionId));
+    return ok({ ...SPACE_STATUS, excursions: SPACE_STATUS.excursions.map((x) => ({ ...x, hasAction: withActions.has(x.id) })) });
   }
   return undefined;
 };

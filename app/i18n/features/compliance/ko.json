@@ -264,7 +264,9 @@
       "ongoing": "진행 중",
       "peak": "최고 {{value}}",
       "alarm": "알람 #{{id}}",
-      "noExcursions": "이탈 구간이 없습니다"
+      "noExcursions": "이탈 구간이 없습니다",
+      "recordAction": "개선 조치 기록",
+      "viewActions": "조치 보기"
     },
     "reports": {
       "title": "리포트",
@@ -382,6 +384,70 @@
         "notPdf": "PDF 파일만 검증할 수 있습니다.",
         "tooLarge": "50MB 이하 파일만 검증할 수 있습니다."
       }
+    },
+    "actions": {
+      "title": "개선 조치 기록",
+      "back": "준수 현황으로",
+      "target": "대상 이탈",
+      "space": "공간",
+      "metric": "항목",
+      "period": "기간",
+      "peak": "최고값",
+      "alarmLabel": "알람",
+      "alarm": "알람 #{{id}}",
+      "workOrder": "작업 지시 #{{id}}",
+      "recorded": "기록된 조치 {{n}}건",
+      "empty": "아직 기록된 조치가 없습니다",
+      "newTitle": "새 조치",
+      "editTitle": "조치 고치기",
+      "cause": "원인",
+      "causePlaceholder": "원인을 고르세요",
+      "causeNote": "원인 메모",
+      "actionText": "조치 내용",
+      "actor": "조치자",
+      "actedAt": "조치 일시",
+      "actedAtHint": "{{timezone}} 기준, 이탈 시작 이후",
+      "alarms": "연결 알람",
+      "workOrders": "연결 작업 지시",
+      "idsHint": "ID를 쉼표로 나눠 적습니다",
+      "createWorkOrder": "작업 지시 만들기",
+      "resultMode": "결과 확인",
+      "autoHint": "24시간 후 결과가 기록됩니다(조치 후 24시간 충족률)",
+      "resultNote": "결과 메모",
+      "causes": {
+        "VENTILATION": "환기 부족",
+        "EQUIPMENT": "장비 고장",
+        "OUTDOOR_INFLOW": "외부 유입",
+        "CROWDING": "재실 과밀",
+        "SENSOR": "센서 이상",
+        "OTHER": "기타"
+      },
+      "modes": {
+        "AUTO": "자동(조치 후 24시간 충족률)",
+        "MANUAL": "수동 입력"
+      },
+      "result": {
+        "confirmed": "조치 후 충족률 {{ratio}}%",
+        "recorded": "결과: {{note}}",
+        "pending": "자동 확인 대기 중",
+        "unverifiable": "확인 불가(데이터 결측)"
+      },
+      "validation": {
+        "causeRequired": "원인을 선택하세요",
+        "causeNoteRequired": "기타 원인을 적어 주세요",
+        "causeNoteTooLong": "원인 메모는 200자까지입니다",
+        "actionRequired": "조치 내용을 적어 주세요",
+        "actionTooLong": "조치 내용은 1000자까지입니다",
+        "actorRequired": "조치자를 고르세요",
+        "actedAtRequired": "조치 일시를 입력하세요",
+        "beforeExcursion": "이탈 이전 시각은 입력할 수 없습니다",
+        "future": "미래 시각은 입력할 수 없습니다",
+        "resultModeRequired": "결과 확인 방식을 고르세요",
+        "resultNoteRequired": "결과를 적어 주세요",
+        "resultNoteTooLong": "결과 메모는 500자까지입니다",
+        "workOrderNotFound": "없는 작업 지시가 있습니다",
+        "alarmNotFound": "없는 알람이 있습니다"
+      }
     }
   },
   "errors": {
@@ -398,6 +464,9 @@
     "CMP_PROFILE_NOT_APPLIED": "선택한 공간에 프로필이 적용되어 있지 않습니다.",
     "CMP_VIRTUAL_DATA_NOT_ALLOWED": "가상 기기만 있는 공간은 리포트에 쓸 수 없습니다.",
     "CMP_REPORT_NOT_FOUND": "리포트를 찾을 수 없습니다.",
-    "CMP_REPORT_STATE_CONFLICT": "지금 상태에서는 할 수 없습니다. 새로고침한 뒤 다시 시도하세요."
+    "CMP_REPORT_STATE_CONFLICT": "지금 상태에서는 할 수 없습니다. 새로고침한 뒤 다시 시도하세요.",
+    "CMP_ACTION_INVALID": "조치 정보를 확인하세요.",
+    "CMP_EXCURSION_NOT_FOUND": "이탈 구간을 찾을 수 없습니다.",
+    "CMP_ACTION_NOT_FOUND": "개선 조치를 찾을 수 없습니다."
   }
 }
