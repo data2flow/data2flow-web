@@ -10,7 +10,7 @@ import { ScriptAssistPanel } from "~/features/ai/components/script-assist-panel"
 import { Link } from "react-router";
 import { Alert, Badge, Button, Dialog, TextArea, TextField } from "~/components/ui";
 import { errorText } from "~/lib/error-text";
-import { latestVersionNo, type ScriptApi, type ScriptDetail } from "./api";
+import { latestVersionNo, type AppliedStatus, type ScriptApi, type ScriptDetail } from "./api";
 import { CONTRACT_TYPES } from "./model/contract-types";
 import { FORCE_REASON_MIN, checkForceReason, nextCaseName, reprocessLink, type ReprocessSuggestion, type RunCasesResult } from "./model/m5";
 import { CODE_LIMIT_BYTES, byteSize, canDeploy, checkMemo, createDebouncer, requiredFunctionProblem, type Problem } from "./model/script-model";
@@ -233,6 +233,9 @@ export function ScriptEditor({ script, canWrite, canForce, recent, recentFailed,
   );
 }
 
+const APPLIED_POLL_MS = 1000;
+const APPLIED_POLLS = 10;
+
 function DeployDialog({
   script,
   draft,
@@ -252,7 +255,7 @@ function DeployDialog({
   dirty: boolean;
   processed: number;
   canForce: boolean;
-  api: Pick<ScriptApi, "deploy" | "runCases">;
+  api: Pick<ScriptApi, "deploy" | "runCases"> & Partial<Pick<ScriptApi, "detail">>;
   onClose: () => void;
   onDeployed: (versionId: string) => void;
 }) {
@@ -263,11 +266,14 @@ function DeployDialog({
   const [error, setError] = useState<string | null>(null);
   const [memoError, setMemoError] = useState(false);
   const [reasonError, setReasonError] = useState(false);
-  const [applied, setApplied] = useState<{ reported: number; total: number } | null>(null);
+  const [applied, setApplied] = useState<AppliedStatus | null>(null);
+  const [applying, setApplying] = useState(false);
   const [suggestion, setSuggestion] = useState<ReprocessSuggestion | null>(null);
   const [busy, setBusy] = useState(false);
   const [cases, setCases] = useState<RunCasesResult | null>(null);
   const [casesState, setCasesState] = useState<"idle" | "running" | "done" | "unavailable">(api.runCases ? "running" : "idle");
+  const mounted = useRef(true);
+  useEffect(() => () => void (mounted.current = false), []);
   const hasErrors = problems.some((p) => p.severity === "ERROR");
   const casesFailed = (cases?.failed ?? 0) > 0;
 
@@ -300,9 +306,30 @@ function DeployDialog({
       if (result.code === "SCRIPT_TEST_FAILED") void runCases();
       return;
     }
-    setApplied(result.data.applied ?? { reported: 0, total: 0 });
+    const first = result.data.applied ?? { reported: 0, total: 0 };
+    setApplied(first);
     setSuggestion(result.data.reprocessSuggestion ?? null);
     onDeployed(result.data.activeVersionId);
+    if (api.detail && first.reported < first.total) void followApplied(result.data.activeVersionId);
+  };
+
+  // 배포 응답은 그 시점의 적용 보고만 싣는다. pipeline은 10초 안에 보고하므로 상세(API-SCR-04)를 다시 읽어 갱신한다(SCR-03.04, UC-SCR 4a)
+  const followApplied = async (versionId: string) => {
+    if (!api.detail) return;
+    setApplying(true);
+    try {
+      for (let i = 0; i < APPLIED_POLLS; i++) {
+        await new Promise((resolve) => setTimeout(resolve, APPLIED_POLL_MS));
+        const detail = await api.detail(script.id);
+        if (!mounted.current) return;
+        const now = detail.ok && detail.data.activeVersion?.versionId === versionId ? detail.data.activeVersion.applied : undefined;
+        if (!now) continue;
+        setApplied(now);
+        if (now.reported >= now.total) return;
+      }
+    } finally {
+      if (mounted.current) setApplying(false);
+    }
   };
 
   return (
@@ -343,7 +370,11 @@ function DeployDialog({
       {dirty && <Alert tone="warning">{t("scripts.deploy.unsavedNote")}</Alert>}
       {applied ? (
         <>
-          <Alert tone="success">{t("scripts.deploy.applied", applied)}</Alert>
+          {applied.reported >= applied.total ? (
+            <Alert tone="success">{t("scripts.deploy.applied", applied)}</Alert>
+          ) : (
+            <Alert tone="warning">{t(applying ? "scripts.deploy.applying" : "scripts.deploy.appliedPartial", applied)}</Alert>
+          )}
           <div className="flex flex-col gap-1 text-[13px]" aria-label={t("scripts.deploy.next")}>
             <p className="font-semibold">{t("scripts.deploy.next")}</p>
             {(suggestion?.requests ?? []).map((request, i) => (

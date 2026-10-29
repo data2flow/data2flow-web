@@ -115,6 +115,8 @@
       "force": "强制部署",
       "forceReason": "强制部署的原因",
       "applied": "已部署。实例应用 {{reported}}/{{total}}",
+      "applying": "已部署。正在应用到实例({{reported}}/{{total}})",
+      "appliedPartial": "已部署。应用中({{reported}}/{{total}}) — 未报告的实例将在下次配置同步时应用",
       "blocked": "存在错误，无法部署。只有警告时可以部署。",
       "cases": "测试用例",
       "casesUnavailable": "无法检查(部署时服务器会再次检查)",
