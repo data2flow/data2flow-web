@@ -223,6 +223,21 @@ data2flow 화면과 BFF입니다. React Router v8 프레임워크 모드(SSR, Vi
 - 결과 CSV·PNG는 화면에서 바로 만든다(UTF-8 BOM). API-ANA-12의 CSV·PNG `downloadPath`(`/bff/download/{exportId}`)는 BFF에 내려받기 경로가 없어 쓰지 않고, PDF만 비동기로 요청해 알림 센터로 받는다.
 - 권한: 분석 조회 ANALYTICS_READ(VIEWER 이상), 마법사·실행·모델 ANALYTICS_RUN, AI 해설 생성 ANALYTICS_RUN + AI_USE, 피드백 ALARM_HANDLE(O 이상), 고정 DASHBOARD_WRITE, 토큰 발급 API_TOKEN_ISSUE(VIEWER 제외), 관리 화면 ADMIN. 데이터 품질 화면(UI-ING-06)은 VIEWER에게도 ANALYTICS_READ가 있어 화면 권한을 INGEST_READ·ANALYTICS_RUN으로 좁혔다.
 
+## 요구사항 시험 화면 보강
+
+M2~M6에서 API는 있었지만 화면이 없어 요구사항을 화면에서 시험할 수 없던 곳을 채웠다.
+
+| 경로 | 화면 | 스펙 |
+|---|---|---|
+| `/settings/control` | 조직 제어 한계·보호 설정: 기능별 절대 한계 표(표준 범위 참고, 모델 범위보다 넓으면 그 줄에 LIMIT_WIDER_THAN_MODEL), 수동 우선 시간·명령 최소 간격·진동 감지·명령 기본 유효 시간, 예약의 수동 우선 존중, 제어 노드 배포 승인. ADMIN(CONTROL_SETTINGS) | UI-ACT-08, ACT-06.04·06.01·02.05 |
+| `/ingest/raw-messages` | 원본 메시지 목록: 기간(1시간~30일)·소스·기기·상태(여러 개)·토픽 포함 문자열·가상 포함 필터(URL 쿼리), 상태별 건수(누르면 그 상태로), 커서 [더 보기], 행을 누르면 원본 상세 패널(payload는 INTEGRATOR+). OPERATOR 이상. CSV 내보내기는 core가 아직 400이라 뺐다 | UI-ING-02, ING-01.01·01.02 |
+| `/explore/coverage` | 데이터 완전성: 기간·공간 → 기기별 예상·실제 수신 수, 완전성 %, 공백 수, 가장 긴 공백(완전성 낮은 순). 기기를 펼치면 공백 목록, 공백을 누르면 탐색기에서 앞뒤 1시간. VIEWER 이상 | UI-TSD-06, TSD-02.04 |
+| `/settings/analytics-templates` | 분석 템플릿 설정: 템플릿별 현재 버전·사용 중인 분석·일정·실시간 수와 활성 스위치(끌 때 "일정 N건, 실시간 M건이 중지됩니다" 확인), 결과 보관 기간 30~1,095일. ADMIN | UI-ANA-07, ANA-01.03·05.08 |
+| `/analytics/datasets`, `/analytics/datasets/{id}` | 데이터셋: 목록(버전·연결 수·사용 중인 분석 수), 기존 분석의 바인딩·기간·품질 필터로 만들기, 상세(바인딩 칩·기간·버전 이력·사용 중인 분석과 [최신 버전으로 올리기], 이름 바꾸기 = 버전 +1, 쓰는 중이면 지우기 막음). 조회 VIEWER, 편집 ANALYST 이상 | UI-ANA-09, ANA-10.01 |
+| `/me/preferences` | 내 정보 [화면 설정] 탭: 테마(쿠키로 바로 적용), 온도 단위, 첫 화면(홈/기본 대시보드), 즐겨찾기 빼기, 기능 안내 다시 보기. 언어·시간대는 [프로필] 탭 | UI-DSH-11, DSH-07 |
+
+- 범위 밖·이미 있는 화면: 프로비저닝 키(UI-DEV-16)는 ADR-031로 만들지 않는다. 엣지 업데이트 탭(UI-DSC-11 update)과 장기 보관 파일 목록(UI-TSD-05, `/settings/data-retention` 안)은 이미 있다. 엣지 로컬 규칙(DSC-08.05)은 M7, 장기 보관 파일 [복원](API-TSD-33 restore)은 core에 아직 없다.
+
 ## 개발
 
 ```bash

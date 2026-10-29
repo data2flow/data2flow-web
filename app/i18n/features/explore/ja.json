@@ -90,6 +90,24 @@
       "SCRIPT_ERROR": "スクリプトエラー",
       "ANOMALY": "異常",
       "USER": "ユーザー"
+    },
+    "coverage": {
+      "title": "データ完全性",
+      "period": "期間",
+      "lastDays": "直近{{n}}日",
+      "space": "空間",
+      "help": "報告周期から予想した受信数と実際の受信数を比べます。機器名で欠損一覧、欠損を押すとエクスプローラーでその区間を開きます。",
+      "empty": "期間内に確認する機器がありません",
+      "device": "機器",
+      "expected": "予想受信数",
+      "received": "実際の受信数",
+      "percent": "完全性",
+      "gapCount": "欠損数",
+      "longest": "最長の欠損",
+      "gapsOf": "{{name}} の欠損一覧",
+      "missingEstimate": "欠落推定 {{n}}件",
+      "minutes": "{{n}}分",
+      "hoursMinutes": "{{h}}時間{{m}}分"
     }
   },
   "errors": {

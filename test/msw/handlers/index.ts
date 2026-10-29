@@ -11,6 +11,7 @@
  */
 import type { CoreHandler } from "../core-fixtures";
 import { analyticsHandler } from "./analytics";
+import { requirementScreensHandler } from "./requirement-screens";
 import { baseHandler } from "./base";
 import { controlHandler } from "./control";
 import { dataHandler } from "./data";
@@ -37,7 +38,8 @@ import { telemetryHandler } from "./telemetry";
 
 // M5 scripts: scriptsM5Handler는 /scripts·/ingest 핸들러보다 먼저 M5 경로를 받는다
 // M6: analyticsHandler는 대시보드 핸들러보다 먼저 pin-analysis(API-DSH-08)를 받는다
-export const CORE_HANDLERS: CoreHandler[] = [analyticsHandler, dashboardsHandler, scriptsM5Handler, fieldHandler, devModelHandler, dataHandler, floorHandler, rulesHandler, notifyHandler, flowopsHandler, flowsHandler, simHandler, controlHandler, spacesHandler, devicesHandler, modelsHandler, groupsHandler, sourcesM5Handler, sourcesHandler, telemetryHandler, ingestHandler, scriptsHandler, homeHandler, baseHandler];
+// 요구사항 시험 화면 보강(UI-ACT-08·TSD-06·ANA-07·ANA-09): 분석 핸들러보다 먼저 데이터셋·템플릿 설정을 받는다
+export const CORE_HANDLERS: CoreHandler[] = [requirementScreensHandler, analyticsHandler, dashboardsHandler, scriptsM5Handler, fieldHandler, devModelHandler, dataHandler, floorHandler, rulesHandler, notifyHandler, flowopsHandler, flowsHandler, simHandler, controlHandler, spacesHandler, devicesHandler, modelsHandler, groupsHandler, sourcesM5Handler, sourcesHandler, telemetryHandler, ingestHandler, scriptsHandler, homeHandler, baseHandler];
 
 /** 공개 경로(로그인 없음, `/public/**`) 핸들러. M5: 공유 링크 보기·브랜딩(API-DSH-15·25) */
 export const PUBLIC_HANDLERS = [dashboardsPublicHandler];

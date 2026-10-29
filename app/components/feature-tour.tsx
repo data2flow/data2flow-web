@@ -33,6 +33,15 @@ export function writeDismissedLocal(tourId: string, storage: Pick<Storage, "getI
   }
 }
 
+/** 화면 설정의 [기능 안내 다시 보기](UI-DSH-11): 브라우저에 남긴 "다시 보지 않기"를 지운다 */
+export function clearDismissedLocal(storage: Pick<Storage, "removeItem"> | null = safeStorage()): void {
+  try {
+    storage?.removeItem(STORAGE_KEY);
+  } catch {
+    // 저장소를 쓸 수 없으면 서버 설정만 지운다
+  }
+}
+
 function safeStorage(): Storage | null {
   try {
     return typeof window === "undefined" ? null : window.localStorage;

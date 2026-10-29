@@ -2,7 +2,8 @@
   "nav": {
     "analytics": "分析",
     "apiTokens": "API 令牌",
-    "aiSettings": "AI 设置"
+    "aiSettings": "AI 设置",
+    "analyticsTemplateSettings": "分析模板"
   },
   "me": {
     "tabs": {
@@ -15,7 +16,8 @@
       "templates": "模板库",
       "analyses": "分析列表",
       "models": "模型",
-      "mcp": "MCP 连接"
+      "mcp": "MCP 连接",
+      "datasets": "数据集"
     },
     "category": {
       "ENV_QUALITY": "环境质量",
@@ -353,6 +355,68 @@
       "submit": "固定",
       "done": "已固定到“{{name}}”。",
       "open": "打开仪表板"
+    },
+    "templateSettings": {
+      "title": "分析模板设置",
+      "templates": "模板",
+      "empty": "没有模板",
+      "name": "名称",
+      "key": "键",
+      "version": "当前版本",
+      "analyses": "使用中的分析",
+      "schedules": "计划",
+      "realtime": "实时",
+      "enabled": "启用",
+      "on": "开",
+      "off": "关",
+      "toggle": "启用 {{name}} 模板",
+      "enabledDone": "已开启 {{name}}。已暂停的计划不会自动恢复。",
+      "disabledDone": "已关闭 {{name}}。已停止 {{n}} 个分析的计划和实时。",
+      "confirmTitle": "关闭 {{name}}",
+      "confirmBody": "将停止 {{schedules}} 个计划和 {{realtime}} 个实时分析。重新开启也不会自动恢复。",
+      "disable": "关闭",
+      "org": "组织设置",
+      "retention": "结果保留期(天)",
+      "retentionHint": "30~1,095 天，默认 365 天。从新结果开始生效。",
+      "retentionProblem": "请输入 30~1095 的整数。",
+      "retentionSaved": "已保存结果保留期。"
+    },
+    "datasets": {
+      "title": "数据集",
+      "new": "+ 数据集",
+      "empty": "没有数据集",
+      "emptyBody": "为常用的绑定和期间命名保存后，多个分析可使用同一数据。",
+      "name": "名称",
+      "version": "版本",
+      "bindings": "绑定",
+      "analyses": "使用中的分析",
+      "updatedAt": "修改时间",
+      "nameProblem": "名称须为 1~100 个字符。",
+      "fromAnalysis": "从分析复制绑定",
+      "fromAnalysisProblem": "请选择分析。",
+      "fromAnalysisHint": "按原样保存所选分析的绑定、期间、质量过滤和是否包含虚拟。",
+      "noAnalyses": "没有已保存的分析",
+      "definition": "定义",
+      "period": "期间",
+      "lastDays": "最近 {{n}} 天",
+      "quality": "质量过滤",
+      "qualities": {
+        "NORMAL_ONLY": "仅正常值",
+        "INCLUDE_ALL": "所有值"
+      },
+      "virtual": "包含虚拟",
+      "rename": "重命名",
+      "savedVersion": "已保存，当前为 v{{v}}。",
+      "deleteConfirm": "要删除数据集 {{name}} 吗？",
+      "usage": "使用中的分析",
+      "noUsage": "没有分析使用此数据集",
+      "analysis": "分析",
+      "usedVersion": "使用的版本",
+      "outdated": "有新版本",
+      "upgrade": "升级到最新版本",
+      "upgradeOf": "将 {{name}} 升级到最新版本",
+      "upgraded": "{{name}} 现在使用 v{{v}}。",
+      "history": "版本历史"
     }
   },
   "dashboards": {
@@ -394,6 +458,8 @@
     "API_TOKEN_NOT_FOUND": "找不到令牌。",
     "API_TOKEN_STATE_CONFLICT": "当前状态下无法执行该操作。",
     "SERVICE_ACCOUNT_NOT_FOUND": "找不到服务账号。",
-    "ATTEMPT_LIMIT": "最多可重试 5 次。"
+    "ATTEMPT_LIMIT": "最多可重试 5 次。",
+    "DATASET_IN_USE": "有分析正在使用此数据集，无法删除。",
+    "DATASET_NOT_FOUND": "找不到数据集。"
   }
 }

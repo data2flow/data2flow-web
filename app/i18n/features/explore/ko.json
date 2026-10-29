@@ -90,6 +90,24 @@
       "SCRIPT_ERROR": "스크립트 오류",
       "ANOMALY": "이상",
       "USER": "사용자"
+    },
+    "coverage": {
+      "title": "데이터 완전성",
+      "period": "기간",
+      "lastDays": "최근 {{n}}일",
+      "space": "공간",
+      "help": "보고 주기로 예상한 수신 수와 실제 수신 수를 비교합니다. 기기 이름을 누르면 공백 목록, 공백을 누르면 탐색기에서 그 구간을 엽니다.",
+      "empty": "기간 안에 확인할 기기가 없습니다",
+      "device": "기기",
+      "expected": "예상 수신 수",
+      "received": "실제 수신 수",
+      "percent": "완전성",
+      "gapCount": "공백 수",
+      "longest": "가장 긴 공백",
+      "gapsOf": "{{name}} 공백 목록",
+      "missingEstimate": "누락 추정 {{n}}건",
+      "minutes": "{{n}}분",
+      "hoursMinutes": "{{h}}시간 {{m}}분"
     }
   },
   "errors": {

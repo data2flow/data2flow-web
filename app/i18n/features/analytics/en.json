@@ -2,7 +2,8 @@
   "nav": {
     "analytics": "Analytics",
     "apiTokens": "API tokens",
-    "aiSettings": "AI settings"
+    "aiSettings": "AI settings",
+    "analyticsTemplateSettings": "Analysis templates"
   },
   "me": {
     "tabs": {
@@ -15,7 +16,8 @@
       "templates": "Template gallery",
       "analyses": "Analyses",
       "models": "Models",
-      "mcp": "MCP connection"
+      "mcp": "MCP connection",
+      "datasets": "Datasets"
     },
     "category": {
       "ENV_QUALITY": "Environment quality",
@@ -353,6 +355,68 @@
       "submit": "Pin",
       "done": "Pinned to “{{name}}”.",
       "open": "Open dashboard"
+    },
+    "templateSettings": {
+      "title": "Analysis template settings",
+      "templates": "Templates",
+      "empty": "No templates",
+      "name": "Name",
+      "key": "Key",
+      "version": "Current version",
+      "analyses": "Analyses in use",
+      "schedules": "Schedules",
+      "realtime": "Real-time",
+      "enabled": "Enabled",
+      "on": "On",
+      "off": "Off",
+      "toggle": "Enable {{name}} template",
+      "enabledDone": "Turned on {{name}}. Paused schedules do not restart automatically.",
+      "disabledDone": "Turned off {{name}}. Stopped schedules and real-time for {{n}} analyses.",
+      "confirmTitle": "Turn off {{name}}",
+      "confirmBody": "{{schedules}} schedules and {{realtime}} real-time analyses will stop. They do not resume when turned back on.",
+      "disable": "Turn off",
+      "org": "Organization settings",
+      "retention": "Result retention (days)",
+      "retentionHint": "30–1,095 days, default 365. Applies to new results.",
+      "retentionProblem": "Enter a whole number from 30 to 1095.",
+      "retentionSaved": "Result retention saved."
+    },
+    "datasets": {
+      "title": "Datasets",
+      "new": "+ Dataset",
+      "empty": "No datasets",
+      "emptyBody": "Save bindings and a period under a name so several analyses use the same data.",
+      "name": "Name",
+      "version": "Version",
+      "bindings": "Bindings",
+      "analyses": "Analyses in use",
+      "updatedAt": "Changed",
+      "nameProblem": "Use 1–100 characters.",
+      "fromAnalysis": "Copy bindings from analysis",
+      "fromAnalysisProblem": "Choose an analysis.",
+      "fromAnalysisHint": "Saves the bindings, period, quality filter and virtual setting of the chosen analysis.",
+      "noAnalyses": "No saved analyses",
+      "definition": "Definition",
+      "period": "Period",
+      "lastDays": "Last {{n}} days",
+      "quality": "Quality filter",
+      "qualities": {
+        "NORMAL_ONLY": "Normal values only",
+        "INCLUDE_ALL": "All values"
+      },
+      "virtual": "Include virtual",
+      "rename": "Rename",
+      "savedVersion": "Saved. Now v{{v}}.",
+      "deleteConfirm": "Delete dataset {{name}}?",
+      "usage": "Analyses in use",
+      "noUsage": "No analyses use this dataset",
+      "analysis": "Analysis",
+      "usedVersion": "Version used",
+      "outdated": "Newer version",
+      "upgrade": "Upgrade to latest",
+      "upgradeOf": "Upgrade {{name}} to the latest version",
+      "upgraded": "{{name}} now uses v{{v}}.",
+      "history": "Version history"
     }
   },
   "dashboards": {
@@ -394,6 +458,8 @@
     "API_TOKEN_NOT_FOUND": "Token not found.",
     "API_TOKEN_STATE_CONFLICT": "That action isn't possible in the token's current state.",
     "SERVICE_ACCOUNT_NOT_FOUND": "Service account not found.",
-    "ATTEMPT_LIMIT": "You can retry up to 5 times."
+    "ATTEMPT_LIMIT": "You can retry up to 5 times.",
+    "DATASET_IN_USE": "Analyses use this dataset, so it cannot be deleted.",
+    "DATASET_NOT_FOUND": "Dataset not found."
   }
 }

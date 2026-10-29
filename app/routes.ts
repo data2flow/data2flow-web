@@ -42,6 +42,8 @@ export default [
       route("sessions", "routes/me-sessions.tsx"),
       route("notifications", "routes/me-notifications.tsx"),
       route("tokens", "routes/me-tokens.tsx"),
+      // UI-DSH-11 화면 설정
+      route("preferences", "routes/me-preferences.tsx"),
     ]),
     route("admin/members", "routes/admin-members.tsx"),
     route("admin/members/:userId", "routes/admin-member-detail.tsx"),
@@ -64,7 +66,11 @@ export default [
     route("device-groups", "routes/device-groups.tsx"),
     route("device-groups/:groupId", "routes/device-group-detail.tsx"),
     route("explore", "routes/explore.tsx"),
+    // UI-TSD-06 데이터 완전성
+    route("explore/coverage", "routes/explore-coverage.tsx"),
     route("ingest/monitor", "routes/ingest-monitor.tsx"),
+    // UI-ING-02 원본 메시지 목록
+    route("ingest/raw-messages", "routes/ingest-raw-messages.tsx"),
     route("ingest/failures", "routes/ingest-failures.tsx"),
     route("sources", "routes/sources.tsx"),
     route("sources/new", "routes/sources-new.tsx"),
@@ -134,6 +140,10 @@ export default [
     route("imports/new", "routes/imports-new.tsx"),
     route("imports/:importId", "routes/import-detail.tsx"),
     route("settings/data-retention", "routes/settings-data-retention.tsx"),
+    // UI-ACT-08 조직 제어 한계·보호 설정(ADMIN)
+    route("settings/control", "routes/settings-control.tsx"),
+    // UI-ANA-07 분석 템플릿 설정(ADMIN)
+    route("settings/analytics-templates", "routes/settings-analytics-templates.tsx"),
     route("admin/system", "routes/admin-system.tsx"),
     // M5 devmodel: 게이트웨이 수신 분포(UI-DEV-10, DEV-05.02). 검색식(DEV-13.03)·모델 가져오기/내보내기(DEV-03.04)·표준 내보내기(DEV-13.04)·
     // 표시 단위(DEV-04.04)는 기존 /devices·/models·/metrics·/me/profile 화면에 붙는다
@@ -164,6 +174,9 @@ export default [
     // AI 설정·사용량·평가(UI-AIA-06), API 토큰·서비스 계정 관리(UI-IAM-10). 내 토큰은 /me/tokens
     route("analytics", "routes/analytics.tsx"),
     route("analytics/templates", "routes/analytics-templates.tsx"),
+    // UI-ANA-09 데이터셋
+    route("analytics/datasets", "routes/analytics-datasets.tsx"),
+    route("analytics/datasets/:datasetId", "routes/analytics-dataset-detail.tsx"),
     route("analytics/templates/:templateKey", "routes/analytics-template.tsx"),
     route("analytics/new", "routes/analytics-new.tsx"),
     route("analytics/models", "routes/analytics-models.tsx"),

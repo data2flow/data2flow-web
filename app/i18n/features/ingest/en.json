@@ -6,7 +6,8 @@
       "scripts": "Scripts",
       "failures": "Failed messages",
       "reprocess": "Reprocess",
-      "quality": "Data quality"
+      "quality": "Data quality",
+      "raw": "Raw messages"
     },
     "stage": {
       "SOURCE": "Source",
@@ -239,6 +240,33 @@
         "late": "Late arrival"
       },
       "bottom10": "Bottom 10"
+    },
+    "rawList": {
+      "title": "Raw messages",
+      "counts": "Counts by status",
+      "empty": "No messages match the filters",
+      "source": "Source",
+      "device": "Device",
+      "metrics": "Metrics",
+      "quality": "Quality",
+      "qualityValue": "Normal {{normal}} · Out of range {{outOfRange}} · Unverified {{unverified}}",
+      "size": "Size",
+      "open": "Open raw message {{id}}",
+      "unknownDevice": "(unidentified)",
+      "virtual": "Virtual",
+      "more": "Load more",
+      "period": "Period",
+      "periods": {
+        "1h": "Last hour",
+        "6h": "Last 6 hours",
+        "24h": "Last 24 hours",
+        "7d": "Last 7 days",
+        "30d": "Last 30 days"
+      },
+      "topic": "Topic contains",
+      "includeVirtual": "Include virtual",
+      "excludeVirtual": "Exclude virtual",
+      "retention": "Raw messages older than 30 days are not kept."
     }
   },
   "errors": {

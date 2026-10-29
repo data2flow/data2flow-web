@@ -28,7 +28,10 @@ export type MenuKey =
   // M6 분석·AI
   | "analytics"
   | "apiTokens"
-  | "aiSettings";
+  | "aiSettings"
+  // 요구사항 시험 화면 보강(UI-ACT-08·ANA-07)
+  | "controlSettings"
+  | "analyticsTemplateSettings";
 
 export interface MenuItem {
   key: MenuKey;
@@ -74,6 +77,10 @@ export const MENU: MenuItem[] = [
   // M6: API 토큰·서비스 계정(UI-IAM-10 관리 보기), AI 설정·사용량·평가(UI-AIA-06) — ADMIN
   { key: "apiTokens", path: "/admin/tokens", anyOf: ["IAM_MANAGE"], group: "admin" },
   { key: "aiSettings", path: "/settings/ai", anyOf: ["IAM_MANAGE"], group: "admin" },
+  // 조직 제어 한계·보호 설정(UI-ACT-08, CONTROL_SETTINGS = ADMIN)
+  { key: "controlSettings", path: "/settings/control", anyOf: ["CONTROL_SETTINGS"], group: "admin" },
+  // 분석 템플릿 켜기·끄기와 결과 보관 기간(UI-ANA-07, ADMIN — core는 ADMIN 역할을 본다)
+  { key: "analyticsTemplateSettings", path: "/settings/analytics-templates", anyOf: ["IAM_MANAGE"], group: "admin" },
 ];
 
 /** 메뉴 밖 경로의 권한(라우트 가드). 가장 긴 접두사가 이긴다 */

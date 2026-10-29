@@ -2,7 +2,8 @@
   "nav": {
     "analytics": "분석",
     "apiTokens": "API 토큰",
-    "aiSettings": "AI 설정"
+    "aiSettings": "AI 설정",
+    "analyticsTemplateSettings": "분석 템플릿"
   },
   "me": {
     "tabs": {
@@ -15,7 +16,8 @@
       "templates": "템플릿 갤러리",
       "analyses": "분석 목록",
       "models": "모델",
-      "mcp": "MCP 연결"
+      "mcp": "MCP 연결",
+      "datasets": "데이터셋"
     },
     "category": {
       "ENV_QUALITY": "환경 품질",
@@ -353,6 +355,68 @@
       "submit": "고정",
       "done": "“{{name}}”에 고정했습니다.",
       "open": "대시보드 열기"
+    },
+    "templateSettings": {
+      "title": "분석 템플릿 설정",
+      "templates": "템플릿",
+      "empty": "템플릿이 없습니다",
+      "name": "이름",
+      "key": "키",
+      "version": "현재 버전",
+      "analyses": "사용 중인 분석",
+      "schedules": "일정",
+      "realtime": "실시간",
+      "enabled": "활성",
+      "on": "켜짐",
+      "off": "꺼짐",
+      "toggle": "{{name}} 템플릿 활성",
+      "enabledDone": "{{name}} 템플릿을 켰습니다. 멈춘 일정은 자동으로 다시 시작하지 않습니다.",
+      "disabledDone": "{{name}} 템플릿을 껐습니다. 분석 {{n}}건의 일정·실시간을 멈췄습니다.",
+      "confirmTitle": "{{name}} 템플릿 끄기",
+      "confirmBody": "일정 {{schedules}}건, 실시간 {{realtime}}건이 중지됩니다. 다시 켜도 자동으로 재개되지 않습니다.",
+      "disable": "끄기",
+      "org": "조직 설정",
+      "retention": "결과 보관 기간(일)",
+      "retentionHint": "30~1,095일, 기본 365일. 바꾸면 새 결과부터 적용됩니다.",
+      "retentionProblem": "30~1095 사이 정수를 넣으세요.",
+      "retentionSaved": "결과 보관 기간을 저장했습니다."
+    },
+    "datasets": {
+      "title": "데이터셋",
+      "new": "+ 데이터셋",
+      "empty": "데이터셋이 없습니다",
+      "emptyBody": "자주 쓰는 바인딩·기간을 이름 붙여 저장하면 여러 분석이 같은 데이터를 씁니다.",
+      "name": "이름",
+      "version": "버전",
+      "bindings": "연결",
+      "analyses": "사용 중인 분석",
+      "updatedAt": "바꾼 시각",
+      "nameProblem": "이름은 1~100자로 쓰세요.",
+      "fromAnalysis": "바인딩을 가져올 분석",
+      "fromAnalysisProblem": "분석을 고르세요.",
+      "fromAnalysisHint": "고른 분석의 연결·기간·품질 필터·가상 포함 여부를 그대로 저장합니다.",
+      "noAnalyses": "저장된 분석이 없습니다",
+      "definition": "정의",
+      "period": "기간",
+      "lastDays": "최근 {{n}}일",
+      "quality": "품질 필터",
+      "qualities": {
+        "NORMAL_ONLY": "정상 값만",
+        "INCLUDE_ALL": "모든 값"
+      },
+      "virtual": "가상 포함",
+      "rename": "이름 바꾸기",
+      "savedVersion": "저장했습니다. 이제 v{{v}}입니다.",
+      "deleteConfirm": "{{name}} 데이터셋을 지울까요?",
+      "usage": "사용 중인 분석",
+      "noUsage": "이 데이터셋을 쓰는 분석이 없습니다",
+      "analysis": "분석",
+      "usedVersion": "쓰는 버전",
+      "outdated": "새 버전 있음",
+      "upgrade": "최신 버전으로 올리기",
+      "upgradeOf": "{{name}} 분석을 최신 버전으로 올리기",
+      "upgraded": "{{name}} 분석이 이제 v{{v}}을 씁니다.",
+      "history": "버전 이력"
     }
   },
   "dashboards": {
@@ -394,6 +458,8 @@
     "API_TOKEN_NOT_FOUND": "토큰을 찾을 수 없습니다.",
     "API_TOKEN_STATE_CONFLICT": "지금 상태에서는 할 수 없는 작업입니다.",
     "SERVICE_ACCOUNT_NOT_FOUND": "서비스 계정을 찾을 수 없습니다.",
-    "ATTEMPT_LIMIT": "다시 요청은 5회까지입니다."
+    "ATTEMPT_LIMIT": "다시 요청은 5회까지입니다.",
+    "DATASET_IN_USE": "이 데이터셋을 쓰는 분석이 있어 지울 수 없습니다.",
+    "DATASET_NOT_FOUND": "데이터셋을 찾을 수 없습니다."
   }
 }

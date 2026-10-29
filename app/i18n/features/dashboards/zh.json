@@ -355,5 +355,50 @@
     "DASHBOARD_NOT_FOUND": "找不到仪表板。",
     "SHARE_LINK_INVALID": "链接无效。",
     "DASHBOARD_VERSION_CONFLICT": "其他用户已先保存。"
+  },
+  "me": {
+    "tabs": {
+      "preferences": "显示设置"
+    },
+    "preferences": {
+      "display": "显示",
+      "theme": "主题",
+      "themes": {
+        "SYSTEM": "跟随系统",
+        "LIGHT": "浅色",
+        "DARK": "深色"
+      },
+      "temperatureUnit": "温度单位",
+      "orgDefault": "组织默认({{unit}})",
+      "home": "首页",
+      "homes": {
+        "HOME": "主页",
+        "DASHBOARD": "默认仪表板"
+      },
+      "defaultDashboard": "默认仪表板",
+      "noDashboard": "(无)",
+      "dashboardRequired": "要以仪表板为首页，请选择默认仪表板。",
+      "localeHint": "语言和时区请在以下标签更改：",
+      "favorites": "收藏",
+      "noFavorites": "没有收藏",
+      "favoriteType": "类型",
+      "favoriteName": "名称",
+      "types": {
+        "SPACE": "空间",
+        "DEVICE": "设备",
+        "DASHBOARD": "仪表板",
+        "FLOW": "流程",
+        "ANALYSIS": "分析"
+      },
+      "removeFavorite": "从收藏中移除 {{name}}",
+      "tours": "功能导览",
+      "toursBody": "已设为不再显示的导览 {{n}} 个",
+      "resetTours": "重新显示功能导览",
+      "done": {
+        "save": "已保存显示设置。",
+        "removeFavorite": "已从收藏中移除。",
+        "resetTours": "将重新显示功能导览。"
+      }
+    }
   }
 }
