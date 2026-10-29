@@ -1,7 +1,7 @@
 /**
  * UI-ANA-01 템플릿 갤러리(ANA-01.01·01.04·01.07)·UI-ANA-02 설명서(ANA-01.06) 인수 시험.
  */
-import { act, fireEvent, screen, within } from "@testing-library/react";
+import { act, fireEvent, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { useLocation } from "react-router";
@@ -59,8 +59,9 @@ describe("ANA-01.01 UI-ANA-01 템플릿 갤러리", () => {
     expect(screen.getAllByRole("article")).toHaveLength(1);
     expect(screen.getByTestId("where").textContent).toBe("?category=ASSET_HEALTH");
     await userEvent.click(screen.getByRole("button", { name: "전체" }));
+    await waitFor(() => expect(screen.getByTestId("where").textContent).toBe(""));
     await userEvent.click(screen.getByRole("button", { name: "도메인" }));
-    expect(screen.getByTestId("where").textContent).toBe("?kind=DOMAIN");
+    await waitFor(() => expect(screen.getByTestId("where").textContent).toBe("?kind=DOMAIN"));
     expect(screen.getAllByRole("article").map((a) => a.getAttribute("data-template"))).toEqual(["comfort-index", "sensor-health"]);
   });
 

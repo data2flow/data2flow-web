@@ -184,7 +184,72 @@
       "other": "其他·公共",
       "noChildren": "没有下级单位",
       "noSources": "请连接能源来源",
-      "from": "开始日期"
+      "from": "开始日期",
+      "tabs": {
+        "dashboard": "概况",
+        "baseline": "基线"
+      },
+      "noWeather": "没有用于基线比较的气温数据"
+    },
+    "baseline": {
+      "activeSummary": "已启用: {{method}} · {{from}} ~ {{to}} · R² {{r2}}",
+      "noActive": "尚无启用的基线。计算后[启用]，仪表板的基线比较即会使用",
+      "result": "结果",
+      "methods": {
+        "PERIOD_AVERAGE": "期间平均",
+        "DEGREE_DAY_REGRESSION": "气温修正回归"
+      },
+      "statuses": {
+        "TRAINING": "计算中",
+        "READY": "就绪",
+        "FAILED": "失败",
+        "ACTIVE": "已启用",
+        "RETIRED": "已停用"
+      },
+      "lowFit": "拟合度低(R² < 0.5)",
+      "needed": "训练期间太短，还需要{{n}}天(至少30天)",
+      "failures": {
+        "INSUFFICIENT_DATA": "训练数据少于30天",
+        "NO_WEATHER": "训练期间没有气温数据",
+        "INTERNAL_ERROR": "计算失败，请稍后重试"
+      },
+      "training": "正在计算，请稍后刷新",
+      "coefficients": {
+        "intercept": "截距(kWh/日)",
+        "cdd": "CDD系数",
+        "hdd": "HDD系数",
+        "weekend": "周末差"
+      },
+      "fitChart": "实测 vs 预测",
+      "actual": "实测",
+      "predicted": "预测",
+      "versions": "版本",
+      "noVersions": "尚未计算基线",
+      "columns": {
+        "method": "方式",
+        "period": "训练期间",
+        "status": "状态"
+      },
+      "activate": "启用",
+      "create": "计算基线",
+      "method": "方式",
+      "trainFrom": "训练开始日",
+      "trainTo": "训练结束日",
+      "coolingBaseC": "制冷基准温度(℃)",
+      "heatingBaseC": "供暖基准温度(℃)",
+      "splitWeekday": "区分工作日和周末",
+      "temperatureDevice": "气温来源设备",
+      "noTemperature": "不选择",
+      "temperatureMetric": "气温测量项",
+      "hint": "训练期间为30~730天。气温修正回归需要气温来源设备",
+      "calculate": "计算",
+      "errors": {
+        "required": "必填",
+        "date": "请输入日期",
+        "order": "结束日早于开始日",
+        "tooLong": "不能超过730天",
+        "number": "请输入数字"
+      }
     }
   },
   "errors": {
@@ -197,6 +262,9 @@
     "ENE_TARIFF_NOT_FOUND": "找不到电价",
     "ENE_EMISSION_FACTOR_NOT_FOUND": "找不到排放系数",
     "ENE_SOURCE_NOT_FOUND": "找不到能源来源",
-    "ENE_BILL_NOT_FOUND": "找不到电费账单"
+    "ENE_BILL_NOT_FOUND": "找不到电费账单",
+    "ENE_BASELINE_INSUFFICIENT_DATA": "训练期间少于30天",
+    "ENE_BASELINE_NOT_READY": "只能启用就绪的版本",
+    "ENE_BASELINE_NOT_FOUND": "找不到基线"
   }
 }

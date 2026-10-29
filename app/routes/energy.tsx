@@ -4,15 +4,18 @@
  * 지표 카드(사용량·EUI·재실 시간당·비용·탄소, 비교 대비 ±%), 일별 추이(추정분 빗금, 기준선 선), 하위 단위 표(추정 비율·출처 배지)와 기타·공용.
  * 계량이 없으면 "에너지 출처를 연결하세요 [계량 설정]", 면적이 없으면 EUI "–". 공간 범위가 제한된 사용자는 허용 공간만 합산된다(TC-ENE-019).
  * API: API-ENE-10 지표, API-ENE-11 하위 단위, 공간 트리 API-DEV-01.
+ * 범위 공간이 있으면 [기준선] 탭(`?tab=baseline&version=`, UI-ENE-04, API-ENE-12): 기준선·버전 목록·버전 상세, 계산(ENE_ANALYZE)·적용.
  */
-import { useCallback } from "react";
+import { useCallback, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { Form, Link, useRouteLoaderData } from "react-router";
-import { callApi } from "~/bff/api.server";
+import { Form, Link, data, redirect, useRouteLoaderData } from "react-router";
+import { callApi, callList, field } from "~/bff/api.server";
 import { bff } from "~/bff/middleware.server";
 import { getMe } from "~/bff/user.server";
 import { EChartView } from "~/components/charts/echart-view";
-import { Alert, Badge, Button, ButtonLink, Card, EmptyState, PageHeader, SelectField, Table, TextField } from "~/components/ui";
+import { Alert, Badge, Button, ButtonLink, Card, EmptyState, PageHeader, SelectField, Table, Tabs, TextField } from "~/components/ui";
+import { BaselineSettings, type BaselineFailure } from "~/features/energy/components/baseline-settings";
+import { baselineBody, validateBaselineForm, type BaselineDetail, type BaselineForm, type BaselineSummary, type BaselineVersion } from "~/features/energy/model/baseline";
 import { COMPARES, PERIODS, diffText, diffTone, granularityOf, periodRange, trendOption, type Breakdown, type EnergyMetrics } from "~/features/energy/model/dashboard";
 import { percent } from "~/features/energy/model/settings";
 import { errorText } from "~/lib/error-text";
@@ -26,11 +29,76 @@ export function meta() {
   return [{ title: "data2flow" }];
 }
 
+const addDays = (day: string, n: number) => new Date(Date.parse(`${day}T00:00:00Z`) + n * 86_400_000).toISOString().slice(0, 10);
+
+/** [기준선] 탭: 범위 공간의 기준선, 버전 목록, 고른 버전(없으면 활성 → 최신) 상세, 기온 원천 후보 기기 */
+async function baselineTab(ctx: ReturnType<typeof bff>, request: Request, scope: string, versionParam: string | null, today: string) {
+  const [baselines, devices] = await Promise.all([
+    callList<BaselineSummary>(ctx, request, `/api/v1/core/energy/baselines?scopeSpaceId=${encodeURIComponent(scope)}`),
+    callList<{ id: string; name: string }>(ctx, request, "/api/v1/core/devices?status=ACTIVE&virtual=false&size=100"),
+  ]);
+  const baseline = baselines.ok ? (baselines.list.responses[0] ?? null) : null;
+  const versions = baseline ? await callList<BaselineVersion>(ctx, request, `/api/v1/core/energy/baselines/${baseline.baselineId}/versions?size=50`) : null;
+  const rows = versions?.ok ? versions.list.responses : [];
+  const selected = versionParam ?? baseline?.activeVersion?.versionId ?? rows[0]?.versionId ?? null;
+  const detail = baseline && selected ? await callApi<BaselineDetail>(ctx, request, `/api/v1/core/energy/baselines/${baseline.baselineId}/versions/${encodeURIComponent(selected)}`) : null;
+  const yesterday = addDays(today, -1);
+  return {
+    baseline,
+    versions: rows,
+    detail: detail?.ok ? detail.data : null,
+    devices: devices.ok ? devices.list.responses.map((d) => ({ id: String(d.id), name: d.name })) : [],
+    defaults: { trainFrom: addDays(yesterday, -89), trainTo: yesterday },
+    failed: baselines.ok ? null : { code: baselines.code, message: baselines.message },
+  };
+}
+
+type BaselineActionResult = { error?: BaselineFailure; fieldErrors?: Record<string, string>; values?: Partial<BaselineForm> };
+
+export async function action({ request, context }: Route.ActionArgs) {
+  const ctx = bff(context);
+  const url = new URL(request.url);
+  const scope = url.searchParams.get("scope") ?? "";
+  const form = await request.formData();
+  const intent = field(form, "intent");
+  const back = (version?: string) => `/energy?${new URLSearchParams({ scope, tab: "baseline", ...(version ? { version } : {}) })}`;
+  if (intent === "activateBaseline") {
+    const versionId = field(form, "versionId");
+    const result = await callApi(ctx, request, `/api/v1/core/energy/baselines/versions/${encodeURIComponent(versionId)}/activate`, { method: "POST" });
+    if (!result.ok) return data<BaselineActionResult>({ error: { code: result.code, message: result.message } }, { status: result.status });
+    throw redirect(back(versionId));
+  }
+  if (intent === "createBaseline") {
+    const values: BaselineForm = {
+      method: field(form, "method"),
+      trainFrom: field(form, "trainFrom").trim(),
+      trainTo: field(form, "trainTo").trim(),
+      coolingBaseC: field(form, "coolingBaseC").trim(),
+      heatingBaseC: field(form, "heatingBaseC").trim(),
+      splitWeekday: field(form, "splitWeekday") === "true",
+      temperatureDeviceId: field(form, "temperatureDeviceId"),
+      temperatureMetricKey: field(form, "temperatureMetricKey").trim(),
+    };
+    const fieldErrors = validateBaselineForm(values);
+    if (Object.keys(fieldErrors).length) return data<BaselineActionResult>({ fieldErrors, values }, { status: 400 });
+    const result = await callApi<{ jobId: string; versionId: string }>(ctx, request, "/api/v1/core/energy/baselines/versions", { method: "POST", body: baselineBody(scope, values) });
+    if (!result.ok) return data<BaselineActionResult>({ error: { code: result.code, message: result.message, errors: result.errors }, values }, { status: result.status });
+    throw redirect(back(result.data.versionId));
+  }
+  return data<BaselineActionResult>({ error: { code: "BAD_REQUEST" } }, { status: 400 });
+}
+
 export async function loader({ request, context }: Route.LoaderArgs) {
   const ctx = bff(context);
   const url = new URL(request.url);
   const me = await getMe(ctx, request);
   const today = zonedDate(ctx.runtime.now(), resolveTimezone(me.ok ? me.data.timezone : undefined));
+  const scopeParam = url.searchParams.get("scope") ?? "";
+  if (scopeParam && url.searchParams.get("tab") === "baseline") {
+    const spaces = await callApi<SpaceNode[]>(ctx, request, "/api/v1/core/spaces");
+    return { tab: "baseline" as const, scope: scopeParam, trail: trailOf(spaces.ok ? flattenSpaces(spaces.data) : [], scopeParam),
+      baselineTab: await baselineTab(ctx, request, scopeParam, url.searchParams.get("version"), today) };
+  }
   const range = periodRange(url.searchParams.get("period") ?? "thisMonth", today, { from: url.searchParams.get("from"), to: url.searchParams.get("to") });
   const compareParam = url.searchParams.get("compare") ?? "BASELINE";
   const compare = (COMPARES as readonly string[]).includes(compareParam) ? compareParam : "BASELINE";
@@ -45,14 +113,12 @@ export async function loader({ request, context }: Route.LoaderArgs) {
     callApi<Breakdown>(ctx, request, `/api/v1/core/energy/breakdown?${breakdownQuery}`),
     callApi<unknown[]>(ctx, request, "/api/v1/core/energy/sources"),
   ]);
-  const flat = spaces.ok ? flattenSpaces(spaces.data) : [];
-  const trail: { id: string; name: string }[] = [];
-  for (let cur = flat.find((s) => s.id === scope); cur; cur = flat.find((s) => s.id === cur!.parentId)) trail.unshift({ id: cur.id, name: cur.name });
   return {
+    tab: "dashboard" as const,
     ...range,
     compare,
     scope,
-    trail,
+    trail: trailOf(spaces.ok ? flattenSpaces(spaces.data) : [], scope),
     metrics: metrics.ok ? metrics.data : null,
     breakdown: breakdown.ok ? breakdown.data : null,
     noSources: sources.ok && sources.data.length === 0,
@@ -60,7 +126,74 @@ export async function loader({ request, context }: Route.LoaderArgs) {
   };
 }
 
-export default function EnergyDashboard({ loaderData }: Route.ComponentProps) {
+function trailOf(flat: ReturnType<typeof flattenSpaces>, scope: string) {
+  const trail: { id: string; name: string }[] = [];
+  for (let cur = flat.find((s) => s.id === scope); cur; cur = flat.find((s) => s.id === cur!.parentId)) trail.unshift({ id: cur.id, name: cur.name });
+  return trail;
+}
+
+export default function EnergyRoute({ loaderData, actionData }: Route.ComponentProps) {
+  const { t } = useTranslation();
+  const { scope, trail } = loaderData;
+  const tabs = scope ? (
+    <Tabs
+      current={loaderData.tab}
+      items={[
+        { key: "dashboard", label: t("energy.dashboard.tabs.dashboard"), to: `/energy?scope=${encodeURIComponent(scope)}` },
+        { key: "baseline", label: t("energy.dashboard.tabs.baseline"), to: `/energy?scope=${encodeURIComponent(scope)}&tab=baseline` },
+      ]}
+    />
+  ) : null;
+  if (loaderData.tab === "baseline") {
+    const b = loaderData.baselineTab;
+    const result = actionData as BaselineActionResult | undefined;
+    return (
+      <>
+        <PageHeader title={t("energy.dashboard.title")} crumb={t("nav.energy")} />
+        <ScopeTrail scope={scope} trail={trail} href={(id) => (id ? `/energy?scope=${encodeURIComponent(id)}&tab=baseline` : "/energy")} />
+        {tabs}
+        {b.failed ? (
+          <Alert tone="warning">{errorText(t, b.failed)}</Alert>
+        ) : (
+          <BaselineSettings
+            scopeSpaceId={scope}
+            baseline={b.baseline}
+            versions={b.versions}
+            detail={b.detail}
+            devices={b.devices}
+            defaults={b.defaults}
+            versionHref={(v) => `/energy?scope=${encodeURIComponent(scope)}&tab=baseline&version=${encodeURIComponent(v)}`}
+            error={result?.error}
+            fieldErrors={result?.fieldErrors}
+            values={result?.values}
+          />
+        )}
+      </>
+    );
+  }
+  return <EnergyDashboard data={loaderData} tabs={tabs} />;
+}
+
+function ScopeTrail({ scope, trail, href }: { scope: string; trail: { id: string; name: string }[]; href: (id: string) => string }) {
+  const { t } = useTranslation();
+  return (
+    <nav aria-label={t("energy.dashboard.scope")} className="mb-3 flex flex-wrap items-center gap-1 text-[13px]">
+      <Link to={href("")} className={scope ? "text-accent" : "font-semibold"}>
+        {t("energy.dashboard.portfolio")}
+      </Link>
+      {trail.map((s, i) => (
+        <span key={s.id} className="flex items-center gap-1">
+          <span aria-hidden className="text-muted">›</span>
+          {i === trail.length - 1 ? <span className="font-semibold">{s.name}</span> : <Link to={href(s.id)} className="text-accent">{s.name}</Link>}
+        </span>
+      ))}
+    </nav>
+  );
+}
+
+type DashboardData = Extract<Route.ComponentProps["loaderData"], { tab: "dashboard" }>;
+
+function EnergyDashboard({ data: loaderData, tabs }: { data: DashboardData; tabs: ReactNode }) {
   const { t, i18n } = useTranslation();
   const root = useRouteLoaderData("root") as RootData | undefined;
   const canConfigure = hasAny(root?.me?.permissions, ["ENE_OPERATE", "ENE_ADMIN"]);
@@ -93,17 +226,8 @@ export default function EnergyDashboard({ loaderData }: Route.ComponentProps) {
   return (
     <>
       <PageHeader title={t("energy.dashboard.title")} crumb={t("nav.energy")} />
-      <nav aria-label={t("energy.dashboard.scope")} className="mb-3 flex flex-wrap items-center gap-1 text-[13px]">
-        <Link to={keep({ scope: "" })} className={scope ? "text-accent" : "font-semibold"}>
-          {t("energy.dashboard.portfolio")}
-        </Link>
-        {trail.map((s, i) => (
-          <span key={s.id} className="flex items-center gap-1">
-            <span aria-hidden className="text-muted">›</span>
-            {i === trail.length - 1 ? <span className="font-semibold">{s.name}</span> : <Link to={keep({ scope: s.id })} className="text-accent">{s.name}</Link>}
-          </span>
-        ))}
-      </nav>
+      <ScopeTrail scope={scope} trail={trail} href={(id) => keep({ scope: id })} />
+      {tabs}
       <Form method="get" className="mb-4 flex flex-wrap items-end gap-3">
         {scope && <input type="hidden" name="scope" value={scope} />}
         <SelectField label={t("energy.dashboard.period")} name="period" defaultValue={period}>
@@ -142,7 +266,8 @@ export default function EnergyDashboard({ loaderData }: Route.ComponentProps) {
           <p className="text-[12.5px] text-muted">
             {t("energy.dashboard.summary", { from, to, estimated: percent(m.totals.estimatedRatio) ?? "–" })}
             {m.compare?.reason === "NO_BASELINE" && ` · ${t("energy.dashboard.noBaseline")}`}
-            {m.compare && m.compare.reason !== "NO_BASELINE" && ` · ${t(`energy.dashboard.compares.${m.compare.kind}`)} ${num(m.compare.kwh, 0, "kWh")}`}
+            {m.compare?.reason === "NO_WEATHER" && ` · ${t("energy.dashboard.noWeather")}`}
+            {m.compare && !m.compare.reason && ` · ${t(`energy.dashboard.compares.${m.compare.kind}`)} ${num(m.compare.kwh, 0, "kWh")}`}
           </p>
           <Card title={t("energy.dashboard.trend")}>
             <div className="p-3">
