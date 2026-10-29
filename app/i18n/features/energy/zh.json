@@ -4,6 +4,7 @@
   },
   "energy": {
     "area": {
+      "dashboard": "能源仪表板",
       "meters": "计量与账单",
       "settings": "能源设置"
     },
@@ -129,6 +130,61 @@
         "kwhPositive": "用量必须大于0(最多一位小数)",
         "wholeWon": "请输入整数韩元"
       }
+    },
+    "dashboard": {
+      "title": "能源",
+      "scope": "范围",
+      "portfolio": "组合",
+      "period": "期间",
+      "periods": {
+        "thisMonth": "本月",
+        "lastMonth": "上月",
+        "thisYear": "今年",
+        "custom": "自定义"
+      },
+      "to": "结束日期",
+      "compare": "比较",
+      "compares": {
+        "BASELINE": "基准线",
+        "PREVIOUS_PERIOD": "上一期间",
+        "SAME_PERIOD_LAST_YEAR": "去年同期"
+      },
+      "apply": "查看",
+      "cards": {
+        "kwh": "用量",
+        "eui": "EUI",
+        "perHour": "每在室小时",
+        "krw": "费用",
+        "tco2": "碳排放"
+      },
+      "won": "韩元",
+      "noArea": "无面积",
+      "noOccupancy": "无在室时间",
+      "summary": "{{from}} ~ {{to}} · 估算比例 {{estimated}}",
+      "noBaseline": "尚无基准线",
+      "trend": "每日用量",
+      "measured": "计量",
+      "estimated": "估算",
+      "baseline": "基准线",
+      "noData": "此期间没有汇总的用量",
+      "children": "下级单位",
+      "columns": {
+        "name": "名称",
+        "kwh": "用量(kWh)",
+        "eui": "EUI",
+        "share": "占比",
+        "estimated": "估算比例",
+        "source": "来源"
+      },
+      "sources": {
+        "metered": "计量",
+        "mixed": "计量·估算",
+        "none": "无数据"
+      },
+      "other": "其他·公共",
+      "noChildren": "没有下级单位",
+      "noSources": "请连接能源来源",
+      "from": "开始日期"
     }
   },
   "errors": {

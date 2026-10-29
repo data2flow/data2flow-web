@@ -4,6 +4,7 @@
   },
   "energy": {
     "area": {
+      "dashboard": "エネルギーダッシュボード",
       "meters": "計量・請求書",
       "settings": "エネルギー設定"
     },
@@ -129,6 +130,61 @@
         "kwhPositive": "使用量は0より大きくしてください(小数第1位まで)",
         "wholeWon": "ウォン単位の数字で入力してください"
       }
+    },
+    "dashboard": {
+      "title": "エネルギー",
+      "scope": "範囲",
+      "portfolio": "ポートフォリオ",
+      "period": "期間",
+      "periods": {
+        "thisMonth": "今月",
+        "lastMonth": "先月",
+        "thisYear": "今年",
+        "custom": "カスタム"
+      },
+      "to": "終了日",
+      "compare": "比較",
+      "compares": {
+        "BASELINE": "ベースライン",
+        "PREVIOUS_PERIOD": "前期間",
+        "SAME_PERIOD_LAST_YEAR": "前年同期"
+      },
+      "apply": "表示",
+      "cards": {
+        "kwh": "使用量",
+        "eui": "EUI",
+        "perHour": "在室時間あたり",
+        "krw": "費用",
+        "tco2": "炭素"
+      },
+      "won": "ウォン",
+      "noArea": "面積なし",
+      "noOccupancy": "在室時間なし",
+      "summary": "{{from}} ~ {{to}} · 推定比率 {{estimated}}",
+      "noBaseline": "ベースラインはまだありません",
+      "trend": "日別使用量",
+      "measured": "計測",
+      "estimated": "推定",
+      "baseline": "ベースライン",
+      "noData": "この期間に集計された使用量はありません",
+      "children": "下位単位",
+      "columns": {
+        "name": "名前",
+        "kwh": "使用量(kWh)",
+        "eui": "EUI",
+        "share": "比率",
+        "estimated": "推定比率",
+        "source": "出所"
+      },
+      "sources": {
+        "metered": "計測",
+        "mixed": "計測・推定",
+        "none": "データなし"
+      },
+      "other": "その他・共用",
+      "noChildren": "下位単位はありません",
+      "noSources": "エネルギー出所を接続してください",
+      "from": "開始日"
     }
   },
   "errors": {

@@ -4,6 +4,7 @@
   },
   "energy": {
     "area": {
+      "dashboard": "에너지 대시보드",
       "meters": "계량·고지서",
       "settings": "에너지 설정"
     },
@@ -129,6 +130,61 @@
         "kwhPositive": "사용량은 0보다 커야 합니다(소수 첫째 자리까지)",
         "wholeWon": "원 단위 숫자로 입력하세요"
       }
+    },
+    "dashboard": {
+      "title": "에너지",
+      "scope": "범위",
+      "portfolio": "포트폴리오",
+      "period": "기간",
+      "periods": {
+        "thisMonth": "이번 달",
+        "lastMonth": "지난달",
+        "thisYear": "올해",
+        "custom": "사용자 지정"
+      },
+      "to": "종료일",
+      "compare": "비교",
+      "compares": {
+        "BASELINE": "기준선",
+        "PREVIOUS_PERIOD": "직전 기간",
+        "SAME_PERIOD_LAST_YEAR": "작년 같은 기간"
+      },
+      "apply": "보기",
+      "cards": {
+        "kwh": "사용량",
+        "eui": "EUI",
+        "perHour": "재실 시간당",
+        "krw": "비용",
+        "tco2": "탄소"
+      },
+      "won": "원",
+      "noArea": "면적 없음",
+      "noOccupancy": "재실 시간 없음",
+      "summary": "{{from}} ~ {{to}} · 추정 비율 {{estimated}}",
+      "noBaseline": "기준선이 아직 없습니다",
+      "trend": "일별 사용량",
+      "measured": "측정",
+      "estimated": "추정",
+      "baseline": "기준선",
+      "noData": "이 기간에 집계된 사용량이 없습니다",
+      "children": "하위 단위",
+      "columns": {
+        "name": "이름",
+        "kwh": "사용량(kWh)",
+        "eui": "EUI",
+        "share": "비중",
+        "estimated": "추정 비율",
+        "source": "출처"
+      },
+      "sources": {
+        "metered": "측정",
+        "mixed": "측정·추정",
+        "none": "데이터 없음"
+      },
+      "other": "기타·공용",
+      "noChildren": "하위 단위가 없습니다",
+      "noSources": "에너지 출처를 연결하세요",
+      "from": "시작일"
     }
   },
   "errors": {
