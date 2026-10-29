@@ -4,6 +4,8 @@
  * 같은 기기·항목 계량은 충돌, 같은 달 고지서는 overwrite가 있어야 덮어쓴다. 상태는 core.extra["ene"].
  * 실습실(31)에 스마트 플러그(2001, energy·power)가 측정으로, AM107(1042)이 추정으로 연결되어 있다. 본관(2) 2026-09 고지서는 측정 합계 2,950kWh와 7.8% 다르다.
  * 지표 API-ENE-10·하위 단위 API-ENE-11은 analytics 롤업 결과 모양의 고정 값: 본관(2) 6,020kWh(기준선 없음, 직전 기간 대비 −4.1%), 하위 3층(3) 6,020kWh 중 추정 12%.
+ * 기준선 API-ENE-12(조회 ENE_READ, 계산·적용 ENE_ANALYZE): 본관(2) 기준선 601에 기간 평균 701(ACTIVE, R² 0.82)과 회귀 702(READY, R² 0.41 LOW_FIT).
+ * 학습 기간이 30일보다 짧으면 409 ENE_BASELINE_INSUFFICIENT_DATA(errors neededDays), 새 버전은 TRAINING으로 남는다.
  */
 import { fail, list, noContent, ok, type CoreHandler, type CoreState } from "../core-fixtures";
 
@@ -17,6 +19,10 @@ export interface EneState {
   seq: number;
   /** 마지막 API-ENE-10 질의(기간·비교·범위 확인용) */
   lastMetrics?: Record<string, string>;
+  baselines: Json[];
+  versions: Json[];
+  /** 마지막 기준선 계산 요청 본문 */
+  lastBaselineRequest?: Json;
 }
 
 const PLUG = { id: "2001", name: "스마트 플러그-01" };
@@ -41,6 +47,15 @@ export function eneState(core: CoreState): EneState {
     ],
     bills: [{ billId: "501", spaceId: "2", month: "2026-09", kwh: 3200, amountKrw: 480000, attachmentObjectKey: null, meteredKwh: 2950, diffRatio: 0.0781 }],
     seq: 900,
+    baselines: [{ baselineId: "601", scopeSpace: { id: "2", name: "본관" }, activeVersionId: "701", updatedAt: "2026-10-02T00:00:00Z" }],
+    versions: [
+      { versionId: "702", baselineId: "601", method: "DEGREE_DAY_REGRESSION", trainFrom: "2026-06-01", trainTo: "2026-09-30", status: "READY", r2: 0.41, warning: "LOW_FIT", errorCode: null, neededDays: null,
+        params: { coolingBaseC: 24, heatingBaseC: 18, splitWeekday: true, temperatureSource: { deviceId: 1001, metricKey: "temperature" } }, coefficients: { intercept: 180.5, cdd: 9.2, hdd: 0, weekend: -40.1 },
+        residuals: [{ date: "2026-06-01", actual: 190, predicted: 185.2 }, { date: "2026-06-02", actual: 175, predicted: 181 }], createdBy: { userId: "8", name: "이통합" }, createdAt: "2026-10-02T00:00:00Z" },
+      { versionId: "701", baselineId: "601", method: "PERIOD_AVERAGE", trainFrom: "2026-03-01", trainTo: "2026-05-31", status: "ACTIVE", r2: 0.82, warning: null, errorCode: null, neededDays: null,
+        params: { coolingBaseC: 24, heatingBaseC: 18, splitWeekday: true, temperatureSource: null }, coefficients: { intercept: 200, cdd: 0, hdd: 0, weekend: -50 },
+        residuals: [], createdBy: { userId: "8", name: "이통합" }, createdAt: "2026-06-01T00:00:00Z" },
+    ],
   } satisfies EneState;
   return core.extra.ene as EneState;
 }
@@ -59,10 +74,11 @@ function withValidTo(rows: Json[], scopeOf: (r: Json) => unknown): Json[] {
 export const energyHandler: CoreHandler = (core, { method, path, url, body, can }) => {
   if (!path.startsWith("/energy/")) return undefined;
   if (!can("ENE_READ")) return fail(403, "PERMISSION_DENIED");
-  if (method !== "GET" && !can("ENE_ADMIN")) return fail(403, "PERMISSION_DENIED");
   const s = eneState(core);
   const b = (body ?? {}) as Json;
   const id = () => String(++s.seq);
+  if (path.startsWith("/energy/baselines")) return baselines(core, s, method, path, url, b, can, id);
+  if (method !== "GET" && !can("ENE_ADMIN")) return fail(403, "PERMISSION_DENIED");
 
   if (path === "/energy/tariffs" && method === "GET") return ok(withValidTo(s.tariffs, (r) => (r.scopeSpace as Json | null)?.id ?? null));
   if (path === "/energy/tariffs" && method === "POST") {
@@ -170,3 +186,58 @@ export const energyHandler: CoreHandler = (core, { method, path, url, body, can 
   }
   return undefined;
 };
+
+const days = (from: string, to: string) => Math.round((Date.parse(`${to}T00:00:00Z`) - Date.parse(`${from}T00:00:00Z`)) / 86_400_000) + 1;
+const versionView = (v: Json) => Object.fromEntries(Object.entries(v).filter(([k]) => !["params", "coefficients", "residuals"].includes(k)));
+
+/** 기준선 API-ENE-12 */
+function baselines(core: CoreState, s: EneState, method: string, path: string, url: URL, b: Json, can: (p: string) => boolean, id: () => string) {
+  if (method !== "GET" && !can("ENE_ANALYZE")) return fail(403, "PERMISSION_DENIED");
+  const summary = (row: Json) => {
+    const active = s.versions.find((v) => v.versionId === row.activeVersionId);
+    return { baselineId: row.baselineId, scopeSpace: row.scopeSpace, updatedAt: row.updatedAt,
+      activeVersion: active ? { versionId: active.versionId, method: active.method, r2: active.r2, trainFrom: active.trainFrom, trainTo: active.trainTo } : null };
+  };
+  if (path === "/energy/baselines" && method === "GET") {
+    const scope = url.searchParams.get("scopeSpaceId");
+    return list(s.baselines.filter((x) => !scope || (x.scopeSpace as Json).id === scope).map(summary), url);
+  }
+  let m = path.match(/^\/energy\/baselines\/([^/]+)\/versions$/);
+  if (m && method === "GET") {
+    if (!s.baselines.some((x) => x.baselineId === m![1])) return fail(404, "ENE_BASELINE_NOT_FOUND");
+    return list(s.versions.filter((v) => v.baselineId === m![1]).map(versionView), url);
+  }
+  m = path.match(/^\/energy\/baselines\/([^/]+)\/versions\/([^/]+)$/);
+  if (m && method === "GET") {
+    const v = s.versions.find((x) => x.baselineId === m![1] && x.versionId === m![2]);
+    return v ? ok({ ...v, scopeSpaceId: "2" }) : fail(404, "ENE_BASELINE_NOT_FOUND");
+  }
+  if (path === "/energy/baselines/versions" && method === "POST") {
+    s.lastBaselineRequest = b;
+    const space = core.spaces.find((sp) => sp.id === b.scopeSpaceId);
+    if (!space) return fail(404, "SPACE_NOT_FOUND");
+    const n = days(String(b.trainFrom), String(b.trainTo));
+    if (n < 30) return fail(409, "ENE_BASELINE_INSUFFICIENT_DATA", { errors: [{ field: "neededDays", code: "NeededDays", message: String(30 - n) }] });
+    let baseline = s.baselines.find((x) => (x.scopeSpace as Json).id === space.id);
+    if (!baseline) {
+      baseline = { baselineId: id(), scopeSpace: { id: space.id, name: space.name }, activeVersionId: null, updatedAt: "2026-10-04T00:00:00Z" };
+      s.baselines.push(baseline);
+    }
+    const versionId = id();
+    s.versions.unshift({ versionId, baselineId: baseline.baselineId, method: b.method, trainFrom: b.trainFrom, trainTo: b.trainTo, status: "TRAINING", r2: null, warning: null, errorCode: null,
+      neededDays: null, params: { ...(b.params as Json), temperatureSource: b.temperatureSource ?? null }, coefficients: null, residuals: [], createdBy: { userId: "8", name: "이통합" }, createdAt: "2026-10-04T00:00:00Z" });
+    return ok({ jobId: id(), versionId }, 202);
+  }
+  m = path.match(/^\/energy\/baselines\/versions\/([^/]+)\/activate$/);
+  if (m && method === "POST") {
+    const v = s.versions.find((x) => x.versionId === m![1]);
+    if (!v) return fail(404, "ENE_BASELINE_NOT_FOUND");
+    if (v.status !== "READY" && v.status !== "ACTIVE") return fail(409, "ENE_BASELINE_NOT_READY");
+    for (const o of s.versions) if (o.baselineId === v.baselineId && o.status === "ACTIVE" && o !== v) o.status = "RETIRED";
+    v.status = "ACTIVE";
+    const baseline = s.baselines.find((x) => x.baselineId === v.baselineId)!;
+    baseline.activeVersionId = v.versionId;
+    return ok(versionView(v));
+  }
+  return undefined;
+}

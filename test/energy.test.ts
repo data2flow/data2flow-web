@@ -189,3 +189,51 @@ describe("ENE-01.03 UI-ENE-03 에너지 대시보드", () => {
     expect(page.body).toContain('href="/energy/meters"');
   });
 });
+
+describe("ENE-01.04 UI-ENE-04 기준선 탭", () => {
+  it("범위 공간에 [현황]·[기준선] 탭, VIEWER는 결과·버전만(계산·적용 없음)", async () => {
+    const v = await viewer();
+    const dash = await v.get("/energy?scope=2");
+    expect(dash.body).toContain('href="/energy?scope=2&amp;tab=baseline"');
+    const page = await v.get("/energy?scope=2&tab=baseline");
+    expect(page.response.status).toBe(200);
+    expect(page.body).toContain("적용 중: 기간 평균 · 2026-03-01 ~ 2026-05-31 · R² 0.820");
+    expect(page.body).toContain('data-version="701"');
+    expect(page.body).toContain("적합도 낮음(R² &lt; 0.5)");
+    expect(page.body).not.toContain('value="createBaseline"');
+    expect(page.body).not.toContain('value="activateBaseline"');
+    const portfolio = await v.get("/energy");
+    expect(portfolio.body).not.toContain("tab=baseline");
+  });
+
+  it("계산: 30일보다 짧으면 \"N일 더 필요\", 회귀는 기온 원천 필수, 맞으면 TRAINING 버전으로 이동 → READY 버전 [적용]", async () => {
+    const i = await integrator();
+    const page = await i.get("/energy?scope=2&tab=baseline&version=702");
+    expect(page.body).toContain('value="createBaseline"');
+    expect(page.body).toContain('data-version="702"');
+    expect(page.body).toContain(`value="2026-07-06"`);
+    expect(page.body).toContain(`value="2026-10-03"`);
+    const base = { intent: "createBaseline", method: "PERIOD_AVERAGE", trainFrom: "2026-09-01", trainTo: "2026-09-25", coolingBaseC: "24", heatingBaseC: "18", splitWeekday: "true", temperatureDeviceId: "", temperatureMetricKey: "temperature" };
+    const short = await i.post("/energy?scope=2&tab=baseline", base);
+    expect(short.response.status).toBe(409);
+    expect(short.body).toContain("학습 기간이 짧습니다. 5일 더 필요합니다(최소 30일)");
+    const noTemp = await i.post("/energy?scope=2&tab=baseline", { ...base, method: "DEGREE_DAY_REGRESSION", trainFrom: "2026-07-01", trainTo: "2026-09-30" });
+    expect(noTemp.response.status).toBe(400);
+    expect(noTemp.body).toContain("필수 입력입니다");
+    const ok = await i.post("/energy?scope=2&tab=baseline", { ...base, method: "DEGREE_DAY_REGRESSION", trainFrom: "2026-07-01", trainTo: "2026-09-30", temperatureDeviceId: "1001" });
+    expect(ok.response.status).toBe(302);
+    const s = eneState(app.gateway.m2);
+    expect(s.lastBaselineRequest).toMatchObject({ scopeSpaceId: "2", method: "DEGREE_DAY_REGRESSION", params: { coolingBaseC: 24, heatingBaseC: 18, splitWeekday: true }, temperatureSource: { deviceId: "1001", metricKey: "temperature" } });
+    expect(ok.response.headers.get("location")).toBe(`/energy?scope=2&tab=baseline&version=${s.versions[0].versionId}`);
+    const training = await i.get(ok.response.headers.get("location")!);
+    expect(training.body).toContain("계산 중입니다. 잠시 뒤 새로 고치세요");
+
+    const notReady = await i.post("/energy?scope=2&tab=baseline", { intent: "activateBaseline", versionId: String(s.versions[0].versionId) });
+    expect(notReady.response.status).toBe(409);
+    expect(notReady.body).toContain("계산이 끝난(준비됨) 버전만 적용할 수 있습니다");
+    const activated = await i.post("/energy?scope=2&tab=baseline", { intent: "activateBaseline", versionId: "702" });
+    expect(activated.response.status).toBe(302);
+    expect(s.versions.find((x) => x.versionId === "701")!.status).toBe("RETIRED");
+    expect(s.baselines[0].activeVersionId).toBe("702");
+  });
+});

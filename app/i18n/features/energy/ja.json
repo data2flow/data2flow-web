@@ -184,7 +184,72 @@
       "other": "その他・共用",
       "noChildren": "下位単位はありません",
       "noSources": "エネルギー出所を接続してください",
-      "from": "開始日"
+      "from": "開始日",
+      "tabs": {
+        "dashboard": "概要",
+        "baseline": "ベースライン"
+      },
+      "noWeather": "ベースライン比較に使う気温データがありません"
+    },
+    "baseline": {
+      "activeSummary": "適用中: {{method}} · {{from}} ~ {{to}} · R² {{r2}}",
+      "noActive": "適用中のベースラインがありません。計算して[適用]するとダッシュボードの比較に使われます",
+      "result": "結果",
+      "methods": {
+        "PERIOD_AVERAGE": "期間平均",
+        "DEGREE_DAY_REGRESSION": "外気温補正回帰"
+      },
+      "statuses": {
+        "TRAINING": "計算中",
+        "READY": "準備完了",
+        "FAILED": "失敗",
+        "ACTIVE": "適用中",
+        "RETIRED": "以前"
+      },
+      "lowFit": "適合度低(R² < 0.5)",
+      "needed": "学習期間が短すぎます。あと{{n}}日必要です(最低30日)",
+      "failures": {
+        "INSUFFICIENT_DATA": "学習データが30日未満です",
+        "NO_WEATHER": "学習期間に気温データがありません",
+        "INTERNAL_ERROR": "計算に失敗しました。しばらくしてから再計算してください"
+      },
+      "training": "計算中です。しばらくしてから更新してください",
+      "coefficients": {
+        "intercept": "切片(kWh/日)",
+        "cdd": "CDD係数",
+        "hdd": "HDD係数",
+        "weekend": "週末差"
+      },
+      "fitChart": "実測 vs 予測",
+      "actual": "実測",
+      "predicted": "予測",
+      "versions": "バージョン",
+      "noVersions": "まだ計算したベースラインがありません",
+      "columns": {
+        "method": "方式",
+        "period": "学習期間",
+        "status": "状態"
+      },
+      "activate": "適用",
+      "create": "ベースライン計算",
+      "method": "方式",
+      "trainFrom": "学習開始日",
+      "trainTo": "学習終了日",
+      "coolingBaseC": "冷房基準温度(℃)",
+      "heatingBaseC": "暖房基準温度(℃)",
+      "splitWeekday": "平日・週末を分ける",
+      "temperatureDevice": "気温ソース機器",
+      "noTemperature": "選択しない",
+      "temperatureMetric": "気温の測定項目",
+      "hint": "学習期間は30~730日です。外気温補正回帰には気温ソース機器が必要です",
+      "calculate": "計算",
+      "errors": {
+        "required": "必須です",
+        "date": "日付を入力してください",
+        "order": "終了日が開始日より前です",
+        "tooLong": "730日を超えられません",
+        "number": "数値を入力してください"
+      }
     }
   },
   "errors": {
@@ -197,6 +262,9 @@
     "ENE_TARIFF_NOT_FOUND": "料金単価が見つかりません",
     "ENE_EMISSION_FACTOR_NOT_FOUND": "排出係数が見つかりません",
     "ENE_SOURCE_NOT_FOUND": "エネルギー源が見つかりません",
-    "ENE_BILL_NOT_FOUND": "請求書が見つかりません"
+    "ENE_BILL_NOT_FOUND": "請求書が見つかりません",
+    "ENE_BASELINE_INSUFFICIENT_DATA": "学習期間が30日未満です",
+    "ENE_BASELINE_NOT_READY": "準備完了のバージョンのみ適用できます",
+    "ENE_BASELINE_NOT_FOUND": "ベースラインが見つかりません"
   }
 }

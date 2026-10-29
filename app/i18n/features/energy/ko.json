@@ -184,7 +184,72 @@
       "other": "기타·공용",
       "noChildren": "하위 단위가 없습니다",
       "noSources": "에너지 출처를 연결하세요",
-      "from": "시작일"
+      "from": "시작일",
+      "tabs": {
+        "dashboard": "현황",
+        "baseline": "기준선"
+      },
+      "noWeather": "기준선 비교에 쓸 기온 데이터가 없습니다"
+    },
+    "baseline": {
+      "activeSummary": "적용 중: {{method}} · {{from}} ~ {{to}} · R² {{r2}}",
+      "noActive": "적용된 기준선이 없습니다. 계산한 뒤 [적용]하면 대시보드 기준선 비교에 쓰입니다",
+      "result": "결과",
+      "methods": {
+        "PERIOD_AVERAGE": "기간 평균",
+        "DEGREE_DAY_REGRESSION": "외기 온도 보정 회귀"
+      },
+      "statuses": {
+        "TRAINING": "계산 중",
+        "READY": "준비됨",
+        "FAILED": "실패",
+        "ACTIVE": "적용 중",
+        "RETIRED": "이전"
+      },
+      "lowFit": "적합도 낮음(R² < 0.5)",
+      "needed": "학습 기간이 짧습니다. {{n}}일 더 필요합니다(최소 30일)",
+      "failures": {
+        "INSUFFICIENT_DATA": "학습 데이터가 30일보다 적습니다",
+        "NO_WEATHER": "학습 기간에 기온 데이터가 없습니다",
+        "INTERNAL_ERROR": "계산에 실패했습니다. 잠시 뒤 다시 계산하세요"
+      },
+      "training": "계산 중입니다. 잠시 뒤 새로 고치세요",
+      "coefficients": {
+        "intercept": "절편(kWh/일)",
+        "cdd": "CDD 계수",
+        "hdd": "HDD 계수",
+        "weekend": "주말 차이"
+      },
+      "fitChart": "실측 vs 예측",
+      "actual": "실측",
+      "predicted": "예측",
+      "versions": "버전",
+      "noVersions": "아직 계산한 기준선이 없습니다",
+      "columns": {
+        "method": "방식",
+        "period": "학습 기간",
+        "status": "상태"
+      },
+      "activate": "적용",
+      "create": "기준선 계산",
+      "method": "방식",
+      "trainFrom": "학습 시작일",
+      "trainTo": "학습 종료일",
+      "coolingBaseC": "냉방 기준 온도(℃)",
+      "heatingBaseC": "난방 기준 온도(℃)",
+      "splitWeekday": "평일·주말 분리",
+      "temperatureDevice": "기온 원천 기기",
+      "noTemperature": "선택 안 함",
+      "temperatureMetric": "기온 측정 항목",
+      "hint": "학습 기간은 30~730일입니다. 외기 온도 보정 회귀는 기온 원천 기기가 필요합니다",
+      "calculate": "계산",
+      "errors": {
+        "required": "필수 입력입니다",
+        "date": "날짜를 입력하세요",
+        "order": "종료일이 시작일보다 빠릅니다",
+        "tooLong": "730일을 넘을 수 없습니다",
+        "number": "숫자를 입력하세요"
+      }
     }
   },
   "errors": {
@@ -197,6 +262,9 @@
     "ENE_TARIFF_NOT_FOUND": "요금 단가를 찾을 수 없습니다",
     "ENE_EMISSION_FACTOR_NOT_FOUND": "배출계수를 찾을 수 없습니다",
     "ENE_SOURCE_NOT_FOUND": "에너지 출처를 찾을 수 없습니다",
-    "ENE_BILL_NOT_FOUND": "고지서를 찾을 수 없습니다"
+    "ENE_BILL_NOT_FOUND": "고지서를 찾을 수 없습니다",
+    "ENE_BASELINE_INSUFFICIENT_DATA": "학습 기간이 30일보다 짧습니다",
+    "ENE_BASELINE_NOT_READY": "계산이 끝난(준비됨) 버전만 적용할 수 있습니다",
+    "ENE_BASELINE_NOT_FOUND": "기준선을 찾을 수 없습니다"
   }
 }

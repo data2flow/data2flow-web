@@ -184,7 +184,72 @@
       "other": "Other / common",
       "noChildren": "No child units",
       "noSources": "Connect an energy source",
-      "from": "From"
+      "from": "From",
+      "tabs": {
+        "dashboard": "Overview",
+        "baseline": "Baseline"
+      },
+      "noWeather": "No temperature data for the baseline comparison"
+    },
+    "baseline": {
+      "activeSummary": "Active: {{method}} · {{from}} – {{to}} · R² {{r2}}",
+      "noActive": "No baseline is active. Calculate one and [Activate] it to use it in the dashboard comparison",
+      "result": "Result",
+      "methods": {
+        "PERIOD_AVERAGE": "Period average",
+        "DEGREE_DAY_REGRESSION": "Weather-normalized regression"
+      },
+      "statuses": {
+        "TRAINING": "Calculating",
+        "READY": "Ready",
+        "FAILED": "Failed",
+        "ACTIVE": "Active",
+        "RETIRED": "Retired"
+      },
+      "lowFit": "Low fit (R² < 0.5)",
+      "needed": "The training period is too short. {{n}} more day(s) needed (minimum 30)",
+      "failures": {
+        "INSUFFICIENT_DATA": "Fewer than 30 days of training data",
+        "NO_WEATHER": "No temperature data in the training period",
+        "INTERNAL_ERROR": "Calculation failed. Try again later"
+      },
+      "training": "Calculating. Refresh in a moment",
+      "coefficients": {
+        "intercept": "Intercept (kWh/day)",
+        "cdd": "CDD coefficient",
+        "hdd": "HDD coefficient",
+        "weekend": "Weekend difference"
+      },
+      "fitChart": "Actual vs predicted",
+      "actual": "Actual",
+      "predicted": "Predicted",
+      "versions": "Versions",
+      "noVersions": "No baseline has been calculated yet",
+      "columns": {
+        "method": "Method",
+        "period": "Training period",
+        "status": "Status"
+      },
+      "activate": "Activate",
+      "create": "Calculate baseline",
+      "method": "Method",
+      "trainFrom": "Training start",
+      "trainTo": "Training end",
+      "coolingBaseC": "Cooling base (℃)",
+      "heatingBaseC": "Heating base (℃)",
+      "splitWeekday": "Separate weekdays and weekends",
+      "temperatureDevice": "Temperature source device",
+      "noTemperature": "None",
+      "temperatureMetric": "Temperature metric",
+      "hint": "The training period is 30–730 days. Weather-normalized regression needs a temperature source device",
+      "calculate": "Calculate",
+      "errors": {
+        "required": "Required",
+        "date": "Enter a date",
+        "order": "The end date is before the start date",
+        "tooLong": "Cannot exceed 730 days",
+        "number": "Enter a number"
+      }
     }
   },
   "errors": {
@@ -197,6 +262,9 @@
     "ENE_TARIFF_NOT_FOUND": "Tariff not found",
     "ENE_EMISSION_FACTOR_NOT_FOUND": "Emission factor not found",
     "ENE_SOURCE_NOT_FOUND": "Energy source not found",
-    "ENE_BILL_NOT_FOUND": "Bill not found"
+    "ENE_BILL_NOT_FOUND": "Bill not found",
+    "ENE_BASELINE_INSUFFICIENT_DATA": "The training period is shorter than 30 days",
+    "ENE_BASELINE_NOT_READY": "Only a ready version can be activated",
+    "ENE_BASELINE_NOT_FOUND": "Baseline not found"
   }
 }
