@@ -124,8 +124,10 @@ describe("TC-ACT-107 AT-ACT-09.4 전역 띠", () => {
   });
 
   it("공간 범위 띠는 공간 이름, 유지보수 띠와 [종료](DEV_PLACE)", async () => {
+    // 가짜 시계에서는 부하가 클 때 React가 미룬 그리기가 다시 돌지 않아 [종료] 뒤 띠가 남는다. 이 시험은 시계를 쓰지 않는다
+    vi.useRealTimers();
     const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response(null, { status: 204 }));
-    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    const user = userEvent.setup();
     await renderRoute(
       <GlobalBands
         initialStops={[{ ...STOP, scope: { type: "SPACE", spaceId: "2", includeChildren: true } }]}
