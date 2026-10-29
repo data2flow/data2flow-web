@@ -1,0 +1,207 @@
+{
+  "nav": {
+    "compliance": "環境基準"
+  },
+  "compliance": {
+    "area": {
+      "profiles": "基準プロファイル"
+    },
+    "archived": "アーカイブ済み",
+    "kind": {
+      "SYSTEM": "システム",
+      "ORGANIZATION": "組織"
+    },
+    "tabs": {
+      "criteria": "基準値",
+      "versions": "バージョン履歴",
+      "applications": "適用範囲"
+    },
+    "list": {
+      "title": "基準プロファイル",
+      "new": "新規プロファイル",
+      "kind": "区分",
+      "keyword": "検索",
+      "appliedOnly": "適用中のみ",
+      "noOrganization": "組織プロファイルはまだありません。システムプロファイルを複製して組織の基準を作成できます。",
+      "name": "名前",
+      "source": "出典",
+      "effectiveDate": "基準日",
+      "version": "バージョン",
+      "applications": "適用",
+      "updatedAt": "更新日",
+      "actions": "操作",
+      "empty": "基準プロファイルがありません",
+      "emptyBody": "検索条件を変えるか、新しいプロファイルを作成してください。"
+    },
+    "clone": {
+      "open": "複製して編集",
+      "title": "プロファイルの複製",
+      "body": "{{name}} の現在のバージョンを新しい組織プロファイル v1 として複製します。",
+      "name": "新しいプロファイル名",
+      "defaultName": "{{name}}（コピー）",
+      "submit": "複製"
+    },
+    "detail": {
+      "source": "出典",
+      "effectiveDate": "基準日",
+      "streak": "連続達成",
+      "streakText": "{{days}}日連続、1日 {{ratio}}% 以上",
+      "description": "説明",
+      "edit": "編集",
+      "archive": "アーカイブ",
+      "unarchive": "アーカイブ解除",
+      "systemNote": "システムプロファイルは編集できません。［複製して編集］で組織プロファイルを作成してください。",
+      "archivedNote": "アーカイブ済みのプロファイルです。既存の適用は評価されますが、新たに適用できません。",
+      "olderVersion": "過去のバージョン v{{n}} を表示しています（現在 v{{current}}）。",
+      "toCurrent": "現在のバージョン",
+      "versionMissing": "指定のバージョンが見つからないため、現在のバージョンを表示します。"
+    },
+    "criteria": {
+      "metric": "項目",
+      "facilityType": "施設種別",
+      "unit": "単位",
+      "evalWindow": "評価区間",
+      "limit": "基準",
+      "bands": "等級",
+      "note": "備考",
+      "requirement": "区分",
+      "lower": "下限",
+      "upper": "上限"
+    },
+    "requirement": {
+      "LIMIT": "維持基準",
+      "CONTINUOUS_MONITORING_ONLY": "測定のみ",
+      "RECOMMENDED": "勧告"
+    },
+    "window": {
+      "INSTANT": "瞬時値",
+      "HOUR_1": "1時間平均",
+      "HOUR_8": "8時間平均",
+      "DAY_1": "24時間平均"
+    },
+    "facility": {
+      "GENERAL": "一般多重利用施設",
+      "SENSITIVE": "敏感層利用施設",
+      "INDOOR_PARKING": "屋内駐車場"
+    },
+    "versions": {
+      "version": "バージョン",
+      "createdBy": "作成者",
+      "createdAt": "作成日時",
+      "changeNote": "変更メモ",
+      "usage": "使用",
+      "current": "現在",
+      "locked": "ロック",
+      "system": "システム",
+      "usageText": "適用 {{applications}} · レポート {{reports}}",
+      "view": "表示"
+    },
+    "editor": {
+      "title": "基準プロファイルの編集",
+      "createTitle": "新規基準プロファイル",
+      "editTitle": "{{name}} v{{n}} を編集",
+      "newVersionTitle": "{{name}} の新バージョン",
+      "lockedNote": "v{{n}} は適用またはレポートで使われているためロックされています。保存すると新しいバージョンになります。",
+      "basics": "基本情報",
+      "name": "名前",
+      "sourceTitle": "出典",
+      "sourceUrl": "出典リンク",
+      "effectiveDate": "基準日",
+      "streakDays": "連続達成日数",
+      "streakHint": "空欄なら連続達成を判定しません",
+      "streakRatio": "1日の達成率（%）",
+      "description": "説明",
+      "metrics": "項目別基準",
+      "addMetric": "項目を追加",
+      "changeNote": "変更メモ",
+      "fixFirst": "先に {{n}} 件のエラーを修正してください",
+      "saveVersion": "新バージョンとして保存",
+      "chooseMetric": "項目を選択",
+      "baseName": "基準等級名",
+      "baseNamePlaceholder": "例：基準",
+      "inclusive": "境界値を含む",
+      "bandName": "等級名",
+      "removeBand": "等級を削除",
+      "addBand": "等級を追加",
+      "facilityPlaceholder": "すべての施設",
+      "removeMetric": "項目を削除"
+    },
+    "validation": {
+      "required": "必須項目です",
+      "tooLong": "長すぎます",
+      "nameRequired": "名前を入力してください",
+      "nameTooLong": "名前は100文字までです",
+      "sourceRequired": "出典を入力してください",
+      "sourceTooLong": "出典は200文字までです",
+      "url": "https:// で始まるアドレスにしてください",
+      "dateRequired": "基準日を選択してください",
+      "streakDays": "1～365の整数にしてください",
+      "streakRatio": "50～100の範囲にしてください",
+      "changeNoteRequired": "変更メモを入力してください",
+      "changeNoteTooLong": "変更メモは500文字までです",
+      "metricsRequired": "項目を1つ以上追加してください",
+      "metricRequired": "項目を選択してください",
+      "duplicateMetric": "同じ項目・施設種別が既にあります",
+      "evalWindow": "評価区間を選択してください",
+      "requirement": "区分を選択してください",
+      "unitRequired": "単位を入力してください",
+      "number": "数値を入力してください",
+      "limitRequired": "下限か上限のどちらかを入力してください",
+      "range": "下限は上限を超えられません",
+      "bandCount": "等級は4つまでです",
+      "bandName": "等級名は1～30文字です",
+      "bandNameDuplicate": "等級名が重複しています",
+      "bandOverlap": "等級の区間は基準の内側にしてください",
+      "threshold": "基準値を確認してください",
+      "spaceRequired": "空間を選択してください",
+      "facilityRequired": "このプロファイルは施設種別の選択が必要です"
+    },
+    "apply": {
+      "usageTarget": "用途：{{usage}}",
+      "empty": "まだ適用されていません",
+      "emptyBody": "空間・サイト・空間用途に適用すると、その測定値をこの基準で評価します。",
+      "target": "対象",
+      "descendants": "下位を含む",
+      "facilityType": "施設種別",
+      "version": "バージョン",
+      "appliedAt": "適用日",
+      "measurability": "測定可能性",
+      "type": {
+        "SPACE": "空間",
+        "SITE": "サイト",
+        "SPACE_USAGE": "空間用途"
+      },
+      "pinned": "v{{n}} 固定",
+      "latest": "最新（v{{n}}）",
+      "remove": "解除",
+      "add": "適用を追加",
+      "archivedNote": "アーカイブ済みのプロファイルは新たに適用できません。",
+      "targetType": "適用対象",
+      "usage": "空間用途",
+      "space": "空間",
+      "chooseSpace": "空間を選択",
+      "includeDescendants": "下位空間も含む",
+      "chooseFacility": "施設種別を選択",
+      "pin": "v{{n}} に固定（新バージョンに追従しない）",
+      "submit": "適用",
+      "summary": "測定可 {{measurable}} · 一部 {{partial}} · 不可 {{unmeasurable}}"
+    },
+    "measurability": {
+      "MEASURABLE": "測定可",
+      "PARTIAL": "一部",
+      "NOT_MEASURABLE": "測定不可",
+      "without": "機器なし：{{names}}"
+    }
+  },
+  "errors": {
+    "CMP_PROFILE_NOT_FOUND": "基準プロファイルが見つかりません。",
+    "CMP_PROFILE_READ_ONLY": "このプロファイル（バージョン）は編集できません。複製するか新バージョンとして保存してください。",
+    "CMP_PROFILE_NAME_DUPLICATE": "同じ名前のプロファイルが既にあります。",
+    "CMP_PROFILE_VERSION_CONFLICT": "他のユーザーが先に変更しました。再読み込みしてから保存してください。",
+    "CMP_PROFILE_ARCHIVED": "アーカイブ済みのプロファイルは新たに適用できません。",
+    "CMP_THRESHOLD_INVALID": "基準値が正しくありません。",
+    "CMP_FACILITY_TYPE_REQUIRED": "このプロファイルは施設種別の選択が必要です。",
+    "CMP_APPLICATION_DUPLICATE": "同じ対象に既に適用されています。",
+    "CMP_APPLICATION_NOT_FOUND": "適用が見つかりません。"
+  }
+}

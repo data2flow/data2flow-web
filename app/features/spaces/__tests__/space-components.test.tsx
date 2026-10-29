@@ -1,7 +1,7 @@
 /**
  * 공간 화면 부품(UI-DEV-01·02·03, UI-DSH-02): TC-DEV-006·014·019·025·285, DSH-01.02.
  */
-import { act, fireEvent, screen, within } from "@testing-library/react";
+import { act, fireEvent, screen, within, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 import { meOf, renderRoute } from "../../../../test/render";
@@ -209,7 +209,7 @@ describe("UI-DSH-02 개요 카드(DSH-01.02, DSH-05.01)", () => {
       </>,
     );
     expect(await screen.findByText("경고")).toBeInTheDocument();
-    expect(FakeSource.last.url).toBe(`/bff/stream/live?topics=${encodeURIComponent("space:31")}`);
+    await waitFor(() => expect(FakeSource.last?.url).toBe(`/bff/stream/live?topics=${encodeURIComponent("space:31")}`));
     expect(screen.getByText("517ppm")).toBeInTheDocument();
     expect(screen.getByText("마지막 수신 12초 전 · 배터리 92% · -33dBm")).toBeInTheDocument();
     act(() => FakeSource.last.listeners["device-update"][0]({ data: JSON.stringify({ deviceId: "1042", metrics: [{ key: "co2", value: 1150, unit: "ppm", at: "2026-10-04T00:00:00Z" }], connection: "ONLINE" }), lastEventId: "" } as MessageEvent));

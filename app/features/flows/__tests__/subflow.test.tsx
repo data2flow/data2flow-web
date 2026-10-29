@@ -49,6 +49,7 @@ describe("FLW-01.04 TC-FLW-014 AT-FLW-13.1 서브플로우로 만들기", () => 
   it("트리거를 포함하면 만들지 않는다, 서버 오류는 대화상자에", async () => {
     const api = fakeApi({ createSubflow: vi.fn(() => Promise.resolve({ ok: false as const, status: 400, code: "FLOW_VALIDATION_FAILED", message: "" })) });
     const { container } = await renderEditor({ role: "OPERATOR", detail: detailOf(coolingGraph()), api });
+    await waitFor(() => expect(nodeEl(container, "n-thr00001")).not.toBeNull());
     fireEvent.click(nodeEl(container, "n-trg00001"));
     await userEvent.click(screen.getByRole("button", { name: "서브플로우로 만들기" }));
     expect(screen.getByText("트리거 노드는 서브플로우에 넣을 수 없습니다")).toBeInTheDocument();

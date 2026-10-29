@@ -1,0 +1,207 @@
+{
+  "nav": {
+    "compliance": "Standards"
+  },
+  "compliance": {
+    "area": {
+      "profiles": "Standard profiles"
+    },
+    "archived": "Archived",
+    "kind": {
+      "SYSTEM": "System",
+      "ORGANIZATION": "Organization"
+    },
+    "tabs": {
+      "criteria": "Criteria",
+      "versions": "Versions",
+      "applications": "Applied to"
+    },
+    "list": {
+      "title": "Standard profiles",
+      "new": "New profile",
+      "kind": "Type",
+      "keyword": "Search",
+      "appliedOnly": "Applied only",
+      "noOrganization": "No organization profiles yet. Clone a system profile to make your own standard.",
+      "name": "Name",
+      "source": "Source",
+      "effectiveDate": "Effective date",
+      "version": "Version",
+      "applications": "Applied",
+      "updatedAt": "Updated",
+      "actions": "Actions",
+      "empty": "No standard profiles",
+      "emptyBody": "Change the filters or create a new profile."
+    },
+    "clone": {
+      "open": "Clone to edit",
+      "title": "Clone profile",
+      "body": "Copies the current version of {{name}} into a new organization profile (v1).",
+      "name": "New profile name",
+      "defaultName": "{{name}} (copy)",
+      "submit": "Clone"
+    },
+    "detail": {
+      "source": "Source",
+      "effectiveDate": "Effective date",
+      "streak": "Streak",
+      "streakText": "{{days}} days in a row, at least {{ratio}}% per day",
+      "description": "Description",
+      "edit": "Edit",
+      "archive": "Archive",
+      "unarchive": "Unarchive",
+      "systemNote": "System profiles are read-only. Use [Clone to edit] to make an organization profile.",
+      "archivedNote": "This profile is archived. Existing applications are still evaluated, but it cannot be applied again.",
+      "olderVersion": "You are viewing an older version v{{n}} (current v{{current}}).",
+      "toCurrent": "View current",
+      "versionMissing": "That version was not found; showing the current version."
+    },
+    "criteria": {
+      "metric": "Metric",
+      "facilityType": "Facility type",
+      "unit": "Unit",
+      "evalWindow": "Window",
+      "limit": "Limit",
+      "bands": "Bands",
+      "note": "Note",
+      "requirement": "Requirement",
+      "lower": "Lower",
+      "upper": "Upper"
+    },
+    "requirement": {
+      "LIMIT": "Limit",
+      "CONTINUOUS_MONITORING_ONLY": "Monitoring only",
+      "RECOMMENDED": "Recommended"
+    },
+    "window": {
+      "INSTANT": "Instant",
+      "HOUR_1": "1-hour avg",
+      "HOUR_8": "8-hour avg",
+      "DAY_1": "24-hour avg"
+    },
+    "facility": {
+      "GENERAL": "General facility",
+      "SENSITIVE": "Sensitive-group facility",
+      "INDOOR_PARKING": "Indoor parking"
+    },
+    "versions": {
+      "version": "Version",
+      "createdBy": "Author",
+      "createdAt": "Created",
+      "changeNote": "Change note",
+      "usage": "Usage",
+      "current": "Current",
+      "locked": "Locked",
+      "system": "System",
+      "usageText": "{{applications}} applied · {{reports}} reports",
+      "view": "View"
+    },
+    "editor": {
+      "title": "Edit standard profile",
+      "createTitle": "New standard profile",
+      "editTitle": "Edit {{name}} v{{n}}",
+      "newVersionTitle": "New version of {{name}}",
+      "lockedNote": "v{{n}} is locked because it is in use. Saving creates a new version.",
+      "basics": "Basics",
+      "name": "Name",
+      "sourceTitle": "Source",
+      "sourceUrl": "Source link",
+      "effectiveDate": "Effective date",
+      "streakDays": "Streak days",
+      "streakHint": "Leave empty to skip streaks",
+      "streakRatio": "Daily ratio (%)",
+      "description": "Description",
+      "metrics": "Metric criteria",
+      "addMetric": "Add metric",
+      "changeNote": "Change note",
+      "fixFirst": "Fix {{n}} errors first",
+      "saveVersion": "Save as new version",
+      "chooseMetric": "Choose a metric",
+      "baseName": "Base band name",
+      "baseNamePlaceholder": "e.g. Standard",
+      "inclusive": "Inclusive",
+      "bandName": "Band name",
+      "removeBand": "Remove band",
+      "addBand": "Add band",
+      "facilityPlaceholder": "All facilities",
+      "removeMetric": "Remove metric"
+    },
+    "validation": {
+      "required": "Required",
+      "tooLong": "Too long",
+      "nameRequired": "Enter a name",
+      "nameTooLong": "Name can be up to 100 characters",
+      "sourceRequired": "Enter a source",
+      "sourceTooLong": "Source can be up to 200 characters",
+      "url": "Must be an https:// address",
+      "dateRequired": "Choose a date",
+      "streakDays": "Must be a whole number from 1 to 365",
+      "streakRatio": "Must be between 50 and 100",
+      "changeNoteRequired": "Enter a change note",
+      "changeNoteTooLong": "Change note can be up to 500 characters",
+      "metricsRequired": "Add at least one metric",
+      "metricRequired": "Choose a metric",
+      "duplicateMetric": "This metric and facility type already exist",
+      "evalWindow": "Choose a window",
+      "requirement": "Choose a requirement",
+      "unitRequired": "Enter a unit",
+      "number": "Enter a number",
+      "limitRequired": "Enter a lower or upper limit",
+      "range": "Lower cannot exceed upper",
+      "bandCount": "Up to 4 bands",
+      "bandName": "Band name must be 1–30 characters",
+      "bandNameDuplicate": "Band names must be unique",
+      "bandOverlap": "Bands must lie within the limit",
+      "threshold": "Check the threshold",
+      "spaceRequired": "Choose a space",
+      "facilityRequired": "This profile needs a facility type"
+    },
+    "apply": {
+      "usageTarget": "Usage: {{usage}}",
+      "empty": "Not applied anywhere yet",
+      "emptyBody": "Apply it to a space, site or space usage to evaluate readings there.",
+      "target": "Target",
+      "descendants": "Descendants",
+      "facilityType": "Facility type",
+      "version": "Version",
+      "appliedAt": "Applied",
+      "measurability": "Measurability",
+      "type": {
+        "SPACE": "Space",
+        "SITE": "Site",
+        "SPACE_USAGE": "Space usage"
+      },
+      "pinned": "Pinned v{{n}}",
+      "latest": "Latest (v{{n}})",
+      "remove": "Remove",
+      "add": "Apply",
+      "archivedNote": "Archived profiles cannot be applied.",
+      "targetType": "Apply to",
+      "usage": "Space usage",
+      "space": "Space",
+      "chooseSpace": "Choose a space",
+      "includeDescendants": "Include child spaces",
+      "chooseFacility": "Choose a facility type",
+      "pin": "Pin to v{{n}} (don't follow new versions)",
+      "submit": "Apply",
+      "summary": "{{measurable}} measurable · {{partial}} partial · {{unmeasurable}} not"
+    },
+    "measurability": {
+      "MEASURABLE": "Measurable",
+      "PARTIAL": "Partial",
+      "NOT_MEASURABLE": "Not measurable",
+      "without": "No device: {{names}}"
+    }
+  },
+  "errors": {
+    "CMP_PROFILE_NOT_FOUND": "Standard profile not found.",
+    "CMP_PROFILE_READ_ONLY": "This profile (version) is read-only. Clone it or save a new version.",
+    "CMP_PROFILE_NAME_DUPLICATE": "A profile with this name already exists.",
+    "CMP_PROFILE_VERSION_CONFLICT": "Someone else changed this first. Reload and save again.",
+    "CMP_PROFILE_ARCHIVED": "Archived profiles cannot be applied.",
+    "CMP_THRESHOLD_INVALID": "The thresholds are invalid.",
+    "CMP_FACILITY_TYPE_REQUIRED": "This profile needs a facility type.",
+    "CMP_APPLICATION_DUPLICATE": "Already applied to this target.",
+    "CMP_APPLICATION_NOT_FOUND": "Application not found."
+  }
+}

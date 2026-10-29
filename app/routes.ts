@@ -172,6 +172,11 @@ export default [
     route("ai/mcp", "routes/ai-mcp.tsx"),
     route("settings/ai", "routes/settings-ai.tsx"),
     route("admin/tokens", "routes/admin-tokens.tsx"),
+    // M7 환경 기준(CMP, spec/detail/00-navigation.md §2): 기준 프로필 목록·상세·편집(UI-CMP-01~04). 적용 범위는 상세의 [적용 범위] 탭
+    route("compliance/profiles", "routes/compliance-profiles.tsx"),
+    route("compliance/profiles/new", "routes/compliance-profile-edit.tsx", { id: "routes/compliance-profile-new" }),
+    route("compliance/profiles/:profileId", "routes/compliance-profile-detail.tsx"),
+    route("compliance/profiles/:profileId/edit", "routes/compliance-profile-edit.tsx"),
   ]),
 
   // M5 field: 모바일 셸(UI-DSH-14, UI-DEV-17·21)과 QR 딥링크(`/d/{qrToken}`, 로그인 필요) — 00-navigation.md §2·§3

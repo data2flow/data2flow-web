@@ -26,7 +26,7 @@ describe("TC-ACT-044 AT-ACT-03.3 기기에서 직접 바꾼 보고(ACT-02.04)", 
     const api = fakeApi();
     await render({ api });
     expect(await screen.findAllByText("원하는 상태 = 실제 상태")).toHaveLength(2);
-    expect(FakeES.all[0].url).toBe(`/bff/stream/live?topics=${encodeURIComponent("commands:2001,space:31")}`);
+    await waitFor(() => expect(FakeES.all[0]?.url).toBe(`/bff/stream/live?topics=${encodeURIComponent("commands:2001,space:31")}`));
     // 측정값 갱신(state는 기기 상태 문자열)은 섀도와 무관하다
     act(() => FakeES.all[0].emit("device-update", { deviceId: "2001", metrics: [{ key: "temperature", value: 25.1, unit: "℃", quality: 0, at: "2026-10-04T00:00:04Z" }], state: "ACTIVE" }));
     expect(screen.getAllByText("원하는 상태 = 실제 상태")).toHaveLength(2);

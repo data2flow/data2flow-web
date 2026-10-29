@@ -1,0 +1,207 @@
+{
+  "nav": {
+    "compliance": "环境标准"
+  },
+  "compliance": {
+    "area": {
+      "profiles": "标准配置"
+    },
+    "archived": "已归档",
+    "kind": {
+      "SYSTEM": "系统",
+      "ORGANIZATION": "组织"
+    },
+    "tabs": {
+      "criteria": "标准值",
+      "versions": "版本历史",
+      "applications": "适用范围"
+    },
+    "list": {
+      "title": "标准配置",
+      "new": "新建配置",
+      "kind": "类型",
+      "keyword": "搜索",
+      "appliedOnly": "仅显示已适用",
+      "noOrganization": "还没有组织配置。可以复制系统配置来创建组织标准。",
+      "name": "名称",
+      "source": "来源",
+      "effectiveDate": "生效日期",
+      "version": "版本",
+      "applications": "适用",
+      "updatedAt": "更新日期",
+      "actions": "操作",
+      "empty": "没有标准配置",
+      "emptyBody": "请更改筛选条件或新建配置。"
+    },
+    "clone": {
+      "open": "复制并编辑",
+      "title": "复制配置",
+      "body": "将 {{name}} 的当前版本复制为新的组织配置 v1。",
+      "name": "新配置名称",
+      "defaultName": "{{name}}（副本）",
+      "submit": "复制"
+    },
+    "detail": {
+      "source": "来源",
+      "effectiveDate": "生效日期",
+      "streak": "连续达标",
+      "streakText": "连续 {{days}} 天，每天至少 {{ratio}}%",
+      "description": "说明",
+      "edit": "编辑",
+      "archive": "归档",
+      "unarchive": "取消归档",
+      "systemNote": "系统配置为只读。请使用［复制并编辑］创建组织配置。",
+      "archivedNote": "此配置已归档。现有适用仍会评估，但不能再新增适用。",
+      "olderVersion": "正在查看旧版本 v{{n}}（当前 v{{current}}）。",
+      "toCurrent": "查看当前版本",
+      "versionMissing": "找不到该版本，显示当前版本。"
+    },
+    "criteria": {
+      "metric": "指标",
+      "facilityType": "设施类型",
+      "unit": "单位",
+      "evalWindow": "评估区间",
+      "limit": "标准",
+      "bands": "等级",
+      "note": "备注",
+      "requirement": "类别",
+      "lower": "下限",
+      "upper": "上限"
+    },
+    "requirement": {
+      "LIMIT": "限值",
+      "CONTINUOUS_MONITORING_ONLY": "仅监测",
+      "RECOMMENDED": "建议"
+    },
+    "window": {
+      "INSTANT": "瞬时值",
+      "HOUR_1": "1小时平均",
+      "HOUR_8": "8小时平均",
+      "DAY_1": "24小时平均"
+    },
+    "facility": {
+      "GENERAL": "一般公共设施",
+      "SENSITIVE": "敏感人群设施",
+      "INDOOR_PARKING": "室内停车场"
+    },
+    "versions": {
+      "version": "版本",
+      "createdBy": "作者",
+      "createdAt": "创建时间",
+      "changeNote": "变更说明",
+      "usage": "使用",
+      "current": "当前",
+      "locked": "已锁定",
+      "system": "系统",
+      "usageText": "适用 {{applications}} · 报告 {{reports}}",
+      "view": "查看"
+    },
+    "editor": {
+      "title": "编辑标准配置",
+      "createTitle": "新建标准配置",
+      "editTitle": "编辑 {{name}} v{{n}}",
+      "newVersionTitle": "{{name}} 的新版本",
+      "lockedNote": "v{{n}} 已被适用或报告使用而锁定。保存将创建新版本。",
+      "basics": "基本信息",
+      "name": "名称",
+      "sourceTitle": "来源",
+      "sourceUrl": "来源链接",
+      "effectiveDate": "生效日期",
+      "streakDays": "连续达标天数",
+      "streakHint": "留空则不计算连续达标",
+      "streakRatio": "每日达标比例（%）",
+      "description": "说明",
+      "metrics": "指标标准",
+      "addMetric": "添加指标",
+      "changeNote": "变更说明",
+      "fixFirst": "请先修正 {{n}} 个错误",
+      "saveVersion": "保存为新版本",
+      "chooseMetric": "选择指标",
+      "baseName": "基准等级名称",
+      "baseNamePlaceholder": "例如：标准",
+      "inclusive": "包含边界值",
+      "bandName": "等级名称",
+      "removeBand": "删除等级",
+      "addBand": "添加等级",
+      "facilityPlaceholder": "所有设施",
+      "removeMetric": "删除指标"
+    },
+    "validation": {
+      "required": "必填",
+      "tooLong": "太长",
+      "nameRequired": "请输入名称",
+      "nameTooLong": "名称最多100个字符",
+      "sourceRequired": "请输入来源",
+      "sourceTooLong": "来源最多200个字符",
+      "url": "必须是 https:// 地址",
+      "dateRequired": "请选择日期",
+      "streakDays": "必须是1到365之间的整数",
+      "streakRatio": "必须在50到100之间",
+      "changeNoteRequired": "请输入变更说明",
+      "changeNoteTooLong": "变更说明最多500个字符",
+      "metricsRequired": "请至少添加一个指标",
+      "metricRequired": "请选择指标",
+      "duplicateMetric": "相同指标和设施类型已存在",
+      "evalWindow": "请选择评估区间",
+      "requirement": "请选择类别",
+      "unitRequired": "请输入单位",
+      "number": "请输入数字",
+      "limitRequired": "请输入下限或上限",
+      "range": "下限不能大于上限",
+      "bandCount": "最多4个等级",
+      "bandName": "等级名称为1到30个字符",
+      "bandNameDuplicate": "等级名称重复",
+      "bandOverlap": "等级区间必须在标准范围内",
+      "threshold": "请检查标准值",
+      "spaceRequired": "请选择空间",
+      "facilityRequired": "此配置需要选择设施类型"
+    },
+    "apply": {
+      "usageTarget": "用途：{{usage}}",
+      "empty": "尚未适用",
+      "emptyBody": "适用于空间、站点或空间用途后，将按此标准评估其测量值。",
+      "target": "对象",
+      "descendants": "包含下级",
+      "facilityType": "设施类型",
+      "version": "版本",
+      "appliedAt": "适用日期",
+      "measurability": "可测性",
+      "type": {
+        "SPACE": "空间",
+        "SITE": "站点",
+        "SPACE_USAGE": "空间用途"
+      },
+      "pinned": "固定 v{{n}}",
+      "latest": "最新（v{{n}}）",
+      "remove": "解除",
+      "add": "添加适用",
+      "archivedNote": "已归档的配置不能新增适用。",
+      "targetType": "适用对象",
+      "usage": "空间用途",
+      "space": "空间",
+      "chooseSpace": "选择空间",
+      "includeDescendants": "包含下级空间",
+      "chooseFacility": "选择设施类型",
+      "pin": "固定为 v{{n}}（不跟随新版本）",
+      "submit": "适用",
+      "summary": "可测 {{measurable}} · 部分 {{partial}} · 不可 {{unmeasurable}}"
+    },
+    "measurability": {
+      "MEASURABLE": "可测",
+      "PARTIAL": "部分",
+      "NOT_MEASURABLE": "不可测",
+      "without": "无设备：{{names}}"
+    }
+  },
+  "errors": {
+    "CMP_PROFILE_NOT_FOUND": "找不到标准配置。",
+    "CMP_PROFILE_READ_ONLY": "此配置（版本）为只读。请复制或保存为新版本。",
+    "CMP_PROFILE_NAME_DUPLICATE": "已存在同名配置。",
+    "CMP_PROFILE_VERSION_CONFLICT": "其他人已先修改。请刷新后重新保存。",
+    "CMP_PROFILE_ARCHIVED": "已归档的配置不能新增适用。",
+    "CMP_THRESHOLD_INVALID": "标准值无效。",
+    "CMP_FACILITY_TYPE_REQUIRED": "此配置需要选择设施类型。",
+    "CMP_APPLICATION_DUPLICATE": "已适用于该对象。",
+    "CMP_APPLICATION_NOT_FOUND": "找不到适用。"
+  }
+}

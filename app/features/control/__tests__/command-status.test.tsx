@@ -96,7 +96,7 @@ describe("TC-ACT-085 AT-ACT-01.6 명령 상태 실시간 표시(ACT-04.02)", () 
     const api = fakeApi({ commandDetail: vi.fn(async (id: string) => ({ ok: true as const, status: 200, data: { id, status: "SENT", deviceId: "2001", capability: "Switch", command: "set" } })) });
     await renderRoute(<DeviceControlPanel deviceId="2001" initial={aircon()} canControl timezone="Asia/Seoul" lang="ko" api={api} live={live} />);
     await screen.findAllByText("원하는 상태 = 실제 상태");
-    expect(FakeES.all[0].url).toBe(`/bff/stream/live?topics=${encodeURIComponent("commands:2001")}`);
+    await waitFor(() => expect(FakeES.all[0]?.url).toBe(`/bff/stream/live?topics=${encodeURIComponent("commands:2001")}`));
     act(() => FakeES.all[0].emit("command-status", { status: "SENT" }));
     act(() => FakeES.all[0].emit("command-status", { commandId: "c-flow", status: "SENT" }));
     expect(await screen.findByRole("status", { name: "명령 상태: 전송됨" })).toBeInTheDocument();
