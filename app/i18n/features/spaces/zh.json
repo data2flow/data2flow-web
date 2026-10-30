@@ -30,6 +30,7 @@
       "longitude": "经度",
       "usage": "用途",
       "areaM2": "面积（㎡）",
+      "ceilingHeightM": "层高（m）",
       "capacity": "容纳人数",
       "grid": "气象格点 nx {{nx}}，ny {{ny}}（自动计算）"
     },
@@ -68,7 +69,8 @@
       "targets": "目标环境",
       "schedule": "运营时间",
       "floorplan": "平面图",
-      "alarms": "告警"
+      "alarms": "告警",
+      "virtual": "虚拟传感器"
     },
     "targets": {
       "inherit": "使用上级值",

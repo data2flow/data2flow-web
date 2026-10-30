@@ -30,6 +30,7 @@
       "longitude": "経度",
       "usage": "用途",
       "areaM2": "面積（㎡）",
+      "ceilingHeightM": "天井高（m）",
       "capacity": "定員（名）",
       "grid": "気象庁格子 nx {{nx}}, ny {{ny}}（自動計算）"
     },
@@ -68,7 +69,8 @@
       "targets": "目標環境",
       "schedule": "運用時間",
       "floorplan": "平面図",
-      "alarms": "アラーム"
+      "alarms": "アラーム",
+      "virtual": "仮想センサー"
     },
     "targets": {
       "inherit": "上位の値を使用",

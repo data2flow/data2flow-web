@@ -30,6 +30,7 @@
       "longitude": "경도",
       "usage": "용도",
       "areaM2": "면적(㎡)",
+      "ceilingHeightM": "층고(m)",
       "capacity": "정원(명)",
       "grid": "기상청 격자 nx {{nx}}, ny {{ny}}(자동 계산)"
     },
@@ -68,7 +69,8 @@
       "targets": "목표 환경",
       "schedule": "운영 시간",
       "floorplan": "평면도",
-      "alarms": "알람"
+      "alarms": "알람",
+      "virtual": "가상 센서"
     },
     "targets": {
       "inherit": "상위 값 사용",

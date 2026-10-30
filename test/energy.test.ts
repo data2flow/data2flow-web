@@ -265,3 +265,50 @@ describe("ENE-01.05 월간 리포트", () => {
     expect(after.body).toContain("만드는 중 10%");
   });
 });
+
+describe("ENE-02.01 UI-ENE-05 가상 센서 탭", () => {
+  it("층고가 없으면 409 안내와 공간 편집 링크, 층고를 넣고 켜면 ACH·환기량이 보인다", async () => {
+    const i = await integrator();
+    const tab = await i.get("/spaces/31?tab=virtual");
+    expect(tab.response.status).toBe(200);
+    expect(tab.body).toContain('data-sensor="ACH"');
+    expect(tab.body).toContain("꺼짐");
+    const denied = await i.post("/spaces/31?tab=virtual", { intent: "virtualSensor", kind: "ach", enabled: "true", outdoorCo2Ppm: "430", minDecayMinutes: "30" });
+    expect(denied.response.status).toBe(409);
+    expect(denied.body).toContain("공간 면적과 층고를 입력하세요");
+    expect(denied.body).toContain('href="/spaces/31?tab=props"');
+    const bad = await i.post("/spaces/31?tab=virtual", { intent: "virtualSensor", kind: "ach", enabled: "true", outdoorCo2Ppm: "900", minDecayMinutes: "30" });
+    expect(bad.response.status).toBe(400);
+    expect(bad.body).toContain("300~600ppm 사이로 입력하세요");
+
+    const props = await i.post("/spaces/31?tab=props", { intent: "props", name: "실습실", code: "lab", usage: "CLASSROOM", areaM2: "50", ceilingHeightM: "3", capacity: "30", baseVersion: "2" });
+    expect(props.response.status).toBeLessThan(400);
+    expect(app.gateway.m2.spaces.find((s) => s.id === "31")?.ceilingHeightM).toBe(3);
+    expect((await i.get("/spaces/31?tab=props")).body).toContain('name="ceilingHeightM"');
+
+    const on = await i.post("/spaces/31?tab=virtual", { intent: "virtualSensor", kind: "ach", enabled: "true", outdoorCo2Ppm: "430", minDecayMinutes: "30" });
+    expect(on.response.status).toBeLessThan(400);
+    expect(eneState(app.gateway.m2).lastVirtualRequest).toEqual({ enabled: true, params: { outdoorCo2Mode: "FIXED", outdoorCo2Ppm: 430, minDecayMinutes: 30 } });
+    const after = await i.get("/spaces/31?tab=virtual");
+    expect(after.body).toContain("정상");
+    expect(after.body).toContain("2.00 1/h");
+    expect(after.body).toContain("300 ㎥/h");
+    const off = await i.post("/spaces/31?tab=virtual", { intent: "virtualSensor", kind: "ach", enabled: "false" });
+    expect(off.response.status).toBeLessThan(400);
+    expect(eneState(app.gateway.m2).lastVirtualRequest).toEqual({ enabled: false });
+  });
+
+  it("CO2 기기 없는 공간은 409 입력 없음, VIEWER는 설정 폼이 없다", async () => {
+    app.gateway.m2.spaces.find((s) => s.id === "3")!.ceilingHeightM = 3;
+    app.gateway.m2.spaces.find((s) => s.id === "3")!.areaM2 = 400;
+    const i = await integrator();
+    const missing = await i.post("/spaces/3?tab=virtual", { intent: "virtualSensor", kind: "ach", enabled: "true", outdoorCo2Ppm: "420", minDecayMinutes: "30" });
+    expect(missing.response.status).toBe(409);
+    expect(missing.body).toContain("공간에 필요한 입력 센서가 없습니다: CO2");
+    const v = await viewer();
+    const page = await v.get("/spaces/31?tab=virtual");
+    expect(page.response.status).toBe(200);
+    expect(page.body).toContain('data-sensor="ACH"');
+    expect(page.body).not.toContain('name="outdoorCo2Ppm"');
+  });
+});

@@ -7,6 +7,8 @@
  * 기준선 API-ENE-12(조회 ENE_READ, 계산·적용 ENE_ANALYZE): 본관(2) 기준선 601에 기간 평균 701(ACTIVE, R² 0.82)과 회귀 702(READY, R² 0.41 LOW_FIT).
  * 학습 기간이 30일보다 짧으면 409 ENE_BASELINE_INSUFFICIENT_DATA(errors neededDays), 새 버전은 TRAINING으로 남는다.
  * 월간 리포트 API-ENE-13(조회 ENE_READ, 생성 ENE_ANALYZE): 본관(2) 2026-09 리포트 801(READY, PDF). 새 리포트는 GENERATING 10%로 남는다.
+ * 가상 센서 API-ENE-20·21(조회 ENE_READ, 변경 ENE_ADMIN): CO2 기기(AM107 1042)는 실습실(31)에만 있다. 켜려면 면적 × 층고가 있어야 하고(409 ENE_SPACE_VOLUME_REQUIRED),
+ * CO2 기기가 없으면 409 ENE_VIRTUAL_SENSOR_INPUT_MISSING(errors code co2). 켜진 공간은 2026-10-02~03 ACH 1.8·2.0(환기량 = ACH × 부피).
  */
 import { fail, list, noContent, ok, type CoreHandler, type CoreState } from "../core-fixtures";
 
@@ -27,6 +29,9 @@ export interface EneState {
   reports: Json[];
   /** 마지막 월간 리포트 생성 요청 본문 */
   lastReportRequest?: Json;
+  /** 공간별 ACH 설정 */
+  virtual?: Record<string, { enabled: boolean; params: Json }>;
+  lastVirtualRequest?: Json;
 }
 
 const PLUG = { id: "2001", name: "스마트 플러그-01" };
@@ -88,6 +93,7 @@ export const energyHandler: CoreHandler = (core, { method, path, url, body, can 
   if (path.startsWith("/energy/baselines")) return baselines(core, s, method, path, url, b, can, id);
   if (path.startsWith("/energy/reports")) return reports(core, s, method, path, url, b, can, id);
   if (method !== "GET" && !can("ENE_ADMIN")) return fail(403, "PERMISSION_DENIED");
+  if (path.startsWith("/energy/spaces/")) return virtualSensors(core, s, method, path, b);
 
   if (path === "/energy/tariffs" && method === "GET") return ok(withValidTo(s.tariffs, (r) => (r.scopeSpace as Json | null)?.id ?? null));
   if (path === "/energy/tariffs" && method === "POST") {
@@ -271,6 +277,53 @@ function reports(core: CoreState, s: EneState, method: string, path: string, url
   if (m && method === "GET") {
     const r = s.reports.find((x) => x.reportId === m[1]);
     return r ? ok(r) : fail(404, "ENE_REPORT_NOT_FOUND");
+  }
+  return fail(404, "RESOURCE_NOT_FOUND");
+}
+
+const CO2_DEVICES: Record<string, string[]> = { "31": ["1042"] };
+
+function sensorView(core: CoreState, s: EneState, spaceId: string) {
+  const space = core.spaces.find((x) => x.id === spaceId);
+  const cfg = s.virtual?.[spaceId];
+  const devices = CO2_DEVICES[spaceId] ?? [];
+  const volumeM3 = space?.areaM2 != null && space.ceilingHeightM != null ? space.areaM2 * space.ceilingHeightM : null;
+  const enabled = cfg?.enabled ?? false;
+  return {
+    kind: "ACH", enabled, params: cfg?.params ?? { outdoorCo2Mode: "FIXED", outdoorCo2Ppm: 420, minDecayMinutes: 30 }, outputMetrics: ["ach", "ventilation_m3h"],
+    inputs: [{ metricKey: "co2", available: devices.length > 0, deviceIds: devices }], lastComputedAt: enabled ? "2026-10-03T17:00:05Z" : null,
+    status: !enabled ? "DISABLED" : devices.length ? "OK" : "INPUT_MISSING", missing: enabled && !devices.length ? ["co2"] : null, volumeM3,
+  };
+}
+
+function virtualSensors(core: CoreState, s: EneState, method: string, path: string, b: Json) {
+  const m = path.match(/^\/energy\/spaces\/([^/]+)\/(virtual-sensors(?:\/([^/]+))?|ach)$/);
+  if (!m) return fail(404, "RESOURCE_NOT_FOUND");
+  const spaceId = m[1];
+  if (!core.spaces.some((x) => x.id === spaceId)) return fail(404, "SPACE_NOT_FOUND");
+  if (m[2] === "virtual-sensors" && method === "GET") return ok([sensorView(core, s, spaceId)]);
+  if (m[3] && method === "PUT") {
+    if (m[3].toUpperCase() !== "ACH") return fail(400, "INVALID_REQUEST");
+    s.lastVirtualRequest = b;
+    const view = sensorView(core, s, spaceId);
+    if (b.enabled === true) {
+      if (view.volumeM3 == null) return fail(409, "ENE_SPACE_VOLUME_REQUIRED");
+      if (!view.inputs[0].available) return fail(409, "ENE_VIRTUAL_SENSOR_INPUT_MISSING", { errors: [{ field: "inputs", code: "co2", message: null }] });
+    }
+    s.virtual ??= {};
+    s.virtual[spaceId] = { enabled: b.enabled === true, params: (b.params as Json | undefined) ?? s.virtual[spaceId]?.params ?? (view.params as Json) };
+    return ok(sensorView(core, s, spaceId));
+  }
+  if (m[2] === "ach" && method === "GET") {
+    const view = sensorView(core, s, spaceId);
+    const volume = view.volumeM3;
+    const items = view.enabled
+      ? [
+          { day: "2026-10-02", ach: 1.8, ciLow: 1.7, ciHigh: 1.9, decayWindow: { from: "2026-10-02T09:10:00Z", to: "2026-10-02T11:00:00Z" }, fitR2: 0.97 },
+          { day: "2026-10-03", ach: 2.0, ciLow: 1.9, ciHigh: 2.1, decayWindow: { from: "2026-10-03T09:05:00Z", to: "2026-10-03T11:10:00Z" }, fitR2: 0.99 },
+        ].map((i) => ({ ...i, ventilationM3h: volume == null ? null : i.ach * volume }))
+      : [];
+    return ok({ spaceId, volumeM3: volume, outdoorCo2Ppm: Number((view.params as Json).outdoorCo2Ppm ?? 420), items });
   }
   return fail(404, "RESOURCE_NOT_FOUND");
 }
