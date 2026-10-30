@@ -42,6 +42,7 @@ export function useTableLabels(): TableLabels {
     min: k("min"),
     max: k("max"),
     content: k("content"),
+    total: k("total"),
   };
 }
 

@@ -42,7 +42,9 @@
       "markdown": "메모",
       "control": "제어",
       "analysis": "분석 결과",
-      "kpi": "KPI"
+      "kpi": "KPI",
+      "energy-kpi": "에너지 지표",
+      "energy-trend": "에너지 추이"
     },
     "kinds": {
       "DEVICE_METRIC": "기기 측정 항목",
@@ -122,7 +124,8 @@
         "device": "기기",
         "min": "최소",
         "max": "최대",
-        "content": "내용"
+        "content": "내용",
+        "total": "합계"
       }
     },
     "tone": {

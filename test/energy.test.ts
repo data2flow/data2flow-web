@@ -237,3 +237,31 @@ describe("ENE-01.04 UI-ENE-04 기준선 탭", () => {
     expect(s.baselines[0].activeVersionId).toBe("702");
   });
 });
+
+describe("ENE-01.05 월간 리포트", () => {
+  it("대시보드에 [월간 리포트], 목록은 범위로 거르고 READY는 PDF 받기, VIEWER는 만들기 폼이 없다", async () => {
+    const v = await viewer();
+    const dash = await v.get("/energy?scope=2");
+    expect(dash.body).toContain('href="/energy/reports?scope=2"');
+    const page = await v.get("/energy/reports?scope=2");
+    expect(page.response.status).toBe(200);
+    expect(page.body).toContain('data-report="801"');
+    expect(page.body).toContain('href="/bff/api/core/energy/reports/801/file"');
+    expect(page.body).not.toContain('name="month"');
+  });
+
+  it("ANALYST 이상은 달을 골라 만든다: 미래 달은 400, 만들면 생성 중으로 목록에 보인다", async () => {
+    const i = await integrator();
+    const page = await i.get("/energy/reports?scope=2");
+    expect(page.body).toContain('value="2026-09"');
+    const future = await i.post("/energy/reports?scope=2", { scopeSpaceId: "2", month: "2026-11" });
+    expect(future.response.status).toBe(400);
+    expect(future.body).toContain("지난 달이나 이번 달만 고를 수 있습니다");
+    const created = await i.post("/energy/reports?scope=2", { scopeSpaceId: "2", month: "2026-08" });
+    expect(created.response.status).toBe(302);
+    expect(created.response.headers.get("location")).toBe("/energy/reports?scope=2");
+    expect(eneState(app.gateway.m2).lastReportRequest).toEqual({ scopeSpaceId: "2", month: "2026-08", format: "PDF" });
+    const after = await i.get("/energy/reports?scope=2");
+    expect(after.body).toContain("만드는 중 10%");
+  });
+});

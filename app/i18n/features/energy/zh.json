@@ -250,6 +250,41 @@
         "tooLong": "不能超过730天",
         "number": "请输入数字"
       }
+    },
+    "widget": {
+      "estimated": "含估算 {{ratio}}",
+      "trendLabel": "{{name}} 能源趋势({{from}} ~ {{to}})"
+    },
+    "reports": {
+      "title": "月度报告",
+      "create": "生成报告",
+      "month": "月份",
+      "generate": "生成",
+      "hint": "生成包含指标、基线对比、用能最多空间和节能措施结果的 PDF。",
+      "empty": "还没有报告",
+      "columns": {
+        "scope": "范围",
+        "month": "月份",
+        "status": "状态",
+        "createdBy": "创建人",
+        "createdAt": "创建时间"
+      },
+      "generating": "生成中 {{progress}}%",
+      "statuses": {
+        "GENERATING": "生成中",
+        "READY": "已完成",
+        "FAILED": "失败"
+      },
+      "failures": {
+        "INTERNAL_ERROR": "内部错误",
+        "SERVICE_UNAVAILABLE": "无法连接分析服务"
+      },
+      "download": "下载 PDF",
+      "errors": {
+        "required": "请选择月份",
+        "format": "请使用 YYYY-MM 格式",
+        "future": "只能选择本月或之前的月份"
+      }
     }
   },
   "errors": {

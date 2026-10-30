@@ -168,7 +168,7 @@ describe("DSH-11.01 시간 범위·확대 동기화", () => {
   });
 });
 
-const LABELS = Object.fromEntries(["time", "value", "unit", "name", "connection", "battery", "rssi", "alarms", "severity", "title", "state", "device", "x", "y", "min", "max", "content"].map((k) => [k, k])) as unknown as TableLabels;
+const LABELS = Object.fromEntries(["time", "value", "unit", "name", "connection", "battery", "rssi", "alarms", "severity", "title", "state", "device", "x", "y", "min", "max", "content", "total"].map((k) => [k, k])) as unknown as TableLabels;
 
 describe("DSH-06.01 DSH-11.03 위젯 데이터 표·CSV", () => {
   it("TC-DSH-097: 위젯 종류별 표(시계열은 시각별 행, 시각은 사용자 시간대), 권한 밖·없음은 빈 표", () => {

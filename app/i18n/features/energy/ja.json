@@ -250,6 +250,41 @@
         "tooLong": "730日を超えられません",
         "number": "数値を入力してください"
       }
+    },
+    "widget": {
+      "estimated": "推定 {{ratio}} を含む",
+      "trendLabel": "{{name}} のエネルギー推移({{from}} ~ {{to}})"
+    },
+    "reports": {
+      "title": "月次レポート",
+      "create": "レポート作成",
+      "month": "月",
+      "generate": "作成",
+      "hint": "指標、ベースライン比較、上位使用スペース、省エネ施策の結果を PDF で作成します。",
+      "empty": "作成したレポートはありません",
+      "columns": {
+        "scope": "範囲",
+        "month": "月",
+        "status": "状態",
+        "createdBy": "作成者",
+        "createdAt": "作成日時"
+      },
+      "generating": "作成中 {{progress}}%",
+      "statuses": {
+        "GENERATING": "作成中",
+        "READY": "完了",
+        "FAILED": "失敗"
+      },
+      "failures": {
+        "INTERNAL_ERROR": "内部エラー",
+        "SERVICE_UNAVAILABLE": "分析サービスに接続できませんでした"
+      },
+      "download": "PDF をダウンロード",
+      "errors": {
+        "required": "月を選んでください",
+        "format": "YYYY-MM 形式で入力してください",
+        "future": "今月以前の月を選んでください"
+      }
     }
   },
   "errors": {

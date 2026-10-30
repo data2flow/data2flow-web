@@ -3,6 +3,7 @@
  * 범위 선택(브레드크럼 포트폴리오 › 사이트 › 건물 › 층 › 공간), 기간(이번 달/지난달/올해/사용자 지정), 비교(기준선/직전 기간/작년 같은 기간).
  * 지표 카드(사용량·EUI·재실 시간당·비용·탄소, 비교 대비 ±%), 일별 추이(추정분 빗금, 기준선 선), 하위 단위 표(추정 비율·출처 배지)와 기타·공용.
  * 계량이 없으면 "에너지 출처를 연결하세요 [계량 설정]", 면적이 없으면 EUI "–". 공간 범위가 제한된 사용자는 허용 공간만 합산된다(TC-ENE-019).
+ * [월간 리포트]는 `/energy/reports?scope=`(ENE-01.05, API-ENE-13).
  * API: API-ENE-10 지표, API-ENE-11 하위 단위, 공간 트리 API-DEV-01.
  * 범위 공간이 있으면 [기준선] 탭(`?tab=baseline&version=`, UI-ENE-04, API-ENE-12): 기준선·버전 목록·버전 상세, 계산(ENE_ANALYZE)·적용.
  */
@@ -225,7 +226,7 @@ function EnergyDashboard({ data: loaderData, tabs }: { data: DashboardData; tabs
     : [];
   return (
     <>
-      <PageHeader title={t("energy.dashboard.title")} crumb={t("nav.energy")} />
+      <PageHeader title={t("energy.dashboard.title")} crumb={t("nav.energy")} actions={<ButtonLink to={scope ? `/energy/reports?scope=${encodeURIComponent(scope)}` : "/energy/reports"}>{t("energy.reports.title")}</ButtonLink>} />
       <ScopeTrail scope={scope} trail={trail} href={(id) => keep({ scope: id })} />
       {tabs}
       <Form method="get" className="mb-4 flex flex-wrap items-end gap-3">

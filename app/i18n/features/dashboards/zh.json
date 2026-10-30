@@ -42,7 +42,9 @@
       "markdown": "备注",
       "control": "控制",
       "analysis": "分析结果",
-      "kpi": "KPI"
+      "kpi": "KPI",
+      "energy-kpi": "能源指标",
+      "energy-trend": "能源趋势"
     },
     "kinds": {
       "DEVICE_METRIC": "设备测量项",
@@ -122,7 +124,8 @@
         "device": "设备",
         "min": "最小",
         "max": "最大",
-        "content": "内容"
+        "content": "内容",
+        "total": "合计"
       }
     },
     "tone": {

@@ -189,6 +189,7 @@ export default [
     route("energy", "routes/energy.tsx"),
     route("energy/meters", "routes/energy-meters.tsx"),
     route("energy/settings", "routes/energy-settings.tsx"),
+    route("energy/reports", "routes/energy-reports.tsx"),
   ]),
 
   // M5 field: 모바일 셸(UI-DSH-14, UI-DEV-17·21)과 QR 딥링크(`/d/{qrToken}`, 로그인 필요) — 00-navigation.md §2·§3
