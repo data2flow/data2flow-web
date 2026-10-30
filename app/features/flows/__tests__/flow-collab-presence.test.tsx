@@ -1,7 +1,7 @@
 /**
  * 동시 편집 표시(FLW-11.01, FLW-06.09, UI-FLW-17, API-FLW-42)와 플로우 설정·설명서(UI-FLW-09·22, FLW-11.06).
  */
-import { act, fireEvent, screen, within } from "@testing-library/react";
+import { act, fireEvent, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { checkSettings, modeOf, ownerMissing, modeProblem, parseInitial, settingsFormOf, settingsPatch, toMode, variableProblems, variablesOf } from "../model/settings";
@@ -12,13 +12,19 @@ beforeEach(() => stubReactFlowDom());
 afterEach(() => vi.useRealTimers());
 
 const nodeEl = (container: HTMLElement, id: string) => container.querySelector(`.react-flow__node[data-id="${id}"]`) as HTMLElement;
-const presenceSocket = (sockets: { sockets: FakeSocket[] }) => sockets.sockets.find((s) => s.url.endsWith("/presence"))!;
+// 편집 참여 채널은 마운트 뒤 effect에서 열리므로, 느린 CI에서도 소켓이 생길 때까지 기다린다
+const presenceSocket = (sockets: { sockets: FakeSocket[] }) =>
+  waitFor(() => {
+    const socket = sockets.sockets.find((s) => s.url.endsWith("/presence"));
+    if (!socket) throw new Error("presence socket not opened yet");
+    return socket;
+  });
 const A = { userId: "21", name: "A", color: "#e5484d", readOnly: false, selected: [] as string[] };
 
 describe("FLW-11.01 TC-FLW-222 AT-FLW-25.1 다른 사람이 고른 노드 표시", () => {
   it("편집 참여 채널에 연결해 참여자 아바타와, A가 고른 노드에 A의 색 테두리·이름표를 보인다", async () => {
     const { container, sockets } = await renderEditor({ role: "OPERATOR", detail: detailOf(coolingGraph()) });
-    const socket = presenceSocket(sockets);
+    const socket = await presenceSocket(sockets);
     expect(socket.url).toMatch(/\/bff\/stream\/flows\/f-7f3a\/presence$/);
     act(() => socket.open());
     act(() => socket.emit({ type: "presence.snapshot", participants: [{ userId: "7", name: "김운영" }, { ...A, selected: ["n-thr00001"] }] }));
@@ -29,7 +35,7 @@ describe("FLW-11.01 TC-FLW-222 AT-FLW-25.1 다른 사람이 고른 노드 표시
 
   it("내가 노드를 고르면 200ms 뒤 presence.select, 설정 패널을 열면 lock.acquire, 20초마다 heartbeat", async () => {
     const { container, sockets } = await renderEditor({ role: "OPERATOR", detail: detailOf(coolingGraph()) });
-    const socket = presenceSocket(sockets);
+    const socket = await presenceSocket(sockets);
     vi.useFakeTimers();
     act(() => socket.open());
     act(() => {
@@ -47,7 +53,7 @@ describe("FLW-11.01 TC-FLW-222 AT-FLW-25.1 다른 사람이 고른 노드 표시
 describe("FLW-11.01 TC-FLW-224 AT-FLW-25.2 · TC-FLW-226 AT-FLW-25.3 편집 잠금", () => {
   it("A가 잡은 노드의 설정 패널은 읽기 전용 'A님이 편집 중입니다', A가 떠나 잠금이 풀리면 다시 요청해 편집할 수 있다", async () => {
     const { container, sockets } = await renderEditor({ role: "OPERATOR", detail: detailOf(coolingGraph()) });
-    const socket = presenceSocket(sockets);
+    const socket = await presenceSocket(sockets);
     act(() => socket.open());
     act(() => socket.emit({ type: "presence.snapshot", participants: [{ userId: "7", name: "김운영" }, A] }));
     vi.useFakeTimers();
@@ -73,7 +79,7 @@ describe("FLW-11.01 TC-FLW-224 AT-FLW-25.2 · TC-FLW-226 AT-FLW-25.3 편집 잠�
 describe("FLW-11.01 TC-FLW-229 AT-FLW-25.4 보기 전용 참여자", () => {
   it("편집 권한이 없으면 노드를 골라도 잠금을 잡지 않고, 다른 보기 전용 참여자는 '(보기)'로 표시", async () => {
     const { container, sockets } = await renderEditor({ role: "ANALYST", detail: detailOf(coolingGraph()) });
-    const socket = presenceSocket(sockets);
+    const socket = await presenceSocket(sockets);
     act(() => socket.open());
     act(() => socket.emit({ type: "presence.snapshot", participants: [{ userId: "9", name: "B", readOnly: true }] }));
     fireEvent.click(nodeEl(container, "n-thr00001"));
@@ -84,7 +90,7 @@ describe("FLW-11.01 TC-FLW-229 AT-FLW-25.4 보기 전용 참여자", () => {
   it("다른 사람이 저장하면(flow.updated) 다시 불러오기 안내, 연결이 끊기면 협업 끊김 띠", async () => {
     const onReload = vi.fn();
     const { sockets } = await renderEditor({ role: "OPERATOR", detail: detailOf(coolingGraph()), onReload });
-    const socket = presenceSocket(sockets);
+    const socket = await presenceSocket(sockets);
     act(() => socket.open());
     act(() => socket.emit({ type: "flow.updated", version: 15, by: { userId: "21", name: "A" } }));
     expect(screen.getByText(/A님이 v15을\(를\) 저장했습니다/)).toBeInTheDocument();
