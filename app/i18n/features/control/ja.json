@@ -494,6 +494,63 @@
       "title": "新しい通知",
       "open": "開く",
       "dismiss": "通知を閉じる"
+    },
+    "settings": {
+      "title": "組織の制御上限・保護設定",
+      "saved": "制御設定を保存しました。",
+      "defaults": "まだ保存されていないため既定値を表示しています。",
+      "updated": "最終変更: {{at}} · {{name}}",
+      "limits": {
+        "title": "機能別の絶対上限",
+        "add": "+ 上限を追加",
+        "empty": "絶対上限はありません。モデルの範囲だけが適用されます。",
+        "help": "絶対上限はすべてのコマンド(人・フロー・予約)に適用されます。その機能を使うすべてのモデル範囲の内側にしか設定できません。",
+        "capability": "機能",
+        "attribute": "属性",
+        "min": "最小",
+        "max": "最大",
+        "standard": "標準範囲",
+        "capabilityOf": "{{n}}番目の上限の機能",
+        "attributeOf": "{{n}}番目の上限の属性",
+        "minOf": "{{n}}番目の上限の最小",
+        "maxOf": "{{n}}番目の上限の最大",
+        "removeOf": "{{n}}番目の上限を削除",
+        "widerThanModel": "モデルの範囲より広くはできません。",
+        "problems": {
+          "target": "機能と属性を選んでください。",
+          "duplicate": "同じ機能・属性がすでにあります。",
+          "range": "最小か最大を入力してください。最小は最大を超えられません。",
+          "min": "最小は数値にしてください。",
+          "max": "最大は数値にしてください。",
+          "standard": "標準範囲の内側にしてください。"
+        }
+      },
+      "protection": {
+        "title": "機器保護・コマンド既定値"
+      },
+      "fields": {
+        "manualOverrideMinutes": "手動優先時間(分)",
+        "minIntervalSec": "コマンド最小間隔(秒)",
+        "oscillationWindowSec": "振動検知区間(秒)",
+        "oscillationFlips": "振動検知の逆コマンド数",
+        "defaultValiditySec": "コマンド既定有効時間(秒)",
+        "scheduleRespectsManualOverride": "予約制御も手動優先を守る",
+        "requireApprovalForControlNodes": "制御ノードを含むフローはデプロイ承認が必要"
+      },
+      "hints": {
+        "manualOverrideMinutes": "既定30分、0で無効",
+        "minIntervalSec": "既定10秒",
+        "oscillationWindowSec": "既定60秒",
+        "oscillationFlips": "既定3回",
+        "defaultValiditySec": "既定600秒(10分)"
+      },
+      "problems": {
+        "manualOverrideMinutes": "0〜1440の整数を入力してください。",
+        "minIntervalSec": "0〜3600の整数を入力してください。",
+        "oscillationWindowSec": "1〜3600の整数を入力してください。",
+        "oscillationFlips": "2〜100の整数を入力してください。",
+        "defaultValiditySec": "60〜3600の整数を入力してください。"
+      }
     }
   },
   "errors": {
@@ -518,6 +575,10 @@
     "DRIVER_CONTRACT_FAILED": "ドライバー契約の確認に失敗しました",
     "DRIVER_NOT_FOUND": "ドライバーが見つかりません",
     "CAPABILITY_NAME_RESERVED": "標準機能名は使えません",
-    "COMMAND_BULK_LIMIT_EXCEEDED": "一度に制御できるのは500台までです"
+    "COMMAND_BULK_LIMIT_EXCEEDED": "一度に制御できるのは500台までです",
+    "LIMIT_WIDER_THAN_MODEL": "絶対上限がモデルの範囲より広いです。すべてのモデル範囲の内側にしてください。"
+  },
+  "nav": {
+    "controlSettings": "制御の上限・保護"
   }
 }

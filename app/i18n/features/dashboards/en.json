@@ -355,5 +355,50 @@
     "DASHBOARD_NOT_FOUND": "Dashboard not found.",
     "SHARE_LINK_INVALID": "This link is not valid.",
     "DASHBOARD_VERSION_CONFLICT": "Another user saved first."
+  },
+  "me": {
+    "tabs": {
+      "preferences": "Display"
+    },
+    "preferences": {
+      "display": "Display",
+      "theme": "Theme",
+      "themes": {
+        "SYSTEM": "Follow system",
+        "LIGHT": "Light",
+        "DARK": "Dark"
+      },
+      "temperatureUnit": "Temperature unit",
+      "orgDefault": "Organization default ({{unit}})",
+      "home": "Start page",
+      "homes": {
+        "HOME": "Home",
+        "DASHBOARD": "Default dashboard"
+      },
+      "defaultDashboard": "Default dashboard",
+      "noDashboard": "(none)",
+      "dashboardRequired": "Choose a default dashboard to start on a dashboard.",
+      "localeHint": "Change language and time zone on:",
+      "favorites": "Favorites",
+      "noFavorites": "No favorites",
+      "favoriteType": "Type",
+      "favoriteName": "Name",
+      "types": {
+        "SPACE": "Space",
+        "DEVICE": "Device",
+        "DASHBOARD": "Dashboard",
+        "FLOW": "Flow",
+        "ANALYSIS": "Analysis"
+      },
+      "removeFavorite": "Remove {{name}} from favorites",
+      "tours": "Feature tours",
+      "toursBody": "{{n}} tours set to not show again",
+      "resetTours": "Show feature tours again",
+      "done": {
+        "save": "Display settings saved.",
+        "removeFavorite": "Removed from favorites.",
+        "resetTours": "Feature tours will show again."
+      }
+    }
   }
 }

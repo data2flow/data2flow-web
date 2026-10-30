@@ -494,6 +494,63 @@
       "title": "新通知",
       "open": "打开",
       "dismiss": "关闭通知"
+    },
+    "settings": {
+      "title": "组织控制上限与保护设置",
+      "saved": "已保存控制设置。",
+      "defaults": "尚未保存，显示默认值。",
+      "updated": "最后修改：{{at}} · {{name}}",
+      "limits": {
+        "title": "按功能的绝对上限",
+        "add": "+ 添加上限",
+        "empty": "没有绝对上限，只适用型号范围。",
+        "help": "绝对上限适用于所有命令(人员、流程、计划)。只能设在使用该功能的所有型号范围之内。",
+        "capability": "功能",
+        "attribute": "属性",
+        "min": "最小",
+        "max": "最大",
+        "standard": "标准范围",
+        "capabilityOf": "第 {{n}} 个上限的功能",
+        "attributeOf": "第 {{n}} 个上限的属性",
+        "minOf": "第 {{n}} 个上限的最小值",
+        "maxOf": "第 {{n}} 个上限的最大值",
+        "removeOf": "删除第 {{n}} 个上限",
+        "widerThanModel": "不能比型号范围更宽。",
+        "problems": {
+          "target": "请选择功能和属性。",
+          "duplicate": "已有相同的功能和属性。",
+          "range": "请输入最小值或最大值，最小值不能大于最大值。",
+          "min": "最小值必须是数字。",
+          "max": "最大值必须是数字。",
+          "standard": "请设在标准范围之内。"
+        }
+      },
+      "protection": {
+        "title": "设备保护与命令默认值"
+      },
+      "fields": {
+        "manualOverrideMinutes": "手动优先时间(分钟)",
+        "minIntervalSec": "命令最小间隔(秒)",
+        "oscillationWindowSec": "振荡检测区间(秒)",
+        "oscillationFlips": "振荡检测反向命令数",
+        "defaultValiditySec": "命令默认有效时间(秒)",
+        "scheduleRespectsManualOverride": "计划控制也遵守手动优先",
+        "requireApprovalForControlNodes": "含控制节点的流程需要部署审批"
+      },
+      "hints": {
+        "manualOverrideMinutes": "默认 30 分钟，0 为关闭",
+        "minIntervalSec": "默认 10 秒",
+        "oscillationWindowSec": "默认 60 秒",
+        "oscillationFlips": "默认 3 次",
+        "defaultValiditySec": "默认 600 秒(10 分钟)"
+      },
+      "problems": {
+        "manualOverrideMinutes": "请输入 0~1440 的整数。",
+        "minIntervalSec": "请输入 0~3600 的整数。",
+        "oscillationWindowSec": "请输入 1~3600 的整数。",
+        "oscillationFlips": "请输入 2~100 的整数。",
+        "defaultValiditySec": "请输入 60~3600 的整数。"
+      }
     }
   },
   "errors": {
@@ -518,6 +575,10 @@
     "DRIVER_CONTRACT_FAILED": "驱动契约检查失败",
     "DRIVER_NOT_FOUND": "未找到驱动",
     "CAPABILITY_NAME_RESERVED": "不能使用标准功能名称",
-    "COMMAND_BULK_LIMIT_EXCEEDED": "一次最多可控制500台设备"
+    "COMMAND_BULK_LIMIT_EXCEEDED": "一次最多可控制500台设备",
+    "LIMIT_WIDER_THAN_MODEL": "绝对上限比型号范围更宽。请设在所有型号范围之内。"
+  },
+  "nav": {
+    "controlSettings": "控制上限与保护"
   }
 }

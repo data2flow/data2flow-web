@@ -355,5 +355,50 @@
     "DASHBOARD_NOT_FOUND": "ダッシュボードが見つかりません。",
     "SHARE_LINK_INVALID": "無効なリンクです。",
     "DASHBOARD_VERSION_CONFLICT": "他のユーザーが先に保存しました。"
+  },
+  "me": {
+    "tabs": {
+      "preferences": "画面設定"
+    },
+    "preferences": {
+      "display": "画面",
+      "theme": "テーマ",
+      "themes": {
+        "SYSTEM": "システム設定に従う",
+        "LIGHT": "ライト",
+        "DARK": "ダーク"
+      },
+      "temperatureUnit": "温度単位",
+      "orgDefault": "組織の既定({{unit}})",
+      "home": "最初の画面",
+      "homes": {
+        "HOME": "ホーム",
+        "DASHBOARD": "既定のダッシュボード"
+      },
+      "defaultDashboard": "既定のダッシュボード",
+      "noDashboard": "(なし)",
+      "dashboardRequired": "最初の画面をダッシュボードにするには既定のダッシュボードを選んでください。",
+      "localeHint": "言語とタイムゾーンは次のタブで変更します:",
+      "favorites": "お気に入り",
+      "noFavorites": "お気に入りはありません",
+      "favoriteType": "種類",
+      "favoriteName": "名前",
+      "types": {
+        "SPACE": "空間",
+        "DEVICE": "機器",
+        "DASHBOARD": "ダッシュボード",
+        "FLOW": "フロー",
+        "ANALYSIS": "分析"
+      },
+      "removeFavorite": "{{name}} をお気に入りから外す",
+      "tours": "機能ガイドツアー",
+      "toursBody": "再表示しないにしたガイド {{n}}件",
+      "resetTours": "機能ガイドを再表示",
+      "done": {
+        "save": "画面設定を保存しました。",
+        "removeFavorite": "お気に入りから外しました。",
+        "resetTours": "機能ガイドを再び表示します。"
+      }
+    }
   }
 }

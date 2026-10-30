@@ -90,6 +90,24 @@
       "SCRIPT_ERROR": "脚本错误",
       "ANOMALY": "异常",
       "USER": "用户"
+    },
+    "coverage": {
+      "title": "数据完整性",
+      "period": "期间",
+      "lastDays": "最近 {{n}} 天",
+      "space": "空间",
+      "help": "比较按上报周期预计的接收数与实际接收数。点击设备名查看缺口，点击缺口在浏览器中打开该区间。",
+      "empty": "此期间没有可检查的设备",
+      "device": "设备",
+      "expected": "预计接收数",
+      "received": "实际接收数",
+      "percent": "完整性",
+      "gapCount": "缺口数",
+      "longest": "最长缺口",
+      "gapsOf": "{{name}} 的缺口",
+      "missingEstimate": "估计缺失 {{n}} 条",
+      "minutes": "{{n}} 分钟",
+      "hoursMinutes": "{{h}} 小时 {{m}} 分钟"
     }
   },
   "errors": {

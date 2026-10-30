@@ -90,6 +90,24 @@
       "SCRIPT_ERROR": "Script error",
       "ANOMALY": "Anomaly",
       "USER": "User"
+    },
+    "coverage": {
+      "title": "Data completeness",
+      "period": "Period",
+      "lastDays": "Last {{n}} days",
+      "space": "Space",
+      "help": "Compares received counts with counts expected from the report interval. Select a device for its gaps, then a gap to open that window in the explorer.",
+      "empty": "No devices to check in this period",
+      "device": "Device",
+      "expected": "Expected",
+      "received": "Received",
+      "percent": "Completeness",
+      "gapCount": "Gaps",
+      "longest": "Longest gap",
+      "gapsOf": "Gaps of {{name}}",
+      "missingEstimate": "About {{n}} missing",
+      "minutes": "{{n}} min",
+      "hoursMinutes": "{{h}} h {{m}} min"
     }
   },
   "errors": {

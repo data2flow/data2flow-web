@@ -355,5 +355,50 @@
     "DASHBOARD_NOT_FOUND": "대시보드를 찾을 수 없습니다.",
     "SHARE_LINK_INVALID": "유효하지 않은 링크입니다.",
     "DASHBOARD_VERSION_CONFLICT": "다른 사용자가 먼저 저장했습니다."
+  },
+  "me": {
+    "tabs": {
+      "preferences": "화면 설정"
+    },
+    "preferences": {
+      "display": "화면",
+      "theme": "테마",
+      "themes": {
+        "SYSTEM": "시스템 설정 따름",
+        "LIGHT": "라이트",
+        "DARK": "다크"
+      },
+      "temperatureUnit": "온도 단위",
+      "orgDefault": "조직 기본({{unit}})",
+      "home": "첫 화면",
+      "homes": {
+        "HOME": "홈",
+        "DASHBOARD": "기본 대시보드"
+      },
+      "defaultDashboard": "기본 대시보드",
+      "noDashboard": "(없음)",
+      "dashboardRequired": "첫 화면을 대시보드로 하려면 기본 대시보드를 고르세요.",
+      "localeHint": "언어·시간대는 다음 탭에서 바꿉니다:",
+      "favorites": "즐겨찾기",
+      "noFavorites": "즐겨찾기가 없습니다",
+      "favoriteType": "종류",
+      "favoriteName": "이름",
+      "types": {
+        "SPACE": "공간",
+        "DEVICE": "기기",
+        "DASHBOARD": "대시보드",
+        "FLOW": "플로우",
+        "ANALYSIS": "분석"
+      },
+      "removeFavorite": "{{name}} 즐겨찾기 빼기",
+      "tours": "기능 안내 투어",
+      "toursBody": "다시 보지 않기로 한 안내 {{n}}개",
+      "resetTours": "기능 안내 다시 보기",
+      "done": {
+        "save": "화면 설정을 저장했습니다.",
+        "removeFavorite": "즐겨찾기에서 뺐습니다.",
+        "resetTours": "기능 안내를 다시 보여 줍니다."
+      }
+    }
   }
 }

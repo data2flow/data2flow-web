@@ -494,6 +494,63 @@
       "title": "New notification",
       "open": "Open",
       "dismiss": "Dismiss notification"
+    },
+    "settings": {
+      "title": "Organization control limits and protection",
+      "saved": "Control settings saved.",
+      "defaults": "Not saved yet. Showing defaults.",
+      "updated": "Last changed: {{at}} · {{name}}",
+      "limits": {
+        "title": "Absolute limits by capability",
+        "add": "+ Add limit",
+        "empty": "No absolute limits. Only model ranges apply.",
+        "help": "Absolute limits apply to every command (people, flows, schedules). They can only be narrower than every model range that uses the capability.",
+        "capability": "Capability",
+        "attribute": "Attribute",
+        "min": "Min",
+        "max": "Max",
+        "standard": "Standard range",
+        "capabilityOf": "Capability of limit {{n}}",
+        "attributeOf": "Attribute of limit {{n}}",
+        "minOf": "Min of limit {{n}}",
+        "maxOf": "Max of limit {{n}}",
+        "removeOf": "Remove limit {{n}}",
+        "widerThanModel": "Cannot be wider than the model range.",
+        "problems": {
+          "target": "Choose a capability and attribute.",
+          "duplicate": "This capability and attribute already exist.",
+          "range": "Enter a min or max; min cannot exceed max.",
+          "min": "Min must be a number.",
+          "max": "Max must be a number.",
+          "standard": "Stay within the standard range."
+        }
+      },
+      "protection": {
+        "title": "Equipment protection and command defaults"
+      },
+      "fields": {
+        "manualOverrideMinutes": "Manual override time (min)",
+        "minIntervalSec": "Minimum command interval (s)",
+        "oscillationWindowSec": "Oscillation window (s)",
+        "oscillationFlips": "Opposite commands for oscillation",
+        "defaultValiditySec": "Default command validity (s)",
+        "scheduleRespectsManualOverride": "Schedules also respect manual override",
+        "requireApprovalForControlNodes": "Flows with control nodes need deployment approval"
+      },
+      "hints": {
+        "manualOverrideMinutes": "Default 30 min, 0 turns it off",
+        "minIntervalSec": "Default 10 s",
+        "oscillationWindowSec": "Default 60 s",
+        "oscillationFlips": "Default 3",
+        "defaultValiditySec": "Default 600 s (10 min)"
+      },
+      "problems": {
+        "manualOverrideMinutes": "Enter a whole number from 0 to 1440.",
+        "minIntervalSec": "Enter a whole number from 0 to 3600.",
+        "oscillationWindowSec": "Enter a whole number from 1 to 3600.",
+        "oscillationFlips": "Enter a whole number from 2 to 100.",
+        "defaultValiditySec": "Enter a whole number from 60 to 3600."
+      }
     }
   },
   "errors": {
@@ -518,6 +575,10 @@
     "DRIVER_CONTRACT_FAILED": "Driver contract check failed",
     "DRIVER_NOT_FOUND": "Driver not found",
     "CAPABILITY_NAME_RESERVED": "Standard capability names are reserved",
-    "COMMAND_BULK_LIMIT_EXCEEDED": "You can control up to 500 devices at once"
+    "COMMAND_BULK_LIMIT_EXCEEDED": "You can control up to 500 devices at once",
+    "LIMIT_WIDER_THAN_MODEL": "An absolute limit is wider than a model range. Keep it within every model range."
+  },
+  "nav": {
+    "controlSettings": "Control limits"
   }
 }

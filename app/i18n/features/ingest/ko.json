@@ -6,7 +6,8 @@
       "scripts": "스크립트",
       "failures": "실패 메시지",
       "reprocess": "재처리",
-      "quality": "데이터 품질"
+      "quality": "데이터 품질",
+      "raw": "원본 메시지"
     },
     "stage": {
       "SOURCE": "소스",
@@ -239,6 +240,33 @@
         "late": "지연 도착"
       },
       "bottom10": "최하위 10개"
+    },
+    "rawList": {
+      "title": "원본 메시지",
+      "counts": "상태별 건수",
+      "empty": "조건에 맞는 메시지가 없습니다",
+      "source": "소스",
+      "device": "기기",
+      "metrics": "측정 항목 수",
+      "quality": "품질",
+      "qualityValue": "정상 {{normal}} · 범위 초과 {{outOfRange}} · 미검증 {{unverified}}",
+      "size": "크기",
+      "open": "원본 메시지 {{id}} 상세 열기",
+      "unknownDevice": "(식별 불가)",
+      "virtual": "가상",
+      "more": "더 보기",
+      "period": "기간",
+      "periods": {
+        "1h": "최근 1시간",
+        "6h": "최근 6시간",
+        "24h": "최근 24시간",
+        "7d": "최근 7일",
+        "30d": "최근 30일"
+      },
+      "topic": "토픽 포함 문자열",
+      "includeVirtual": "가상 포함",
+      "excludeVirtual": "가상 제외",
+      "retention": "30일 이전 원본은 보관되지 않습니다."
     }
   },
   "errors": {

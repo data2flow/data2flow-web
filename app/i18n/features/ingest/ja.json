@@ -6,7 +6,8 @@
       "scripts": "スクリプト",
       "failures": "失敗メッセージ",
       "reprocess": "再処理",
-      "quality": "データ品質"
+      "quality": "データ品質",
+      "raw": "元メッセージ"
     },
     "stage": {
       "SOURCE": "ソース",
@@ -239,6 +240,33 @@
         "late": "遅延到着"
       },
       "bottom10": "下位10件"
+    },
+    "rawList": {
+      "title": "元メッセージ",
+      "counts": "状態別件数",
+      "empty": "条件に合うメッセージがありません",
+      "source": "ソース",
+      "device": "機器",
+      "metrics": "測定項目数",
+      "quality": "品質",
+      "qualityValue": "正常 {{normal}} · 範囲外 {{outOfRange}} · 未検証 {{unverified}}",
+      "size": "サイズ",
+      "open": "元メッセージ {{id}} の詳細を開く",
+      "unknownDevice": "(識別不可)",
+      "virtual": "仮想",
+      "more": "さらに表示",
+      "period": "期間",
+      "periods": {
+        "1h": "直近1時間",
+        "6h": "直近6時間",
+        "24h": "直近24時間",
+        "7d": "直近7日",
+        "30d": "直近30日"
+      },
+      "topic": "トピックに含む文字列",
+      "includeVirtual": "仮想を含む",
+      "excludeVirtual": "仮想を除く",
+      "retention": "30日より前の元メッセージは保管されません。"
     }
   },
   "errors": {

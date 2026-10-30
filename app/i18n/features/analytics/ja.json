@@ -2,7 +2,8 @@
   "nav": {
     "analytics": "分析",
     "apiTokens": "APIトークン",
-    "aiSettings": "AI設定"
+    "aiSettings": "AI設定",
+    "analyticsTemplateSettings": "分析テンプレート"
   },
   "me": {
     "tabs": {
@@ -15,7 +16,8 @@
       "templates": "テンプレートギャラリー",
       "analyses": "分析一覧",
       "models": "モデル",
-      "mcp": "MCP接続"
+      "mcp": "MCP接続",
+      "datasets": "データセット"
     },
     "category": {
       "ENV_QUALITY": "環境品質",
@@ -353,6 +355,68 @@
       "submit": "固定",
       "done": "「{{name}}」に固定しました。",
       "open": "ダッシュボードを開く"
+    },
+    "templateSettings": {
+      "title": "分析テンプレート設定",
+      "templates": "テンプレート",
+      "empty": "テンプレートがありません",
+      "name": "名前",
+      "key": "キー",
+      "version": "現在のバージョン",
+      "analyses": "使用中の分析",
+      "schedules": "スケジュール",
+      "realtime": "リアルタイム",
+      "enabled": "有効",
+      "on": "オン",
+      "off": "オフ",
+      "toggle": "{{name}} テンプレートを有効化",
+      "enabledDone": "{{name}} をオンにしました。停止したスケジュールは自動で再開しません。",
+      "disabledDone": "{{name}} をオフにしました。分析 {{n}}件のスケジュール・リアルタイムを停止しました。",
+      "confirmTitle": "{{name}} をオフにする",
+      "confirmBody": "スケジュール {{schedules}}件、リアルタイム {{realtime}}件が停止します。再びオンにしても自動で再開しません。",
+      "disable": "オフにする",
+      "org": "組織設定",
+      "retention": "結果の保管期間(日)",
+      "retentionHint": "30〜1,095日、既定365日。新しい結果から適用されます。",
+      "retentionProblem": "30〜1095の整数を入力してください。",
+      "retentionSaved": "結果の保管期間を保存しました。"
+    },
+    "datasets": {
+      "title": "データセット",
+      "new": "+ データセット",
+      "empty": "データセットがありません",
+      "emptyBody": "よく使うバインディング・期間に名前を付けて保存すると、複数の分析が同じデータを使えます。",
+      "name": "名前",
+      "version": "バージョン",
+      "bindings": "接続",
+      "analyses": "使用中の分析",
+      "updatedAt": "変更日時",
+      "nameProblem": "名前は1〜100文字にしてください。",
+      "fromAnalysis": "バインディングを取り込む分析",
+      "fromAnalysisProblem": "分析を選んでください。",
+      "fromAnalysisHint": "選んだ分析の接続・期間・品質フィルター・仮想を含むかをそのまま保存します。",
+      "noAnalyses": "保存された分析がありません",
+      "definition": "定義",
+      "period": "期間",
+      "lastDays": "直近{{n}}日",
+      "quality": "品質フィルター",
+      "qualities": {
+        "NORMAL_ONLY": "正常値のみ",
+        "INCLUDE_ALL": "すべての値"
+      },
+      "virtual": "仮想を含む",
+      "rename": "名前を変更",
+      "savedVersion": "保存しました。現在 v{{v}} です。",
+      "deleteConfirm": "データセット {{name}} を削除しますか?",
+      "usage": "使用中の分析",
+      "noUsage": "このデータセットを使う分析はありません",
+      "analysis": "分析",
+      "usedVersion": "使用バージョン",
+      "outdated": "新しいバージョンあり",
+      "upgrade": "最新バージョンに上げる",
+      "upgradeOf": "{{name}} を最新バージョンに上げる",
+      "upgraded": "{{name}} は v{{v}} を使います。",
+      "history": "バージョン履歴"
     }
   },
   "dashboards": {
@@ -394,6 +458,8 @@
     "API_TOKEN_NOT_FOUND": "トークンが見つかりません。",
     "API_TOKEN_STATE_CONFLICT": "現在の状態ではできない操作です。",
     "SERVICE_ACCOUNT_NOT_FOUND": "サービスアカウントが見つかりません。",
-    "ATTEMPT_LIMIT": "再リクエストは5回までです。"
+    "ATTEMPT_LIMIT": "再リクエストは5回までです。",
+    "DATASET_IN_USE": "このデータセットを使う分析があるため削除できません。",
+    "DATASET_NOT_FOUND": "データセットが見つかりません。"
   }
 }

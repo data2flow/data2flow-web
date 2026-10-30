@@ -6,7 +6,8 @@
       "scripts": "脚本",
       "failures": "失败消息",
       "reprocess": "重新处理",
-      "quality": "数据质量"
+      "quality": "数据质量",
+      "raw": "原始消息"
     },
     "stage": {
       "SOURCE": "数据源",
@@ -239,6 +240,33 @@
         "late": "延迟到达"
       },
       "bottom10": "最低 10 个"
+    },
+    "rawList": {
+      "title": "原始消息",
+      "counts": "按状态计数",
+      "empty": "没有符合条件的消息",
+      "source": "数据源",
+      "device": "设备",
+      "metrics": "测量项数",
+      "quality": "质量",
+      "qualityValue": "正常 {{normal}} · 超出范围 {{outOfRange}} · 未验证 {{unverified}}",
+      "size": "大小",
+      "open": "打开原始消息 {{id}} 详情",
+      "unknownDevice": "(无法识别)",
+      "virtual": "虚拟",
+      "more": "加载更多",
+      "period": "期间",
+      "periods": {
+        "1h": "最近 1 小时",
+        "6h": "最近 6 小时",
+        "24h": "最近 24 小时",
+        "7d": "最近 7 天",
+        "30d": "最近 30 天"
+      },
+      "topic": "主题包含",
+      "includeVirtual": "包含虚拟",
+      "excludeVirtual": "排除虚拟",
+      "retention": "不保留 30 天之前的原始消息。"
     }
   },
   "errors": {

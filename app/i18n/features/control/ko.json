@@ -494,6 +494,63 @@
       "title": "새 알림",
       "open": "열기",
       "dismiss": "알림 닫기"
+    },
+    "settings": {
+      "title": "조직 제어 한계·보호 설정",
+      "saved": "제어 설정을 저장했습니다.",
+      "defaults": "아직 저장한 적이 없어 기본값을 보여 줍니다.",
+      "updated": "마지막 변경: {{at}} · {{name}}",
+      "limits": {
+        "title": "기능별 절대 한계",
+        "add": "+ 한계 추가",
+        "empty": "정한 절대 한계가 없습니다. 모델 범위만 적용됩니다.",
+        "help": "절대 한계는 모든 명령(사람·플로우·예약)에 적용됩니다. 그 기능을 쓰는 모든 모델 범위 안쪽으로만 정할 수 있습니다.",
+        "capability": "기능",
+        "attribute": "속성",
+        "min": "최소",
+        "max": "최대",
+        "standard": "표준 범위",
+        "capabilityOf": "{{n}}번째 한계 기능",
+        "attributeOf": "{{n}}번째 한계 속성",
+        "minOf": "{{n}}번째 한계 최소",
+        "maxOf": "{{n}}번째 한계 최대",
+        "removeOf": "{{n}}번째 한계 삭제",
+        "widerThanModel": "모델 범위보다 넓게 정할 수 없습니다.",
+        "problems": {
+          "target": "기능과 속성을 고르세요.",
+          "duplicate": "같은 기능·속성이 이미 있습니다.",
+          "range": "최소 또는 최대를 넣고, 최소는 최대보다 클 수 없습니다.",
+          "min": "최소는 숫자여야 합니다.",
+          "max": "최대는 숫자여야 합니다.",
+          "standard": "표준 범위 안쪽으로 정하세요."
+        }
+      },
+      "protection": {
+        "title": "장비 보호·명령 기본값"
+      },
+      "fields": {
+        "manualOverrideMinutes": "수동 우선 시간(분)",
+        "minIntervalSec": "명령 최소 간격(초)",
+        "oscillationWindowSec": "진동 감지 구간(초)",
+        "oscillationFlips": "진동 감지 반대 명령 수",
+        "defaultValiditySec": "명령 기본 유효 시간(초)",
+        "scheduleRespectsManualOverride": "예약 제어도 수동 우선을 지킨다",
+        "requireApprovalForControlNodes": "제어 노드가 있는 플로우는 배포 승인 필요"
+      },
+      "hints": {
+        "manualOverrideMinutes": "기본 30분, 0이면 끔",
+        "minIntervalSec": "기본 10초",
+        "oscillationWindowSec": "기본 60초",
+        "oscillationFlips": "기본 3회",
+        "defaultValiditySec": "기본 600초(10분)"
+      },
+      "problems": {
+        "manualOverrideMinutes": "0~1440 사이 정수를 넣으세요.",
+        "minIntervalSec": "0~3600 사이 정수를 넣으세요.",
+        "oscillationWindowSec": "1~3600 사이 정수를 넣으세요.",
+        "oscillationFlips": "2~100 사이 정수를 넣으세요.",
+        "defaultValiditySec": "60~3600 사이 정수를 넣으세요."
+      }
     }
   },
   "errors": {
@@ -518,6 +575,10 @@
     "DRIVER_CONTRACT_FAILED": "드라이버 계약 확인에 실패했습니다",
     "DRIVER_NOT_FOUND": "드라이버를 찾을 수 없습니다",
     "CAPABILITY_NAME_RESERVED": "표준 기능 이름은 쓸 수 없습니다",
-    "COMMAND_BULK_LIMIT_EXCEEDED": "한 번에 500대까지 제어할 수 있습니다"
+    "COMMAND_BULK_LIMIT_EXCEEDED": "한 번에 500대까지 제어할 수 있습니다",
+    "LIMIT_WIDER_THAN_MODEL": "절대 한계가 모델 범위보다 넓습니다. 모든 모델 범위 안쪽으로 정하세요."
+  },
+  "nav": {
+    "controlSettings": "제어 한계·보호"
   }
 }

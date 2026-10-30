@@ -39,11 +39,13 @@ export const RAIL: Partial<Record<MenuKey | "admin", RailItem[]>> = {
   ],
   explore: [
     { label: "explore.title", path: "/explore" },
+    { label: "explore.coverage.title", path: "/explore/coverage" },
     { label: "data.jobs.title", path: "/exports", anyOf: ["TS_EXPORT"] },
     { label: "data.imports.title", path: "/imports" },
   ],
   ingest: [
     { label: "ingest.area.monitor", path: "/ingest/monitor" },
+    { label: "ingest.area.raw", path: "/ingest/raw-messages" },
     { label: "ingest.area.sources", path: "/sources" },
     { label: "ingest.area.scripts", path: "/scripts" },
     { label: "ingest.area.failures", path: "/ingest/failures" },
@@ -78,6 +80,7 @@ export const RAIL: Partial<Record<MenuKey | "admin", RailItem[]>> = {
   analytics: [
     { label: "analytics.area.templates", path: "/analytics/templates" },
     { label: "analytics.area.analyses", path: "/analytics", anyOf: ["ANALYTICS_READ"] },
+    { label: "analytics.area.datasets", path: "/analytics/datasets", anyOf: ["ANALYTICS_READ"] },
     { label: "analytics.area.models", path: "/analytics/models" },
     { label: "analytics.area.mcp", path: "/ai/mcp" },
   ],
