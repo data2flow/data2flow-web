@@ -1,0 +1,270 @@
+{
+  "nav": {
+    "energy": "Energy"
+  },
+  "energy": {
+    "area": {
+      "dashboard": "Energy dashboard",
+      "meters": "Meters & bills",
+      "settings": "Energy settings"
+    },
+    "settings": {
+      "title": "Energy settings",
+      "tabs": {
+        "tariffs": "Tariffs",
+        "factors": "Emission factors"
+      },
+      "noRecalc": "Changed rates and factors apply from their start date. Periods already calculated are not recalculated.",
+      "noTariffs": "No tariffs yet",
+      "scope": "Scope",
+      "scopeOrg": "Whole organization",
+      "period": "Period",
+      "range": "{{from}} ~ {{to}}",
+      "mode": "Type",
+      "modes": {
+        "FLAT": "Flat rate",
+        "TOU": "Time of use"
+      },
+      "rate": "Rate / bands",
+      "baseCharge": "Base charge (KRW/month)",
+      "perKwh": "{{rate}} KRW/kWh",
+      "dayType": {
+        "WEEKDAY": "Weekdays",
+        "WEEKEND_HOLIDAY": "Weekends & holidays"
+      },
+      "band": {
+        "from": "From",
+        "to": "To",
+        "rate": "KRW/kWh",
+        "label": "Name (off-peak etc.)",
+        "remove": "Remove",
+        "add": "+ Band"
+      },
+      "addTariff": "Add tariff period",
+      "validFrom": "Start date",
+      "flatRate": "Rate (KRW/kWh)",
+      "touHint": "Split weekdays and weekends/holidays into bands that cover 00:00 to 24:00 without gaps. Holidays follow the organization calendar.",
+      "add": "Add",
+      "addFactor": "Add emission factor period",
+      "factor": "Factor (tCO2eq/MWh)",
+      "sourceTitle": "Source document",
+      "sourceYear": "Reference year",
+      "source": "Source",
+      "systemDefault": "Default (read-only)",
+      "sourceOf": "{{title}} (as of {{year}})",
+      "factorValue": "{{value}} tCO2eq/MWh",
+      "delete": "Delete",
+      "validation": {
+        "dateRequired": "Enter a start date",
+        "ratePositive": "Rate must be greater than 0 (up to 2 decimals)",
+        "coverage": "Cover all 24 hours",
+        "modeRequired": "Choose a type",
+        "wholeWon": "Enter whole won",
+        "factorRange": "Enter a number from 0 to 2 (up to 4 decimals)",
+        "sourceRequired": "Enter the source",
+        "sourceTooLong": "Source can be up to 200 characters",
+        "yearRange": "Enter a year from 1990 to 2100"
+      }
+    },
+    "meters": {
+      "title": "Meters & bills",
+      "spaces": "Spaces",
+      "noSpaces": "No spaces",
+      "sourcesOf": "Energy sources of {{name}}",
+      "meteredFirst": "This space has both metered and estimated sources. Totals use metered values; estimates are for comparison only.",
+      "noSources": "No energy sources linked",
+      "noSourcesBody": "Link an energy meter or smart plug, or estimate from equipment rated power.",
+      "col": {
+        "kind": "Type",
+        "target": "Target",
+        "scope": "Coverage",
+        "status": "Status",
+        "month": "Month",
+        "billKwh": "Bill kWh",
+        "amount": "Amount (KRW)",
+        "meteredKwh": "Metered kWh",
+        "diff": "Difference"
+      },
+      "kind": {
+        "METERED": "Metered",
+        "ESTIMATED": "Estimated"
+      },
+      "cumulative": "{{metric}} · cumulative",
+      "instant": "{{metric}} · instantaneous",
+      "rated": "Rated {{rated}} W · standby {{standby}} W",
+      "integrated": "Power (W) is integrated over time into kWh",
+      "coversDescendants": "Includes child spaces",
+      "thisSpace": "This space",
+      "status": {
+        "OK": "OK",
+        "NO_DATA": "No data in 24 h",
+        "DISABLED": "Off"
+      },
+      "remove": "Remove",
+      "addMetered": "Add meter",
+      "noCandidates": "No device in this space has an energy or power metric.",
+      "meter": "Device · metric",
+      "autoDetect": "energy is treated as cumulative (kWh) and power as instantaneous (W).",
+      "coversDescendantsLabel": "Main meter that includes child spaces",
+      "add": "Link",
+      "addEstimated": "Add estimate",
+      "equipment": "Equipment",
+      "choose": "Choose",
+      "ratedPowerW": "Rated power (W)",
+      "standbyPowerW": "Standby power (W)",
+      "bills": "{{year}} bills",
+      "prevYear": "‹ Previous year",
+      "nextYear": "Next year ›",
+      "noBills": "No bills entered",
+      "noMetered": "No metered total",
+      "diff": "{{value}} difference",
+      "overwriteConfirm": "A bill for {{month}} already exists. Overwrite it?",
+      "overwrite": "Overwrite",
+      "cancel": "Cancel",
+      "saveBill": "Save bill",
+      "billsSiteOnly": "Bills are entered per site or building.",
+      "validation": {
+        "deviceRequired": "Choose a device",
+        "powerRequired": "Enter the rated power as a number",
+        "monthRequired": "Choose a month",
+        "kwhPositive": "Usage must be greater than 0 (up to 1 decimal)",
+        "wholeWon": "Enter whole won"
+      }
+    },
+    "dashboard": {
+      "title": "Energy",
+      "scope": "Scope",
+      "portfolio": "Portfolio",
+      "period": "Period",
+      "periods": {
+        "thisMonth": "This month",
+        "lastMonth": "Last month",
+        "thisYear": "This year",
+        "custom": "Custom"
+      },
+      "to": "To",
+      "compare": "Compare",
+      "compares": {
+        "BASELINE": "Baseline",
+        "PREVIOUS_PERIOD": "Previous period",
+        "SAME_PERIOD_LAST_YEAR": "Same period last year"
+      },
+      "apply": "Show",
+      "cards": {
+        "kwh": "Usage",
+        "eui": "EUI",
+        "perHour": "Per occupied hour",
+        "krw": "Cost",
+        "tco2": "Carbon"
+      },
+      "won": "KRW",
+      "noArea": "No area",
+      "noOccupancy": "No occupancy hours",
+      "summary": "{{from}} – {{to}} · estimated {{estimated}}",
+      "noBaseline": "No baseline yet",
+      "trend": "Daily usage",
+      "measured": "Metered",
+      "estimated": "Estimated",
+      "baseline": "Baseline",
+      "noData": "No usage aggregated for this period",
+      "children": "Breakdown",
+      "columns": {
+        "name": "Name",
+        "kwh": "Usage (kWh)",
+        "eui": "EUI",
+        "share": "Share",
+        "estimated": "Estimated",
+        "source": "Source"
+      },
+      "sources": {
+        "metered": "Metered",
+        "mixed": "Metered + estimated",
+        "none": "No data"
+      },
+      "other": "Other / common",
+      "noChildren": "No child units",
+      "noSources": "Connect an energy source",
+      "from": "From",
+      "tabs": {
+        "dashboard": "Overview",
+        "baseline": "Baseline"
+      },
+      "noWeather": "No temperature data for the baseline comparison"
+    },
+    "baseline": {
+      "activeSummary": "Active: {{method}} · {{from}} – {{to}} · R² {{r2}}",
+      "noActive": "No baseline is active. Calculate one and [Activate] it to use it in the dashboard comparison",
+      "result": "Result",
+      "methods": {
+        "PERIOD_AVERAGE": "Period average",
+        "DEGREE_DAY_REGRESSION": "Weather-normalized regression"
+      },
+      "statuses": {
+        "TRAINING": "Calculating",
+        "READY": "Ready",
+        "FAILED": "Failed",
+        "ACTIVE": "Active",
+        "RETIRED": "Retired"
+      },
+      "lowFit": "Low fit (R² < 0.5)",
+      "needed": "The training period is too short. {{n}} more day(s) needed (minimum 30)",
+      "failures": {
+        "INSUFFICIENT_DATA": "Fewer than 30 days of training data",
+        "NO_WEATHER": "No temperature data in the training period",
+        "INTERNAL_ERROR": "Calculation failed. Try again later"
+      },
+      "training": "Calculating. Refresh in a moment",
+      "coefficients": {
+        "intercept": "Intercept (kWh/day)",
+        "cdd": "CDD coefficient",
+        "hdd": "HDD coefficient",
+        "weekend": "Weekend difference"
+      },
+      "fitChart": "Actual vs predicted",
+      "actual": "Actual",
+      "predicted": "Predicted",
+      "versions": "Versions",
+      "noVersions": "No baseline has been calculated yet",
+      "columns": {
+        "method": "Method",
+        "period": "Training period",
+        "status": "Status"
+      },
+      "activate": "Activate",
+      "create": "Calculate baseline",
+      "method": "Method",
+      "trainFrom": "Training start",
+      "trainTo": "Training end",
+      "coolingBaseC": "Cooling base (℃)",
+      "heatingBaseC": "Heating base (℃)",
+      "splitWeekday": "Separate weekdays and weekends",
+      "temperatureDevice": "Temperature source device",
+      "noTemperature": "None",
+      "temperatureMetric": "Temperature metric",
+      "hint": "The training period is 30–730 days. Weather-normalized regression needs a temperature source device",
+      "calculate": "Calculate",
+      "errors": {
+        "required": "Required",
+        "date": "Enter a date",
+        "order": "The end date is before the start date",
+        "tooLong": "Cannot exceed 730 days",
+        "number": "Enter a number"
+      }
+    }
+  },
+  "errors": {
+    "ENE_RATE_PERIOD_OVERLAP": "The period overlaps another one",
+    "ENE_EMISSION_FACTOR_SYSTEM_READONLY": "The system default emission factor cannot be changed. Add an organization factor for a new period",
+    "ENE_RATE_INVALID": "Check the tariff settings",
+    "ENE_SOURCE_CONFLICT": "This meter is already linked to another space or overlaps a main meter",
+    "ENE_SOURCE_METRIC_INVALID": "This is not an energy metric",
+    "ENE_BILL_DUPLICATE": "A bill for this month already exists",
+    "ENE_TARIFF_NOT_FOUND": "Tariff not found",
+    "ENE_EMISSION_FACTOR_NOT_FOUND": "Emission factor not found",
+    "ENE_SOURCE_NOT_FOUND": "Energy source not found",
+    "ENE_BILL_NOT_FOUND": "Bill not found",
+    "ENE_BASELINE_INSUFFICIENT_DATA": "The training period is shorter than 30 days",
+    "ENE_BASELINE_NOT_READY": "Only a ready version can be activated",
+    "ENE_BASELINE_NOT_FOUND": "Baseline not found"
+  }
+}

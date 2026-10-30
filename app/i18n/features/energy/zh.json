@@ -1,0 +1,270 @@
+{
+  "nav": {
+    "energy": "能源"
+  },
+  "energy": {
+    "area": {
+      "dashboard": "能源仪表板",
+      "meters": "计量与账单",
+      "settings": "能源设置"
+    },
+    "settings": {
+      "title": "能源设置",
+      "tabs": {
+        "tariffs": "电价",
+        "factors": "排放系数"
+      },
+      "noRecalc": "修改后的电价和系数从开始日期起生效。已计算的过去期间不会重新计算。",
+      "noTariffs": "尚无电价",
+      "scope": "适用范围",
+      "scopeOrg": "整个组织",
+      "period": "期间",
+      "range": "{{from}} ~ {{to}}",
+      "mode": "方式",
+      "modes": {
+        "FLAT": "单一电价",
+        "TOU": "分时电价"
+      },
+      "rate": "电价·时段",
+      "baseCharge": "基本电费(韩元/月)",
+      "perKwh": "{{rate}} 韩元/kWh",
+      "dayType": {
+        "WEEKDAY": "工作日",
+        "WEEKEND_HOLIDAY": "周末·节假日"
+      },
+      "band": {
+        "from": "开始",
+        "to": "结束",
+        "rate": "韩元/kWh",
+        "label": "名称(低谷等)",
+        "remove": "删除",
+        "add": "+ 时段"
+      },
+      "addTariff": "添加电价期间",
+      "validFrom": "开始日期",
+      "flatRate": "电价(韩元/kWh)",
+      "touHint": "请将工作日和周末·节假日分别从 00:00 到 24:00 无间隙地划分时段。节假日以组织日历为准。",
+      "add": "添加",
+      "addFactor": "添加排放系数期间",
+      "factor": "系数(tCO2eq/MWh)",
+      "sourceTitle": "来源文件",
+      "sourceYear": "基准年份",
+      "source": "来源",
+      "systemDefault": "默认值(只读)",
+      "sourceOf": "{{title}}({{year}}年基准)",
+      "factorValue": "{{value}} tCO2eq/MWh",
+      "delete": "删除",
+      "validation": {
+        "dateRequired": "请输入开始日期",
+        "ratePositive": "电价必须大于0(最多两位小数)",
+        "coverage": "请覆盖全部24小时",
+        "modeRequired": "请选择方式",
+        "wholeWon": "请输入整数韩元",
+        "factorRange": "请输入0~2之间的数字(最多四位小数)",
+        "sourceRequired": "请输入来源",
+        "sourceTooLong": "来源最多200个字符",
+        "yearRange": "请输入1990~2100之间的年份"
+      }
+    },
+    "meters": {
+      "title": "计量与账单",
+      "spaces": "空间",
+      "noSpaces": "没有空间",
+      "sourcesOf": "{{name}}的能源来源",
+      "meteredFirst": "该空间同时有实测和估算来源。合计使用实测值,估算值仅用于比较。",
+      "noSources": "尚未连接能源来源",
+      "noSourcesBody": "请连接电能表或智能插座,或按设备额定功率估算。",
+      "col": {
+        "kind": "类型",
+        "target": "对象",
+        "scope": "覆盖范围",
+        "status": "状态",
+        "month": "月份",
+        "billKwh": "账单 kWh",
+        "amount": "金额(韩元)",
+        "meteredKwh": "实测合计 kWh",
+        "diff": "差异"
+      },
+      "kind": {
+        "METERED": "实测",
+        "ESTIMATED": "估算"
+      },
+      "cumulative": "{{metric}} · 累计型",
+      "instant": "{{metric}} · 瞬时型",
+      "rated": "额定 {{rated}}W · 待机 {{standby}}W",
+      "integrated": "将功率(W)按时间积分计算为 kWh",
+      "coversDescendants": "含下级空间合计",
+      "thisSpace": "本空间",
+      "status": {
+        "OK": "正常",
+        "NO_DATA": "24小时无数据",
+        "DISABLED": "已关闭"
+      },
+      "remove": "删除",
+      "addMetered": "添加实测",
+      "noCandidates": "该空间没有带 energy·power 测量项的设备。",
+      "meter": "设备·测量项",
+      "autoDetect": "energy 自动识别为累计型(kWh),power 为瞬时型(W)。",
+      "coversDescendantsLabel": "包含下级空间合计的总表",
+      "add": "连接",
+      "addEstimated": "添加估算",
+      "equipment": "设备",
+      "choose": "请选择",
+      "ratedPowerW": "额定功率(W)",
+      "standbyPowerW": "待机功率(W)",
+      "bills": "{{year}}年账单",
+      "prevYear": "‹ 上一年",
+      "nextYear": "下一年 ›",
+      "noBills": "尚未录入账单",
+      "noMetered": "无实测合计",
+      "diff": "差异 {{value}}",
+      "overwriteConfirm": "{{month}}的账单已存在。要覆盖吗?",
+      "overwrite": "覆盖",
+      "cancel": "取消",
+      "saveBill": "保存账单",
+      "billsSiteOnly": "账单按站点·建筑录入。",
+      "validation": {
+        "deviceRequired": "请选择设备",
+        "powerRequired": "请输入额定功率数字",
+        "monthRequired": "请选择月份",
+        "kwhPositive": "用量必须大于0(最多一位小数)",
+        "wholeWon": "请输入整数韩元"
+      }
+    },
+    "dashboard": {
+      "title": "能源",
+      "scope": "范围",
+      "portfolio": "组合",
+      "period": "期间",
+      "periods": {
+        "thisMonth": "本月",
+        "lastMonth": "上月",
+        "thisYear": "今年",
+        "custom": "自定义"
+      },
+      "to": "结束日期",
+      "compare": "比较",
+      "compares": {
+        "BASELINE": "基准线",
+        "PREVIOUS_PERIOD": "上一期间",
+        "SAME_PERIOD_LAST_YEAR": "去年同期"
+      },
+      "apply": "查看",
+      "cards": {
+        "kwh": "用量",
+        "eui": "EUI",
+        "perHour": "每在室小时",
+        "krw": "费用",
+        "tco2": "碳排放"
+      },
+      "won": "韩元",
+      "noArea": "无面积",
+      "noOccupancy": "无在室时间",
+      "summary": "{{from}} ~ {{to}} · 估算比例 {{estimated}}",
+      "noBaseline": "尚无基准线",
+      "trend": "每日用量",
+      "measured": "计量",
+      "estimated": "估算",
+      "baseline": "基准线",
+      "noData": "此期间没有汇总的用量",
+      "children": "下级单位",
+      "columns": {
+        "name": "名称",
+        "kwh": "用量(kWh)",
+        "eui": "EUI",
+        "share": "占比",
+        "estimated": "估算比例",
+        "source": "来源"
+      },
+      "sources": {
+        "metered": "计量",
+        "mixed": "计量·估算",
+        "none": "无数据"
+      },
+      "other": "其他·公共",
+      "noChildren": "没有下级单位",
+      "noSources": "请连接能源来源",
+      "from": "开始日期",
+      "tabs": {
+        "dashboard": "概况",
+        "baseline": "基线"
+      },
+      "noWeather": "没有用于基线比较的气温数据"
+    },
+    "baseline": {
+      "activeSummary": "已启用: {{method}} · {{from}} ~ {{to}} · R² {{r2}}",
+      "noActive": "尚无启用的基线。计算后[启用]，仪表板的基线比较即会使用",
+      "result": "结果",
+      "methods": {
+        "PERIOD_AVERAGE": "期间平均",
+        "DEGREE_DAY_REGRESSION": "气温修正回归"
+      },
+      "statuses": {
+        "TRAINING": "计算中",
+        "READY": "就绪",
+        "FAILED": "失败",
+        "ACTIVE": "已启用",
+        "RETIRED": "已停用"
+      },
+      "lowFit": "拟合度低(R² < 0.5)",
+      "needed": "训练期间太短，还需要{{n}}天(至少30天)",
+      "failures": {
+        "INSUFFICIENT_DATA": "训练数据少于30天",
+        "NO_WEATHER": "训练期间没有气温数据",
+        "INTERNAL_ERROR": "计算失败，请稍后重试"
+      },
+      "training": "正在计算，请稍后刷新",
+      "coefficients": {
+        "intercept": "截距(kWh/日)",
+        "cdd": "CDD系数",
+        "hdd": "HDD系数",
+        "weekend": "周末差"
+      },
+      "fitChart": "实测 vs 预测",
+      "actual": "实测",
+      "predicted": "预测",
+      "versions": "版本",
+      "noVersions": "尚未计算基线",
+      "columns": {
+        "method": "方式",
+        "period": "训练期间",
+        "status": "状态"
+      },
+      "activate": "启用",
+      "create": "计算基线",
+      "method": "方式",
+      "trainFrom": "训练开始日",
+      "trainTo": "训练结束日",
+      "coolingBaseC": "制冷基准温度(℃)",
+      "heatingBaseC": "供暖基准温度(℃)",
+      "splitWeekday": "区分工作日和周末",
+      "temperatureDevice": "气温来源设备",
+      "noTemperature": "不选择",
+      "temperatureMetric": "气温测量项",
+      "hint": "训练期间为30~730天。气温修正回归需要气温来源设备",
+      "calculate": "计算",
+      "errors": {
+        "required": "必填",
+        "date": "请输入日期",
+        "order": "结束日早于开始日",
+        "tooLong": "不能超过730天",
+        "number": "请输入数字"
+      }
+    }
+  },
+  "errors": {
+    "ENE_RATE_PERIOD_OVERLAP": "期间重叠",
+    "ENE_EMISSION_FACTOR_SYSTEM_READONLY": "系统默认排放系数不可修改。请为新期间添加组织系数",
+    "ENE_RATE_INVALID": "请检查电价设置",
+    "ENE_SOURCE_CONFLICT": "该电表已连接到其他空间,或与总表重叠",
+    "ENE_SOURCE_METRIC_INVALID": "不是能源测量项",
+    "ENE_BILL_DUPLICATE": "该月份已录入",
+    "ENE_TARIFF_NOT_FOUND": "找不到电价",
+    "ENE_EMISSION_FACTOR_NOT_FOUND": "找不到排放系数",
+    "ENE_SOURCE_NOT_FOUND": "找不到能源来源",
+    "ENE_BILL_NOT_FOUND": "找不到电费账单",
+    "ENE_BASELINE_INSUFFICIENT_DATA": "训练期间少于30天",
+    "ENE_BASELINE_NOT_READY": "只能启用就绪的版本",
+    "ENE_BASELINE_NOT_FOUND": "找不到基线"
+  }
+}

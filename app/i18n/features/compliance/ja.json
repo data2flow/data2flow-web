@@ -5,7 +5,9 @@
   "compliance": {
     "area": {
       "profiles": "基準プロファイル",
-      "status": "遵守状況"
+      "status": "遵守状況",
+      "reports": "レポート",
+      "coverage": "カバレッジ点検"
     },
     "archived": "アーカイブ済み",
     "kind": {
@@ -263,7 +265,354 @@
       "ongoing": "継続中",
       "peak": "最大 {{value}}",
       "alarm": "アラーム #{{id}}",
-      "noExcursions": "逸脱区間はありません"
+      "noExcursions": "逸脱区間はありません",
+      "recordAction": "改善措置を記録",
+      "viewActions": "措置を見る"
+    },
+    "reports": {
+      "title": "レポート",
+      "new": "新しいレポート",
+      "type": "種類",
+      "statusLabel": "状態",
+      "empty": "レポートはまだありません",
+      "emptyBody": "空間と期間を選んで自主点検レポートを作ると、下書きを確認して発行できます。",
+      "types": {
+        "KR_SELF_CHECK": "自主点検",
+        "RESET_SUPPORT": "認証補助(RESET)",
+        "WELL_A08_SUPPORT": "認証補助(WELL A08)"
+      },
+      "status": {
+        "GENERATING": "作成中",
+        "DRAFT": "下書き",
+        "PUBLISHED": "発行済み",
+        "FAILED": "失敗"
+      },
+      "col": {
+        "title": "タイトル",
+        "type": "種類",
+        "period": "期間",
+        "revision": "版",
+        "status": "状態",
+        "published": "発行"
+      },
+      "wizard": {
+        "step1": "1. 種類",
+        "step2": "2. 対象",
+        "step3": "3. 期間",
+        "step4": "4. オプション",
+        "soon": "(準備中)",
+        "title": "タイトル",
+        "titleHint": "空欄なら期間から付けます。",
+        "spaces": "対象空間",
+        "spacesHint": "{{n}}件選択。上位の空間を選ぶと下位も含みます。",
+        "spacesFailed": "空間一覧を読み込めませんでした。",
+        "facility": "施設種別",
+        "facilityAuto": "適用プロファイルから決める",
+        "from": "開始日",
+        "to": "終了日",
+        "periodHint": "最大400日、今日まで。日付は組織のタイムゾーン({{timezone}})基準です。",
+        "includeActions": "改善措置を含める",
+        "includeRawCsv": "生データCSVを含める",
+        "branding": "表紙に組織ロゴ",
+        "submit": "プレビューを作成"
+      },
+      "validation": {
+        "typeRequired": "種類を選んでください。",
+        "typeUnsupported": "この種類はまだ作成できません。",
+        "spaceRequired": "空間を1つ以上選んでください。",
+        "profileNotApplied": "選択した空間にプロファイルが適用されていません。",
+        "virtualOnly": "仮想デバイスだけの空間です。実デバイスがある空間を選んでください。",
+        "facilityRequired": "施設種別を選んでください。",
+        "facilityInvalid": "施設種別が正しくありません。",
+        "periodRequired": "開始日と終了日を入力してください。",
+        "periodOrder": "終了日は開始日以降にしてください。",
+        "periodFuture": "未来の日付は選べません。",
+        "periodTooLong": "期間は400日以内にしてください。",
+        "titleTooLong": "タイトルは200文字以内にしてください。"
+      },
+      "detail": {
+        "publish": "発行",
+        "regenerate": "再作成",
+        "delete": "版を削除",
+        "revisions": "版",
+        "noRevision": "版がありません",
+        "toc": "目次",
+        "generating": "レポートを作成しています",
+        "failed": "レポートを作成できませんでした。",
+        "draftNote": "下書きです。すべてのページに「下書き」表示があり、発行すると表示なしで作り直すためハッシュが変わります。",
+        "preview": "レポートのプレビュー",
+        "previewMissing": "プレビューを開けません。",
+        "meta": "情報",
+        "pdf": "PDFをダウンロード",
+        "csv": "生データCSV"
+      },
+      "sections": {
+        "cover": "表紙・告知",
+        "summary": "概要",
+        "metrics": "項目別統計",
+        "devices": "機器・校正",
+        "unmeasurable": "測定不可項目",
+        "actions": "改善措置"
+      },
+      "meta": {
+        "period": "期間",
+        "revision": "版",
+        "facility": "施設種別",
+        "noFacility": "指定なし",
+        "profiles": "基準プロファイル",
+        "profileCount": "バージョン{{n}}件",
+        "rows": "データ行",
+        "missing": "欠測率",
+        "virtual": "仮想デバイス",
+        "virtualCount": "{{n}}台を除外",
+        "late": "遅れて届いたデータ",
+        "lateCount": "前の版から{{n}}件追加",
+        "generated": "作成",
+        "published": "発行",
+        "hash": "SHA-256",
+        "qualityWarning": "欠測率が{{ratio}}%で10%を超えています。数値の解釈に注意してください。"
+      },
+      "verify": {
+        "title": "ハッシュ検証",
+        "label": "PDFファイル",
+        "hint": "受け取ったレポートPDFをアップロードすると、この組織が作った原本と同じか確認します(50MB以下)。",
+        "checking": "確認中…",
+        "matched": "原本と一致します: 版r{{n}}。",
+        "publishedAt": "{{at}}発行。",
+        "draft": "下書きのファイルです。",
+        "open": "レポートを開く",
+        "mismatch": "一致するレポートがありません。ファイルが変更されたか、この組織のレポートではありません。",
+        "notPdf": "PDFファイルだけ検証できます。",
+        "tooLarge": "50MB以下のファイルだけ検証できます。"
+      }
+    },
+    "actions": {
+      "title": "改善措置の記録",
+      "back": "遵守状況へ戻る",
+      "target": "対象の逸脱",
+      "space": "空間",
+      "metric": "項目",
+      "period": "期間",
+      "peak": "最高値",
+      "alarmLabel": "アラーム",
+      "alarm": "アラーム #{{id}}",
+      "workOrder": "作業指示 #{{id}}",
+      "recorded": "記録された措置 {{n}}件",
+      "empty": "まだ記録された措置はありません",
+      "newTitle": "新しい措置",
+      "editTitle": "措置を編集",
+      "cause": "原因",
+      "causePlaceholder": "原因を選択してください",
+      "causeNote": "原因メモ",
+      "actionText": "措置内容",
+      "actor": "実施者",
+      "actedAt": "実施日時",
+      "actedAtHint": "{{timezone}}基準、逸脱開始以降",
+      "alarms": "関連アラーム",
+      "workOrders": "関連作業指示",
+      "idsHint": "IDをカンマで区切って入力します",
+      "createWorkOrder": "作業指示を作成",
+      "resultMode": "結果確認",
+      "autoHint": "24時間後に結果が記録されます(措置後24時間の充足率)",
+      "resultNote": "結果メモ",
+      "causes": {
+        "VENTILATION": "換気不足",
+        "EQUIPMENT": "機器故障",
+        "OUTDOOR_INFLOW": "外部流入",
+        "CROWDING": "在室過密",
+        "SENSOR": "センサー異常",
+        "OTHER": "その他"
+      },
+      "modes": {
+        "AUTO": "自動(措置後24時間の充足率)",
+        "MANUAL": "手動入力"
+      },
+      "result": {
+        "confirmed": "措置後の充足率 {{ratio}}%",
+        "recorded": "結果: {{note}}",
+        "pending": "自動確認待ち",
+        "unverifiable": "確認不可(データ欠測)"
+      },
+      "validation": {
+        "causeRequired": "原因を選択してください",
+        "causeNoteRequired": "その他の原因を入力してください",
+        "causeNoteTooLong": "原因メモは200文字までです",
+        "actionRequired": "措置内容を入力してください",
+        "actionTooLong": "措置内容は1000文字までです",
+        "actorRequired": "実施者を選択してください",
+        "actedAtRequired": "実施日時を入力してください",
+        "beforeExcursion": "逸脱前の時刻は入力できません",
+        "future": "未来の時刻は入力できません",
+        "resultModeRequired": "結果確認の方法を選択してください",
+        "resultNoteRequired": "結果を入力してください",
+        "resultNoteTooLong": "結果メモは500文字までです",
+        "workOrderNotFound": "存在しない作業指示があります",
+        "alarmNotFound": "存在しないアラームがあります"
+      }
+    },
+    "schedules": {
+      "title": "定期発行",
+      "new": "新しい定期発行",
+      "editTitle": "定期発行の編集",
+      "hint": "スケジュールは組織のタイムゾーン（{{timezone}}）で実行し、発行すると受信者に通知します。",
+      "empty": "定期発行のスケジュールがありません",
+      "emptyBody": "毎月または四半期ごとに自己点検レポートを自動で作成・発行し、受信者に通知できます。",
+      "col": {
+        "name": "名前",
+        "type": "種類",
+        "cadence": "周期",
+        "next": "次回発行予定",
+        "last": "前回の結果"
+      },
+      "every": {
+        "MONTHLY": "毎月{{day}}日 {{time}}",
+        "QUARTERLY": "四半期の最初の月{{day}}日 {{time}}"
+      },
+      "disabled": "オフ",
+      "runNow": "今すぐ実行",
+      "retry": "再試行",
+      "history": "履歴",
+      "historyOf": "実行履歴: {{name}}",
+      "noRuns": "まだ実行していません",
+      "runStatus": {
+        "PENDING": "待機",
+        "RUNNING": "作成中",
+        "SUCCEEDED": "成功",
+        "FAILED": "失敗"
+      },
+      "run": {
+        "at": "予定時刻",
+        "trigger": "実行",
+        "result": "結果",
+        "report": "レポート",
+        "deliveries": "受信者"
+      },
+      "trigger": {
+        "SCHEDULED": "スケジュール",
+        "MANUAL": "今すぐ実行"
+      },
+      "attempts": "{{n}}回試行",
+      "openReport": "レポートを開く",
+      "delivery": {
+        "REQUESTED": "通知依頼",
+        "UNSUPPORTED": "メール未対応"
+      },
+      "basics": "基本",
+      "name": "名前",
+      "timing": "スケジュール",
+      "cadence": "周期",
+      "cadences": {
+        "MONTHLY": "毎月",
+        "QUARTERLY": "四半期"
+      },
+      "day": "実行日（1〜28）",
+      "time": "発行時刻",
+      "periodRule": "対象期間",
+      "periodRules": {
+        "PREVIOUS_MONTH": "前月",
+        "PREVIOUS_QUARTER": "前四半期"
+      },
+      "dayHint": {
+        "MONTHLY": "毎月その日のその時刻（{{timezone}}）に作成します。",
+        "QUARTERLY": "1・4・7・10月のその日のその時刻（{{timezone}}）に作成します。"
+      },
+      "recipients": "受信者",
+      "users": "ユーザー",
+      "usersFailed": "ユーザー一覧を読み込めませんでした。",
+      "emails": "メール",
+      "emailsHint": "カンマか改行で区切ります。メール送信はチャネルの準備ができ次第始まります。",
+      "output": "形式と使用",
+      "format": "形式",
+      "formats": {
+        "PDF": "PDF",
+        "PDF_CSV": "PDF + CSV"
+      },
+      "enabled": "使用",
+      "validation": {
+        "nameRequired": "名前を入力してください。",
+        "nameTooLong": "名前は100文字までです。",
+        "typeUnsupported": "この種類はまだ定期発行できません。",
+        "spaceRequired": "空間を1つ以上選んでください。",
+        "profileNotApplied": "選択した空間にプロファイルが適用されていません。",
+        "facilityRequired": "施設種別を選んでください。",
+        "titleTooLong": "タイトルは200文字以内にしてください。",
+        "cadenceRequired": "周期を選んでください。",
+        "dayRange": "実行日は1〜28の間です。",
+        "timeFormat": "発行時刻はHH:mm形式です。",
+        "periodRuleRequired": "対象期間を選んでください。",
+        "formatRequired": "形式を選んでください。",
+        "recipientsRequired": "受信者を1人以上指定してください。",
+        "tooManyRecipients": "受信者は{{max}}人までです。",
+        "emailInvalid": "メールアドレスの形式が正しくありません。",
+        "userNotFound": "存在しないユーザーがいます。"
+      }
+    },
+    "coverage": {
+      "title": "カバレッジ点検",
+      "site": "サイト",
+      "profile": "プロファイル",
+      "noProfile": "プロファイルなし（既定値）",
+      "run": "点検",
+      "noSite": "点検するサイトがありません",
+      "density": "設置密度",
+      "publicDisplay": "公開表示",
+      "calibration": "校正期限",
+      "quality": "データ品質",
+      "na": "対象外",
+      "ok": "充足",
+      "signal": {
+        "density": "不足 {{n}}か所",
+        "publicDisplay": "不足 {{n}}個",
+        "calibration": "超過 {{n}}台",
+        "quality": "未達 {{n}}か所"
+      },
+      "densityNa": "このプロファイルには設置密度の基準がありません。",
+      "displayNa": "このプロファイルには公開表示の基準がありません。",
+      "col": {
+        "space": "空間",
+        "usage": "用途",
+        "area": "面積",
+        "required": "必要",
+        "actual": "実際",
+        "shortage": "不足",
+        "device": "機器",
+        "model": "モデル",
+        "interval": "推奨周期",
+        "last": "前回校正",
+        "elapsed": "経過",
+        "status": "状態",
+        "devices": "機器数",
+        "missing": "欠測率",
+        "intervalViolations": "周期未達機器",
+        "abnormal": "品質異常"
+      },
+      "usage": {
+        "CLASSROOM": "講義室",
+        "OFFICE": "事務室",
+        "MEETING": "会議室",
+        "LAB": "実験室",
+        "CORRIDOR": "廊下",
+        "OTHER": "その他"
+      },
+      "noArea": "判断不可（面積なし）",
+      "enterArea": "面積を入力",
+      "needMore": "追加必要 {{n}}台",
+      "displayLine": "対象面積 {{area}}㎡ · 必要 {{required}}個 · 実際の公開画面 {{links}}個、QR {{qr}}個 · 不足 {{shortage}}個",
+      "displayPending": "公開画面・QR機能の準備前のため、実際の数は0として数えます。",
+      "recommend": "推奨場所: {{spaces}}",
+      "noDevices": "点検する機器がありません。",
+      "pickDevices": "作業指示を作る機器を選んでください。",
+      "createWorkOrder": "作業指示を作成",
+      "days": "{{n}}日",
+      "calibrationStatus": {
+        "OK": "正常",
+        "DUE_SOON": "間近",
+        "OVERDUE": "超過",
+        "NO_RECORD": "記録なし"
+      },
+      "qualityPeriod": "{{from}} 〜 {{to}} 基準",
+      "belowStandard": "データ品質基準未達",
+      "violations": "周期未達 {{n}}台"
     }
   },
   "errors": {
@@ -276,6 +625,15 @@
     "CMP_FACILITY_TYPE_REQUIRED": "このプロファイルは施設種別の選択が必要です。",
     "CMP_APPLICATION_DUPLICATE": "同じ対象に既に適用されています。",
     "CMP_APPLICATION_NOT_FOUND": "適用が見つかりません。",
-    "CMP_REPORT_PERIOD_INVALID": "期間は開始日が終了日より前で、400日以内である必要があります"
+    "CMP_REPORT_PERIOD_INVALID": "期間は開始日が終了日より前で、400日以内である必要があります",
+    "CMP_PROFILE_NOT_APPLIED": "選択した空間にプロファイルが適用されていません。",
+    "CMP_VIRTUAL_DATA_NOT_ALLOWED": "仮想デバイスだけの空間はレポートに使えません。",
+    "CMP_REPORT_NOT_FOUND": "レポートが見つかりません。",
+    "CMP_REPORT_STATE_CONFLICT": "現在の状態ではできません。再読み込みしてからやり直してください。",
+    "CMP_ACTION_INVALID": "改善措置の内容を確認してください。",
+    "CMP_EXCURSION_NOT_FOUND": "逸脱区間が見つかりません。",
+    "CMP_ACTION_NOT_FOUND": "改善措置が見つかりません。",
+    "CMP_SCHEDULE_INVALID": "定期発行の設定を確認してください。",
+    "CMP_SCHEDULE_NOT_FOUND": "定期発行のスケジュールが見つかりません。"
   }
 }

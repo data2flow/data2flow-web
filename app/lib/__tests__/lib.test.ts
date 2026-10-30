@@ -94,7 +94,11 @@ describe("permissions IAM-04.05 메뉴 숨김", () => {
     expect(requiredPermissionsFor("/imports/9")).toEqual(["TS_IMPORT"]);
     expect(requiredPermissionsFor("/settings/data-retention")).toEqual(["TS_POLICY"]);
     expect(isMenuActive(MENU.find((m) => m.key === "explore")!, "/imports/new")).toBe(true);
-    expect(visibleMenu(["IAM_MANAGE", "AUDIT_READ", "OPS_MANAGE", "DEV_READ", "TS_READ", "INGEST_READ", "FLOW_READ", "DEVICE_CONTROL", "SIM_READ", "ALARM_READ", "DEV_PLACE", "NOTIFY_CHANNEL_MANAGE", "TS_POLICY", "DASHBOARD_READ", "BRANDING_MANAGE", "ANALYTICS_READ", "CMP_READ", "CONTROL_SETTINGS"])).toHaveLength(MENU.length);
+    // M7 에너지: 대시보드(/energy)는 ENE_READ, 계량·고지서는 ENE_OPERATE·ENE_ADMIN, 설정은 ENE_ADMIN
+    expect(requiredPermissionsFor("/energy")).toEqual(["ENE_READ"]);
+    expect(requiredPermissionsFor("/energy/meters")).toEqual(["ENE_OPERATE", "ENE_ADMIN"]);
+    expect(isMenuActive(MENU.find((m) => m.key === "energy")!, "/energy/settings")).toBe(true);
+    expect(visibleMenu(["IAM_MANAGE", "AUDIT_READ", "OPS_MANAGE", "DEV_READ", "TS_READ", "INGEST_READ", "FLOW_READ", "DEVICE_CONTROL", "SIM_READ", "ALARM_READ", "DEV_PLACE", "NOTIFY_CHANNEL_MANAGE", "TS_POLICY", "DASHBOARD_READ", "BRANDING_MANAGE", "ANALYTICS_READ", "CMP_READ", "ENE_READ", "CONTROL_SETTINGS"])).toHaveLength(MENU.length);
     // M6: 분석 메뉴(ANALYTICS_READ, /analytics·/ai 포함), 마법사·모델은 ANALYTICS_RUN, MCP 연결은 토큰 발급 권한
     expect(visibleMenu(["ANALYTICS_READ"]).map((m) => m.key)).toEqual(["home", "analytics"]);
     expect(requiredPermissionsFor("/analytics/17/runs/128")).toEqual(["ANALYTICS_READ"]);

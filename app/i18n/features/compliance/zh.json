@@ -5,7 +5,9 @@
   "compliance": {
     "area": {
       "profiles": "标准配置",
-      "status": "合规状况"
+      "status": "合规状况",
+      "reports": "报告",
+      "coverage": "覆盖检查"
     },
     "archived": "已归档",
     "kind": {
@@ -263,7 +265,354 @@
       "ongoing": "进行中",
       "peak": "最高 {{value}}",
       "alarm": "告警 #{{id}}",
-      "noExcursions": "没有超标区间"
+      "noExcursions": "没有超标区间",
+      "recordAction": "记录改进措施",
+      "viewActions": "查看措施"
+    },
+    "reports": {
+      "title": "报告",
+      "new": "新建报告",
+      "type": "类型",
+      "statusLabel": "状态",
+      "empty": "还没有报告",
+      "emptyBody": "选择空间和期间生成自查报告后，可以查看草稿并发布。",
+      "types": {
+        "KR_SELF_CHECK": "自查",
+        "RESET_SUPPORT": "认证辅助(RESET)",
+        "WELL_A08_SUPPORT": "认证辅助(WELL A08)"
+      },
+      "status": {
+        "GENERATING": "生成中",
+        "DRAFT": "草稿",
+        "PUBLISHED": "已发布",
+        "FAILED": "失败"
+      },
+      "col": {
+        "title": "标题",
+        "type": "类型",
+        "period": "期间",
+        "revision": "版本",
+        "status": "状态",
+        "published": "发布"
+      },
+      "wizard": {
+        "step1": "1. 类型",
+        "step2": "2. 对象",
+        "step3": "3. 期间",
+        "step4": "4. 选项",
+        "soon": "(准备中)",
+        "title": "标题",
+        "titleHint": "留空则按期间命名。",
+        "spaces": "对象空间",
+        "spacesHint": "已选 {{n}} 个。选择上级空间会包含其下级空间。",
+        "spacesFailed": "无法加载空间列表。",
+        "facility": "设施类型",
+        "facilityAuto": "按已应用的配置确定",
+        "from": "开始日期",
+        "to": "结束日期",
+        "periodHint": "最多 400 天，截至今天。日期按组织时区({{timezone}})计算。",
+        "includeActions": "包含改进措施",
+        "includeRawCsv": "包含原始数据 CSV",
+        "branding": "封面显示组织标志",
+        "submit": "生成预览"
+      },
+      "validation": {
+        "typeRequired": "请选择类型。",
+        "typeUnsupported": "暂不支持此类型。",
+        "spaceRequired": "请至少选择一个空间。",
+        "profileNotApplied": "所选空间未应用任何标准配置。",
+        "virtualOnly": "这些空间只有虚拟设备。请选择有真实设备的空间。",
+        "facilityRequired": "请选择设施类型。",
+        "facilityInvalid": "设施类型无效。",
+        "periodRequired": "请输入开始和结束日期。",
+        "periodOrder": "结束日期不能早于开始日期。",
+        "periodFuture": "不能选择未来日期。",
+        "periodTooLong": "期间不能超过 400 天。",
+        "titleTooLong": "标题不能超过 200 个字符。"
+      },
+      "detail": {
+        "publish": "发布",
+        "regenerate": "重新生成",
+        "delete": "删除版本",
+        "revisions": "版本",
+        "noRevision": "没有版本",
+        "toc": "目录",
+        "generating": "正在生成报告",
+        "failed": "无法生成报告。",
+        "draftNote": "这是草稿。每页都有“草稿”标记，发布时会去掉标记重新生成，因此哈希会改变。",
+        "preview": "报告预览",
+        "previewMissing": "无法打开预览。",
+        "meta": "信息",
+        "pdf": "下载 PDF",
+        "csv": "原始数据 CSV"
+      },
+      "sections": {
+        "cover": "封面与声明",
+        "summary": "摘要",
+        "metrics": "分项统计",
+        "devices": "设备与校准",
+        "unmeasurable": "无法测量的项目",
+        "actions": "改进措施"
+      },
+      "meta": {
+        "period": "期间",
+        "revision": "版本",
+        "facility": "设施类型",
+        "noFacility": "未指定",
+        "profiles": "标准配置",
+        "profileCount": "{{n}} 个版本",
+        "rows": "数据行",
+        "missing": "缺失率",
+        "virtual": "虚拟设备",
+        "virtualCount": "已排除 {{n}} 台",
+        "late": "迟到数据",
+        "lateCount": "自上一版本新增 {{n}} 条",
+        "generated": "生成",
+        "published": "发布",
+        "hash": "SHA-256",
+        "qualityWarning": "缺失率为 {{ratio}}%，超过 10%。请谨慎解读数值。"
+      },
+      "verify": {
+        "title": "哈希验证",
+        "label": "PDF 文件",
+        "hint": "上传收到的报告 PDF，确认是否与本组织生成的原件一致(50MB 以下)。",
+        "checking": "正在检查…",
+        "matched": "与原件一致：版本 r{{n}}。",
+        "publishedAt": "{{at}} 发布。",
+        "draft": "这是草稿文件。",
+        "open": "打开报告",
+        "mismatch": "没有一致的报告。文件已被修改，或不是本组织的报告。",
+        "notPdf": "只能验证 PDF 文件。",
+        "tooLarge": "只能验证 50MB 以下的文件。"
+      }
+    },
+    "actions": {
+      "title": "改进措施记录",
+      "back": "返回达标状况",
+      "target": "对象超标",
+      "space": "空间",
+      "metric": "项目",
+      "period": "期间",
+      "peak": "最高值",
+      "alarmLabel": "告警",
+      "alarm": "告警 #{{id}}",
+      "workOrder": "工单 #{{id}}",
+      "recorded": "已记录措施 {{n}} 条",
+      "empty": "尚无记录的措施",
+      "newTitle": "新措施",
+      "editTitle": "编辑措施",
+      "cause": "原因",
+      "causePlaceholder": "请选择原因",
+      "causeNote": "原因备注",
+      "actionText": "措施内容",
+      "actor": "执行人",
+      "actedAt": "执行时间",
+      "actedAtHint": "按{{timezone}}，超标开始之后",
+      "alarms": "关联告警",
+      "workOrders": "关联工单",
+      "idsHint": "用逗号分隔 ID",
+      "createWorkOrder": "创建工单",
+      "resultMode": "结果确认",
+      "autoHint": "24 小时后记录结果(措施后 24 小时达标率)",
+      "resultNote": "结果备注",
+      "causes": {
+        "VENTILATION": "通风不足",
+        "EQUIPMENT": "设备故障",
+        "OUTDOOR_INFLOW": "室外流入",
+        "CROWDING": "人员过密",
+        "SENSOR": "传感器异常",
+        "OTHER": "其他"
+      },
+      "modes": {
+        "AUTO": "自动(措施后 24 小时达标率)",
+        "MANUAL": "手动输入"
+      },
+      "result": {
+        "confirmed": "措施后达标率 {{ratio}}%",
+        "recorded": "结果: {{note}}",
+        "pending": "等待自动确认",
+        "unverifiable": "无法确认(数据缺失)"
+      },
+      "validation": {
+        "causeRequired": "请选择原因",
+        "causeNoteRequired": "请填写其他原因",
+        "causeNoteTooLong": "原因备注最多 200 字",
+        "actionRequired": "请填写措施内容",
+        "actionTooLong": "措施内容最多 1000 字",
+        "actorRequired": "请选择执行人",
+        "actedAtRequired": "请输入执行时间",
+        "beforeExcursion": "不能输入超标之前的时间",
+        "future": "不能输入未来的时间",
+        "resultModeRequired": "请选择结果确认方式",
+        "resultNoteRequired": "请填写结果",
+        "resultNoteTooLong": "结果备注最多 500 字",
+        "workOrderNotFound": "存在不存在的工单",
+        "alarmNotFound": "存在不存在的告警"
+      }
+    },
+    "schedules": {
+      "title": "定期发布",
+      "new": "新建定期发布",
+      "editTitle": "编辑定期发布",
+      "hint": "计划按组织时区（{{timezone}}）运行，发布后通知接收人。",
+      "empty": "暂无定期发布计划",
+      "emptyBody": "可每月或每季度自动生成并发布自检报告，并通知接收人。",
+      "col": {
+        "name": "名称",
+        "type": "类型",
+        "cadence": "周期",
+        "next": "下次发布",
+        "last": "上次结果"
+      },
+      "every": {
+        "MONTHLY": "每月{{day}}日 {{time}}",
+        "QUARTERLY": "每季度首月{{day}}日 {{time}}"
+      },
+      "disabled": "已关闭",
+      "runNow": "立即运行",
+      "retry": "重试",
+      "history": "历史",
+      "historyOf": "运行历史：{{name}}",
+      "noRuns": "尚未运行",
+      "runStatus": {
+        "PENDING": "等待",
+        "RUNNING": "生成中",
+        "SUCCEEDED": "成功",
+        "FAILED": "失败"
+      },
+      "run": {
+        "at": "计划时间",
+        "trigger": "触发",
+        "result": "结果",
+        "report": "报告",
+        "deliveries": "接收人"
+      },
+      "trigger": {
+        "SCHEDULED": "计划",
+        "MANUAL": "立即运行"
+      },
+      "attempts": "尝试{{n}}次",
+      "openReport": "打开报告",
+      "delivery": {
+        "REQUESTED": "已请求通知",
+        "UNSUPPORTED": "暂不支持邮件"
+      },
+      "basics": "基本",
+      "name": "名称",
+      "timing": "计划",
+      "cadence": "周期",
+      "cadences": {
+        "MONTHLY": "每月",
+        "QUARTERLY": "每季度"
+      },
+      "day": "执行日（1~28）",
+      "time": "发布时间",
+      "periodRule": "目标期间",
+      "periodRules": {
+        "PREVIOUS_MONTH": "上个月",
+        "PREVIOUS_QUARTER": "上个季度"
+      },
+      "dayHint": {
+        "MONTHLY": "每月该日该时间（{{timezone}}）生成。",
+        "QUARTERLY": "在1、4、7、10月的该日该时间（{{timezone}}）生成。"
+      },
+      "recipients": "接收人",
+      "users": "用户",
+      "usersFailed": "无法加载用户列表。",
+      "emails": "邮箱",
+      "emailsHint": "用逗号或换行分隔。邮件通道就绪后开始发送。",
+      "output": "格式与启用",
+      "format": "格式",
+      "formats": {
+        "PDF": "PDF",
+        "PDF_CSV": "PDF + CSV"
+      },
+      "enabled": "启用",
+      "validation": {
+        "nameRequired": "请输入名称。",
+        "nameTooLong": "名称最多100个字符。",
+        "typeUnsupported": "该类型暂不支持定期发布。",
+        "spaceRequired": "请至少选择一个空间。",
+        "profileNotApplied": "所选空间未应用配置文件。",
+        "facilityRequired": "请选择设施类型。",
+        "titleTooLong": "标题不超过200个字符。",
+        "cadenceRequired": "请选择周期。",
+        "dayRange": "执行日必须在1到28之间。",
+        "timeFormat": "发布时间格式为HH:mm。",
+        "periodRuleRequired": "请选择目标期间。",
+        "formatRequired": "请选择格式。",
+        "recipientsRequired": "请至少指定一个接收人。",
+        "tooManyRecipients": "接收人最多{{max}}个。",
+        "emailInvalid": "邮箱格式不正确。",
+        "userNotFound": "存在不存在的用户。"
+      }
+    },
+    "coverage": {
+      "title": "覆盖检查",
+      "site": "站点",
+      "profile": "配置文件",
+      "noProfile": "不使用配置文件（默认标准）",
+      "run": "检查",
+      "noSite": "没有可检查的站点",
+      "density": "安装密度",
+      "publicDisplay": "公开显示",
+      "calibration": "校准期限",
+      "quality": "数据质量",
+      "na": "不适用",
+      "ok": "满足",
+      "signal": {
+        "density": "不足 {{n}} 处",
+        "publicDisplay": "不足 {{n}} 个",
+        "calibration": "超期 {{n}} 台",
+        "quality": "未达标 {{n}} 处"
+      },
+      "densityNa": "该配置文件没有安装密度标准。",
+      "displayNa": "该配置文件没有公开显示标准。",
+      "col": {
+        "space": "空间",
+        "usage": "用途",
+        "area": "面积",
+        "required": "需要",
+        "actual": "实际",
+        "shortage": "不足",
+        "device": "设备",
+        "model": "型号",
+        "interval": "建议周期",
+        "last": "上次校准",
+        "elapsed": "已过",
+        "status": "状态",
+        "devices": "设备数",
+        "missing": "缺失率",
+        "intervalViolations": "周期不达标设备",
+        "abnormal": "质量异常"
+      },
+      "usage": {
+        "CLASSROOM": "教室",
+        "OFFICE": "办公室",
+        "MEETING": "会议室",
+        "LAB": "实验室",
+        "CORRIDOR": "走廊",
+        "OTHER": "其他"
+      },
+      "noArea": "无法判断（无面积）",
+      "enterArea": "输入面积",
+      "needMore": "需增加 {{n}} 台",
+      "displayLine": "目标面积 {{area}}㎡ · 需要 {{required}} 个 · 实际公开屏 {{links}} 个、二维码 {{qr}} 个 · 不足 {{shortage}} 个",
+      "displayPending": "公开屏和二维码功能尚未就绪，实际数量按 0 计算。",
+      "recommend": "推荐位置：{{spaces}}",
+      "noDevices": "没有可检查的设备。",
+      "pickDevices": "请选择要创建工单的设备。",
+      "createWorkOrder": "创建工单",
+      "days": "{{n}} 天",
+      "calibrationStatus": {
+        "OK": "正常",
+        "DUE_SOON": "临近",
+        "OVERDUE": "超期",
+        "NO_RECORD": "无记录"
+      },
+      "qualityPeriod": "{{from}} 至 {{to}}",
+      "belowStandard": "数据质量未达标",
+      "violations": "周期不达标 {{n}} 台"
     }
   },
   "errors": {
@@ -276,6 +625,15 @@
     "CMP_FACILITY_TYPE_REQUIRED": "此配置需要选择设施类型。",
     "CMP_APPLICATION_DUPLICATE": "已适用于该对象。",
     "CMP_APPLICATION_NOT_FOUND": "找不到适用。",
-    "CMP_REPORT_PERIOD_INVALID": "期间的开始日期必须早于结束日期，且不超过400天"
+    "CMP_REPORT_PERIOD_INVALID": "期间的开始日期必须早于结束日期，且不超过400天",
+    "CMP_PROFILE_NOT_APPLIED": "所选空间未应用任何标准配置。",
+    "CMP_VIRTUAL_DATA_NOT_ALLOWED": "只有虚拟设备的空间不能用于报告。",
+    "CMP_REPORT_NOT_FOUND": "找不到报告。",
+    "CMP_REPORT_STATE_CONFLICT": "当前状态下无法执行。请刷新后重试。",
+    "CMP_ACTION_INVALID": "请检查改进措施信息。",
+    "CMP_EXCURSION_NOT_FOUND": "找不到超标区间。",
+    "CMP_ACTION_NOT_FOUND": "找不到改进措施。",
+    "CMP_SCHEDULE_INVALID": "请检查定期发布设置。",
+    "CMP_SCHEDULE_NOT_FOUND": "找不到定期发布计划。"
   }
 }

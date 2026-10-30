@@ -86,7 +86,9 @@ describe("UI-DEV-17 모바일 기기 상세", () => {
   });
 
   it("오프라인이면 사진을 대기열에 넣는다", async () => {
-    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    // 대기열(IndexedDB)의 비동기 콜백이 가짜 타이머에 묶이지 않게 이 시험은 실제 타이머로 돈다(바쁜 CI에서 간헐 실패)
+    vi.useRealTimers();
+    const user = userEvent.setup();
     const api = fakeFieldApi();
     // 렌더 전에 끊어 둔다: 마운트 때 연결 상태를 읽으므로 리스너 등록 시점과 경합하지 않는다
     setOnline(false);

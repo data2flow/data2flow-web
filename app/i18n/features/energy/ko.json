@@ -1,0 +1,270 @@
+{
+  "nav": {
+    "energy": "에너지"
+  },
+  "energy": {
+    "area": {
+      "dashboard": "에너지 대시보드",
+      "meters": "계량·고지서",
+      "settings": "에너지 설정"
+    },
+    "settings": {
+      "title": "에너지 설정",
+      "tabs": {
+        "tariffs": "요금 단가",
+        "factors": "배출계수"
+      },
+      "noRecalc": "바꾼 단가·계수는 시작일부터 적용됩니다. 이미 계산한 과거 기간은 다시 계산하지 않습니다.",
+      "noTariffs": "등록된 요금 단가가 없습니다",
+      "scope": "적용 범위",
+      "scopeOrg": "조직 전체",
+      "period": "기간",
+      "range": "{{from}} ~ {{to}}",
+      "mode": "방식",
+      "modes": {
+        "FLAT": "단일 단가",
+        "TOU": "시간대별"
+      },
+      "rate": "단가·구간",
+      "baseCharge": "기본요금(원/월)",
+      "perKwh": "{{rate}} 원/kWh",
+      "dayType": {
+        "WEEKDAY": "평일",
+        "WEEKEND_HOLIDAY": "주말·공휴일"
+      },
+      "band": {
+        "from": "시작",
+        "to": "끝",
+        "rate": "원/kWh",
+        "label": "이름(경부하 등)",
+        "remove": "빼기",
+        "add": "+ 구간"
+      },
+      "addTariff": "단가 기간 추가",
+      "validFrom": "시작일",
+      "flatRate": "단가(원/kWh)",
+      "touHint": "평일과 주말·공휴일 각각 00:00부터 24:00까지 빈틈없이 구간을 나누세요. 공휴일은 조직 달력을 따릅니다.",
+      "add": "추가",
+      "addFactor": "배출계수 기간 추가",
+      "factor": "계수(tCO2eq/MWh)",
+      "sourceTitle": "출처 문서명",
+      "sourceYear": "기준 연도",
+      "source": "출처",
+      "systemDefault": "기본값(읽기 전용)",
+      "sourceOf": "{{title}} ({{year}}년 기준)",
+      "factorValue": "{{value}} tCO2eq/MWh",
+      "delete": "삭제",
+      "validation": {
+        "dateRequired": "시작일을 입력하세요",
+        "ratePositive": "단가는 0보다 커야 합니다(소수 둘째 자리까지)",
+        "coverage": "24시간을 모두 지정하세요",
+        "modeRequired": "방식을 고르세요",
+        "wholeWon": "원 단위 숫자로 입력하세요",
+        "factorRange": "0~2 사이 숫자로 입력하세요(소수 넷째 자리까지)",
+        "sourceRequired": "출처를 입력하세요",
+        "sourceTooLong": "출처는 200자까지입니다",
+        "yearRange": "1990~2100 사이 연도를 입력하세요"
+      }
+    },
+    "meters": {
+      "title": "계량·고지서",
+      "spaces": "공간",
+      "noSpaces": "공간이 없습니다",
+      "sourcesOf": "{{name}}의 에너지 출처",
+      "meteredFirst": "이 공간에는 측정과 추정이 함께 있습니다. 합계에는 측정값을 쓰고 추정값은 비교용으로만 씁니다.",
+      "noSources": "연결된 에너지 출처가 없습니다",
+      "noSourcesBody": "전력량계·스마트 플러그를 연결하거나 장비 정격 전력으로 추정하세요.",
+      "col": {
+        "kind": "종류",
+        "target": "대상",
+        "scope": "포함 범위",
+        "status": "상태",
+        "month": "월",
+        "billKwh": "고지서 kWh",
+        "amount": "금액(원)",
+        "meteredKwh": "측정 합계 kWh",
+        "diff": "차이"
+      },
+      "kind": {
+        "METERED": "측정",
+        "ESTIMATED": "추정"
+      },
+      "cumulative": "{{metric}} · 누적형",
+      "instant": "{{metric}} · 순간형",
+      "rated": "정격 {{rated}}W · 대기 {{standby}}W",
+      "integrated": "전력(W)을 시간 적분해 kWh로 계산합니다",
+      "coversDescendants": "하위 공간 합계",
+      "thisSpace": "이 공간",
+      "status": {
+        "OK": "정상",
+        "NO_DATA": "최근 24시간 수신 없음",
+        "DISABLED": "꺼짐"
+      },
+      "remove": "삭제",
+      "addMetered": "측정 추가",
+      "noCandidates": "이 공간에 energy·power 측정 항목이 있는 기기가 없습니다.",
+      "meter": "기기·측정 항목",
+      "autoDetect": "energy는 누적형(kWh), power는 순간형(W)으로 자동 판별합니다.",
+      "coversDescendantsLabel": "하위 공간 합계를 포함하는 상위 계량기",
+      "add": "연결",
+      "addEstimated": "추정 추가",
+      "equipment": "장비",
+      "choose": "고르세요",
+      "ratedPowerW": "정격 소비 전력(W)",
+      "standbyPowerW": "대기 전력(W)",
+      "bills": "{{year}}년 고지서",
+      "prevYear": "‹ 전년",
+      "nextYear": "다음 해 ›",
+      "noBills": "입력한 고지서가 없습니다",
+      "noMetered": "측정 합계 없음",
+      "diff": "차이 {{value}}",
+      "overwriteConfirm": "{{month}} 고지서가 이미 있습니다. 새 값으로 덮어쓸까요?",
+      "overwrite": "덮어쓰기",
+      "cancel": "취소",
+      "saveBill": "고지서 저장",
+      "billsSiteOnly": "고지서는 사이트·건물 단위로 입력합니다.",
+      "validation": {
+        "deviceRequired": "기기를 고르세요",
+        "powerRequired": "정격 소비 전력을 숫자로 입력하세요",
+        "monthRequired": "월을 고르세요",
+        "kwhPositive": "사용량은 0보다 커야 합니다(소수 첫째 자리까지)",
+        "wholeWon": "원 단위 숫자로 입력하세요"
+      }
+    },
+    "dashboard": {
+      "title": "에너지",
+      "scope": "범위",
+      "portfolio": "포트폴리오",
+      "period": "기간",
+      "periods": {
+        "thisMonth": "이번 달",
+        "lastMonth": "지난달",
+        "thisYear": "올해",
+        "custom": "사용자 지정"
+      },
+      "to": "종료일",
+      "compare": "비교",
+      "compares": {
+        "BASELINE": "기준선",
+        "PREVIOUS_PERIOD": "직전 기간",
+        "SAME_PERIOD_LAST_YEAR": "작년 같은 기간"
+      },
+      "apply": "보기",
+      "cards": {
+        "kwh": "사용량",
+        "eui": "EUI",
+        "perHour": "재실 시간당",
+        "krw": "비용",
+        "tco2": "탄소"
+      },
+      "won": "원",
+      "noArea": "면적 없음",
+      "noOccupancy": "재실 시간 없음",
+      "summary": "{{from}} ~ {{to}} · 추정 비율 {{estimated}}",
+      "noBaseline": "기준선이 아직 없습니다",
+      "trend": "일별 사용량",
+      "measured": "측정",
+      "estimated": "추정",
+      "baseline": "기준선",
+      "noData": "이 기간에 집계된 사용량이 없습니다",
+      "children": "하위 단위",
+      "columns": {
+        "name": "이름",
+        "kwh": "사용량(kWh)",
+        "eui": "EUI",
+        "share": "비중",
+        "estimated": "추정 비율",
+        "source": "출처"
+      },
+      "sources": {
+        "metered": "측정",
+        "mixed": "측정·추정",
+        "none": "데이터 없음"
+      },
+      "other": "기타·공용",
+      "noChildren": "하위 단위가 없습니다",
+      "noSources": "에너지 출처를 연결하세요",
+      "from": "시작일",
+      "tabs": {
+        "dashboard": "현황",
+        "baseline": "기준선"
+      },
+      "noWeather": "기준선 비교에 쓸 기온 데이터가 없습니다"
+    },
+    "baseline": {
+      "activeSummary": "적용 중: {{method}} · {{from}} ~ {{to}} · R² {{r2}}",
+      "noActive": "적용된 기준선이 없습니다. 계산한 뒤 [적용]하면 대시보드 기준선 비교에 쓰입니다",
+      "result": "결과",
+      "methods": {
+        "PERIOD_AVERAGE": "기간 평균",
+        "DEGREE_DAY_REGRESSION": "외기 온도 보정 회귀"
+      },
+      "statuses": {
+        "TRAINING": "계산 중",
+        "READY": "준비됨",
+        "FAILED": "실패",
+        "ACTIVE": "적용 중",
+        "RETIRED": "이전"
+      },
+      "lowFit": "적합도 낮음(R² < 0.5)",
+      "needed": "학습 기간이 짧습니다. {{n}}일 더 필요합니다(최소 30일)",
+      "failures": {
+        "INSUFFICIENT_DATA": "학습 데이터가 30일보다 적습니다",
+        "NO_WEATHER": "학습 기간에 기온 데이터가 없습니다",
+        "INTERNAL_ERROR": "계산에 실패했습니다. 잠시 뒤 다시 계산하세요"
+      },
+      "training": "계산 중입니다. 잠시 뒤 새로 고치세요",
+      "coefficients": {
+        "intercept": "절편(kWh/일)",
+        "cdd": "CDD 계수",
+        "hdd": "HDD 계수",
+        "weekend": "주말 차이"
+      },
+      "fitChart": "실측 vs 예측",
+      "actual": "실측",
+      "predicted": "예측",
+      "versions": "버전",
+      "noVersions": "아직 계산한 기준선이 없습니다",
+      "columns": {
+        "method": "방식",
+        "period": "학습 기간",
+        "status": "상태"
+      },
+      "activate": "적용",
+      "create": "기준선 계산",
+      "method": "방식",
+      "trainFrom": "학습 시작일",
+      "trainTo": "학습 종료일",
+      "coolingBaseC": "냉방 기준 온도(℃)",
+      "heatingBaseC": "난방 기준 온도(℃)",
+      "splitWeekday": "평일·주말 분리",
+      "temperatureDevice": "기온 원천 기기",
+      "noTemperature": "선택 안 함",
+      "temperatureMetric": "기온 측정 항목",
+      "hint": "학습 기간은 30~730일입니다. 외기 온도 보정 회귀는 기온 원천 기기가 필요합니다",
+      "calculate": "계산",
+      "errors": {
+        "required": "필수 입력입니다",
+        "date": "날짜를 입력하세요",
+        "order": "종료일이 시작일보다 빠릅니다",
+        "tooLong": "730일을 넘을 수 없습니다",
+        "number": "숫자를 입력하세요"
+      }
+    }
+  },
+  "errors": {
+    "ENE_RATE_PERIOD_OVERLAP": "기간이 겹칩니다",
+    "ENE_EMISSION_FACTOR_SYSTEM_READONLY": "시스템 기본 배출계수는 바꿀 수 없습니다. 조직 계수를 새 기간으로 추가하세요",
+    "ENE_RATE_INVALID": "요금 설정을 확인하세요",
+    "ENE_SOURCE_CONFLICT": "이미 다른 공간에 연결된 계량기이거나 상위 계량기와 겹칩니다",
+    "ENE_SOURCE_METRIC_INVALID": "에너지 측정 항목이 아닙니다",
+    "ENE_BILL_DUPLICATE": "이미 입력된 달입니다",
+    "ENE_TARIFF_NOT_FOUND": "요금 단가를 찾을 수 없습니다",
+    "ENE_EMISSION_FACTOR_NOT_FOUND": "배출계수를 찾을 수 없습니다",
+    "ENE_SOURCE_NOT_FOUND": "에너지 출처를 찾을 수 없습니다",
+    "ENE_BILL_NOT_FOUND": "고지서를 찾을 수 없습니다",
+    "ENE_BASELINE_INSUFFICIENT_DATA": "학습 기간이 30일보다 짧습니다",
+    "ENE_BASELINE_NOT_READY": "계산이 끝난(준비됨) 버전만 적용할 수 있습니다",
+    "ENE_BASELINE_NOT_FOUND": "기준선을 찾을 수 없습니다"
+  }
+}

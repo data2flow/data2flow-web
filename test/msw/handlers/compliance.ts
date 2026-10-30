@@ -1,10 +1,10 @@
 /**
  * M7 환경 기준 가짜 core API(design/api/CMP-api.md): 프로필 API-CMP-01~06a, 적용 API-CMP-07, 측정 가능성 API-CMP-08,
- * 종합 점수 API-CMP-10, 준수 현황 API-CMP-13·14.
- * 권한은 core와 같게 검사한다(조회 CMP_READ, 쓰기 CMP_ADMIN). 시스템 프로필은 READ_ONLY, 잠긴 버전 PUT도 READ_ONLY.
+ * 종합 점수 API-CMP-10, 준수 현황 API-CMP-13·14, 리포트 API-CMP-16~20a, 정기 발행 API-CMP-21·22(일정 701), 개선 조치 API-CMP-23·24(이탈 구간 9001), 커버리지 점검 API-CMP-25(사이트 1).
+ * 권한은 core와 같게 검사한다(조회 CMP_READ, 쓰기 CMP_ADMIN, 리포트 생성·발행 CMP_REPORT, 개선 조치 CMP_ACTION). 시스템 프로필은 READ_ONLY, 잠긴 버전 PUT도 READ_ONLY.
  * 상태는 core.extra["cmp"].
  */
-import { fail, list, noContent, ok, type CoreHandler, type CoreState } from "../core-fixtures";
+import { NOW, fail, list, noContent, ok, type CoreHandler, type CoreState } from "../core-fixtures";
 
 type Json = Record<string, unknown>;
 
@@ -12,6 +12,10 @@ export interface CmpState {
   profiles: Json[];
   versions: Record<string, Json[]>;
   applications: Json[];
+  reports: Json[];
+  actions: Json[];
+  schedules: Json[];
+  runs: Json[];
   seq: number;
 }
 
@@ -35,9 +39,202 @@ export function cmpState(core: CoreState): CmpState {
       ],
     },
     applications: [{ applicationId: "501", profileId: "101", profileName: "우리 학교 기준", pinnedVersionNo: null, versionNo: 2, targetType: "SPACE", targetSpaceId: "31", targetName: "실습실", targetUsage: null, includeDescendants: true, facilityType: null, appliedBy: { userId: "8", name: "이통합" }, appliedAt: "2026-10-02T00:00:00Z", measurability: { measurable: 1, partial: 0, unmeasurable: 0 } }],
+    reports: [
+      {
+        reportId: "801", type: "KR_SELF_CHECK", title: "2026-09 자가 점검(실습실)", spaceIds: ["31"], facilityType: "GENERAL", periodFrom: "2026-09-01", periodTo: "2026-09-30", options: { includeRawCsv: false, includeActions: true, branding: false }, createdAt: "2026-10-01T00:00:00Z", updatedAt: "2026-10-02T00:00:00Z",
+        revisions: [revision("801", 1, "PUBLISHED", { publishedBy: { userId: "7", name: "김운영" }, publishedAt: "2026-10-01T01:00:00Z" }), revision("801", 2, "DRAFT", { sha256: "b".repeat(64), dataRange: { ...RANGE, missingRatio: 12.5, lateRowsSincePrevious: 30 } })],
+      },
+      { reportId: "802", type: "KR_SELF_CHECK", title: "2026-10 자가 점검", spaceIds: ["31"], facilityType: "GENERAL", periodFrom: "2026-10-01", periodTo: "2026-10-03", options: {}, createdAt: "2026-10-04T00:00:00Z", updatedAt: "2026-10-04T00:00:00Z", revisions: [revision("802", 1, "GENERATING", { progress: 60, sha256: null, dataRange: null })] },
+    ],
+    actions: [],
+    schedules: [
+      {
+        reportScheduleId: "701", name: "월간 자가 점검", reportTemplate: { type: "KR_SELF_CHECK", title: null, spaceIds: ["31"], facilityType: null, options: null }, cadence: "MONTHLY", dayOfPeriod: 1, publishTime: "09:00",
+        periodRule: "PREVIOUS_MONTH", recipients: { userIds: ["7"], emails: ["audit@example.com"] }, format: "PDF", enabled: true, nextRunAt: "2026-11-01T00:00:00Z", version: 0, updatedAt: "2026-10-01T00:00:00Z",
+      },
+    ],
+    runs: [
+      { runId: "7101", scheduleId: "701", scheduledAt: "2026-10-01T00:00:00Z", trigger: "SCHEDULED", status: "FAILED", attempts: 3, reportId: null, revisionNo: null, error: "CMP_PROFILE_NOT_APPLIED", deliveries: [] },
+    ],
     seq: 600,
   } satisfies CmpState;
   return core.extra.cmp as CmpState;
+}
+
+const RANGE = { from: "2026-08-31T15:00:00Z", to: "2026-09-30T15:00:00Z", rows: 43200, missingRatio: 1.2, excludedVirtualDevices: 1, lateRowsSincePrevious: 0 };
+
+function revision(reportId: string, revisionNo: number, status: string, extra: Json = {}): Json {
+  return { reportId, revisionNo, status, progress: status === "GENERATING" ? 10 : 100, sha256: "9f2a".padEnd(61, "0") + "c41", sizeBytes: 120_000, dataRange: RANGE, profileVersions: ["70"], generatedBy: { userId: "7", name: "김운영" }, publishedBy: null, publishedAt: null, failureReason: null, createdAt: "2026-10-01T00:00:00Z", updatedAt: "2026-10-01T00:05:00Z", ...extra };
+}
+
+const reportView = (r: Json, all: boolean): Json => {
+  const { revisions, ...rest } = r as Json & { revisions: Json[] };
+  const sorted = [...revisions].sort((a, b) => Number(b.revisionNo) - Number(a.revisionNo));
+  return { ...rest, latest: sorted[0] ?? null, revisions: all ? sorted : null };
+};
+
+/** 리포트 API-CMP-16~20a. 32번(사무실)에는 프로필이 적용되어 있지 않다 */
+function reportsHandler(s: CmpState, { method, path, url, body, can }: Parameters<CoreHandler>[1]): Response | undefined {
+  const b = (body ?? {}) as Json;
+  if (path === "/compliance/reports" && method === "GET") {
+    const type = url.searchParams.get("type");
+    const status = url.searchParams.get("status");
+    const rows = s.reports.map((r) => reportView(r, false)).filter((r) => (!type || r.type === type) && (!status || (r.latest as Json | null)?.status === status));
+    return list(rows, url);
+  }
+  if (path === "/compliance/reports" && method === "POST") {
+    if (!can("CMP_REPORT")) return fail(403, "PERMISSION_DENIED");
+    const spaceIds = (b.spaceIds as string[] | undefined) ?? [];
+    if (spaceIds.includes("32")) return fail(409, "CMP_PROFILE_NOT_APPLIED");
+    const key = (r: Json) => [r.type, [...(r.spaceIds as string[])].sort().join(","), r.periodFrom, r.periodTo, r.facilityType ?? "GENERAL"].join("|");
+    const wanted = { type: b.type, spaceIds, periodFrom: b.periodFrom, periodTo: b.periodTo, facilityType: b.facilityType ?? "GENERAL" };
+    let report = s.reports.find((r) => key(r) === key(wanted));
+    if (!report) {
+      report = { reportId: String(++s.seq), ...wanted, title: b.title ?? `실내공기질 자가 점검 리포트 ${b.periodFrom} ~ ${b.periodTo}`, options: b.options ?? {}, createdAt: NOW, updatedAt: NOW, revisions: [] };
+      s.reports.push(report);
+    }
+    const revisions = report.revisions as Json[];
+    const next = revision(report.reportId as string, revisions.length + 1, "GENERATING", { sha256: null, dataRange: null });
+    revisions.push(next);
+    return ok({ reportId: report.reportId, revisionId: String(++s.seq), revisionNo: next.revisionNo, status: "GENERATING" }, 202);
+  }
+  if (path === "/compliance/reports/verify-hash" && method === "POST") return ok({ matched: false });
+  const m = /^\/compliance\/reports\/(\d+)(?:\/revisions\/(\d+)(?:\/(publish|files|content)(?:\/(pdf|csv|preview))?)?)?$/.exec(path);
+  if (!m) return undefined;
+  const report = s.reports.find((r) => r.reportId === m[1]);
+  if (!report) return fail(404, "CMP_REPORT_NOT_FOUND");
+  if (!m[2]) return method === "GET" ? ok(reportView(report, true)) : undefined;
+  const revisions = report.revisions as Json[];
+  const rev = revisions.find((r) => r.revisionNo === Number(m[2]));
+  if (!rev) return fail(404, "CMP_REPORT_NOT_FOUND");
+  if (!m[3] && method === "GET") return ok(rev);
+  if (!m[3] && method === "DELETE") {
+    if (!can("CMP_REPORT")) return fail(403, "PERMISSION_DENIED");
+    if (rev.status !== "DRAFT" && rev.status !== "FAILED") return fail(409, "CMP_REPORT_STATE_CONFLICT");
+    report.revisions = revisions.filter((r) => r !== rev);
+    if ((report.revisions as Json[]).length === 0) s.reports = s.reports.filter((r) => r !== report);
+    return noContent();
+  }
+  if (m[3] === "publish" && method === "POST") {
+    if (!can("CMP_REPORT")) return fail(403, "PERMISSION_DENIED");
+    if (rev.status !== "DRAFT") return fail(409, "CMP_REPORT_STATE_CONFLICT");
+    Object.assign(rev, { status: "PUBLISHED", sha256: "c".repeat(64), publishedBy: { userId: "7", name: "김운영" }, publishedAt: NOW });
+    return ok(rev);
+  }
+  if (m[3] === "files" && method === "GET") {
+    if (m[4] === "csv") return can("CMP_REPORT") ? fail(404, "CMP_REPORT_NOT_FOUND") : fail(403, "PERMISSION_DENIED");
+    if (rev.status !== "DRAFT" && rev.status !== "PUBLISHED") return fail(404, "CMP_REPORT_NOT_FOUND");
+    return ok({ url: `/api/v1/core/compliance/reports/${m[1]}/revisions/${m[2]}/content/${m[4]}?expires=1791000600&signature=abc`, sha256: rev.sha256, sizeBytes: rev.sizeBytes, expiresAt: "2026-10-04T00:10:00Z" });
+  }
+  if (m[3] === "content" && method === "GET") {
+    return new Response("%PDF-1.7\n%fake\n", { status: 200, headers: { "Content-Type": "application/pdf" } });
+  }
+  return undefined;
+}
+
+const EMAIL = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+
+/** 정기 발행 API-CMP-21·22. 공간 32번은 프로필이 없다 */
+function schedulesHandler(s: CmpState, { method, path, url, body, can }: Parameters<CoreHandler>[1]): Response | undefined {
+  const b = (body ?? {}) as Json;
+  const runView = ({ scheduleId: _s, ...r }: Json) => (void _s, r);
+  const view = (x: Json): Json => {
+    const runs = s.runs.filter((r) => r.scheduleId === x.reportScheduleId);
+    return { ...x, lastRun: runs.length ? runView(runs[runs.length - 1]) : null };
+  };
+  const invalid = (field: string, code: string) => fail(400, "CMP_SCHEDULE_INVALID", { errors: [{ field, code, message: "" }] });
+  const save = (existing?: Json): Response => {
+    if (!can("CMP_REPORT")) return fail(403, "PERMISSION_DENIED");
+    const template = (b.reportTemplate ?? {}) as Json;
+    const recipients = (b.recipients ?? {}) as { userIds?: string[]; emails?: string[] };
+    const day = Number(b.dayOfPeriod);
+    if (!String(b.name ?? "").trim()) return invalid("name", "NotBlank");
+    if (!(day >= 1 && day <= 28)) return invalid("dayOfPeriod", "Range");
+    if ((recipients.emails ?? []).some((e) => !EMAIL.test(e))) return invalid("recipients.emails", "Email");
+    if (!(recipients.userIds ?? []).length && !(recipients.emails ?? []).length) return invalid("recipients", "NotEmpty");
+    if (((template.spaceIds as string[] | undefined) ?? []).includes("32")) return fail(409, "CMP_PROFILE_NOT_APPLIED");
+    if (existing && b.version !== existing.version) return fail(409, "VERSION_CONFLICT");
+    const { version: _v, ...rest } = b;
+    void _v;
+    const next: Json = { ...rest, nextRunAt: b.enabled ? (b.cadence === "QUARTERLY" ? "2027-01-01T00:00:00Z" : "2026-11-01T00:00:00Z") : null, updatedAt: NOW };
+    if (existing) {
+      Object.assign(existing, next, { version: Number(existing.version) + 1 });
+      return ok(view(existing));
+    }
+    const created = { reportScheduleId: String(++s.seq), ...next, version: 0 };
+    s.schedules.push(created);
+    return ok(view(created), 201);
+  };
+  if (path === "/compliance/report-schedules" && method === "GET") return list(s.schedules.map(view), url);
+  if (path === "/compliance/report-schedules" && method === "POST") return save();
+  const m = /^\/compliance\/report-schedules\/(\d+)(?:\/(run-now|runs))?$/.exec(path);
+  if (!m) return undefined;
+  const schedule = s.schedules.find((x) => x.reportScheduleId === m[1]);
+  if (!schedule) return fail(404, "CMP_SCHEDULE_NOT_FOUND");
+  if (!m[2] && method === "GET") return ok(view(schedule));
+  if (!m[2] && method === "PUT") return save(schedule);
+  if (!m[2] && method === "DELETE") {
+    if (!can("CMP_REPORT")) return fail(403, "PERMISSION_DENIED");
+    s.schedules = s.schedules.filter((x) => x !== schedule);
+    s.runs = s.runs.filter((r) => r.scheduleId !== m[1]);
+    return noContent();
+  }
+  if (m[2] === "run-now" && method === "POST") {
+    if (!can("CMP_REPORT")) return fail(403, "PERMISSION_DENIED");
+    const run = { runId: String(++s.seq), scheduleId: m[1], scheduledAt: NOW, trigger: "MANUAL", status: "PENDING", attempts: 0, reportId: null, revisionNo: null, error: null, deliveries: [] };
+    s.runs.push(run);
+    return ok({ runId: run.runId, reportScheduleId: m[1], scheduledAt: NOW }, 202);
+  }
+  if (m[2] === "runs" && method === "GET") return list(s.runs.filter((r) => r.scheduleId === m[1]).reverse().map(runView), url);
+  return undefined;
+}
+
+const EXCURSION = { excursionId: "9001", spaceId: "31", spaceName: "실습실", metricKey: "co2", startedAt: "2026-10-02T01:00:00Z", endedAt: "2026-10-02T05:35:00Z", peakValue: 1420, alarmId: "77" };
+
+/** 개선 조치 API-CMP-23·24. 작업 지시 999999·알람 999999는 없다 */
+function actionsHandler(s: CmpState, { method, path, url, body, can, user }: Parameters<CoreHandler>[1]): Response | undefined {
+  const b = (body ?? {}) as Json;
+  const save = (existing?: Json): Response => {
+    if (!can("CMP_ACTION")) return fail(403, "PERMISSION_DENIED");
+    if (!b.cause || !b.actionText || !b.actedAt || Date.parse(b.actedAt as string) < Date.parse(EXCURSION.startedAt)) return fail(400, "CMP_ACTION_INVALID");
+    if (((b.linkedWorkOrderIds as string[] | undefined) ?? []).includes("999999")) return fail(404, "WORKORDER_NOT_FOUND");
+    if (((b.linkedAlarmIds as string[] | undefined) ?? []).includes("999999")) return fail(404, "ALARM_NOT_FOUND");
+    const actorId = (b.actorUserId as string | undefined) ?? user.id;
+    const mode = (b.resultMode as string | undefined) ?? "AUTO";
+    const next: Json = {
+      ...(existing ?? { actionId: String(++s.seq), excursionId: EXCURSION.excursionId }),
+      excursion: { spaceId: EXCURSION.spaceId, metricKey: EXCURSION.metricKey, startedAt: EXCURSION.startedAt, endedAt: EXCURSION.endedAt, peakValue: EXCURSION.peakValue },
+      cause: b.cause, causeNote: b.causeNote ?? null, actionText: b.actionText, actor: { userId: actorId, name: actorId === user.id ? user.name : null }, actedAt: b.actedAt,
+      linkedAlarmIds: b.linkedAlarmIds ?? [], linkedWorkOrderIds: b.linkedWorkOrderIds ?? [], resultMode: mode, resultRatio24h: null, resultNote: b.resultNote ?? null,
+      resultStatus: mode === "MANUAL" ? "RECORDED" : "PENDING", updatedAt: NOW,
+    };
+    if (existing) Object.assign(existing, next);
+    else s.actions.push(next);
+    return ok(next, existing ? 200 : 201);
+  };
+  if (path === "/compliance/actions" && method === "GET") {
+    const excursionId = url.searchParams.get("excursionId");
+    return list(s.actions.filter((a) => !excursionId || a.excursionId === excursionId), url);
+  }
+  const x = /^\/compliance\/excursions\/(\d+)(\/actions)?$/.exec(path);
+  if (x) {
+    if (x[1] !== EXCURSION.excursionId) return fail(404, "CMP_EXCURSION_NOT_FOUND");
+    if (!x[2] && method === "GET") return ok({ ...EXCURSION, actions: s.actions.filter((a) => a.excursionId === x[1]) });
+    if (x[2] && method === "POST") return save();
+    return undefined;
+  }
+  const a = /^\/compliance\/actions\/(\d+)$/.exec(path);
+  if (!a) return undefined;
+  const action = s.actions.find((r) => r.actionId === a[1]);
+  if (!action) return fail(404, "CMP_ACTION_NOT_FOUND");
+  if (method === "GET") return ok(action);
+  if (method === "PUT") return save(action);
+  if (method === "DELETE") {
+    if (!can("CMP_ACTION")) return fail(403, "PERMISSION_DENIED");
+    s.actions = s.actions.filter((r) => r !== action);
+    return noContent();
+  }
+  return undefined;
 }
 
 const current = (s: CmpState, p: Json) => s.versions[p.profileId as string].find((v) => v.versionNo === p.currentVersionNo)!;
@@ -46,6 +243,15 @@ const detail = (s: CmpState, p: Json) => ({ ...p, currentVersion: current(s, p),
 export const complianceHandler: CoreHandler = (core, { method, path, url, body, can, user }) => {
   if (!path.startsWith("/compliance/")) return undefined;
   if (!can("CMP_READ")) return fail(403, "PERMISSION_DENIED");
+  if (path === "/compliance/coverage" && method === "GET") {
+    if (url.searchParams.get("siteId") !== "1") return fail(404, "SPACE_NOT_FOUND");
+    const profileId = url.searchParams.get("profileId");
+    if (profileId && !cmpState(core).profiles.some((p) => p.profileId === profileId)) return fail(404, "CMP_PROFILE_NOT_FOUND");
+    return ok(coverage(profileId));
+  }
+  if (path.startsWith("/compliance/report-schedules")) return schedulesHandler(cmpState(core), { method, path, url, body, can, user } as Parameters<CoreHandler>[1]);
+  if (path.startsWith("/compliance/reports")) return reportsHandler(cmpState(core), { method, path, url, body, can, user } as Parameters<CoreHandler>[1]);
+  if (path.startsWith("/compliance/excursions") || path.startsWith("/compliance/actions")) return actionsHandler(cmpState(core), { method, path, url, body, can, user } as Parameters<CoreHandler>[1]);
   if (method !== "GET" && !can("CMP_ADMIN")) return fail(403, "PERMISSION_DENIED");
   const s = cmpState(core);
   const b = (body ?? {}) as Json;
@@ -155,7 +361,8 @@ export const complianceHandler: CoreHandler = (core, { method, path, url, body, 
   const spaceStatus = /^\/compliance\/status\/spaces\/(\d+)$/.exec(path);
   if (spaceStatus && method === "GET") {
     if (spaceStatus[1] !== "31" && spaceStatus[1] !== "32") return fail(404, "SPACE_NOT_FOUND");
-    return ok(SPACE_STATUS);
+    const withActions = new Set(s.actions.map((a) => a.excursionId));
+    return ok({ ...SPACE_STATUS, excursions: SPACE_STATUS.excursions.map((x) => ({ ...x, hasAction: withActions.has(x.id) })) });
   }
   return undefined;
 };
@@ -214,3 +421,26 @@ const SPACE_STATUS = {
   ],
   excursions: [{ id: "9001", metricKey: "co2", startedAt: "2026-10-02T01:00:00Z", endedAt: "2026-10-02T05:35:00Z", peakValue: 1420, alarmId: "77", hasAction: false }],
 };
+
+/** 커버리지 점검: 프로필 101(우리 학교 기준)은 설치 밀도 기준이 있고 공개 표시 기준은 없다 */
+function coverage(profileId: string | null): Json {
+  const withDensity = profileId === "101";
+  return {
+    siteId: "1",
+    profile: profileId ? { profileId, name: profileId === "101" ? "우리 학교 기준" : "실내공기질관리법 다중이용시설", versionNo: 2 } : null,
+    period: { from: "2026-09-04", to: "2026-10-03" },
+    summary: { density: withDensity ? "RED" : "NA", publicDisplay: "NA", calibration: "RED", quality: "YELLOW" },
+    density: withDensity
+      ? [
+          { space: { id: "32", name: "사무실" }, usage: "OFFICE", areaM2: 1200, required: 3, actual: 2, shortage: 1, undeterminedReason: null },
+          { space: { id: "31", name: "실습실" }, usage: "LAB", areaM2: null, required: null, actual: 4, shortage: null, undeterminedReason: "NO_AREA" },
+        ]
+      : [],
+    publicDisplay: null,
+    calibration: [
+      { device: { id: "d-152590", name: "EM500-CO2-152590" }, space: { id: "31", name: "실습실" }, model: "EM500-CO2", intervalDays: 365, lastCalibratedOn: "2025-08-24", dueOn: "2026-08-24", elapsedDays: 405, status: "OVERDUE" },
+      { device: { id: "d-am103", name: "AM103-실습실" }, space: { id: "31", name: "실습실" }, model: "AM103", intervalDays: 365, lastCalibratedOn: null, dueOn: null, elapsedDays: null, status: "NO_RECORD" },
+    ],
+    quality: [{ space: { id: "31", name: "실습실" }, devices: 2, missingRatio: 2.1, intervalViolations: 1, abnormalQualityRatio: 0.4, belowStandard: false }],
+  };
+}

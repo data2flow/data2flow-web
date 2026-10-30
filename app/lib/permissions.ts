@@ -32,8 +32,9 @@ export type MenuKey =
   // 요구사항 시험 화면 보강(UI-ACT-08·ANA-07)
   | "controlSettings"
   | "analyticsTemplateSettings"
-  // M7 환경 기준
-  | "compliance";
+  // M7 환경 기준·에너지
+  | "compliance"
+  | "energy";
 
 export interface MenuItem {
   key: MenuKey;
@@ -65,6 +66,8 @@ export const MENU: MenuItem[] = [
   { key: "analytics", path: "/analytics/templates", anyOf: ["ANALYTICS_READ"], group: "main", sections: ["/analytics", "/ai"], guard: ["ANALYTICS_READ"] },
   // M7 환경 기준(UI-CMP-01~04): 조회 CMP_READ(VIEWER+), 만들기·편집은 CMP_ADMIN
   { key: "compliance", path: "/compliance/profiles", anyOf: ["CMP_READ"], group: "main", sections: ["/compliance"] },
+  // M7 에너지(00-navigation.md §2): 대시보드(UI-ENE-03)는 VIEWER+, 계량·고지서(UI-ENE-02)는 OPERATOR+, 설정(UI-ENE-01)은 관리자
+  { key: "energy", path: "/energy", anyOf: ["ENE_READ"], group: "main" },
   { key: "members", path: "/admin/members", anyOf: ["IAM_MANAGE"], group: "admin" },
   { key: "roles", path: "/admin/roles", anyOf: ["IAM_MANAGE"], group: "admin" },
   { key: "security", path: "/admin/security", anyOf: ["IAM_MANAGE"], group: "admin" },
@@ -150,6 +153,9 @@ export const ROUTE_GUARDS: { prefix: string; anyOf: string[] }[] = [
   // M6 분석·AI(spec/detail/ANA·AIA screens): 목록·결과 V+, 마법사·모델 A+, MCP 연결은 토큰 발급 권한(V 제외), 내 토큰은 누구나(발급 버튼만 권한)
   { prefix: "/analytics", anyOf: ["ANALYTICS_READ"] },
   { prefix: "/compliance/profiles/new", anyOf: ["CMP_ADMIN"] },
+  { prefix: "/energy", anyOf: ["ENE_READ"] },
+  { prefix: "/energy/meters", anyOf: ["ENE_OPERATE", "ENE_ADMIN"] },
+  { prefix: "/energy/settings", anyOf: ["ENE_ADMIN"] },
   { prefix: "/analytics/new", anyOf: ["ANALYTICS_RUN"] },
   { prefix: "/analytics/models", anyOf: ["ANALYTICS_RUN"] },
   { prefix: "/ai", anyOf: ["AI_USE"] },

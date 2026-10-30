@@ -1,0 +1,270 @@
+{
+  "nav": {
+    "energy": "エネルギー"
+  },
+  "energy": {
+    "area": {
+      "dashboard": "エネルギーダッシュボード",
+      "meters": "計量・請求書",
+      "settings": "エネルギー設定"
+    },
+    "settings": {
+      "title": "エネルギー設定",
+      "tabs": {
+        "tariffs": "料金単価",
+        "factors": "排出係数"
+      },
+      "noRecalc": "変更した単価・係数は開始日から適用されます。計算済みの過去期間は再計算しません。",
+      "noTariffs": "登録された料金単価がありません",
+      "scope": "適用範囲",
+      "scopeOrg": "組織全体",
+      "period": "期間",
+      "range": "{{from}} ~ {{to}}",
+      "mode": "方式",
+      "modes": {
+        "FLAT": "単一単価",
+        "TOU": "時間帯別"
+      },
+      "rate": "単価・区間",
+      "baseCharge": "基本料金(ウォン/月)",
+      "perKwh": "{{rate}} ウォン/kWh",
+      "dayType": {
+        "WEEKDAY": "平日",
+        "WEEKEND_HOLIDAY": "週末・祝日"
+      },
+      "band": {
+        "from": "開始",
+        "to": "終了",
+        "rate": "ウォン/kWh",
+        "label": "名前(軽負荷など)",
+        "remove": "削除",
+        "add": "+ 区間"
+      },
+      "addTariff": "単価期間を追加",
+      "validFrom": "開始日",
+      "flatRate": "単価(ウォン/kWh)",
+      "touHint": "平日と週末・祝日それぞれ 00:00 から 24:00 まで隙間なく区間を分けてください。祝日は組織カレンダーに従います。",
+      "add": "追加",
+      "addFactor": "排出係数期間を追加",
+      "factor": "係数(tCO2eq/MWh)",
+      "sourceTitle": "出典文書名",
+      "sourceYear": "基準年",
+      "source": "出典",
+      "systemDefault": "既定値(読み取り専用)",
+      "sourceOf": "{{title}}({{year}}年基準)",
+      "factorValue": "{{value}} tCO2eq/MWh",
+      "delete": "削除",
+      "validation": {
+        "dateRequired": "開始日を入力してください",
+        "ratePositive": "単価は0より大きくしてください(小数第2位まで)",
+        "coverage": "24時間をすべて指定してください",
+        "modeRequired": "方式を選んでください",
+        "wholeWon": "ウォン単位の数字で入力してください",
+        "factorRange": "0〜2の数字で入力してください(小数第4位まで)",
+        "sourceRequired": "出典を入力してください",
+        "sourceTooLong": "出典は200文字までです",
+        "yearRange": "1990〜2100の年を入力してください"
+      }
+    },
+    "meters": {
+      "title": "計量・請求書",
+      "spaces": "空間",
+      "noSpaces": "空間がありません",
+      "sourcesOf": "{{name}}のエネルギー源",
+      "meteredFirst": "この空間には計測と推定の両方があります。合計には計測値を使い、推定値は比較用です。",
+      "noSources": "接続されたエネルギー源がありません",
+      "noSourcesBody": "電力量計・スマートプラグを接続するか、設備の定格電力で推定してください。",
+      "col": {
+        "kind": "種類",
+        "target": "対象",
+        "scope": "対象範囲",
+        "status": "状態",
+        "month": "月",
+        "billKwh": "請求書 kWh",
+        "amount": "金額(ウォン)",
+        "meteredKwh": "計測合計 kWh",
+        "diff": "差"
+      },
+      "kind": {
+        "METERED": "計測",
+        "ESTIMATED": "推定"
+      },
+      "cumulative": "{{metric}} · 累積型",
+      "instant": "{{metric}} · 瞬時型",
+      "rated": "定格 {{rated}}W · 待機 {{standby}}W",
+      "integrated": "電力(W)を時間積分して kWh で計算します",
+      "coversDescendants": "下位空間の合計",
+      "thisSpace": "この空間",
+      "status": {
+        "OK": "正常",
+        "NO_DATA": "24時間受信なし",
+        "DISABLED": "オフ"
+      },
+      "remove": "削除",
+      "addMetered": "計測を追加",
+      "noCandidates": "この空間に energy・power 測定項目を持つ機器がありません。",
+      "meter": "機器・測定項目",
+      "autoDetect": "energy は累積型(kWh)、power は瞬時型(W)として自動判別します。",
+      "coversDescendantsLabel": "下位空間の合計を含む親メーター",
+      "add": "接続",
+      "addEstimated": "推定を追加",
+      "equipment": "設備",
+      "choose": "選択してください",
+      "ratedPowerW": "定格消費電力(W)",
+      "standbyPowerW": "待機電力(W)",
+      "bills": "{{year}}年の請求書",
+      "prevYear": "‹ 前年",
+      "nextYear": "翌年 ›",
+      "noBills": "入力した請求書がありません",
+      "noMetered": "計測合計なし",
+      "diff": "差 {{value}}",
+      "overwriteConfirm": "{{month}}の請求書がすでにあります。上書きしますか?",
+      "overwrite": "上書き",
+      "cancel": "キャンセル",
+      "saveBill": "請求書を保存",
+      "billsSiteOnly": "請求書はサイト・建物単位で入力します。",
+      "validation": {
+        "deviceRequired": "機器を選んでください",
+        "powerRequired": "定格消費電力を数字で入力してください",
+        "monthRequired": "月を選んでください",
+        "kwhPositive": "使用量は0より大きくしてください(小数第1位まで)",
+        "wholeWon": "ウォン単位の数字で入力してください"
+      }
+    },
+    "dashboard": {
+      "title": "エネルギー",
+      "scope": "範囲",
+      "portfolio": "ポートフォリオ",
+      "period": "期間",
+      "periods": {
+        "thisMonth": "今月",
+        "lastMonth": "先月",
+        "thisYear": "今年",
+        "custom": "カスタム"
+      },
+      "to": "終了日",
+      "compare": "比較",
+      "compares": {
+        "BASELINE": "ベースライン",
+        "PREVIOUS_PERIOD": "前期間",
+        "SAME_PERIOD_LAST_YEAR": "前年同期"
+      },
+      "apply": "表示",
+      "cards": {
+        "kwh": "使用量",
+        "eui": "EUI",
+        "perHour": "在室時間あたり",
+        "krw": "費用",
+        "tco2": "炭素"
+      },
+      "won": "ウォン",
+      "noArea": "面積なし",
+      "noOccupancy": "在室時間なし",
+      "summary": "{{from}} ~ {{to}} · 推定比率 {{estimated}}",
+      "noBaseline": "ベースラインはまだありません",
+      "trend": "日別使用量",
+      "measured": "計測",
+      "estimated": "推定",
+      "baseline": "ベースライン",
+      "noData": "この期間に集計された使用量はありません",
+      "children": "下位単位",
+      "columns": {
+        "name": "名前",
+        "kwh": "使用量(kWh)",
+        "eui": "EUI",
+        "share": "比率",
+        "estimated": "推定比率",
+        "source": "出所"
+      },
+      "sources": {
+        "metered": "計測",
+        "mixed": "計測・推定",
+        "none": "データなし"
+      },
+      "other": "その他・共用",
+      "noChildren": "下位単位はありません",
+      "noSources": "エネルギー出所を接続してください",
+      "from": "開始日",
+      "tabs": {
+        "dashboard": "概要",
+        "baseline": "ベースライン"
+      },
+      "noWeather": "ベースライン比較に使う気温データがありません"
+    },
+    "baseline": {
+      "activeSummary": "適用中: {{method}} · {{from}} ~ {{to}} · R² {{r2}}",
+      "noActive": "適用中のベースラインがありません。計算して[適用]するとダッシュボードの比較に使われます",
+      "result": "結果",
+      "methods": {
+        "PERIOD_AVERAGE": "期間平均",
+        "DEGREE_DAY_REGRESSION": "外気温補正回帰"
+      },
+      "statuses": {
+        "TRAINING": "計算中",
+        "READY": "準備完了",
+        "FAILED": "失敗",
+        "ACTIVE": "適用中",
+        "RETIRED": "以前"
+      },
+      "lowFit": "適合度低(R² < 0.5)",
+      "needed": "学習期間が短すぎます。あと{{n}}日必要です(最低30日)",
+      "failures": {
+        "INSUFFICIENT_DATA": "学習データが30日未満です",
+        "NO_WEATHER": "学習期間に気温データがありません",
+        "INTERNAL_ERROR": "計算に失敗しました。しばらくしてから再計算してください"
+      },
+      "training": "計算中です。しばらくしてから更新してください",
+      "coefficients": {
+        "intercept": "切片(kWh/日)",
+        "cdd": "CDD係数",
+        "hdd": "HDD係数",
+        "weekend": "週末差"
+      },
+      "fitChart": "実測 vs 予測",
+      "actual": "実測",
+      "predicted": "予測",
+      "versions": "バージョン",
+      "noVersions": "まだ計算したベースラインがありません",
+      "columns": {
+        "method": "方式",
+        "period": "学習期間",
+        "status": "状態"
+      },
+      "activate": "適用",
+      "create": "ベースライン計算",
+      "method": "方式",
+      "trainFrom": "学習開始日",
+      "trainTo": "学習終了日",
+      "coolingBaseC": "冷房基準温度(℃)",
+      "heatingBaseC": "暖房基準温度(℃)",
+      "splitWeekday": "平日・週末を分ける",
+      "temperatureDevice": "気温ソース機器",
+      "noTemperature": "選択しない",
+      "temperatureMetric": "気温の測定項目",
+      "hint": "学習期間は30~730日です。外気温補正回帰には気温ソース機器が必要です",
+      "calculate": "計算",
+      "errors": {
+        "required": "必須です",
+        "date": "日付を入力してください",
+        "order": "終了日が開始日より前です",
+        "tooLong": "730日を超えられません",
+        "number": "数値を入力してください"
+      }
+    }
+  },
+  "errors": {
+    "ENE_RATE_PERIOD_OVERLAP": "期間が重なっています",
+    "ENE_EMISSION_FACTOR_SYSTEM_READONLY": "システム既定の排出係数は変更できません。組織の係数を新しい期間で追加してください",
+    "ENE_RATE_INVALID": "料金設定を確認してください",
+    "ENE_SOURCE_CONFLICT": "すでに別の空間に接続されたメーターか、親メーターと重なっています",
+    "ENE_SOURCE_METRIC_INVALID": "エネルギーの測定項目ではありません",
+    "ENE_BILL_DUPLICATE": "すでに入力された月です",
+    "ENE_TARIFF_NOT_FOUND": "料金単価が見つかりません",
+    "ENE_EMISSION_FACTOR_NOT_FOUND": "排出係数が見つかりません",
+    "ENE_SOURCE_NOT_FOUND": "エネルギー源が見つかりません",
+    "ENE_BILL_NOT_FOUND": "請求書が見つかりません",
+    "ENE_BASELINE_INSUFFICIENT_DATA": "学習期間が30日未満です",
+    "ENE_BASELINE_NOT_READY": "準備完了のバージョンのみ適用できます",
+    "ENE_BASELINE_NOT_FOUND": "ベースラインが見つかりません"
+  }
+}

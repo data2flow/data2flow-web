@@ -5,7 +5,9 @@
   "compliance": {
     "area": {
       "profiles": "Standard profiles",
-      "status": "Compliance status"
+      "status": "Compliance status",
+      "reports": "Reports",
+      "coverage": "Coverage check"
     },
     "archived": "Archived",
     "kind": {
@@ -263,7 +265,354 @@
       "ongoing": "Ongoing",
       "peak": "Peak {{value}}",
       "alarm": "Alarm #{{id}}",
-      "noExcursions": "No excursions"
+      "noExcursions": "No excursions",
+      "recordAction": "Record action",
+      "viewActions": "View actions"
+    },
+    "reports": {
+      "title": "Reports",
+      "new": "New report",
+      "type": "Type",
+      "statusLabel": "Status",
+      "empty": "No reports yet",
+      "emptyBody": "Pick spaces and a period to create a self-check report, then review the draft and publish it.",
+      "types": {
+        "KR_SELF_CHECK": "Self-check",
+        "RESET_SUPPORT": "Certification support (RESET)",
+        "WELL_A08_SUPPORT": "Certification support (WELL A08)"
+      },
+      "status": {
+        "GENERATING": "Generating",
+        "DRAFT": "Draft",
+        "PUBLISHED": "Published",
+        "FAILED": "Failed"
+      },
+      "col": {
+        "title": "Title",
+        "type": "Type",
+        "period": "Period",
+        "revision": "Rev.",
+        "status": "Status",
+        "published": "Published"
+      },
+      "wizard": {
+        "step1": "1. Type",
+        "step2": "2. Target",
+        "step3": "3. Period",
+        "step4": "4. Options",
+        "soon": "(coming soon)",
+        "title": "Title",
+        "titleHint": "Leave empty to name it after the period.",
+        "spaces": "Spaces",
+        "spacesHint": "{{n}} selected. Selecting a parent includes its children.",
+        "spacesFailed": "Could not load spaces.",
+        "facility": "Facility type",
+        "facilityAuto": "Use the applied profile",
+        "from": "From",
+        "to": "To",
+        "periodHint": "Up to 400 days, until today. Dates use the organization time zone ({{timezone}}).",
+        "includeActions": "Include corrective actions",
+        "includeRawCsv": "Include raw data CSV",
+        "branding": "Organization logo on cover",
+        "submit": "Generate preview"
+      },
+      "validation": {
+        "typeRequired": "Choose a type.",
+        "typeUnsupported": "This type is not available yet.",
+        "spaceRequired": "Choose at least one space.",
+        "profileNotApplied": "No profile is applied to the selected spaces.",
+        "virtualOnly": "Only virtual devices are in these spaces. Choose spaces with real devices.",
+        "facilityRequired": "Choose a facility type.",
+        "facilityInvalid": "Invalid facility type.",
+        "periodRequired": "Enter start and end dates.",
+        "periodOrder": "The end date must be on or after the start date.",
+        "periodFuture": "Future dates are not allowed.",
+        "periodTooLong": "The period must be 400 days or less.",
+        "titleTooLong": "Use 200 characters or fewer."
+      },
+      "detail": {
+        "publish": "Publish",
+        "regenerate": "Regenerate",
+        "delete": "Delete revision",
+        "revisions": "Revisions",
+        "noRevision": "No revisions",
+        "toc": "Contents",
+        "generating": "Generating the report",
+        "failed": "The report could not be generated.",
+        "draftNote": "This is a draft. Every page is marked \"Draft\"; publishing re-renders it without the mark, so the hash changes.",
+        "preview": "Report preview",
+        "previewMissing": "The preview cannot be opened.",
+        "meta": "Details",
+        "pdf": "Download PDF",
+        "csv": "Raw data CSV"
+      },
+      "sections": {
+        "cover": "Cover and notice",
+        "summary": "Summary",
+        "metrics": "Statistics by metric",
+        "devices": "Devices and calibration",
+        "unmeasurable": "Unmeasurable metrics",
+        "actions": "Corrective actions"
+      },
+      "meta": {
+        "period": "Period",
+        "revision": "Revision",
+        "facility": "Facility type",
+        "noFacility": "Not specified",
+        "profiles": "Profiles",
+        "profileCount": "{{n}} version(s)",
+        "rows": "Data rows",
+        "missing": "Missing ratio",
+        "virtual": "Virtual devices",
+        "virtualCount": "{{n}} excluded",
+        "late": "Late data",
+        "lateCount": "{{n}} rows added since the previous revision",
+        "generated": "Generated",
+        "published": "Published",
+        "hash": "SHA-256",
+        "qualityWarning": "The missing ratio is {{ratio}}%, above 10%. Interpret the figures with care."
+      },
+      "verify": {
+        "title": "Verify hash",
+        "label": "PDF file",
+        "hint": "Upload a report PDF to check that it matches the original made by this organization (50 MB or less).",
+        "checking": "Checking…",
+        "matched": "Matches the original: revision r{{n}}.",
+        "publishedAt": "Published {{at}}.",
+        "draft": "This is a draft file.",
+        "open": "Open report",
+        "mismatch": "No matching report. The file was changed or is not from this organization.",
+        "notPdf": "Only PDF files can be verified.",
+        "tooLarge": "Only files of 50 MB or less can be verified."
+      }
+    },
+    "actions": {
+      "title": "Corrective actions",
+      "back": "Back to compliance status",
+      "target": "Excursion",
+      "space": "Space",
+      "metric": "Metric",
+      "period": "Period",
+      "peak": "Peak",
+      "alarmLabel": "Alarm",
+      "alarm": "Alarm #{{id}}",
+      "workOrder": "Work order #{{id}}",
+      "recorded": "{{n}} recorded actions",
+      "empty": "No actions recorded yet",
+      "newTitle": "New action",
+      "editTitle": "Edit action",
+      "cause": "Cause",
+      "causePlaceholder": "Select a cause",
+      "causeNote": "Cause note",
+      "actionText": "Action taken",
+      "actor": "Taken by",
+      "actedAt": "Taken at",
+      "actedAtHint": "In {{timezone}}, after the excursion started",
+      "alarms": "Linked alarms",
+      "workOrders": "Linked work orders",
+      "idsHint": "Separate IDs with commas",
+      "createWorkOrder": "Create work order",
+      "resultMode": "Result check",
+      "autoHint": "The result is recorded after 24 hours (compliance ratio for 24 hours after the action)",
+      "resultNote": "Result note",
+      "causes": {
+        "VENTILATION": "Poor ventilation",
+        "EQUIPMENT": "Equipment failure",
+        "OUTDOOR_INFLOW": "Outdoor inflow",
+        "CROWDING": "Overcrowding",
+        "SENSOR": "Sensor issue",
+        "OTHER": "Other"
+      },
+      "modes": {
+        "AUTO": "Automatic (24-hour compliance ratio)",
+        "MANUAL": "Manual entry"
+      },
+      "result": {
+        "confirmed": "Compliance after action {{ratio}}%",
+        "recorded": "Result: {{note}}",
+        "pending": "Waiting for automatic check",
+        "unverifiable": "Cannot verify (missing data)"
+      },
+      "validation": {
+        "causeRequired": "Select a cause",
+        "causeNoteRequired": "Describe the other cause",
+        "causeNoteTooLong": "Cause note is limited to 200 characters",
+        "actionRequired": "Describe the action",
+        "actionTooLong": "Action is limited to 1000 characters",
+        "actorRequired": "Select who took the action",
+        "actedAtRequired": "Enter when the action was taken",
+        "beforeExcursion": "The time cannot be before the excursion",
+        "future": "The time cannot be in the future",
+        "resultModeRequired": "Select how to check the result",
+        "resultNoteRequired": "Describe the result",
+        "resultNoteTooLong": "Result note is limited to 500 characters",
+        "workOrderNotFound": "A work order does not exist",
+        "alarmNotFound": "An alarm does not exist"
+      }
+    },
+    "schedules": {
+      "title": "Scheduled publishing",
+      "new": "New schedule",
+      "editTitle": "Edit schedule",
+      "hint": "Schedules run in the organization time zone ({{timezone}}) and notify recipients on publish.",
+      "empty": "No publishing schedules",
+      "emptyBody": "Generate and publish self-check reports every month or quarter and notify recipients automatically.",
+      "col": {
+        "name": "Name",
+        "type": "Type",
+        "cadence": "Cadence",
+        "next": "Next run",
+        "last": "Last result"
+      },
+      "every": {
+        "MONTHLY": "Monthly on day {{day}} at {{time}}",
+        "QUARTERLY": "Quarterly on day {{day}} at {{time}}"
+      },
+      "disabled": "Off",
+      "runNow": "Run now",
+      "retry": "Retry",
+      "history": "History",
+      "historyOf": "Run history: {{name}}",
+      "noRuns": "No runs yet",
+      "runStatus": {
+        "PENDING": "Pending",
+        "RUNNING": "Generating",
+        "SUCCEEDED": "Succeeded",
+        "FAILED": "Failed"
+      },
+      "run": {
+        "at": "Scheduled for",
+        "trigger": "Trigger",
+        "result": "Result",
+        "report": "Report",
+        "deliveries": "Recipients"
+      },
+      "trigger": {
+        "SCHEDULED": "Schedule",
+        "MANUAL": "Run now"
+      },
+      "attempts": "{{n}} attempts",
+      "openReport": "Open report",
+      "delivery": {
+        "REQUESTED": "notified",
+        "UNSUPPORTED": "email not supported"
+      },
+      "basics": "Basics",
+      "name": "Name",
+      "timing": "Schedule",
+      "cadence": "Cadence",
+      "cadences": {
+        "MONTHLY": "Monthly",
+        "QUARTERLY": "Quarterly"
+      },
+      "day": "Day (1–28)",
+      "time": "Publish time",
+      "periodRule": "Period",
+      "periodRules": {
+        "PREVIOUS_MONTH": "Previous month",
+        "PREVIOUS_QUARTER": "Previous quarter"
+      },
+      "dayHint": {
+        "MONTHLY": "Runs on that day and time every month ({{timezone}}).",
+        "QUARTERLY": "Runs on that day and time in January, April, July and October ({{timezone}})."
+      },
+      "recipients": "Recipients",
+      "users": "Users",
+      "usersFailed": "Could not load users.",
+      "emails": "Emails",
+      "emailsHint": "Separate with commas or new lines. Email delivery starts once the channel is available.",
+      "output": "Format and status",
+      "format": "Format",
+      "formats": {
+        "PDF": "PDF",
+        "PDF_CSV": "PDF + CSV"
+      },
+      "enabled": "Enabled",
+      "validation": {
+        "nameRequired": "Enter a name.",
+        "nameTooLong": "Name can be up to 100 characters.",
+        "typeUnsupported": "This type cannot be scheduled yet.",
+        "spaceRequired": "Select at least one space.",
+        "profileNotApplied": "No profile is applied to the selected space.",
+        "facilityRequired": "Select a facility type.",
+        "titleTooLong": "Title can be up to 200 characters.",
+        "cadenceRequired": "Select a cadence.",
+        "dayRange": "Day must be between 1 and 28.",
+        "timeFormat": "Use HH:mm for the publish time.",
+        "periodRuleRequired": "Select a period.",
+        "formatRequired": "Select a format.",
+        "recipientsRequired": "Add at least one recipient.",
+        "tooManyRecipients": "Up to {{max}} recipients.",
+        "emailInvalid": "An email address is invalid.",
+        "userNotFound": "A user does not exist."
+      }
+    },
+    "coverage": {
+      "title": "Coverage check",
+      "site": "Site",
+      "profile": "Profile",
+      "noProfile": "No profile (defaults)",
+      "run": "Check",
+      "noSite": "No site to check",
+      "density": "Sensor density",
+      "publicDisplay": "Public display",
+      "calibration": "Calibration",
+      "quality": "Data quality",
+      "na": "N/A",
+      "ok": "Met",
+      "signal": {
+        "density": "{{n}} spaces short",
+        "publicDisplay": "{{n}} short",
+        "calibration": "{{n}} overdue",
+        "quality": "{{n}} below standard"
+      },
+      "densityNa": "This profile has no sensor density rule.",
+      "displayNa": "This profile has no public display rule.",
+      "col": {
+        "space": "Space",
+        "usage": "Usage",
+        "area": "Area",
+        "required": "Required",
+        "actual": "Actual",
+        "shortage": "Shortage",
+        "device": "Device",
+        "model": "Model",
+        "interval": "Interval",
+        "last": "Last calibrated",
+        "elapsed": "Elapsed",
+        "status": "Status",
+        "devices": "Devices",
+        "missing": "Missing",
+        "intervalViolations": "Slow reporting",
+        "abnormal": "Bad quality"
+      },
+      "usage": {
+        "CLASSROOM": "Classroom",
+        "OFFICE": "Office",
+        "MEETING": "Meeting room",
+        "LAB": "Lab",
+        "CORRIDOR": "Corridor",
+        "OTHER": "Other"
+      },
+      "noArea": "Undetermined (no area)",
+      "enterArea": "Enter area",
+      "needMore": "{{n}} more needed",
+      "displayLine": "Area {{area}}㎡ · required {{required}} · actual displays {{links}}, QR {{qr}} · short {{shortage}}",
+      "displayPending": "Public displays and QR codes are not available yet, so the actual count is 0.",
+      "recommend": "Suggested locations: {{spaces}}",
+      "noDevices": "No devices to check.",
+      "pickDevices": "Select devices for the work order.",
+      "createWorkOrder": "Create work order",
+      "days": "{{n}} days",
+      "calibrationStatus": {
+        "OK": "OK",
+        "DUE_SOON": "Due soon",
+        "OVERDUE": "Overdue",
+        "NO_RECORD": "No record"
+      },
+      "qualityPeriod": "{{from}} to {{to}}",
+      "belowStandard": "Below data quality standard",
+      "violations": "{{n}} slow"
     }
   },
   "errors": {
@@ -276,6 +625,15 @@
     "CMP_FACILITY_TYPE_REQUIRED": "This profile needs a facility type.",
     "CMP_APPLICATION_DUPLICATE": "Already applied to this target.",
     "CMP_APPLICATION_NOT_FOUND": "Application not found.",
-    "CMP_REPORT_PERIOD_INVALID": "The period must start before it ends and span at most 400 days"
+    "CMP_REPORT_PERIOD_INVALID": "The period must start before it ends and span at most 400 days",
+    "CMP_PROFILE_NOT_APPLIED": "No profile is applied to the selected spaces.",
+    "CMP_VIRTUAL_DATA_NOT_ALLOWED": "Spaces with only virtual devices cannot be used in a report.",
+    "CMP_REPORT_NOT_FOUND": "Report not found.",
+    "CMP_REPORT_STATE_CONFLICT": "This is not possible in the current state. Refresh and try again.",
+    "CMP_ACTION_INVALID": "Check the corrective action details.",
+    "CMP_EXCURSION_NOT_FOUND": "Excursion not found.",
+    "CMP_ACTION_NOT_FOUND": "Corrective action not found.",
+    "CMP_SCHEDULE_INVALID": "Check the schedule settings.",
+    "CMP_SCHEDULE_NOT_FOUND": "Publishing schedule not found."
   }
 }
