@@ -285,6 +285,49 @@
         "format": "请使用 YYYY-MM 格式",
         "future": "只能选择本月或之前的月份"
       }
+    },
+    "virtual": {
+      "loadFailed": "无法加载虚拟传感器设置",
+      "saved": "已保存。从下次计算（每天02:00）开始生效",
+      "editSpace": "编辑空间信息",
+      "inputMissing": "空间中没有所需的输入传感器: {{metrics}}",
+      "estimated": "估算值",
+      "formula": "计算公式",
+      "inputs": "输入项",
+      "devices": "设备 {{n}} 台",
+      "noDevice": "无设备",
+      "volume": "空间体积",
+      "volumeMissing": "请输入面积和层高",
+      "lastComputed": "上次计算",
+      "notYet": "尚未计算",
+      "save": "保存",
+      "enable": "开启",
+      "disable": "关闭",
+      "status": {
+        "OK": "正常",
+        "INPUT_MISSING": "缺少输入",
+        "DISABLED": "已关闭"
+      },
+      "metric": {
+        "co2": "CO2"
+      },
+      "errors": {
+        "outdoorRange": "请输入 300~600ppm",
+        "minutesRange": "请输入 15~240 之间的整数分钟"
+      },
+      "ach": {
+        "title": "换气次数（ACH）",
+        "formula": "人员离开后 CO2 衰减区间内 ln(CO2 − 室外 CO2) 对时间的斜率 = ACH，换气量 = ACH × 体积",
+        "value": "ACH",
+        "ci": "95% 置信区间",
+        "latest": "最新估算（{{day}}）",
+        "ventilation": "换气量",
+        "ciRange": "置信区间 {{low}}~{{high}}",
+        "empty": "暂无估算值。需要有人员离开后 CO2 持续下降 30 分钟以上的日子",
+        "chart": "每日换气次数",
+        "outdoor": "室外 CO2 基准（ppm）",
+        "minDecay": "最短衰减区间（分钟）"
+      }
     }
   },
   "errors": {
@@ -300,6 +343,8 @@
     "ENE_BILL_NOT_FOUND": "找不到电费账单",
     "ENE_BASELINE_INSUFFICIENT_DATA": "训练期间少于30天",
     "ENE_BASELINE_NOT_READY": "只能启用就绪的版本",
-    "ENE_BASELINE_NOT_FOUND": "找不到基线"
+    "ENE_BASELINE_NOT_FOUND": "找不到基线",
+    "ENE_SPACE_VOLUME_REQUIRED": "请输入空间面积和层高",
+    "ENE_VIRTUAL_SENSOR_INPUT_MISSING": "空间中没有虚拟传感器所需的输入传感器"
   }
 }

@@ -30,6 +30,7 @@ export interface FakeSpace {
   timezone?: string | null;
   usage?: string | null;
   areaM2?: number | null;
+  ceilingHeightM?: number | null;
   capacity?: number | null;
   address?: string | null;
   latitude?: number | null;

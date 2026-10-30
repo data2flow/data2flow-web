@@ -4,6 +4,7 @@
  * API: API-DEV-01~10, API-DSH-02(개요)·03(평면도 보기)·12(즐겨찾기·최근 본 항목), API-DEV-11(기기 목록)·18(공간 기기)
  * M5: 평면도 보기(실시간 마커·히트 컬러·확대, DSH-02.02·02.03), 위치 경로(DSH-09.02), 건물 층 전환(`?floor=`)과 [3D] 탭(IFC, DSH-12.04, API-DSH-24),
  * 운영 모드 수동 지정(API-DEV-08 POST, DEV_PLACE — core M5 DEV-11.02)
+ * M7: [가상 센서] 탭(UI-ENE-05, API-ENE-20·21 — 환기율 ACH)
  */
 import { useTranslation } from "react-i18next";
 import { Form, Link, data, useActionData, useLoaderData, useRouteLoaderData } from "react-router";
@@ -20,6 +21,8 @@ import { buildingOf, floorNav, locationPath, type FloorItem, type FloorNav } fro
 import { FloorplanPanel, type FloorplanView } from "~/features/spaces/components/floorplan";
 import { ModeCard, PropsForm, ScheduleEditor, TargetsEditor, type FormResult, type ModeData, type ScheduleData, type SpaceDetail, type TargetsData } from "~/features/spaces/components/space-manage";
 import { SpaceAlarms } from "~/features/spaces/components/space-alarms";
+import { VirtualSensorTab } from "~/features/energy/components/virtual-sensors";
+import { achBody, validateAchForm, type AchSeries, type SensorView } from "~/features/energy/model/virtual-sensors";
 import { ScoreCard } from "~/features/compliance/components/score-card";
 import type { ScoreView } from "~/features/compliance/model/status";
 import { ChildSpaces, ComfortBadge, ComfortCauses, DeviceCards } from "~/features/spaces/components/space-overview";
@@ -34,8 +37,8 @@ import type { RootData } from "~/root";
 import type { Route } from "./+types/space-detail";
 import { loadTree, treeAction } from "./spaces-shared.server";
 
-// 보기 탭(UI-DSH-02: 개요·알람) + 관리 탭(UI-DEV-01~03)
-const TABS = ["overview", "alarms", "devices", "props", "targets", "schedule", "floorplan", "model3d"] as const;
+// 보기 탭(UI-DSH-02: 개요·알람) + 관리 탭(UI-DEV-01~03) + 가상 센서(UI-ENE-05)
+const TABS = ["overview", "alarms", "devices", "props", "targets", "schedule", "virtual", "floorplan", "model3d"] as const;
 type Tab = (typeof TABS)[number];
 
 interface Overview {
@@ -99,6 +102,8 @@ export async function loader({ request, context, params }: Route.LoaderArgs) {
   let planSpaceId = params.spaceId;
   let models: ModelSummary[] = [];
   let modelDetail: ModelDetail | null = null;
+  let sensors: SensorView[] | null = null;
+  let ach: AchSeries | null = null;
   const edit = url.searchParams.get("edit") === "1";
   // UI-CMP-05 종합 점수(API-CMP-10). 권한이 없거나 실패하면 카드를 그리지 않는다
   let score: ScoreView | null = null;
@@ -121,6 +126,17 @@ export async function loader({ request, context, params }: Route.LoaderArgs) {
     const [s, m] = await Promise.all([callApi<ScheduleData>(ctx, request, `${base}/schedule`), callApi<ModeData>(ctx, request, `${base}/mode`)]);
     schedule = s.ok ? s.data : { inherit: true, slots: [] };
     mode = m.ok ? m.data : null;
+  } else if (tab === "virtual") {
+    // 최근 30일 일별 ACH(API-ENE-21). 실패하면 차트만 비운다
+    const to = new Date();
+    const from = new Date(to.getTime() - 29 * 86_400_000);
+    const day = (d: Date) => d.toISOString().slice(0, 10);
+    const [s, a] = await Promise.all([
+      callApi<SensorView[]>(ctx, request, `/api/v1/core/energy/spaces/${id}/virtual-sensors`),
+      callApi<AchSeries>(ctx, request, `/api/v1/core/energy/spaces/${id}/ach?from=${day(from)}&to=${day(to)}`),
+    ]);
+    sensors = s.ok ? (s.data ?? []) : null;
+    ach = a.ok ? a.data : null;
   } else if (tab === "floorplan") {
     // 건물이면 층 목록(GET /core/buildings/{id}/floors)으로 층 전환, 층이면 같은 건물의 다른 층으로 이동(AT-DSH-13.1)
     const building = space.data.type === "BUILDING" ? params.spaceId : space.data.type === "FLOOR" ? (buildingOf(tree, params.spaceId)?.id ?? null) : null;
@@ -174,6 +190,8 @@ export async function loader({ request, context, params }: Route.LoaderArgs) {
     planSpaceId,
     models,
     modelDetail,
+    sensors,
+    ach,
     edit,
     from: url.searchParams.get("from"),
     now: Date.now(),
@@ -197,7 +215,7 @@ export async function action({ request, context, params }: Route.ActionArgs) {
     case "props": {
       const input = { name: field(form, "name"), type: "ROOM", code: field(form, "code").trim(), latitude: field(form, "latitude").trim(), longitude: field(form, "longitude").trim() };
       const errors = checkSpaceInput(input);
-      for (const key of ["areaM2", "capacity"]) {
+      for (const key of ["areaM2", "ceilingHeightM", "capacity"]) {
         const raw = field(form, key).trim();
         if (raw && !(Number(raw) >= 0)) errors[key] = "notNumber";
       }
@@ -207,6 +225,7 @@ export async function action({ request, context, params }: Route.ActionArgs) {
         code: input.code || null,
         usage: field(form, "usage") || null,
         areaM2: optionalNumber(field(form, "areaM2")),
+        ceilingHeightM: optionalNumber(field(form, "ceilingHeightM")),
         capacity: optionalNumber(field(form, "capacity")),
         baseVersion: Number(field(form, "baseVersion")),
       };
@@ -270,6 +289,18 @@ export async function action({ request, context, params }: Route.ActionArgs) {
     case "bimDelete": {
       const result = await callApi(ctx, request, `/api/v1/core/buildings/${encodeURIComponent(params.spaceId)}/models/${encodeURIComponent(field(form, "modelId"))}`, { method: "DELETE" });
       return result.ok ? ({ intent, ok: true } as FormResult) : fail(intent, result);
+    }
+    case "virtualSensor": {
+      // API-ENE-20 PUT(ENE_ADMIN). 끄기는 설정값을 보내지 않는다(저장된 값 유지)
+      const enabled = field(form, "enabled") === "true";
+      const values = { outdoorCo2Ppm: field(form, "outdoorCo2Ppm"), minDecayMinutes: field(form, "minDecayMinutes") };
+      const errors = enabled ? validateAchForm(values) : {};
+      if (Object.keys(errors).length) return data({ intent, fieldErrors: errors, values } as FormResult, { status: 400 });
+      const result = await callApi(ctx, request, `/api/v1/core/energy/spaces/${encodeURIComponent(params.spaceId)}/virtual-sensors/${encodeURIComponent(field(form, "kind") || "ach")}`, {
+        method: "PUT",
+        body: achBody(enabled, values),
+      });
+      return result.ok ? ({ intent, ok: true } as FormResult) : data({ intent, error: { code: result.code, message: result.message, errors: result.errors }, values } as FormResult, { status: result.status });
     }
     case "favorite": {
       const prefs = await callApi<Preferences>(ctx, request, "/api/v1/core/accounts/me/preferences");
@@ -345,6 +376,17 @@ export default function SpaceDetailPage() {
             {/* 운영 모드 수동 지정(API-DEV-08 POST …/override-mode)은 DEV-11.02(M5, 조직 달력 DEV-12.01 필요) 범위라 M2에서는 조회만 보인다 */}
             <ModeCard data={loaded.mode} canOverride={hasAny(me?.permissions, ["DEV_PLACE"])} timezone={timezone} lang={lang} now={loaded.now} result={result} />
           </div>
+        )}
+        {tab === "virtual" && (
+          <VirtualSensorTab
+            spaceId={String(space.id)}
+            sensors={loaded.sensors}
+            ach={loaded.ach}
+            error={result?.intent === "virtualSensor" ? result.error : null}
+            fieldErrors={result?.intent === "virtualSensor" ? result.fieldErrors : undefined}
+            values={result?.intent === "virtualSensor" && !result.ok ? result.values : undefined}
+            saved={result?.intent === "virtualSensor" && result.ok}
+          />
         )}
         {tab === "floorplan" && (loaded.edit || (loaded.planSpaceId === String(space.id) && !loaded.floorplan?.imageUrl) || (result && ["markers", "floorplan"].includes(result.intent ?? "")) ? (
           <FloorplanPanel view={loaded.floorplan} devices={loaded.spaceDevices} canEdit={canEdit} result={result} />

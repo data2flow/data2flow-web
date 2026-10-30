@@ -285,6 +285,49 @@
         "format": "YYYY-MM 형식이어야 합니다",
         "future": "지난 달이나 이번 달만 고를 수 있습니다"
       }
+    },
+    "virtual": {
+      "loadFailed": "가상 센서 설정을 불러오지 못했습니다",
+      "saved": "저장했습니다. 다음 계산(매일 02시)부터 반영됩니다",
+      "editSpace": "공간 정보 편집",
+      "inputMissing": "공간에 필요한 입력 센서가 없습니다: {{metrics}}",
+      "estimated": "추정치",
+      "formula": "계산식",
+      "inputs": "입력 항목",
+      "devices": "기기 {{n}}대",
+      "noDevice": "기기 없음",
+      "volume": "공간 부피",
+      "volumeMissing": "면적·층고를 입력하세요",
+      "lastComputed": "마지막 계산",
+      "notYet": "아직 계산하지 않았습니다",
+      "save": "저장",
+      "enable": "켜기",
+      "disable": "끄기",
+      "status": {
+        "OK": "정상",
+        "INPUT_MISSING": "입력 없음",
+        "DISABLED": "꺼짐"
+      },
+      "metric": {
+        "co2": "CO2"
+      },
+      "errors": {
+        "outdoorRange": "300~600ppm 사이로 입력하세요",
+        "minutesRange": "15~240분 사이의 정수로 입력하세요"
+      },
+      "ach": {
+        "title": "환기율(ACH)",
+        "formula": "재실이 끝난 뒤 CO2 감쇠 구간에서 ln(CO2 − 실외 CO2)의 시간 기울기 = ACH, 환기량 = ACH × 부피",
+        "value": "ACH",
+        "ci": "95% 신뢰 구간",
+        "latest": "최근 추정({{day}})",
+        "ventilation": "환기량",
+        "ciRange": "신뢰 구간 {{low}}~{{high}}",
+        "empty": "아직 추정값이 없습니다. 퇴실 뒤 CO2가 30분 이상 떨어진 날이 있어야 합니다",
+        "chart": "일별 환기율",
+        "outdoor": "실외 CO2 기준(ppm)",
+        "minDecay": "최소 감쇠 구간(분)"
+      }
     }
   },
   "errors": {
@@ -300,6 +343,8 @@
     "ENE_BILL_NOT_FOUND": "고지서를 찾을 수 없습니다",
     "ENE_BASELINE_INSUFFICIENT_DATA": "학습 기간이 30일보다 짧습니다",
     "ENE_BASELINE_NOT_READY": "계산이 끝난(준비됨) 버전만 적용할 수 있습니다",
-    "ENE_BASELINE_NOT_FOUND": "기준선을 찾을 수 없습니다"
+    "ENE_BASELINE_NOT_FOUND": "기준선을 찾을 수 없습니다",
+    "ENE_SPACE_VOLUME_REQUIRED": "공간 면적과 층고를 입력하세요",
+    "ENE_VIRTUAL_SENSOR_INPUT_MISSING": "가상 센서에 필요한 입력 센서가 공간에 없습니다"
   }
 }

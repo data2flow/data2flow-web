@@ -17,6 +17,8 @@ export interface SpaceDetail {
   code?: string | null;
   usage?: string | null;
   areaM2?: number | null;
+  /** 층고(m). 면적 × 층고 = 부피(환기량 계산, ENE-02.01) */
+  ceilingHeightM?: number | null;
   capacity?: number | null;
   timezone?: string | null;
   address?: string | null;
@@ -30,8 +32,9 @@ export interface SpaceDetail {
 export interface FormResult {
   intent?: string;
   ok?: boolean;
-  error?: { code: string; message?: string };
+  error?: { code: string; message?: string; errors?: { field?: string; code?: string; message?: string }[] };
   fieldErrors?: Record<string, string>;
+  values?: Record<string, string>;
 }
 
 function ResultLine({ result, intent }: { result?: FormResult; intent: string }) {
@@ -64,6 +67,7 @@ export function PropsForm({ space, canEdit, result }: { space: SpaceDetail; canE
           ))}
         </SelectField>
         <TextField label={t("spaces.field.areaM2")} name="areaM2" type="number" min={0} step="0.1" defaultValue={space.areaM2 ?? ""} disabled={!canEdit} error={fe.areaM2 ? t(`spaces.validation.${fe.areaM2}`) : undefined} />
+        <TextField label={t("spaces.field.ceilingHeightM")} name="ceilingHeightM" type="number" min={0} max={100} step="0.01" defaultValue={space.ceilingHeightM ?? ""} disabled={!canEdit} error={fe.ceilingHeightM ? t(`spaces.validation.${fe.ceilingHeightM}`) : undefined} />
         <TextField label={t("spaces.field.capacity")} name="capacity" type="number" min={0} step="1" defaultValue={space.capacity ?? ""} disabled={!canEdit} error={fe.capacity ? t(`spaces.validation.${fe.capacity}`) : undefined} />
         {space.type === "SITE" && (
           <>

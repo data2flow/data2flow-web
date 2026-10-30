@@ -30,6 +30,7 @@
       "longitude": "Longitude",
       "usage": "Usage",
       "areaM2": "Area (㎡)",
+      "ceilingHeightM": "Ceiling height (m)",
       "capacity": "Capacity (people)",
       "grid": "KMA grid nx {{nx}}, ny {{ny}} (calculated)"
     },
@@ -68,7 +69,8 @@
       "targets": "Target environment",
       "schedule": "Operating hours",
       "floorplan": "Floor plan",
-      "alarms": "Alarms"
+      "alarms": "Alarms",
+      "virtual": "Virtual sensors"
     },
     "targets": {
       "inherit": "Use parent values",

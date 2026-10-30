@@ -285,6 +285,49 @@
         "format": "Use the YYYY-MM format",
         "future": "Choose this month or an earlier one"
       }
+    },
+    "virtual": {
+      "loadFailed": "Could not load the virtual sensor settings",
+      "saved": "Saved. It applies from the next run (daily at 02:00)",
+      "editSpace": "Edit space info",
+      "inputMissing": "The space has no sensor for: {{metrics}}",
+      "estimated": "Estimated",
+      "formula": "Formula",
+      "inputs": "Inputs",
+      "devices": "{{n}} device(s)",
+      "noDevice": "No device",
+      "volume": "Space volume",
+      "volumeMissing": "Enter the area and ceiling height",
+      "lastComputed": "Last computed",
+      "notYet": "Not computed yet",
+      "save": "Save",
+      "enable": "Turn on",
+      "disable": "Turn off",
+      "status": {
+        "OK": "OK",
+        "INPUT_MISSING": "Input missing",
+        "DISABLED": "Off"
+      },
+      "metric": {
+        "co2": "CO2"
+      },
+      "errors": {
+        "outdoorRange": "Enter 300–600 ppm",
+        "minutesRange": "Enter a whole number of minutes between 15 and 240"
+      },
+      "ach": {
+        "title": "Air changes per hour (ACH)",
+        "formula": "After occupancy ends, the slope of ln(CO2 − outdoor CO2) over time during the decay = ACH; ventilation = ACH × volume",
+        "value": "ACH",
+        "ci": "95% confidence interval",
+        "latest": "Latest estimate ({{day}})",
+        "ventilation": "Ventilation",
+        "ciRange": "CI {{low}}–{{high}}",
+        "empty": "No estimate yet. A day needs CO2 falling for at least 30 minutes after people leave",
+        "chart": "Daily air changes",
+        "outdoor": "Outdoor CO2 (ppm)",
+        "minDecay": "Minimum decay window (min)"
+      }
     }
   },
   "errors": {
@@ -300,6 +343,8 @@
     "ENE_BILL_NOT_FOUND": "Bill not found",
     "ENE_BASELINE_INSUFFICIENT_DATA": "The training period is shorter than 30 days",
     "ENE_BASELINE_NOT_READY": "Only a ready version can be activated",
-    "ENE_BASELINE_NOT_FOUND": "Baseline not found"
+    "ENE_BASELINE_NOT_FOUND": "Baseline not found",
+    "ENE_SPACE_VOLUME_REQUIRED": "Enter the space area and ceiling height",
+    "ENE_VIRTUAL_SENSOR_INPUT_MISSING": "The space has no sensor for the required virtual sensor input"
   }
 }

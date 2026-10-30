@@ -285,6 +285,49 @@
         "format": "YYYY-MM 形式で入力してください",
         "future": "今月以前の月を選んでください"
       }
+    },
+    "virtual": {
+      "loadFailed": "仮想センサー設定を読み込めませんでした",
+      "saved": "保存しました。次回の計算（毎日2時）から反映されます",
+      "editSpace": "空間情報を編集",
+      "inputMissing": "空間に必要な入力センサーがありません: {{metrics}}",
+      "estimated": "推定値",
+      "formula": "計算式",
+      "inputs": "入力項目",
+      "devices": "機器 {{n}}台",
+      "noDevice": "機器なし",
+      "volume": "空間の容積",
+      "volumeMissing": "面積と天井高を入力してください",
+      "lastComputed": "最終計算",
+      "notYet": "まだ計算していません",
+      "save": "保存",
+      "enable": "オンにする",
+      "disable": "オフにする",
+      "status": {
+        "OK": "正常",
+        "INPUT_MISSING": "入力なし",
+        "DISABLED": "オフ"
+      },
+      "metric": {
+        "co2": "CO2"
+      },
+      "errors": {
+        "outdoorRange": "300〜600ppmで入力してください",
+        "minutesRange": "15〜240分の整数で入力してください"
+      },
+      "ach": {
+        "title": "換気回数（ACH）",
+        "formula": "在室終了後のCO2減衰区間で ln(CO2 − 外気CO2) の時間に対する傾き = ACH、換気量 = ACH × 容積",
+        "value": "ACH",
+        "ci": "95%信頼区間",
+        "latest": "最新の推定（{{day}}）",
+        "ventilation": "換気量",
+        "ciRange": "信頼区間 {{low}}〜{{high}}",
+        "empty": "まだ推定値がありません。退室後にCO2が30分以上下がった日が必要です",
+        "chart": "日別の換気回数",
+        "outdoor": "外気CO2基準（ppm）",
+        "minDecay": "最小減衰区間（分）"
+      }
     }
   },
   "errors": {
@@ -300,6 +343,8 @@
     "ENE_BILL_NOT_FOUND": "請求書が見つかりません",
     "ENE_BASELINE_INSUFFICIENT_DATA": "学習期間が30日未満です",
     "ENE_BASELINE_NOT_READY": "準備完了のバージョンのみ適用できます",
-    "ENE_BASELINE_NOT_FOUND": "ベースラインが見つかりません"
+    "ENE_BASELINE_NOT_FOUND": "ベースラインが見つかりません",
+    "ENE_SPACE_VOLUME_REQUIRED": "空間の面積と天井高を入力してください",
+    "ENE_VIRTUAL_SENSOR_INPUT_MISSING": "仮想センサーに必要な入力センサーが空間にありません"
   }
 }
