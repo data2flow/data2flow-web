@@ -288,7 +288,7 @@
     },
     "virtual": {
       "loadFailed": "가상 센서 설정을 불러오지 못했습니다",
-      "saved": "저장했습니다. 다음 계산(매일 02시)부터 반영됩니다",
+      "saved": "저장했습니다. 다음 계산부터 반영됩니다(환기율은 매일 02시, 재실 추정은 5분마다)",
       "editSpace": "공간 정보 편집",
       "inputMissing": "공간에 필요한 입력 센서가 없습니다: {{metrics}}",
       "estimated": "추정치",
@@ -309,11 +309,15 @@
         "DISABLED": "꺼짐"
       },
       "metric": {
-        "co2": "CO2"
+        "co2": "CO2",
+        "pir": "적외선(PIR)",
+        "noise": "소음",
+        "illuminance": "조도"
       },
       "errors": {
         "outdoorRange": "300~600ppm 사이로 입력하세요",
-        "minutesRange": "15~240분 사이의 정수로 입력하세요"
+        "minutesRange": "15~240분 사이의 정수로 입력하세요",
+        "signalsMin": "입력 신호를 2개 이상 고르세요"
       },
       "ach": {
         "title": "환기율(ACH)",
@@ -327,6 +331,21 @@
         "chart": "일별 환기율",
         "outdoor": "실외 CO2 기준(ppm)",
         "minDecay": "최소 감쇠 구간(분)"
+      },
+      "occupancy": {
+        "title": "재실 추정",
+        "formula": "적외선 활동, CO2 증가율·수준, 소음, 조도의 가중 판정(0.5 이상이면 사용 중). 5분마다 지난 24시간 신호로 계산해 occupancy_est(0/1)로 저장",
+        "now": "현재 상태",
+        "state": {
+          "OCCUPIED": "사용 중",
+          "VACANT": "비어 있음",
+          "UNKNOWN": "알 수 없음"
+        },
+        "band": "약 {{band}}명",
+        "accuracy": "센서로 본 추정치입니다. 실제 재실 기록(라벨 데이터)이 없어 정확도는 아직 계산하지 않았습니다. 인원 수는 표시하지 않습니다",
+        "chart": "최근 24시간 재실(추정)",
+        "series": "재실 상태(추정)",
+        "signals": "입력 신호(2개 이상)"
       }
     }
   },

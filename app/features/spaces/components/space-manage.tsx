@@ -34,7 +34,7 @@ export interface FormResult {
   ok?: boolean;
   error?: { code: string; message?: string; errors?: { field?: string; code?: string; message?: string }[] };
   fieldErrors?: Record<string, string>;
-  values?: Record<string, string>;
+  values?: Record<string, string | string[]>;
 }
 
 function ResultLine({ result, intent }: { result?: FormResult; intent: string }) {
