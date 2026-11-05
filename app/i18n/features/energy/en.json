@@ -288,7 +288,7 @@
     },
     "virtual": {
       "loadFailed": "Could not load the virtual sensor settings",
-      "saved": "Saved. It applies from the next run (daily at 02:00)",
+      "saved": "Saved. It applies from the next run (ventilation daily at 02:00, occupancy every 5 minutes)",
       "editSpace": "Edit space info",
       "inputMissing": "The space has no sensor for: {{metrics}}",
       "estimated": "Estimated",
@@ -309,11 +309,15 @@
         "DISABLED": "Off"
       },
       "metric": {
-        "co2": "CO2"
+        "co2": "CO2",
+        "pir": "Motion (PIR)",
+        "noise": "Noise",
+        "illuminance": "Illuminance"
       },
       "errors": {
         "outdoorRange": "Enter 300–600 ppm",
-        "minutesRange": "Enter a whole number of minutes between 15 and 240"
+        "minutesRange": "Enter a whole number of minutes between 15 and 240",
+        "signalsMin": "Select at least 2 input signals"
       },
       "ach": {
         "title": "Air changes per hour (ACH)",
@@ -327,6 +331,21 @@
         "chart": "Daily air changes",
         "outdoor": "Outdoor CO2 (ppm)",
         "minDecay": "Minimum decay window (min)"
+      },
+      "occupancy": {
+        "title": "Occupancy estimate",
+        "formula": "Weighted vote of motion, CO2 rise and level, noise and illuminance (occupied at 0.5 or more). Computed every 5 minutes from the last 24 hours and stored as occupancy_est (0/1)",
+        "now": "Current state",
+        "state": {
+          "OCCUPIED": "Occupied",
+          "VACANT": "Vacant",
+          "UNKNOWN": "Unknown"
+        },
+        "band": "About {{band}} people",
+        "accuracy": "This is a sensor-based estimate. Accuracy is not computed yet because there are no actual occupancy records (labels). Head counts are not shown",
+        "chart": "Occupancy in the last 24 hours (estimated)",
+        "series": "Occupancy (estimated)",
+        "signals": "Input signals (2 or more)"
       }
     }
   },

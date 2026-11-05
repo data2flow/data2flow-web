@@ -288,7 +288,7 @@
     },
     "virtual": {
       "loadFailed": "无法加载虚拟传感器设置",
-      "saved": "已保存。从下次计算（每天02:00）开始生效",
+      "saved": "已保存。从下次计算开始生效（换气率每天02:00，在室估计每5分钟）",
       "editSpace": "编辑空间信息",
       "inputMissing": "空间中没有所需的输入传感器: {{metrics}}",
       "estimated": "估算值",
@@ -309,11 +309,15 @@
         "DISABLED": "已关闭"
       },
       "metric": {
-        "co2": "CO2"
+        "co2": "CO2",
+        "pir": "人体感应（PIR）",
+        "noise": "噪声",
+        "illuminance": "照度"
       },
       "errors": {
         "outdoorRange": "请输入 300~600ppm",
-        "minutesRange": "请输入 15~240 之间的整数分钟"
+        "minutesRange": "请输入 15~240 之间的整数分钟",
+        "signalsMin": "请至少选择2个输入信号"
       },
       "ach": {
         "title": "换气次数（ACH）",
@@ -327,6 +331,21 @@
         "chart": "每日换气次数",
         "outdoor": "室外 CO2 基准（ppm）",
         "minDecay": "最短衰减区间（分钟）"
+      },
+      "occupancy": {
+        "title": "在室估计",
+        "formula": "按人体感应、CO2上升率与浓度、噪声、照度加权判定（0.5及以上为使用中）。每5分钟用过去24小时的信号计算，保存为occupancy_est（0/1）",
+        "now": "当前状态",
+        "state": {
+          "OCCUPIED": "使用中",
+          "VACANT": "空闲",
+          "UNKNOWN": "未知"
+        },
+        "band": "约{{band}}人",
+        "accuracy": "这是基于传感器的估计值。由于没有实际在室记录（标签数据），尚未计算准确率。不显示人数",
+        "chart": "最近24小时在室（估计）",
+        "series": "在室状态（估计）",
+        "signals": "输入信号（2个及以上）"
       }
     }
   },

@@ -312,3 +312,25 @@ describe("ENE-02.01 UI-ENE-05 가상 센서 탭", () => {
     expect(page.body).not.toContain('name="outdoorCo2Ppm"');
   });
 });
+
+describe("ENE-02.02 UI-ENE-05 재실 추정", () => {
+  it("신호 1개는 400, 기기 없는 신호뿐이면 409 없는 신호, PIR·CO2로 켜면 현재 상태가 보이고 숫자는 없다", async () => {
+    const i = await integrator();
+    const one = await i.post("/spaces/31?tab=virtual", { intent: "virtualSensor", kind: "occupancy", enabled: "true", signals: ["co2"] });
+    expect(one.response.status).toBe(400);
+    expect(one.body).toContain("입력 신호를 2개 이상 고르세요");
+    const missing = await i.post("/spaces/31?tab=virtual", { intent: "virtualSensor", kind: "occupancy", enabled: "true", signals: ["noise", "illuminance"] });
+    expect(missing.response.status).toBe(409);
+    expect(missing.body).toContain("공간에 필요한 입력 센서가 없습니다: 소음, 조도");
+    const on = await i.post("/spaces/31?tab=virtual", { intent: "virtualSensor", kind: "occupancy", enabled: "true", signals: ["co2", "pir"] });
+    expect(on.response.status).toBeLessThan(400);
+    expect(eneState(app.gateway.m2).lastVirtualRequest).toEqual({ enabled: true, params: { inputs: ["pir", "co2"] } });
+    const page = await i.get("/spaces/31?tab=virtual");
+    expect(page.body).toContain('data-sensor="OCCUPANCY"');
+    expect(page.body).toContain('data-occupancy-state="OCCUPIED"');
+    expect(page.body).not.toMatch(/\d+\s*명/);
+    const v = await viewer();
+    expect((await v.get("/spaces/31?tab=virtual")).body).not.toContain('name="signals"');
+  });
+});
+

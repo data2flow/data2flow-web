@@ -36,7 +36,7 @@ describe("TC-ENE-048 UI-ENE-05 가상 센서 탭", () => {
   it("계산식·입력 항목·마지막 계산 시각, 추정치 배지, 최근 ACH·환기량·신뢰 구간", async () => {
     await renderRoute(<VirtualSensorTab {...props()} />, { session: meOf("INTEGRATOR") });
     expect(await screen.findByText("환기율(ACH)")).toBeTruthy();
-    expect(screen.getByText("추정치")).toBeTruthy();
+    expect(screen.getAllByText("추정치")).toHaveLength(2);
     expect(screen.getByText("정상")).toBeTruthy();
     expect(document.querySelector("[data-formula]")?.textContent).toContain("환기량 = ACH × 부피");
     expect(document.querySelector("[data-inputs]")?.textContent).toBe("CO2: 기기 1대");
@@ -56,9 +56,9 @@ describe("TC-ENE-048 UI-ENE-05 가상 센서 탭", () => {
     expect(await screen.findByText("공간 면적과 층고를 입력하세요")).toBeTruthy();
     const links = screen.getAllByRole("link", { name: /공간 정보 편집|면적·층고를 입력하세요/ });
     expect(links.every((a) => a.getAttribute("href") === "/spaces/31?tab=props")).toBe(true);
-    expect(screen.getByText("꺼짐")).toBeTruthy();
-    expect(screen.getByText("아직 계산하지 않았습니다")).toBeTruthy();
-    expect(screen.getByRole("button", { name: "켜기" })).toBeTruthy();
+    expect(screen.getAllByText("꺼짐").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("아직 계산하지 않았습니다").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByRole("button", { name: "켜기" }).length).toBeGreaterThanOrEqual(1);
   });
 
   it("입력 센서가 없다는 409와 VIEWER(설정 폼 없음)", async () => {

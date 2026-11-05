@@ -282,6 +282,23 @@ function reports(core: CoreState, s: EneState, method: string, path: string, url
 }
 
 const CO2_DEVICES: Record<string, string[]> = { "31": ["1042"] };
+/** 재실 추정 입력 신호별 기기(공간 31: PIR·CO2, 소음·조도 없음) */
+const SIGNAL_DEVICES: Record<string, Record<string, string[]>> = { "31": { pir: ["1043"], co2: ["1042"] } };
+const SIGNAL_KEYS: Record<string, string> = { pir: "activity", co2: "co2", noise: "LAeq", illuminance: "illumination" };
+
+function occupancyView(s: EneState, spaceId: string) {
+  const cfg = s.virtual?.[`${spaceId}:OCCUPANCY`];
+  const enabled = cfg?.enabled ?? false;
+  const selected = ((cfg?.params as { inputs?: string[] } | undefined)?.inputs ?? ["pir", "co2", "noise"]) as string[];
+  const devices = SIGNAL_DEVICES[spaceId] ?? {};
+  const inputs = Object.entries(SIGNAL_KEYS).map(([signal, metricKey]) => ({ metricKey, signal, selected: selected.includes(signal), available: (devices[signal] ?? []).length > 0, deviceIds: devices[signal] ?? [] }));
+  const ok = inputs.filter((i) => i.selected && i.available).length >= 2;
+  return {
+    kind: "OCCUPANCY", enabled, params: { inputs: selected }, outputMetrics: ["occupancy_est"], inputs, lastComputedAt: enabled ? "2026-10-03T03:00:05Z" : null,
+    status: !enabled ? "DISABLED" : ok ? "OK" : "INPUT_MISSING", missing: enabled && !ok ? inputs.filter((i) => i.selected && !i.available).map((i) => i.signal) : null,
+    volumeM3: null, outputDeviceId: enabled ? "9031" : null, current: enabled ? { state: "OCCUPIED", band: null, at: "2026-10-03T03:00:00Z" } : null,
+  };
+}
 
 function sensorView(core: CoreState, s: EneState, spaceId: string) {
   const space = core.spaces.find((x) => x.id === spaceId);
@@ -297,11 +314,35 @@ function sensorView(core: CoreState, s: EneState, spaceId: string) {
 }
 
 function virtualSensors(core: CoreState, s: EneState, method: string, path: string, b: Json) {
-  const m = path.match(/^\/energy\/spaces\/([^/]+)\/(virtual-sensors(?:\/([^/]+))?|ach)$/);
+  const m = path.match(/^\/energy\/spaces\/([^/]+)\/(virtual-sensors(?:\/([^/]+))?|ach|occupancy)$/);
   if (!m) return fail(404, "RESOURCE_NOT_FOUND");
   const spaceId = m[1];
   if (!core.spaces.some((x) => x.id === spaceId)) return fail(404, "SPACE_NOT_FOUND");
-  if (m[2] === "virtual-sensors" && method === "GET") return ok([sensorView(core, s, spaceId)]);
+  if (m[2] === "virtual-sensors" && method === "GET") return ok([sensorView(core, s, spaceId), occupancyView(s, spaceId)]);
+  if (m[3] && method === "PUT" && m[3].toUpperCase() === "OCCUPANCY") {
+    s.lastVirtualRequest = b;
+    if (b.enabled === true) {
+      const selected = ((b.params as { inputs?: string[] } | undefined)?.inputs ?? []) as string[];
+      const devices = SIGNAL_DEVICES[spaceId] ?? {};
+      const missing = selected.filter((sig) => !(devices[sig] ?? []).length);
+      if (selected.length - missing.length < 2) return fail(409, "ENE_VIRTUAL_SENSOR_INPUT_MISSING", { errors: missing.map((code) => ({ field: "inputs", code, message: null })) });
+    }
+    s.virtual ??= {};
+    const key = `${spaceId}:OCCUPANCY`;
+    s.virtual[key] = { enabled: b.enabled === true, params: (b.params as Json | undefined) ?? s.virtual[key]?.params ?? { inputs: ["pir", "co2", "noise"] } };
+    return ok(occupancyView(s, spaceId));
+  }
+  if (m[2] === "occupancy" && method === "GET") {
+    // 상태만(숫자 없음, BR-ENE-10)
+    const items = occupancyView(s, spaceId).enabled
+      ? [
+          { ts: "2026-10-03T01:00:00Z", state: "VACANT", band: null },
+          { ts: "2026-10-03T02:00:00Z", state: "OCCUPIED", band: null },
+          { ts: "2026-10-03T03:00:00Z", state: "OCCUPIED", band: null },
+        ]
+      : [];
+    return ok({ spaceId, estimated: true, items });
+  }
   if (m[3] && method === "PUT") {
     if (m[3].toUpperCase() !== "ACH") return fail(400, "INVALID_REQUEST");
     s.lastVirtualRequest = b;

@@ -22,7 +22,7 @@ import { FloorplanPanel, type FloorplanView } from "~/features/spaces/components
 import { ModeCard, PropsForm, ScheduleEditor, TargetsEditor, type FormResult, type ModeData, type ScheduleData, type SpaceDetail, type TargetsData } from "~/features/spaces/components/space-manage";
 import { SpaceAlarms } from "~/features/spaces/components/space-alarms";
 import { VirtualSensorTab } from "~/features/energy/components/virtual-sensors";
-import { achBody, validateAchForm, type AchSeries, type SensorView } from "~/features/energy/model/virtual-sensors";
+import { achBody, occupancyBody, validateAchForm, validateOccupancySignals, type AchSeries, type OccupancySeries, type SensorView } from "~/features/energy/model/virtual-sensors";
 import { ScoreCard } from "~/features/compliance/components/score-card";
 import type { ScoreView } from "~/features/compliance/model/status";
 import { ChildSpaces, ComfortBadge, ComfortCauses, DeviceCards } from "~/features/spaces/components/space-overview";
@@ -104,6 +104,7 @@ export async function loader({ request, context, params }: Route.LoaderArgs) {
   let modelDetail: ModelDetail | null = null;
   let sensors: SensorView[] | null = null;
   let ach: AchSeries | null = null;
+  let occupancy: OccupancySeries | null = null;
   const edit = url.searchParams.get("edit") === "1";
   // UI-CMP-05 종합 점수(API-CMP-10). 권한이 없거나 실패하면 카드를 그리지 않는다
   let score: ScoreView | null = null;
@@ -131,12 +132,15 @@ export async function loader({ request, context, params }: Route.LoaderArgs) {
     const to = new Date();
     const from = new Date(to.getTime() - 29 * 86_400_000);
     const day = (d: Date) => d.toISOString().slice(0, 10);
-    const [s, a] = await Promise.all([
+    // 재실 추정 최근 24시간(API-ENE-22, 상태만)
+    const [s, a, o] = await Promise.all([
       callApi<SensorView[]>(ctx, request, `/api/v1/core/energy/spaces/${id}/virtual-sensors`),
       callApi<AchSeries>(ctx, request, `/api/v1/core/energy/spaces/${id}/ach?from=${day(from)}&to=${day(to)}`),
+      callApi<OccupancySeries>(ctx, request, `/api/v1/core/energy/spaces/${id}/occupancy`),
     ]);
     sensors = s.ok ? (s.data ?? []) : null;
     ach = a.ok ? a.data : null;
+    occupancy = o.ok ? o.data : null;
   } else if (tab === "floorplan") {
     // 건물이면 층 목록(GET /core/buildings/{id}/floors)으로 층 전환, 층이면 같은 건물의 다른 층으로 이동(AT-DSH-13.1)
     const building = space.data.type === "BUILDING" ? params.spaceId : space.data.type === "FLOOR" ? (buildingOf(tree, params.spaceId)?.id ?? null) : null;
@@ -192,6 +196,7 @@ export async function loader({ request, context, params }: Route.LoaderArgs) {
     modelDetail,
     sensors,
     ach,
+    occupancy,
     edit,
     from: url.searchParams.get("from"),
     now: Date.now(),
@@ -293,12 +298,14 @@ export async function action({ request, context, params }: Route.ActionArgs) {
     case "virtualSensor": {
       // API-ENE-20 PUT(ENE_ADMIN). 끄기는 설정값을 보내지 않는다(저장된 값 유지)
       const enabled = field(form, "enabled") === "true";
-      const values = { outdoorCo2Ppm: field(form, "outdoorCo2Ppm"), minDecayMinutes: field(form, "minDecayMinutes") };
-      const errors = enabled ? validateAchForm(values) : {};
+      const kind = field(form, "kind") === "occupancy" ? "occupancy" : "ach";
+      const signals = form.getAll("signals").map(String);
+      const values = { kind, outdoorCo2Ppm: field(form, "outdoorCo2Ppm"), minDecayMinutes: field(form, "minDecayMinutes"), signals };
+      const errors = !enabled ? {} : kind === "occupancy" ? validateOccupancySignals(signals) : validateAchForm(values);
       if (Object.keys(errors).length) return data({ intent, fieldErrors: errors, values } as FormResult, { status: 400 });
-      const result = await callApi(ctx, request, `/api/v1/core/energy/spaces/${encodeURIComponent(params.spaceId)}/virtual-sensors/${encodeURIComponent(field(form, "kind") || "ach")}`, {
+      const result = await callApi(ctx, request, `/api/v1/core/energy/spaces/${encodeURIComponent(params.spaceId)}/virtual-sensors/${kind}`, {
         method: "PUT",
-        body: achBody(enabled, values),
+        body: kind === "occupancy" ? occupancyBody(enabled, signals) : achBody(enabled, values),
       });
       return result.ok ? ({ intent, ok: true } as FormResult) : data({ intent, error: { code: result.code, message: result.message, errors: result.errors }, values } as FormResult, { status: result.status });
     }
@@ -382,6 +389,7 @@ export default function SpaceDetailPage() {
             spaceId={String(space.id)}
             sensors={loaded.sensors}
             ach={loaded.ach}
+            occupancy={loaded.occupancy}
             error={result?.intent === "virtualSensor" ? result.error : null}
             fieldErrors={result?.intent === "virtualSensor" ? result.fieldErrors : undefined}
             values={result?.intent === "virtualSensor" && !result.ok ? result.values : undefined}
